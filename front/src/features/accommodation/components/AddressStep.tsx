@@ -20,7 +20,7 @@ const optionalCoord = (min: number, max: number) =>
 const schema = z.object({
   street: z.string().min(1, 'La rue est obligatoire'),
   city: z.string().min(1, 'La ville est obligatoire'),
-  zipCode: z.string().min(1, 'Le code postal est obligatoire'),
+  zipCode: z.string().optional().default(''),
   country: z.string().min(1, 'Le pays est obligatoire'),
   latitude: optionalCoord(-90, 90),
   longitude: optionalCoord(-180, 180),
