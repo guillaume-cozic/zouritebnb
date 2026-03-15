@@ -6,15 +6,79 @@
   "hero": {
     "title": "Trouvez votre hébergement idéal",
     "subtitle": "Découvrez des logements uniques pour votre prochain séjour",
-    "city": "Ville",
-    "guests": "Voyageurs"
+    "city": "Lieu",
+    "checkIn": "Arrivée",
+    "checkOut": "Départ",
+    "dates": "Dates du séjour",
+    "guests": "Voyageurs",
+    "searchPlaceholder": "Où allez-vous ?",
+    "selectDates": "Sélectionner les dates",
+    "search": "Rechercher"
   },
   "homepage": {
     "loading": "Chargement...",
     "noResults": "Aucun hébergement trouvé.",
     "perNight": "€ / nuit",
+    "night": "nuit",
     "guest_one": "{{count}} voyageur",
-    "guest_other": "{{count}} voyageurs"
+    "guest_other": "{{count}} voyageurs",
+    "featuredTitle": "Hébergements en vedette",
+    "featuredSubtitle": "Découvrez nos logements les mieux notés par nos voyageurs",
+    "viewAll": "Voir tous les hébergements",
+    "viewDetails": "Voir les détails"
+  },
+  "activities": {
+    "title": "Activités populaires",
+    "diving": "Plongée & Snorkeling",
+    "divingDesc": "Explorez les récifs coralliens et la vie marine exceptionnelle du lagon.",
+    "hiking": "Randonnée",
+    "hikingDesc": "Parcourez les sentiers pittoresques et découvrez des panoramas à couper le souffle.",
+    "excursions": "Excursions",
+    "excursionsDesc": "Visitez les îlots préservés et les sites historiques de l'île.",
+    "gastronomy": "Gastronomie",
+    "gastronomyDesc": "Savourez la cuisine créole authentique et les fruits de mer frais."
+  },
+  "discover": {
+    "title": "Découvrez l'île Rodrigues",
+    "description": "Située dans l'océan Indien, Rodrigues est un joyau préservé offrant une expérience authentique loin du tourisme de masse. Avec ses plages immaculées, ses lagons cristallins et sa culture unique, c'est la destination idéale pour des vacances inoubliables.",
+    "climate": "Climat tropical",
+    "beaches": "Plages paradisiaques",
+    "fishing": "Pêche traditionnelle",
+    "nature": "Sites naturels",
+    "learnMore": "En savoir plus",
+    "videoTitle": "Découvrez l'île Rodrigues"
+  },
+  "projects": {
+    "title": "Nos Projets Solidaires",
+    "subtitle": "Découvrez les initiatives locales que nous soutenons pour préserver l'environnement et la culture unique de Rodrigues.",
+    "learnMore": "En savoir plus",
+    "coral": {
+      "title": "Protection des Récifs Coralliens",
+      "description": "Programme de restauration des récifs coralliens de Rodrigues par micro-fragmentation, en partenariat avec The Coral Planters. Participez à la préservation de notre écosystème marin unique.",
+      "stat1": "Coraux plantés",
+      "stat2": "Surface restaurée",
+      "stat3": "Espèces préservées"
+    },
+    "turtles": {
+      "title": "Réserve François Leguat",
+      "description": "Sanctuaire dédié à la protection et à la reproduction des tortues géantes et des espèces endémiques de Rodrigues.",
+      "stat1": "Tortues protégées",
+      "stat2": "Espèces endémiques",
+      "stat3": "Visiteurs/an"
+    },
+    "water": {
+      "title": "Napa Dilo - Gestion de l'Eau Douce",
+      "description": "Programme innovant de récupération et de gestion durable de l'eau douce, visant à renforcer l'autonomie hydrique de Rodrigues.",
+      "stat1": "Litres économisés/an",
+      "stat2": "Familles bénéficiaires",
+      "stat3": "Citernes installées"
+    }
+  },
+  "footer": {
+    "description": "Plateforme de location de vacances.",
+    "navigation": "Navigation",
+    "contact": "Contact",
+    "copyright": "© 2026 BnB. Tous droits réservés."
   },
   "wizard": {
     "newAccommodation": "Nouvel hébergement",

@@ -1,6 +1,7 @@
 export interface AccommodationListItem {
   id: string;
   title: string;
+  description: string | null;
   price: number | null;
   city: string | null;
   country: string | null;
@@ -11,5 +12,7 @@ export interface AccommodationListItem {
 
 export interface SearchFilters {
   city: string;
+  checkIn: string;
+  checkOut: string;
   guests: number | null;
 }

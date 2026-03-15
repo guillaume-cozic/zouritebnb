@@ -11,7 +11,7 @@ interface HomepageState {
 
 const initialState: HomepageState = {
   accommodations: [],
-  filters: { city: '', guests: null },
+  filters: { city: '', checkIn: '', checkOut: '', guests: null },
   status: 'idle',
   error: null,
 };
@@ -21,7 +21,8 @@ export const fetchPublishedAccommodations = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/api/accommodations');
-      return response.data['hydra:member'] as AccommodationListItem[];
+      const data = response.data;
+      return (data['hydra:member'] ?? data['member'] ?? []) as AccommodationListItem[];
     } catch (err: any) {
       return rejectWithValue(
         err.response?.data?.detail || 'Erreur lors du chargement des hébergements'

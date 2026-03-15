@@ -59,9 +59,13 @@ when@dev:
         App\Tests\Fixtures\:
             resource: '../tests/Fixtures/'
             tags: ['doctrine.fixture.orm']
+            bind:
+                $uploadDir: '%kernel.project_dir%/var/uploads/photos'
 
 when@test:
     services:
         App\Tests\Fixtures\:
             resource: '../tests/Fixtures/'
+            bind:
+                $uploadDir: '%kernel.project_dir%/var/uploads/photos'
             tags: ['doctrine.fixture.orm']

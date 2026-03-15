@@ -8,7 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <div className="pt-16">
+      <div className="pt-16 min-h-screen">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/create" element={<CreateAccommodationWizard />} />

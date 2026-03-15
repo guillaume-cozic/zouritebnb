@@ -271,7 +271,7 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Nom de l\'hébergement', example: 'Chalet Montagne')]
     public ?string $title = null;
 
-    #[Groups(['accommodation:read'])]
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Description détaillée', example: 'Un chalet chaleureux au pied des pistes...')]
     public ?string $description = null;
 

@@ -5,7 +5,7 @@ export const selectAccommodations = (state: RootState) =>
   state.homepage?.accommodations ?? [];
 
 export const selectHomepageFilters = (state: RootState) =>
-  state.homepage?.filters ?? { city: '', guests: null };
+  state.homepage?.filters ?? { city: '', checkIn: '', checkOut: '', guests: null };
 
 export const selectHomepageStatus = (state: RootState) =>
   state.homepage?.status ?? 'idle';

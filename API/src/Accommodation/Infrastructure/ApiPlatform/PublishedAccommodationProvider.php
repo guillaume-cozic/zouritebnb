@@ -30,6 +30,7 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             SELECT
                 BIN_TO_UUID(a.id) AS id,
                 a.title,
+                a.description,
                 a.price,
                 a.city,
                 a.country,
@@ -63,6 +64,7 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $output = new AccommodationOutput();
             $output->id = $row['id'];
             $output->title = $row['title'];
+            $output->description = $row['description'];
             $output->price = null !== $row['price'] ? (float) $row['price'] : null;
             $output->city = $row['city'];
             $output->country = $row['country'];

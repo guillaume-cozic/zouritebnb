@@ -6,15 +6,79 @@
   "hero": {
     "title": "Find your perfect accommodation",
     "subtitle": "Discover unique places to stay for your next trip",
-    "city": "City",
-    "guests": "Guests"
+    "city": "Location",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "dates": "Stay dates",
+    "guests": "Guests",
+    "searchPlaceholder": "Where are you going?",
+    "selectDates": "Select dates",
+    "search": "Search"
   },
   "homepage": {
     "loading": "Loading...",
     "noResults": "No accommodations found.",
     "perNight": "€ / night",
+    "night": "night",
     "guest_one": "{{count}} guest",
-    "guest_other": "{{count}} guests"
+    "guest_other": "{{count}} guests",
+    "featuredTitle": "Featured accommodations",
+    "featuredSubtitle": "Discover our top-rated properties selected by travellers",
+    "viewAll": "View all accommodations",
+    "viewDetails": "View details"
+  },
+  "activities": {
+    "title": "Popular activities",
+    "diving": "Diving & Snorkelling",
+    "divingDesc": "Explore the coral reefs and the exceptional marine life of the lagoon.",
+    "hiking": "Hiking",
+    "hikingDesc": "Walk the picturesque trails and discover breathtaking panoramas.",
+    "excursions": "Excursions",
+    "excursionsDesc": "Visit the preserved islets and historical sites of the island.",
+    "gastronomy": "Gastronomy",
+    "gastronomyDesc": "Savour authentic Creole cuisine and fresh seafood."
+  },
+  "discover": {
+    "title": "Discover Rodrigues Island",
+    "description": "Located in the Indian Ocean, Rodrigues is a preserved gem offering an authentic experience far from mass tourism. With its pristine beaches, crystal-clear lagoons and unique culture, it is the ideal destination for an unforgettable holiday.",
+    "climate": "Tropical climate",
+    "beaches": "Paradise beaches",
+    "fishing": "Traditional fishing",
+    "nature": "Natural sites",
+    "learnMore": "Learn more",
+    "videoTitle": "Discover Rodrigues Island"
+  },
+  "projects": {
+    "title": "Our Solidarity Projects",
+    "subtitle": "Discover the local initiatives we support to preserve the environment and unique culture of Rodrigues.",
+    "learnMore": "Learn more",
+    "coral": {
+      "title": "Coral Reef Protection",
+      "description": "Rodrigues coral reef restoration programme through micro-fragmentation, in partnership with The Coral Planters. Help preserve our unique marine ecosystem.",
+      "stat1": "Corals planted",
+      "stat2": "Area restored",
+      "stat3": "Species preserved"
+    },
+    "turtles": {
+      "title": "François Leguat Reserve",
+      "description": "Sanctuary dedicated to the protection and breeding of giant tortoises and endemic species of Rodrigues.",
+      "stat1": "Tortoises protected",
+      "stat2": "Endemic species",
+      "stat3": "Visitors/year"
+    },
+    "water": {
+      "title": "Napa Dilo - Freshwater Management",
+      "description": "Innovative freshwater recovery and sustainable management programme, aimed at strengthening Rodrigues' water self-sufficiency.",
+      "stat1": "Litres saved/year",
+      "stat2": "Beneficiary families",
+      "stat3": "Cisterns installed"
+    }
+  },
+  "footer": {
+    "description": "Vacation rental platform.",
+    "navigation": "Navigation",
+    "contact": "Contact",
+    "copyright": "© 2026 BnB. All rights reserved."
   },
   "wizard": {
     "newAccommodation": "New accommodation",
