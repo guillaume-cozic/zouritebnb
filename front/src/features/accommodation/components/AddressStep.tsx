@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,6 +9,7 @@ import {
   selectAccommodationStatus,
   selectAccommodationError,
 } from '../AccommodationSelectors';
+import MapSelector from '../../../components/MapSelector';
 
 const optionalCoord = (min: number, max: number) =>
   z.preprocess(
@@ -37,10 +38,23 @@ function AddressStep() {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+
+  const lat = watch('latitude');
+  const lng = watch('longitude');
+
+  const handleMapSelect = useCallback(
+    (newLat: number, newLng: number) => {
+      setValue('latitude', newLat, { shouldValidate: true });
+      setValue('longitude', newLng, { shouldValidate: true });
+    },
+    [setValue]
+  );
 
   const onSubmit = (data: FormData) => {
     if (!accommodation?.id) return;
@@ -143,16 +157,42 @@ function AddressStep() {
         </div>
       </div>
 
-      {/* Geolocation */}
+      {/* Map + Geolocation */}
       <div className="space-y-5">
         <div className="flex items-center gap-2 text-gray-700">
           <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
           </svg>
-          <h3 className="text-base font-semibold">Coordonnées GPS</h3>
+          <h3 className="text-base font-semibold">Localisation sur la carte</h3>
           <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Optionnel</span>
         </div>
 
+        <p className="text-sm text-gray-500">
+          Cliquez sur la carte pour positionner votre hébergement. Les coordonnées se mettront à jour automatiquement.
+        </p>
+
+        <MapSelector
+          latitude={lat}
+          longitude={lng}
+          onSelect={handleMapSelect}
+        />
+
+        {/* Privacy info */}
+        <div className="flex items-start gap-3 rounded-xl bg-amber-50 border border-amber-100 p-4">
+          <svg className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Confidentialité de la localisation</p>
+            <p className="text-xs text-amber-700 mt-1">
+              Les coordonnées GPS exactes ne sont pas communiquées aux voyageurs qui n'ont pas de réservation confirmée.
+              Sur la carte publique, votre hébergement sera affiché dans un rayon approximatif pour protéger votre vie privée.
+            </p>
+          </div>
+        </div>
+
+        {/* Coordinate inputs */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="latitude" className="block text-sm font-semibold text-gray-700 mb-1.5">
