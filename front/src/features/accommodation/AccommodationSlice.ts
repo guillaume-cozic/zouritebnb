@@ -4,6 +4,7 @@ import {
   Accommodation,
   CreateAccommodationPayload,
   SetLocationPayload,
+  SetCapacityPayload,
   AddPhotoPayload,
   WizardStep,
 } from './AccommodationTypes';
@@ -70,6 +71,27 @@ export const setLocation = createAsyncThunk(
   }
 );
 
+export const setCapacity = createAsyncThunk(
+  'accommodation/setCapacity',
+  async (
+    { id, bedrooms, bathrooms, maxGuests, singleBeds, doubleBeds }: SetCapacityPayload,
+    { rejectWithValue }
+  ) => {
+    try {
+      await api.put(
+        `/api/accommodations/${id}/capacity`,
+        { bedrooms, bathrooms, maxGuests, singleBeds, doubleBeds },
+        { headers: { 'Content-Type': 'application/ld+json' } }
+      );
+      return { bedrooms, bathrooms, maxGuests, singleBeds, doubleBeds };
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors de la mise à jour de la capacité'
+      );
+    }
+  }
+);
+
 export const addPhoto = createAsyncThunk(
   'accommodation/addPhoto',
   async ({ id, file }: AddPhotoPayload, { rejectWithValue }) => {
@@ -110,7 +132,7 @@ const accommodationSlice = createSlice({
       .addCase(createAccommodation.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.current = action.payload;
-        state.wizardStep = 'address';
+        state.wizardStep = 'capacity';
       })
       .addCase(createAccommodation.rejected, (state, action) => {
         state.status = 'failed';
@@ -129,6 +151,22 @@ const accommodationSlice = createSlice({
         state.wizardStep = 'photos';
       })
       .addCase(setLocation.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Capacity
+      .addCase(setCapacity.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(setCapacity.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          Object.assign(state.current, action.payload);
+        }
+        state.wizardStep = 'address';
+      })
+      .addCase(setCapacity.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })

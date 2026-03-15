@@ -6,6 +6,7 @@ namespace App\Accommodation\Infrastructure\Doctrine;
 
 use App\Accommodation\Domain\Entity\Accommodation as DomainAccommodation;
 use App\Accommodation\Domain\Entity\Address;
+use App\Accommodation\Domain\Entity\Capacity;
 use App\Accommodation\Domain\Entity\Geolocation;
 use App\Accommodation\Domain\Port\AccommodationRepository as AccommodationRepositoryPort;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -38,7 +39,8 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
 
         $addressData = $data['address'] ?? null;
         $geolocationData = $data['geolocation'] ?? null;
-        unset($data['address'], $data['geolocation']);
+        $capacityData = $data['capacity'] ?? null;
+        unset($data['address'], $data['geolocation'], $data['capacity']);
 
         if (\is_array($addressData)) {
             $data = array_merge($data, $addressData);
@@ -46,6 +48,10 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
 
         if (\is_array($geolocationData)) {
             $data = array_merge($data, $geolocationData);
+        }
+
+        if (\is_array($capacityData)) {
+            $data = array_merge($data, $capacityData);
         }
 
         $this->serializer->denormalize($data, AccommodationEntity::class, null, [
@@ -77,7 +83,17 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
             ];
         }
 
-        unset($data['street'], $data['city'], $data['zipCode'], $data['country'], $data['latitude'], $data['longitude']);
+        if (null !== $data['bedrooms']) {
+            $data['capacity'] = [
+                'bedrooms' => $data['bedrooms'],
+                'bathrooms' => $data['bathrooms'],
+                'maxGuests' => $data['maxGuests'],
+                'singleBeds' => $data['singleBeds'],
+                'doubleBeds' => $data['doubleBeds'],
+            ];
+        }
+
+        unset($data['street'], $data['city'], $data['zipCode'], $data['country'], $data['latitude'], $data['longitude'], $data['bedrooms'], $data['bathrooms'], $data['maxGuests'], $data['singleBeds'], $data['doubleBeds']);
 
         $accommodation = $this->serializer->denormalize($data, DomainAccommodation::class);
 
@@ -97,6 +113,17 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
                 longitude: $data['geolocation']['longitude'],
             );
             $accommodation->updateGeolocation($geolocation);
+        }
+
+        if (isset($data['capacity'])) {
+            $capacity = new Capacity(
+                bedrooms: $data['capacity']['bedrooms'],
+                bathrooms: $data['capacity']['bathrooms'],
+                maxGuests: $data['capacity']['maxGuests'],
+                singleBeds: $data['capacity']['singleBeds'],
+                doubleBeds: $data['capacity']['doubleBeds'],
+            );
+            $accommodation->updateCapacity($capacity);
         }
 
         $accommodation->releaseEvents();

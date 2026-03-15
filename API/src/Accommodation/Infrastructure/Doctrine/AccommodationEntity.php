@@ -47,6 +47,21 @@ class AccommodationEntity
     #[ORM\Column(nullable: true)]
     private ?float $longitude = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $bedrooms = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $bathrooms = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $maxGuests = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $singleBeds = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $doubleBeds = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -175,6 +190,66 @@ class AccommodationEntity
     public function setLongitude(?float $longitude): static
     {
         $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    public function getBedrooms(): ?int
+    {
+        return $this->bedrooms;
+    }
+
+    public function setBedrooms(?int $bedrooms): static
+    {
+        $this->bedrooms = $bedrooms;
+
+        return $this;
+    }
+
+    public function getBathrooms(): ?int
+    {
+        return $this->bathrooms;
+    }
+
+    public function setBathrooms(?int $bathrooms): static
+    {
+        $this->bathrooms = $bathrooms;
+
+        return $this;
+    }
+
+    public function getMaxGuests(): ?int
+    {
+        return $this->maxGuests;
+    }
+
+    public function setMaxGuests(?int $maxGuests): static
+    {
+        $this->maxGuests = $maxGuests;
+
+        return $this;
+    }
+
+    public function getSingleBeds(): ?int
+    {
+        return $this->singleBeds;
+    }
+
+    public function setSingleBeds(?int $singleBeds): static
+    {
+        $this->singleBeds = $singleBeds;
+
+        return $this;
+    }
+
+    public function getDoubleBeds(): ?int
+    {
+        return $this->doubleBeds;
+    }
+
+    public function setDoubleBeds(?int $doubleBeds): static
+    {
+        $this->doubleBeds = $doubleBeds;
 
         return $this;
     }

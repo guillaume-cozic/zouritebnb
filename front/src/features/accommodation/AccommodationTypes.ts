@@ -34,4 +34,13 @@ export interface AddPhotoPayload {
   file: File;
 }
 
-export type WizardStep = 'description' | 'address' | 'photos' | 'success';
+export interface SetCapacityPayload {
+  id: string;
+  bedrooms: number;
+  bathrooms: number;
+  maxGuests: number;
+  singleBeds: number;
+  doubleBeds: number;
+}
+
+export type WizardStep = 'description' | 'capacity' | 'address' | 'photos' | 'success';

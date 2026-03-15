@@ -122,6 +122,35 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: UpdateAccommodationAddressProcessor::class,
         ),
         new Put(
+            uriTemplate: '/accommodations/{id}/capacity',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Définir la capacité d\'un hébergement',
+                description: 'Définit ou remplace la capacité d\'un hébergement (chambres, salles de bain, voyageurs, lits).',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/ld+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: ['bedrooms' => 3, 'bathrooms' => 2, 'maxGuests' => 6, 'singleBeds' => 2, 'doubleBeds' => 2],
+                                ),
+                                'negative_value' => new Example(
+                                    summary: 'Invalide : valeur négative',
+                                    description: 'Retourne une erreur 422 car les valeurs doivent être >= 0.',
+                                    value: ['bedrooms' => -1, 'bathrooms' => 2, 'maxGuests' => 6, 'singleBeds' => 2, 'doubleBeds' => 2],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationCapacityInput::class,
+            output: false,
+            processor: UpdateAccommodationCapacityProcessor::class,
+        ),
+        new Put(
             uriTemplate: '/accommodations/{id}/geolocation',
             status: 204,
             openapi: new OpenApiOperation(
@@ -253,6 +282,26 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Longitude GPS', example: 2.3522)]
     public ?float $longitude = null;
 
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Nombre de chambres', example: 3)]
+    public ?int $bedrooms = null;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Nombre de salles de bain', example: 2)]
+    public ?int $bathrooms = null;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Nombre maximum de voyageurs', example: 6)]
+    public ?int $maxGuests = null;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Nombre de lits simples', example: 2)]
+    public ?int $singleBeds = null;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Nombre de lits doubles', example: 2)]
+    public ?int $doubleBeds = null;
+
     public static function fromEntity(object $entity): static
     {
         /** @var AccommodationEntity $entity */
@@ -268,6 +317,11 @@ class AccommodationOutput implements FromEntityInterface
         $output->country = $entity->getCountry();
         $output->latitude = $entity->getLatitude();
         $output->longitude = $entity->getLongitude();
+        $output->bedrooms = $entity->getBedrooms();
+        $output->bathrooms = $entity->getBathrooms();
+        $output->maxGuests = $entity->getMaxGuests();
+        $output->singleBeds = $entity->getSingleBeds();
+        $output->doubleBeds = $entity->getDoubleBeds();
 
         return $output;
     }

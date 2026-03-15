@@ -3,12 +3,14 @@ import { useAppSelector } from '../../../store/hooks';
 import { selectWizardStep } from '../AccommodationSelectors';
 import StepIndicator from './StepIndicator';
 import DescriptionStep from './DescriptionStep';
+import CapacityStep from './CapacityStep';
 import AddressStep from './AddressStep';
 import PhotosStep from './PhotosStep';
 import SuccessStep from './SuccessStep';
 
 const stepComponents: Record<string, React.FC> = {
   description: DescriptionStep,
+  capacity: CapacityStep,
   address: AddressStep,
   photos: PhotosStep,
   success: SuccessStep,
