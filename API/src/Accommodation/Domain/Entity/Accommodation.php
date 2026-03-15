@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Accommodation\Domain\Entity;
 
 use App\Accommodation\Domain\Event\AccommodationAddressUpdated;
+use App\Accommodation\Domain\Event\AccommodationAmenitiesUpdated;
 use App\Accommodation\Domain\Event\AccommodationCapacityUpdated;
 use App\Accommodation\Domain\Event\AccommodationGeolocationUpdated;
 use App\Accommodation\Domain\Event\AccommodationPriceUpdated;
@@ -25,6 +26,7 @@ final class Accommodation extends AggregateRoot
         private ?Address $address = null,
         private ?Geolocation $geolocation = null,
         private ?Capacity $capacity = null,
+        private ?Amenities $amenities = null,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
@@ -109,5 +111,16 @@ final class Accommodation extends AggregateRoot
     {
         $this->capacity = $capacity;
         $this->recordEvent(new AccommodationCapacityUpdated($this->id));
+    }
+
+    public function getAmenities(): ?Amenities
+    {
+        return $this->amenities;
+    }
+
+    public function updateAmenities(Amenities $amenities): void
+    {
+        $this->amenities = $amenities;
+        $this->recordEvent(new AccommodationAmenitiesUpdated($this->id));
     }
 }

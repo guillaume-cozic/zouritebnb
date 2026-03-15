@@ -11,6 +11,18 @@ export interface Accommodation {
   country?: string;
   latitude?: number;
   longitude?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  maxGuests?: number;
+  singleBeds?: number;
+  doubleBeds?: number;
+  amenities?: string[];
+}
+
+export interface FormDrafts {
+  capacity?: { bedrooms: number; bathrooms: number; maxGuests: number; singleBeds: number; doubleBeds: number };
+  amenities?: string[];
+  address?: { street: string; city: string; zipCode: string; country: string; latitude?: number; longitude?: number };
 }
 
 export interface CreateAccommodationPayload {
@@ -43,4 +55,9 @@ export interface SetCapacityPayload {
   doubleBeds: number;
 }
 
-export type WizardStep = 'description' | 'capacity' | 'address' | 'photos' | 'success';
+export interface SetAmenitiesPayload {
+  id: string;
+  codes: string[];
+}
+
+export type WizardStep = 'description' | 'capacity' | 'amenities' | 'address' | 'photos' | 'success';

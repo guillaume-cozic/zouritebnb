@@ -62,6 +62,9 @@ class AccommodationEntity
     #[ORM\Column(nullable: true)]
     private ?int $doubleBeds = null;
 
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $amenities = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -250,6 +253,18 @@ class AccommodationEntity
     public function setDoubleBeds(?int $doubleBeds): static
     {
         $this->doubleBeds = $doubleBeds;
+
+        return $this;
+    }
+
+    public function getAmenities(): ?array
+    {
+        return $this->amenities;
+    }
+
+    public function setAmenities(?array $amenities): static
+    {
+        $this->amenities = $amenities;
 
         return $this;
     }

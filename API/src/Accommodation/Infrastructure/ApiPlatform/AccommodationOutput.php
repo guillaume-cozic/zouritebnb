@@ -151,6 +151,30 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: UpdateAccommodationCapacityProcessor::class,
         ),
         new Put(
+            uriTemplate: '/accommodations/{id}/amenities',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Définir les équipements d\'un hébergement',
+                description: 'Définit ou remplace la liste des équipements d\'un hébergement.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/ld+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: ['codes' => ['private_pool', 'wifi', 'parking']],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationAmenitiesInput::class,
+            output: false,
+            processor: UpdateAccommodationAmenitiesProcessor::class,
+        ),
+        new Put(
             uriTemplate: '/accommodations/{id}/geolocation',
             status: 204,
             openapi: new OpenApiOperation(
@@ -302,6 +326,10 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Nombre de lits doubles', example: 2)]
     public ?int $doubleBeds = null;
 
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Liste des codes d\'équipements', example: ['private_pool', 'wifi', 'parking'])]
+    public ?array $amenities = null;
+
     public static function fromEntity(object $entity): static
     {
         /** @var AccommodationEntity $entity */
@@ -322,6 +350,7 @@ class AccommodationOutput implements FromEntityInterface
         $output->maxGuests = $entity->getMaxGuests();
         $output->singleBeds = $entity->getSingleBeds();
         $output->doubleBeds = $entity->getDoubleBeds();
+        $output->amenities = $entity->getAmenities();
 
         return $output;
     }

@@ -6,6 +6,7 @@ namespace App\Accommodation\Infrastructure\Doctrine;
 
 use App\Accommodation\Domain\Entity\Accommodation as DomainAccommodation;
 use App\Accommodation\Domain\Entity\Address;
+use App\Accommodation\Domain\Entity\Amenities;
 use App\Accommodation\Domain\Entity\Capacity;
 use App\Accommodation\Domain\Entity\Geolocation;
 use App\Accommodation\Domain\Port\AccommodationRepository as AccommodationRepositoryPort;
@@ -40,7 +41,8 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
         $addressData = $data['address'] ?? null;
         $geolocationData = $data['geolocation'] ?? null;
         $capacityData = $data['capacity'] ?? null;
-        unset($data['address'], $data['geolocation'], $data['capacity']);
+        $amenitiesData = $data['amenities'] ?? null;
+        unset($data['address'], $data['geolocation'], $data['capacity'], $data['amenities']);
 
         if (\is_array($addressData)) {
             $data = array_merge($data, $addressData);
@@ -52,6 +54,10 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
 
         if (\is_array($capacityData)) {
             $data = array_merge($data, $capacityData);
+        }
+
+        if (\is_array($amenitiesData)) {
+            $data['amenities'] = $amenitiesData['codes'] ?? $amenitiesData;
         }
 
         $this->serializer->denormalize($data, AccommodationEntity::class, null, [
@@ -93,7 +99,8 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
             ];
         }
 
-        unset($data['street'], $data['city'], $data['zipCode'], $data['country'], $data['latitude'], $data['longitude'], $data['bedrooms'], $data['bathrooms'], $data['maxGuests'], $data['singleBeds'], $data['doubleBeds']);
+        $amenitiesArray = $data['amenities'] ?? null;
+        unset($data['street'], $data['city'], $data['zipCode'], $data['country'], $data['latitude'], $data['longitude'], $data['bedrooms'], $data['bathrooms'], $data['maxGuests'], $data['singleBeds'], $data['doubleBeds'], $data['amenities']);
 
         $accommodation = $this->serializer->denormalize($data, DomainAccommodation::class);
 
@@ -124,6 +131,11 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
                 doubleBeds: $data['capacity']['doubleBeds'],
             );
             $accommodation->updateCapacity($capacity);
+        }
+
+        if (null !== $amenitiesArray) {
+            $amenities = new Amenities(codes: $amenitiesArray);
+            $accommodation->updateAmenities($amenities);
         }
 
         $accommodation->releaseEvents();

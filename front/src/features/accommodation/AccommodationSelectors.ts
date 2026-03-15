@@ -14,3 +14,6 @@ export const selectAccommodationError = (state: RootState) =>
 
 export const selectPhotoUploadStatus = (state: RootState) =>
   state.accommodation.photoUploadStatus;
+
+export const selectFormDrafts = (state: RootState) =>
+  state.accommodation.formDrafts;
