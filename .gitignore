@@ -1,0 +1,41 @@
+# IDE
+.idea/
+.vscode/
+
+# Claude
+.claude/settings.local.json
+
+# API (Symfony)
+API/.env
+API/.env.local
+API/.env.local.php
+API/.env.*.local
+API/config/secrets/prod/prod.decrypt.private.php
+API/public/bundles/
+API/var/
+API/vendor/
+API/.php-cs-fixer.php
+API/.php-cs-fixer.cache
+API/phpunit.xml
+API/.phpunit.cache/
+
+# Front (React)
+front/node_modules/
+front/.pnp
+front/.pnp.js
+front/coverage/
+front/build/
+front/src/tailwind.output.css
+front/.env.local
+front/.env.development.local
+front/.env.test.local
+front/.env.production.local
+front/npm-debug.log*
+front/yarn-debug.log*
+front/yarn-error.log*
+
+# Client (generated)
+client/node_modules/
+
+# OS
+.DS_Store

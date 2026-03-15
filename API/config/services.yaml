@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+# See also https://symfony.com/doc/current/service_container/import.html
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+
+    App\Accommodation\Domain\Port\AccommodationRepository:
+        alias: App\Accommodation\Infrastructure\Doctrine\DoctrineAccommodationRepository
+
+    App\Accommodation\Domain\Port\PhotoRepository:
+        alias: App\Accommodation\Infrastructure\Doctrine\DoctrinePhotoRepository
+
+    App\Accommodation\Domain\Port\PhotoStorage:
+        alias: App\Accommodation\Infrastructure\Filesystem\LocalPhotoStorage
+
+    App\Accommodation\Domain\Port\GalleryRepository:
+        alias: App\Accommodation\Infrastructure\Doctrine\DoctrineGalleryRepository
+
+    App\Accommodation\Domain\Port\ImageTransformer:
+        alias: App\Accommodation\Infrastructure\Gd\GdImageTransformer
+
+    App\Accommodation\Infrastructure\Filesystem\LocalPhotoStorage:
+        arguments:
+            $uploadDir: '%kernel.project_dir%/var/uploads/photos'
+
+    App\Accommodation\Application\Listener\StorePhotoOnPhotoUploaded:
+        tags: [messenger.message_handler]
+
+    App\Accommodation\Application\Listener\DeletePhotoFileOnPhotoDeleted:
+        tags: [messenger.message_handler]
+
+    App\Shared\Domain\Port\EventBus:
+        alias: App\Shared\Infrastructure\Messenger\MessengerEventBus
+
+    App\Shared\Domain\Port\TransactionManager:
+        alias: App\Shared\Infrastructure\Doctrine\DoctrineTransactionManager
+
+when@dev:
+    services:
+        App\Tests\Fixtures\:
+            resource: '../tests/Fixtures/'
+            tags: ['doctrine.fixture.orm']
+
+when@test:
+    services:
+        App\Tests\Fixtures\:
+            resource: '../tests/Fixtures/'
+            tags: ['doctrine.fixture.orm']
