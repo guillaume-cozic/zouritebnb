@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import WizardNavigation from '../../../components/WizardNavigation';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { goToStep } from '../AccommodationSlice';
 import { selectCurrentAccommodation } from '../AccommodationSelectors';
@@ -252,28 +253,15 @@ function PhotosStep() {
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={handleFinish}
-        disabled={hasUploading}
-        className="
-          w-full py-4 px-6 rounded-xl text-sm font-semibold text-white
-          bg-gradient-to-r from-violet-500 to-purple-600
-          hover:from-violet-600 hover:to-purple-700
-          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500
-          disabled:opacity-50 disabled:cursor-not-allowed
-          shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300
-          transform hover:-translate-y-0.5 active:translate-y-0
-          transition-all duration-200
-        "
-      >
-        <span className="flex items-center justify-center gap-2">
-          {hasUploading ? 'Upload en cours...' : successCount > 0 ? 'Terminer' : 'Passer cette étape'}
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-          </svg>
-        </span>
-      </button>
+      <WizardNavigation
+        onBack={() => dispatch(goToStep('address'))}
+        onSkip={successCount === 0 ? handleFinish : undefined}
+        skipLabel="Plus tard"
+        submitLabel={hasUploading ? 'Upload en cours...' : 'Terminer'}
+        isLoading={hasUploading}
+        isSubmit={false}
+        onClick={!hasUploading ? handleFinish : undefined}
+      />
     </div>
   );
 }
