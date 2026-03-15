@@ -1,13 +1,15 @@
 import React, { useCallback } from 'react';
+import WizardNavigation from '../../../components/WizardNavigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setLocation } from '../AccommodationSlice';
+import { setLocation, goToStep, saveDraft } from '../AccommodationSlice';
 import {
   selectCurrentAccommodation,
   selectAccommodationStatus,
   selectAccommodationError,
+  selectFormDrafts,
 } from '../AccommodationSelectors';
 import MapSelector from '../../../components/MapSelector';
 
@@ -33,16 +35,28 @@ function AddressStep() {
   const accommodation = useAppSelector(selectCurrentAccommodation);
   const status = useAppSelector(selectAccommodationStatus);
   const apiError = useAppSelector(selectAccommodationError);
+  const drafts = useAppSelector(selectFormDrafts);
   const isLoading = status === 'loading';
+
+  const saved = drafts.address || accommodation;
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    getValues,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      street: saved?.street ?? '',
+      city: saved?.city ?? '',
+      zipCode: saved?.zipCode ?? '',
+      country: saved?.country ?? '',
+      latitude: saved?.latitude,
+      longitude: saved?.longitude,
+    },
   });
 
   const lat = watch('latitude');
@@ -58,6 +72,7 @@ function AddressStep() {
 
   const onSubmit = (data: FormData) => {
     if (!accommodation?.id) return;
+    dispatch(saveDraft({ address: data }));
     dispatch(
       setLocation({
         id: accommodation.id,
@@ -238,28 +253,10 @@ function AddressStep() {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full py-4 px-6 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
-      >
-        {isLoading ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Enregistrement...
-          </span>
-        ) : (
-          <span className="flex items-center justify-center gap-2">
-            Continuer
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </span>
-        )}
-      </button>
+      <WizardNavigation
+        onBack={() => { dispatch(saveDraft({ address: getValues() })); dispatch(goToStep('amenities')); }}
+        isLoading={isLoading}
+      />
     </form>
   );
 }

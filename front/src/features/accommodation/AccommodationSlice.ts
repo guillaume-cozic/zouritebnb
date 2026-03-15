@@ -5,7 +5,9 @@ import {
   CreateAccommodationPayload,
   SetLocationPayload,
   SetCapacityPayload,
+  SetAmenitiesPayload,
   AddPhotoPayload,
+  FormDrafts,
   WizardStep,
 } from './AccommodationTypes';
 
@@ -15,6 +17,7 @@ interface AccommodationState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   photoUploadStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  formDrafts: FormDrafts;
 }
 
 const initialState: AccommodationState = {
@@ -23,6 +26,7 @@ const initialState: AccommodationState = {
   status: 'idle',
   error: null,
   photoUploadStatus: 'idle',
+  formDrafts: {},
 };
 
 export const createAccommodation = createAsyncThunk(
@@ -92,6 +96,24 @@ export const setCapacity = createAsyncThunk(
   }
 );
 
+export const setAmenities = createAsyncThunk(
+  'accommodation/setAmenities',
+  async ({ id, codes }: SetAmenitiesPayload, { rejectWithValue }) => {
+    try {
+      await api.put(
+        `/api/accommodations/${id}/amenities`,
+        { codes },
+        { headers: { 'Content-Type': 'application/ld+json' } }
+      );
+      return { codes };
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors de la mise à jour des équipements'
+      );
+    }
+  }
+);
+
 export const addPhoto = createAsyncThunk(
   'accommodation/addPhoto',
   async ({ id, file }: AddPhotoPayload, { rejectWithValue }) => {
@@ -117,6 +139,9 @@ const accommodationSlice = createSlice({
     goToStep(state, action: PayloadAction<WizardStep>) {
       state.wizardStep = action.payload;
       state.error = null;
+    },
+    saveDraft(state, action: PayloadAction<Partial<FormDrafts>>) {
+      Object.assign(state.formDrafts, action.payload);
     },
     resetWizard() {
       return initialState;
@@ -148,6 +173,14 @@ const accommodationSlice = createSlice({
         if (state.current) {
           Object.assign(state.current, action.payload);
         }
+        state.formDrafts.address = {
+          street: action.payload.street,
+          city: action.payload.city,
+          zipCode: action.payload.zipCode,
+          country: action.payload.country,
+          latitude: action.payload.latitude,
+          longitude: action.payload.longitude,
+        };
         state.wizardStep = 'photos';
       })
       .addCase(setLocation.rejected, (state, action) => {
@@ -164,9 +197,27 @@ const accommodationSlice = createSlice({
         if (state.current) {
           Object.assign(state.current, action.payload);
         }
-        state.wizardStep = 'address';
+        state.formDrafts.capacity = action.payload;
+        state.wizardStep = 'amenities';
       })
       .addCase(setCapacity.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Amenities
+      .addCase(setAmenities.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(setAmenities.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.amenities = action.payload.codes;
+        }
+        state.formDrafts.amenities = action.payload.codes;
+        state.wizardStep = 'address';
+      })
+      .addCase(setAmenities.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })
@@ -184,5 +235,5 @@ const accommodationSlice = createSlice({
   },
 });
 
-export const { goToStep, resetWizard } = accommodationSlice.actions;
+export const { goToStep, saveDraft, resetWizard } = accommodationSlice.actions;
 export default accommodationSlice.reducer;
