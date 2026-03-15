@@ -1,4 +1,6 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import WizardNavigation from '../../../components/WizardNavigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,18 +21,19 @@ const optionalCoord = (min: number, max: number) =>
     z.number().min(min).max(max).optional()
   );
 
-const schema = z.object({
-  street: z.string().min(1, 'La rue est obligatoire'),
-  city: z.string().min(1, 'La ville est obligatoire'),
+const getSchema = (t: TFunction) => z.object({
+  street: z.string().min(1, t('addressStep.streetRequired')),
+  city: z.string().min(1, t('addressStep.cityRequired')),
   zipCode: z.string().optional().default(''),
-  country: z.string().min(1, 'Le pays est obligatoire'),
+  country: z.string().min(1, t('addressStep.countryRequired')),
   latitude: optionalCoord(-90, 90),
   longitude: optionalCoord(-180, 180),
 });
 
-type FormData = z.infer<typeof schema>;
+type FormData = z.infer<ReturnType<typeof getSchema>>;
 
 function AddressStep() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const accommodation = useAppSelector(selectCurrentAccommodation);
   const status = useAppSelector(selectAccommodationStatus);
@@ -48,7 +51,7 @@ function AddressStep() {
     getValues,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(getSchema(t)),
     defaultValues: {
       street: saved?.street ?? '',
       city: saved?.city ?? '',
@@ -94,7 +97,7 @@ function AddressStep() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <p className="text-sm text-gray-500">
-        Indiquez l'adresse de votre bien pour que les voyageurs puissent le localiser.
+        {t('addressStep.intro')}
       </p>
 
       {/* Address */}
@@ -103,18 +106,18 @@ function AddressStep() {
           <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
           </svg>
-          <h3 className="text-base font-semibold">Adresse</h3>
+          <h3 className="text-base font-semibold">{t('addressStep.addressTitle')}</h3>
         </div>
 
         <div>
           <label htmlFor="street" className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Rue
+            {t('addressStep.streetLabel')}
           </label>
           <input
             id="street"
             type="text"
             {...register('street')}
-            placeholder="12 rue de la Paix"
+            placeholder={t('addressStep.streetPlaceholder')}
             className={inputClass(!!errors.street)}
           />
           {errors.street && (
@@ -125,13 +128,13 @@ function AddressStep() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="city" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Ville
+              {t('addressStep.cityLabel')}
             </label>
             <input
               id="city"
               type="text"
               {...register('city')}
-              placeholder="Paris"
+              placeholder={t('addressStep.cityPlaceholder')}
               className={inputClass(!!errors.city)}
             />
             {errors.city && (
@@ -140,13 +143,13 @@ function AddressStep() {
           </div>
           <div>
             <label htmlFor="zipCode" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Code postal
+              {t('addressStep.zipCodeLabel')}
             </label>
             <input
               id="zipCode"
               type="text"
               {...register('zipCode')}
-              placeholder="75002"
+              placeholder={t('addressStep.zipCodePlaceholder')}
               className={inputClass(!!errors.zipCode)}
             />
             {errors.zipCode && (
@@ -157,13 +160,13 @@ function AddressStep() {
 
         <div>
           <label htmlFor="country" className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Pays
+            {t('addressStep.countryLabel')}
           </label>
           <input
             id="country"
             type="text"
             {...register('country')}
-            placeholder="France"
+            placeholder={t('addressStep.countryPlaceholder')}
             className={inputClass(!!errors.country)}
           />
           {errors.country && (
@@ -179,12 +182,12 @@ function AddressStep() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
           </svg>
-          <h3 className="text-base font-semibold">Localisation sur la carte</h3>
-          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Optionnel</span>
+          <h3 className="text-base font-semibold">{t('addressStep.mapTitle')}</h3>
+          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{t('addressStep.optional')}</span>
         </div>
 
         <p className="text-sm text-gray-500">
-          Cliquez sur la carte pour positionner votre hébergement. Les coordonnées se mettront à jour automatiquement.
+          {t('addressStep.mapHint')}
         </p>
 
         <MapSelector
@@ -199,10 +202,9 @@ function AddressStep() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
           <div>
-            <p className="text-sm font-semibold text-amber-800">Confidentialité de la localisation</p>
+            <p className="text-sm font-semibold text-amber-800">{t('addressStep.privacyTitle')}</p>
             <p className="text-xs text-amber-700 mt-1">
-              Les coordonnées GPS exactes ne sont pas communiquées aux voyageurs qui n'ont pas de réservation confirmée.
-              Sur la carte publique, votre hébergement sera affiché dans un rayon approximatif pour protéger votre vie privée.
+              {t('addressStep.privacyText')}
             </p>
           </div>
         </div>
@@ -211,7 +213,7 @@ function AddressStep() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="latitude" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Latitude
+              {t('addressStep.latitudeLabel')}
             </label>
             <input
               id="latitude"
@@ -227,7 +229,7 @@ function AddressStep() {
           </div>
           <div>
             <label htmlFor="longitude" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Longitude
+              {t('addressStep.longitudeLabel')}
             </label>
             <input
               id="longitude"

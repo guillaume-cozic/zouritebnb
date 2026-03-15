@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import WizardNavigation from '../../../components/WizardNavigation';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setAmenities, goToStep, saveDraft } from '../AccommodationSlice';
@@ -11,6 +12,7 @@ import {
 import { AMENITY_CATEGORIES } from '../AmenityData';
 
 function AmenitiesStep() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const accommodation = useAppSelector(selectCurrentAccommodation);
   const status = useAppSelector(selectAccommodationStatus);
@@ -43,19 +45,19 @@ function AmenitiesStep() {
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500">
-          Sélectionnez les équipements disponibles dans votre hébergement.
+          {t('amenitiesStep.intro')}
         </p>
         <span className="text-sm font-semibold text-blue-600 whitespace-nowrap ml-4">
-          {selectedCodes.size} équipement{selectedCodes.size !== 1 ? 's' : ''} sélectionné{selectedCodes.size !== 1 ? 's' : ''}
+          {t('amenitiesStep.selected', { count: selectedCodes.size })}
         </span>
       </div>
 
       <div className="space-y-6">
         {AMENITY_CATEGORIES.map((category) => (
-          <div key={category.label}>
+          <div key={category.key}>
             <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-              {category.label}
+              {t('amenityCategories.' + category.key)}
             </h3>
             <div className="flex flex-wrap gap-2">
               {category.items.map((item) => {
@@ -80,7 +82,7 @@ function AmenitiesStep() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
                     )}
-                    {item.label}
+                    {t('amenities.' + item.code)}
                   </button>
                 );
               })}

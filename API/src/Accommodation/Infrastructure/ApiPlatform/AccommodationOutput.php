@@ -36,10 +36,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new GetCollection(
             uriTemplate: '/accommodations',
             openapi: new OpenApiOperation(
-                summary: 'Lister les hébergements',
-                description: 'Retourne la liste paginée de tous les hébergements disponibles.',
+                summary: 'Lister les hébergements publiés',
+                description: 'Retourne la liste paginée des hébergements publiés avec leur photo principale.',
             ),
             normalizationContext: ['groups' => ['accommodation:list']],
+            provider: PublishedAccommodationProvider::class,
         ),
         new Patch(
             uriTemplate: '/accommodations/{id}/publish',
@@ -274,7 +275,7 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Description détaillée', example: 'Un chalet chaleureux au pied des pistes...')]
     public ?string $description = null;
 
-    #[Groups(['accommodation:read'])]
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Prix par nuit en euros', example: 150.0)]
     public ?float $price = null;
 
@@ -286,7 +287,7 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Rue', example: '12 rue de la Paix')]
     public ?string $street = null;
 
-    #[Groups(['accommodation:read'])]
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Ville', example: 'Paris')]
     public ?string $city = null;
 
@@ -294,7 +295,7 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Code postal', example: '75002')]
     public ?string $zipCode = null;
 
-    #[Groups(['accommodation:read'])]
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Pays', example: 'France')]
     public ?string $country = null;
 
@@ -314,7 +315,7 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Nombre de salles de bain', example: 2)]
     public ?int $bathrooms = null;
 
-    #[Groups(['accommodation:read'])]
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Nombre maximum de voyageurs', example: 6)]
     public ?int $maxGuests = null;
 
@@ -329,6 +330,10 @@ class AccommodationOutput implements FromEntityInterface
     #[Groups(['accommodation:read'])]
     #[ApiProperty(description: 'Liste des codes d\'équipements', example: ['private_pool', 'wifi', 'parking'])]
     public ?array $amenities = null;
+
+    #[Groups(['accommodation:list'])]
+    #[ApiProperty(description: 'URL de la photo principale', example: '/uploads/photos/abc123.jpg')]
+    public ?string $thumbnailUrl = null;
 
     public static function fromEntity(object $entity): static
     {

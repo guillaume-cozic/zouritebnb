@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import WizardNavigation from '../../../components/WizardNavigation';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { goToStep } from '../AccommodationSlice';
@@ -17,6 +18,7 @@ interface PhotoItem {
 }
 
 function PhotosStep() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const accommodation = useAppSelector(selectCurrentAccommodation);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,7 +50,7 @@ function PhotosStep() {
     } catch (err: any) {
       updatePhoto(photo.id, {
         status: 'error',
-        error: err.response?.data?.detail || "Erreur lors de l'upload",
+        error: err.response?.data?.detail || t('photosStep.uploadError'),
       });
     }
   };
@@ -108,7 +110,7 @@ function PhotosStep() {
     <div className="space-y-8">
       <div className="space-y-1">
         <p className="text-sm text-gray-500">
-          Ajoutez des photos pour mettre en valeur votre hébergement. Chaque photo est envoyée individuellement.
+          {t('photosStep.intro')}
         </p>
       </div>
 
@@ -138,10 +140,10 @@ function PhotosStep() {
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-700">
-              Glissez vos photos ici
+              {t('photosStep.dropTitle')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              ou cliquez pour parcourir — JPEG, PNG, WebP (max. 20)
+              {t('photosStep.dropHint')}
             </p>
           </div>
         </div>
@@ -161,7 +163,7 @@ function PhotosStep() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-gray-700">
-              Photos
+              {t('photosStep.photosTitle')}
             </h4>
             <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
               {successCount} / 20
@@ -201,7 +203,7 @@ function PhotosStep() {
                 {/* Pending overlay */}
                 {photo.status === 'pending' && (
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <span className="text-white text-xs font-medium bg-black/40 px-2 py-1 rounded-full">En attente</span>
+                    <span className="text-white text-xs font-medium bg-black/40 px-2 py-1 rounded-full">{t('photosStep.pending')}</span>
                   </div>
                 )}
 
@@ -223,14 +225,14 @@ function PhotosStep() {
                       </svg>
                     </div>
                     <p className="text-white text-xs font-medium text-center px-2 drop-shadow">
-                      {photo.error || 'Échec'}
+                      {photo.error || t('photosStep.failed')}
                     </p>
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); retryUpload(photo); }}
                       className="text-xs font-semibold text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-1 rounded-full transition-colors"
                     >
-                      Réessayer
+                      {t('photosStep.retry')}
                     </button>
                   </div>
                 )}
@@ -256,8 +258,8 @@ function PhotosStep() {
       <WizardNavigation
         onBack={() => dispatch(goToStep('address'))}
         onSkip={successCount === 0 ? handleFinish : undefined}
-        skipLabel="Plus tard"
-        submitLabel={hasUploading ? 'Upload en cours...' : 'Terminer'}
+        skipLabel={t('photosStep.later')}
+        submitLabel={hasUploading ? t('photosStep.uploading') : t('photosStep.finish')}
         isLoading={hasUploading}
         isSubmit={false}
         onClick={!hasUploading ? handleFinish : undefined}

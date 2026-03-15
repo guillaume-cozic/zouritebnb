@@ -1,12 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../../store/hooks';
 import { selectWizardStep } from '../AccommodationSelectors';
 import { WizardStep } from '../AccommodationTypes';
 
-const steps: { key: WizardStep; label: string; icon: React.ReactNode }[] = [
+const steps: { key: WizardStep; labelKey: string; icon: React.ReactNode }[] = [
   {
     key: 'description',
-    label: 'Description',
+    labelKey: 'steps.description',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
@@ -15,7 +16,7 @@ const steps: { key: WizardStep; label: string; icon: React.ReactNode }[] = [
   },
   {
     key: 'capacity',
-    label: 'Capacité',
+    labelKey: 'steps.capacity',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
@@ -24,7 +25,7 @@ const steps: { key: WizardStep; label: string; icon: React.ReactNode }[] = [
   },
   {
     key: 'amenities',
-    label: 'Équipements',
+    labelKey: 'steps.amenities',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.049.58.025 1.193-.14 1.743" />
@@ -33,7 +34,7 @@ const steps: { key: WizardStep; label: string; icon: React.ReactNode }[] = [
   },
   {
     key: 'address',
-    label: 'Localisation',
+    labelKey: 'steps.location',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -43,7 +44,7 @@ const steps: { key: WizardStep; label: string; icon: React.ReactNode }[] = [
   },
   {
     key: 'photos',
-    label: 'Photos',
+    labelKey: 'steps.photos',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -53,7 +54,7 @@ const steps: { key: WizardStep; label: string; icon: React.ReactNode }[] = [
   },
   {
     key: 'success',
-    label: 'Confirmation',
+    labelKey: 'steps.confirmation',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -63,6 +64,7 @@ const steps: { key: WizardStep; label: string; icon: React.ReactNode }[] = [
 ];
 
 function StepIndicator() {
+  const { t } = useTranslation();
   const currentStep = useAppSelector(selectWizardStep);
   const currentIndex = steps.findIndex((s) => s.key === currentStep);
 
@@ -100,7 +102,7 @@ function StepIndicator() {
                   ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-emerald-600' : 'text-gray-400'}
                 `}
               >
-                {step.label}
+                {t(step.labelKey)}
               </span>
             </div>
 

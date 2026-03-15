@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../../store/hooks';
 import { selectWizardStep } from '../AccommodationSelectors';
 import StepIndicator from './StepIndicator';
@@ -19,6 +20,7 @@ const stepComponents: Record<string, React.FC> = {
 };
 
 function CreateAccommodationWizard() {
+  const { t } = useTranslation();
   const currentStep = useAppSelector(selectWizardStep);
   const StepComponent = stepComponents[currentStep];
 
@@ -33,8 +35,8 @@ function CreateAccommodationWizard() {
             </svg>
           </div>
           <div>
-            <h1 className="text-lg font-bold text-gray-900">Nouvel hébergement</h1>
-            <p className="text-xs text-gray-400">Créez votre annonce en quelques étapes</p>
+            <h1 className="text-lg font-bold text-gray-900">{t('wizard.newAccommodation')}</h1>
+            <p className="text-xs text-gray-400">{t('wizard.createSubtitle')}</p>
           </div>
         </div>
       </div>

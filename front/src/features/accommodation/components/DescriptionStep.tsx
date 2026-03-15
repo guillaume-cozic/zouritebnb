@@ -1,4 +1,6 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
 import WizardNavigation from '../../../components/WizardNavigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,26 +9,29 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { createAccommodation } from '../AccommodationSlice';
 import { selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
 
-const schema = z.object({
+const getSchema = (t: TFunction) => z.object({
   title: z
     .string()
-    .min(3, 'Le titre doit contenir au moins 3 caractères')
-    .max(100, 'Le titre ne peut pas dépasser 100 caractères'),
+    .min(3, t('descriptionStep.titleMinLength'))
+    .max(100, t('descriptionStep.titleMaxLength')),
   description: z
     .string()
-    .min(10, 'La description doit contenir au moins 10 caractères'),
+    .min(10, t('descriptionStep.descriptionMinLength')),
   price: z
-    .number({ invalid_type_error: 'Le prix est requis' })
-    .positive('Le prix doit être supérieur à 0'),
+    .number({ invalid_type_error: t('descriptionStep.priceRequired') })
+    .positive(t('descriptionStep.pricePositive')),
 });
 
-type FormData = z.infer<typeof schema>;
+type FormData = z.infer<ReturnType<typeof getSchema>>;
 
 function DescriptionStep() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const status = useAppSelector(selectAccommodationStatus);
   const apiError = useAppSelector(selectAccommodationError);
   const isLoading = status === 'loading';
+
+  const schema = getSchema(t);
 
   const {
     register,
@@ -43,19 +48,19 @@ function DescriptionStep() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <p className="text-sm text-gray-500">
-        Commencez par donner envie aux voyageurs avec un titre accrocheur et une description de votre bien.
+        {t('descriptionStep.intro')}
       </p>
 
       <div className="space-y-5">
         <div>
           <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Nom de l'hébergement
+            {t('descriptionStep.titleLabel')}
           </label>
           <input
             id="title"
             type="text"
             {...register('title')}
-            placeholder="Ex : Villa avec vue mer, Loft design centre-ville..."
+            placeholder={t('descriptionStep.titlePlaceholder')}
             className={`block w-full rounded-xl border-0 bg-gray-50 px-4 py-3.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 transition-all duration-200 outline-none ${
               errors.title ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
             }`}
@@ -67,13 +72,13 @@ function DescriptionStep() {
 
         <div>
           <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Description
+            {t('descriptionStep.descriptionLabel')}
           </label>
           <textarea
             id="description"
             rows={10}
             {...register('description')}
-            placeholder="Décrivez votre hébergement : type de logement, nombre de chambres, équipements, ambiance, points forts du quartier, commodités à proximité (restaurant, transports, commerces), accès (à pied, voiture nécessaire, parking)..."
+            placeholder={t('descriptionStep.descriptionPlaceholder')}
             className={`block w-full rounded-xl border-0 bg-gray-50 px-4 py-3.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 transition-all duration-200 resize-none outline-none ${
               errors.description ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
             }`}
@@ -86,14 +91,14 @@ function DescriptionStep() {
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
             </svg>
             <p className="text-xs text-blue-700">
-              Décrivez votre hébergement en détail : type de logement, équipements, accès, commodités à proximité. Une bonne description attire plus de voyageurs.
+              {t('descriptionStep.descriptionHint')}
             </p>
           </div>
         </div>
 
         <div>
           <label htmlFor="price" className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Prix par nuit
+            {t('descriptionStep.priceLabel')}
           </label>
           <div className="relative">
             <input
@@ -107,7 +112,7 @@ function DescriptionStep() {
               }`}
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-              <span className="text-gray-400 font-medium text-sm">EUR / nuit</span>
+              <span className="text-gray-400 font-medium text-sm">{t('descriptionStep.priceUnit')}</span>
             </div>
           </div>
           {errors.price && (
@@ -118,7 +123,7 @@ function DescriptionStep() {
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
             </svg>
             <p className="text-xs text-blue-700">
-              Il s'agit du prix par défaut. Vous pourrez le modifier ultérieurement et définir des tarifs saisonniers.
+              {t('descriptionStep.priceHint')}
             </p>
           </div>
         </div>
@@ -133,7 +138,7 @@ function DescriptionStep() {
         </div>
       )}
 
-      <WizardNavigation submitLabel="Créer et continuer" isLoading={isLoading} />
+      <WizardNavigation submitLabel={t('descriptionStep.submit')} isLoading={isLoading} />
     </form>
   );
 }

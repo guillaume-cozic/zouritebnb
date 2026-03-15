@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface WizardNavigationProps {
   onBack?: () => void;
@@ -14,11 +15,15 @@ function WizardNavigation({
   onBack,
   onSkip,
   onClick,
-  skipLabel = 'Passer',
-  submitLabel = 'Continuer',
+  skipLabel,
+  submitLabel,
   isLoading = false,
   isSubmit = true,
 }: WizardNavigationProps) {
+  const { t } = useTranslation();
+  const resolvedSkipLabel = skipLabel ?? t('wizard.skip');
+  const resolvedSubmitLabel = submitLabel ?? t('wizard.continue');
+
   return (
     <div className="flex items-center gap-3 pt-2">
       {onBack && (
@@ -30,7 +35,7 @@ function WizardNavigation({
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
-          Précédent
+          {t('wizard.previous')}
         </button>
       )}
 
@@ -42,7 +47,7 @@ function WizardNavigation({
           onClick={onSkip}
           className="py-3.5 px-5 rounded-xl text-sm font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-all duration-200"
         >
-          {skipLabel}
+          {resolvedSkipLabel}
         </button>
       )}
 
@@ -58,11 +63,11 @@ function WizardNavigation({
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Enregistrement...
+            {t('wizard.saving')}
           </>
         ) : (
           <>
-            {submitLabel}
+            {resolvedSubmitLabel}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>

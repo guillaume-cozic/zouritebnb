@@ -1,5 +1,6 @@
 export const AMENITY_CATEGORIES = [
   {
+    key: 'general',
     label: 'Équipements généraux',
     items: [
       { code: 'wifi', label: 'Wi-Fi' },
@@ -14,6 +15,7 @@ export const AMENITY_CATEGORIES = [
     ],
   },
   {
+    key: 'kitchen',
     label: 'Cuisine',
     items: [
       { code: 'equipped_kitchen', label: 'Cuisine équipée' },
@@ -29,6 +31,7 @@ export const AMENITY_CATEGORIES = [
     ],
   },
   {
+    key: 'bathroom',
     label: 'Salle de bain',
     items: [
       { code: 'hair_dryer', label: 'Sèche-cheveux' },
@@ -41,6 +44,7 @@ export const AMENITY_CATEGORIES = [
     ],
   },
   {
+    key: 'bedroom',
     label: 'Chambre',
     items: [
       { code: 'bed_linen', label: 'Linge de lit fourni' },
@@ -52,6 +56,7 @@ export const AMENITY_CATEGORIES = [
     ],
   },
   {
+    key: 'outdoor',
     label: 'Extérieur',
     items: [
       { code: 'garden', label: 'Jardin' },
@@ -69,6 +74,7 @@ export const AMENITY_CATEGORIES = [
     ],
   },
   {
+    key: 'entertainment',
     label: 'Loisirs / Divertissement',
     items: [
       { code: 'tv', label: 'Télévision' },
@@ -83,6 +89,7 @@ export const AMENITY_CATEGORIES = [
     ],
   },
   {
+    key: 'children',
     label: 'Enfants',
     items: [
       { code: 'high_chair', label: 'Chaise haute' },
@@ -93,6 +100,7 @@ export const AMENITY_CATEGORIES = [
     ],
   },
   {
+    key: 'accessibility',
     label: 'Accessibilité',
     items: [
       { code: 'wheelchair_access', label: 'Accès PMR' },
@@ -102,6 +110,7 @@ export const AMENITY_CATEGORIES = [
     ],
   },
   {
+    key: 'arrival',
     label: 'Pratique / Arrivée',
     items: [
       { code: 'self_checkin', label: 'Entrée autonome' },
@@ -111,6 +120,7 @@ export const AMENITY_CATEGORIES = [
     ],
   },
   {
+    key: 'environment',
     label: 'Environnement',
     items: [
       { code: 'sea_view', label: 'Vue mer' },

@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { resetWizard } from '../AccommodationSlice';
 import { selectCurrentAccommodation } from '../AccommodationSelectors';
 
 function SuccessStep() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const accommodation = useAppSelector(selectCurrentAccommodation);
 
@@ -20,29 +22,29 @@ function SuccessStep() {
       </div>
 
       <h2 className="text-2xl font-bold text-gray-900 mb-2">
-        Votre annonce est prête !
+        {t('successStep.title')}
       </h2>
       <p className="text-sm text-gray-500 mb-8">
-        Votre hébergement a été créé avec succès. Vous pouvez le publier depuis votre tableau de bord.
+        {t('successStep.subtitle')}
       </p>
 
       {accommodation && (
         <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 p-6 text-left max-w-sm mx-auto shadow-sm">
           <div className="space-y-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Titre</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">{t('successStep.titleLabel')}</p>
               <p className="text-base font-semibold text-gray-900">{accommodation.title}</p>
             </div>
             <div className="flex items-baseline gap-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 w-full">Prix</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 w-full">{t('successStep.priceLabel')}</p>
             </div>
             <div className="flex items-baseline gap-1 -mt-3">
               <span className="text-2xl font-bold text-blue-600">{accommodation.price}</span>
-              <span className="text-sm text-gray-400">EUR / nuit</span>
+              <span className="text-sm text-gray-400">{t('successStep.priceUnit')}</span>
             </div>
             {accommodation.city && (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Adresse</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">{t('successStep.addressLabel')}</p>
                 <p className="text-sm text-gray-700">
                   {accommodation.street}<br />
                   {accommodation.zipCode} {accommodation.city}, {accommodation.country}
@@ -50,10 +52,10 @@ function SuccessStep() {
               </div>
             )}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Statut</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">{t('successStep.statusLabel')}</p>
               <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full border border-amber-100">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                Brouillon
+                {t('successStep.draft')}
               </span>
             </div>
           </div>
@@ -76,7 +78,7 @@ function SuccessStep() {
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
-        Créer un autre hébergement
+        {t('successStep.createAnother')}
       </button>
     </div>
   );

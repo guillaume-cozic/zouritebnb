@@ -38,6 +38,10 @@ services:
         arguments:
             $uploadDir: '%kernel.project_dir%/var/uploads/photos'
 
+    App\Shared\Infrastructure\Controller\ServePhotoController:
+        arguments:
+            $photoUploadDir: '%kernel.project_dir%/var/uploads/photos'
+
     App\Accommodation\Application\Listener\StorePhotoOnPhotoUploaded:
         tags: [messenger.message_handler]
 
