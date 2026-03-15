@@ -23,6 +23,15 @@ const steps: { key: WizardStep; label: string; icon: React.ReactNode }[] = [
     ),
   },
   {
+    key: 'amenities',
+    label: 'Équipements',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.049.58.025 1.193-.14 1.743" />
+      </svg>
+    ),
+  },
+  {
     key: 'address',
     label: 'Localisation',
     icon: (
@@ -72,7 +81,7 @@ function StepIndicator() {
                   ${isCompleted
                     ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-lg shadow-emerald-200'
                     : isCurrent
-                    ? 'bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg shadow-purple-200 scale-110'
+                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200 scale-110'
                     : 'bg-gray-100 text-gray-400'
                   }
                 `}
@@ -88,7 +97,7 @@ function StepIndicator() {
               <span
                 className={`
                   mt-2.5 text-xs font-semibold tracking-wide uppercase transition-colors duration-300
-                  ${isCurrent ? 'text-purple-600' : isCompleted ? 'text-emerald-600' : 'text-gray-400'}
+                  ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-emerald-600' : 'text-gray-400'}
                 `}
               >
                 {step.label}

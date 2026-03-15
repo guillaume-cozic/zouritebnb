@@ -37,7 +37,7 @@ function SuccessStep() {
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 w-full">Prix</p>
             </div>
             <div className="flex items-baseline gap-1 -mt-3">
-              <span className="text-2xl font-bold text-purple-600">{accommodation.price}</span>
+              <span className="text-2xl font-bold text-blue-600">{accommodation.price}</span>
               <span className="text-sm text-gray-400">EUR / nuit</span>
             </div>
             {accommodation.city && (
@@ -65,10 +65,10 @@ function SuccessStep() {
         onClick={() => dispatch(resetWizard())}
         className="
           mt-10 inline-flex items-center gap-2 py-3.5 px-8 rounded-xl text-sm font-semibold text-white
-          bg-gradient-to-r from-violet-500 to-purple-600
-          hover:from-violet-600 hover:to-purple-700
-          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500
-          shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300
+          bg-gradient-to-r from-blue-500 to-blue-600
+          hover:from-blue-600 hover:to-blue-700
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+          shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300
           transform hover:-translate-y-0.5 active:translate-y-0
           transition-all duration-200
         "

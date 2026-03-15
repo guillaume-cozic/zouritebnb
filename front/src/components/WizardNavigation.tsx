@@ -50,7 +50,7 @@ function WizardNavigation({
         type={isSubmit ? 'submit' : 'button'}
         disabled={isLoading}
         onClick={onClick}
-        className="flex items-center gap-2 py-3.5 px-8 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+        className="flex items-center gap-2 py-3.5 px-8 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
       >
         {isLoading ? (
           <>

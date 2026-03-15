@@ -1,4 +1,5 @@
 import React from 'react';
+import WizardNavigation from '../../../components/WizardNavigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -56,7 +57,7 @@ function DescriptionStep() {
             {...register('title')}
             placeholder="Ex : Villa avec vue mer, Loft design centre-ville..."
             className={`block w-full rounded-xl border-0 bg-gray-50 px-4 py-3.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 transition-all duration-200 outline-none ${
-              errors.title ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-purple-500'
+              errors.title ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
             }`}
           />
           {errors.title && (
@@ -70,11 +71,11 @@ function DescriptionStep() {
           </label>
           <textarea
             id="description"
-            rows={5}
+            rows={10}
             {...register('description')}
             placeholder="Décrivez votre hébergement : type de logement, nombre de chambres, équipements, ambiance, points forts du quartier, commodités à proximité (restaurant, transports, commerces), accès (à pied, voiture nécessaire, parking)..."
             className={`block w-full rounded-xl border-0 bg-gray-50 px-4 py-3.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 transition-all duration-200 resize-none outline-none ${
-              errors.description ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-purple-500'
+              errors.description ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
             }`}
           />
           {errors.description && (
@@ -102,7 +103,7 @@ function DescriptionStep() {
               {...register('price', { valueAsNumber: true })}
               placeholder="0.00"
               className={`block w-full rounded-xl border-0 bg-gray-50 pl-4 pr-20 py-3.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 transition-all duration-200 outline-none ${
-                errors.price ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-purple-500'
+                errors.price ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
               }`}
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
@@ -132,28 +133,7 @@ function DescriptionStep() {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full py-4 px-6 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
-      >
-        {isLoading ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Création en cours...
-          </span>
-        ) : (
-          <span className="flex items-center justify-center gap-2">
-            Continuer
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </span>
-        )}
-      </button>
+      <WizardNavigation submitLabel="Créer et continuer" isLoading={isLoading} />
     </form>
   );
 }
