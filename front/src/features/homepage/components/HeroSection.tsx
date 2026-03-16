@@ -4,6 +4,7 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import { fr } from 'date-fns/locale/fr';
 import { enGB } from 'date-fns/locale/en-GB';
 import 'react-datepicker/dist/react-datepicker.css';
+import '../../../styles/datepicker-overrides.css';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setFilters } from '../HomepageSlice';
 import { selectHomepageFilters } from '../HomepageSelectors';
