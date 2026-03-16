@@ -74,6 +74,28 @@
       "stat3": "Citernes installées"
     }
   },
+  "detail": {
+    "save": "Sauvegarder",
+    "guests": "voyageurs",
+    "bedrooms": "chambres",
+    "bathrooms": "salles de bain",
+    "capacity": "Capacité",
+    "withBathroom": "Avec salle de bain",
+    "private": "Privatives",
+    "night": "nuit",
+    "checkIn": "Arrivée",
+    "checkOut": "Départ",
+    "amenitiesTitle": "Équipements",
+    "locationTitle": "Localisation",
+    "datesLabel": "Dates",
+    "selectDates": "Sélectionner les dates",
+    "guestsLabel": "Voyageurs",
+    "reserve": "Réserver",
+    "noCharge": "Aucun montant ne vous sera débité pour le moment",
+    "backToHome": "Retour à l'accueil",
+    "loading": "Chargement...",
+    "error": "Impossible de charger cet hébergement."
+  },
   "footer": {
     "description": "Plateforme de location de vacances.",
     "navigation": "Navigation",

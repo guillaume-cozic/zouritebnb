@@ -17,6 +17,7 @@ export interface Accommodation {
   singleBeds?: number;
   doubleBeds?: number;
   amenities?: string[];
+  thumbnailUrl?: string | null;
 }
 
 export interface FormDrafts {

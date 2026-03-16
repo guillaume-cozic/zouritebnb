@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HomePage from './features/homepage/components/HomePage';
 import CreateAccommodationWizard from './features/accommodation/components/CreateAccommodationWizard';
+import AccommodationDetailPage from './features/accommodation/components/AccommodationDetailPage';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <div className="pt-16 min-h-screen">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/accommodations/:id" element={<AccommodationDetailPage />} />
           <Route path="/create" element={<CreateAccommodationWizard />} />
         </Routes>
       </div>

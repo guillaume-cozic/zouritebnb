@@ -74,6 +74,28 @@
       "stat3": "Cisterns installed"
     }
   },
+  "detail": {
+    "save": "Save",
+    "guests": "guests",
+    "bedrooms": "bedrooms",
+    "bathrooms": "bathrooms",
+    "capacity": "Capacity",
+    "withBathroom": "With bathroom",
+    "private": "Private",
+    "night": "night",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "amenitiesTitle": "Amenities",
+    "locationTitle": "Location",
+    "datesLabel": "Dates",
+    "selectDates": "Select dates",
+    "guestsLabel": "Guests",
+    "reserve": "Reserve",
+    "noCharge": "You won't be charged yet",
+    "backToHome": "Back to home",
+    "loading": "Loading...",
+    "error": "Unable to load this accommodation."
+  },
   "footer": {
     "description": "Vacation rental platform.",
     "navigation": "Navigation",

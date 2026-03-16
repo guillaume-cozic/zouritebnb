@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AccommodationListItem } from '../HomepageTypes';
 
@@ -87,13 +88,16 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation }) 
               <p className="text-gray-400">{'\u2014'}</p>
             )}
           </div>
-          <button className="inline-flex items-center gap-1.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-10 px-5 transition-all hover:shadow-md hover:shadow-blue-200">
+          <Link
+            to={`/accommodations/${accommodation.id}`}
+            className="inline-flex items-center gap-1.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-10 px-5 transition-all hover:shadow-md hover:shadow-blue-200"
+          >
             {t('homepage.viewDetails')}
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
     </div>

@@ -132,6 +132,20 @@ export const addPhoto = createAsyncThunk(
   }
 );
 
+export const fetchAccommodation = createAsyncThunk(
+  'accommodation/fetchOne',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/api/accommodations/${id}`);
+      return response.data as Accommodation;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors du chargement'
+      );
+    }
+  }
+);
+
 const accommodationSlice = createSlice({
   name: 'accommodation',
   initialState,
@@ -230,6 +244,19 @@ const accommodationSlice = createSlice({
       })
       .addCase(addPhoto.rejected, (state, action) => {
         state.photoUploadStatus = 'failed';
+        state.error = action.payload as string;
+      })
+      // Fetch one
+      .addCase(fetchAccommodation.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchAccommodation.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.current = action.payload;
+      })
+      .addCase(fetchAccommodation.rejected, (state, action) => {
+        state.status = 'failed';
         state.error = action.payload as string;
       });
   },
