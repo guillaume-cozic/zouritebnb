@@ -7,6 +7,7 @@ namespace App\Accommodation\Domain\Entity;
 use App\Accommodation\Domain\Event\AccommodationAddressUpdated;
 use App\Accommodation\Domain\Event\AccommodationAmenitiesUpdated;
 use App\Accommodation\Domain\Event\AccommodationCapacityUpdated;
+use App\Accommodation\Domain\Event\AccommodationCheckInOutUpdated;
 use App\Accommodation\Domain\Event\AccommodationGeolocationUpdated;
 use App\Accommodation\Domain\Event\AccommodationPriceUpdated;
 use App\Accommodation\Domain\Event\AccommodationPublished;
@@ -27,6 +28,7 @@ final class Accommodation extends AggregateRoot
         private ?Geolocation $geolocation = null,
         private ?Capacity $capacity = null,
         private ?Amenities $amenities = null,
+        private ?CheckInOut $checkInOut = null,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
@@ -122,5 +124,16 @@ final class Accommodation extends AggregateRoot
     {
         $this->amenities = $amenities;
         $this->recordEvent(new AccommodationAmenitiesUpdated($this->id));
+    }
+
+    public function getCheckInOut(): ?CheckInOut
+    {
+        return $this->checkInOut;
+    }
+
+    public function updateCheckInOut(CheckInOut $checkInOut): void
+    {
+        $this->checkInOut = $checkInOut;
+        $this->recordEvent(new AccommodationCheckInOutUpdated($this->id));
     }
 }

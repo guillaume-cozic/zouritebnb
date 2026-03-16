@@ -74,6 +74,30 @@
       "stat3": "Citernes installées"
     }
   },
+  "edit": {
+    "title": "Modifier l'hébergement",
+    "backToDetail": "Retour à l'annonce",
+    "save": "Enregistrer",
+    "saved": "Modifications enregistrées",
+    "autoSaving": "Enregistrement...",
+    "autoSaved": "Enregistré",
+    "autoError": "Erreur",
+    "autoSaveHint": "Sauvegarde automatique activée",
+    "noPhotos": "Aucune photo pour le moment.",
+    "managePhotos": "Gérer les photos",
+    "notFound": "Hébergement introuvable.",
+    "descriptionReadonly": "Le titre et la description ne sont pas modifiables pour le moment.",
+    "amenitiesSelected": "équipement(s) sélectionné(s)",
+    "section": {
+      "description": "Description",
+      "price": "Prix",
+      "capacity": "Capacité",
+      "amenities": "Équipements",
+      "location": "Localisation",
+      "checkinout": "Arrivée / Départ",
+      "photos": "Photos"
+    }
+  },
   "detail": {
     "save": "Sauvegarder",
     "guests": "voyageurs",
@@ -290,5 +314,13 @@
     "statusLabel": "Statut",
     "draft": "Brouillon",
     "createAnother": "Créer un autre hébergement"
+  },
+  "photos": {
+    "dropzone": "Glissez vos photos ici ou cliquez pour parcourir",
+    "formats": "JPEG, PNG ou WebP — 20 photos maximum",
+    "uploading": "Envoi en cours...",
+    "uploadSuccess": "Photo(s) ajoutée(s)",
+    "currentPhoto": "Photo actuelle",
+    "gallery": "Photos"
   }
 }

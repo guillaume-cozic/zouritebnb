@@ -8,6 +8,7 @@ use App\Accommodation\Domain\Entity\Accommodation as DomainAccommodation;
 use App\Accommodation\Domain\Entity\Address;
 use App\Accommodation\Domain\Entity\Amenities;
 use App\Accommodation\Domain\Entity\Capacity;
+use App\Accommodation\Domain\Entity\CheckInOut;
 use App\Accommodation\Domain\Entity\Geolocation;
 use App\Accommodation\Domain\Port\AccommodationRepository as AccommodationRepositoryPort;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -42,7 +43,13 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
         $geolocationData = $data['geolocation'] ?? null;
         $capacityData = $data['capacity'] ?? null;
         $amenitiesData = $data['amenities'] ?? null;
-        unset($data['address'], $data['geolocation'], $data['capacity'], $data['amenities']);
+        $checkInOutData = $data['checkInOut'] ?? null;
+        unset($data['address'], $data['geolocation'], $data['capacity'], $data['amenities'], $data['checkInOut']);
+
+        if (\is_array($checkInOutData)) {
+            $data['checkIn'] = $checkInOutData['checkIn'] ?? null;
+            $data['checkOut'] = $checkInOutData['checkOut'] ?? null;
+        }
 
         if (\is_array($addressData)) {
             $data = array_merge($data, $addressData);
@@ -100,7 +107,9 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
         }
 
         $amenitiesArray = $data['amenities'] ?? null;
-        unset($data['street'], $data['city'], $data['zipCode'], $data['country'], $data['latitude'], $data['longitude'], $data['bedrooms'], $data['bathrooms'], $data['maxGuests'], $data['singleBeds'], $data['doubleBeds'], $data['amenities']);
+        $checkIn = $data['checkIn'] ?? null;
+        $checkOut = $data['checkOut'] ?? null;
+        unset($data['street'], $data['city'], $data['zipCode'], $data['country'], $data['latitude'], $data['longitude'], $data['bedrooms'], $data['bathrooms'], $data['maxGuests'], $data['singleBeds'], $data['doubleBeds'], $data['amenities'], $data['checkIn'], $data['checkOut']);
 
         $accommodation = $this->serializer->denormalize($data, DomainAccommodation::class);
 
@@ -136,6 +145,11 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
         if (null !== $amenitiesArray) {
             $amenities = new Amenities(codes: $amenitiesArray);
             $accommodation->updateAmenities($amenities);
+        }
+
+        if (null !== $checkIn && null !== $checkOut) {
+            $checkInOut = new CheckInOut(checkIn: $checkIn, checkOut: $checkOut);
+            $accommodation->updateCheckInOut($checkInOut);
         }
 
         $accommodation->releaseEvents();

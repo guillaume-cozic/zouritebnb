@@ -83,12 +83,23 @@ const AccommodationDetailPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <button className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
-            </svg>
-            {t('detail.save')}
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+              </svg>
+              {t('detail.save')}
+            </button>
+            <Link
+              to={`/accommodations/${accommodation.id}/edit`}
+              className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+              </svg>
+              {t('edit.title')}
+            </Link>
+          </div>
         </div>
 
         {/* Two-column layout */}

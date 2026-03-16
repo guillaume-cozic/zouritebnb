@@ -65,6 +65,12 @@ class AccommodationEntity
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $amenities = null;
 
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $checkIn = null;
+
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $checkOut = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -265,6 +271,30 @@ class AccommodationEntity
     public function setAmenities(?array $amenities): static
     {
         $this->amenities = $amenities;
+
+        return $this;
+    }
+
+    public function getCheckIn(): ?string
+    {
+        return $this->checkIn;
+    }
+
+    public function setCheckIn(?string $checkIn): static
+    {
+        $this->checkIn = $checkIn;
+
+        return $this;
+    }
+
+    public function getCheckOut(): ?string
+    {
+        return $this->checkOut;
+    }
+
+    public function setCheckOut(?string $checkOut): static
+    {
+        $this->checkOut = $checkOut;
 
         return $this;
     }

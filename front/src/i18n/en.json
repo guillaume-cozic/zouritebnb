@@ -74,6 +74,30 @@
       "stat3": "Cisterns installed"
     }
   },
+  "edit": {
+    "title": "Edit accommodation",
+    "backToDetail": "Back to listing",
+    "save": "Save",
+    "saved": "Changes saved",
+    "autoSaving": "Saving...",
+    "autoSaved": "Saved",
+    "autoError": "Error",
+    "autoSaveHint": "Auto-save enabled",
+    "noPhotos": "No photos yet.",
+    "managePhotos": "Manage photos",
+    "notFound": "Accommodation not found.",
+    "descriptionReadonly": "Title and description cannot be edited at this time.",
+    "amenitiesSelected": "amenity(ies) selected",
+    "section": {
+      "description": "Description",
+      "price": "Price",
+      "capacity": "Capacity",
+      "amenities": "Amenities",
+      "location": "Location",
+      "checkinout": "Check-in / Check-out",
+      "photos": "Photos"
+    }
+  },
   "detail": {
     "save": "Save",
     "guests": "guests",
@@ -290,5 +314,13 @@
     "statusLabel": "Status",
     "draft": "Draft",
     "createAnother": "Create another accommodation"
+  },
+  "photos": {
+    "dropzone": "Drag your photos here or click to browse",
+    "formats": "JPEG, PNG or WebP — 20 photos max",
+    "uploading": "Uploading...",
+    "uploadSuccess": "Photo(s) uploaded",
+    "currentPhoto": "Current photo",
+    "gallery": "Photos"
   }
 }

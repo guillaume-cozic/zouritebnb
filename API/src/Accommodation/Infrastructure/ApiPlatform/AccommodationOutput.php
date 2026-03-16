@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
                 description: 'Retourne le détail complet d\'un hébergement par son identifiant UUID.',
             ),
             normalizationContext: ['groups' => ['accommodation:read']],
+            provider: AccommodationItemProvider::class,
         ),
         new GetCollection(
             uriTemplate: '/accommodations',
@@ -199,6 +200,30 @@ use Symfony\Component\Serializer\Attribute\Groups;
             output: false,
             processor: UpdateAccommodationGeolocationProcessor::class,
         ),
+        new Put(
+            uriTemplate: '/accommodations/{id}/check-in-out',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Définir les heures d\'arrivée et de départ',
+                description: 'Définit les heures de check-in et check-out d\'un hébergement. Format HH:MM.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/ld+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: ['checkIn' => '16:00', 'checkOut' => '12:00'],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationCheckInOutInput::class,
+            output: false,
+            processor: UpdateAccommodationCheckInOutProcessor::class,
+        ),
         new Post(
             uriTemplate: '/accommodations',
             status: 201,
@@ -331,9 +356,22 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Liste des codes d\'équipements', example: ['private_pool', 'wifi', 'parking'])]
     public ?array $amenities = null;
 
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Heure d\'arrivée', example: '16:00')]
+    public ?string $checkIn = null;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Heure de départ', example: '12:00')]
+    public ?string $checkOut = null;
+
     #[Groups(['accommodation:list'])]
     #[ApiProperty(description: 'URL de la photo principale', example: '/uploads/photos/abc123.jpg')]
     public ?string $thumbnailUrl = null;
+
+    /** @var array<array{id: string, url: string}>|null */
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Liste des photos de l\'hébergement')]
+    public ?array $photos = null;
 
     public static function fromEntity(object $entity): static
     {
@@ -356,6 +394,8 @@ class AccommodationOutput implements FromEntityInterface
         $output->singleBeds = $entity->getSingleBeds();
         $output->doubleBeds = $entity->getDoubleBeds();
         $output->amenities = $entity->getAmenities();
+        $output->checkIn = $entity->getCheckIn();
+        $output->checkOut = $entity->getCheckOut();
 
         return $output;
     }

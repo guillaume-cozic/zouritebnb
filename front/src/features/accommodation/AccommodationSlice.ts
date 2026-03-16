@@ -7,6 +7,8 @@ import {
   SetCapacityPayload,
   SetAmenitiesPayload,
   AddPhotoPayload,
+  UpdatePricePayload,
+  SetCheckInOutPayload,
   FormDrafts,
   WizardStep,
 } from './AccommodationTypes';
@@ -132,6 +134,42 @@ export const addPhoto = createAsyncThunk(
   }
 );
 
+export const updatePrice = createAsyncThunk(
+  'accommodation/updatePrice',
+  async ({ id, price }: UpdatePricePayload, { rejectWithValue }) => {
+    try {
+      await api.patch(
+        `/api/accommodations/${id}/price`,
+        { price },
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return { price };
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors de la mise à jour du prix'
+      );
+    }
+  }
+);
+
+export const setCheckInOut = createAsyncThunk(
+  'accommodation/setCheckInOut',
+  async ({ id, checkIn, checkOut }: SetCheckInOutPayload, { rejectWithValue }) => {
+    try {
+      await api.put(
+        `/api/accommodations/${id}/check-in-out`,
+        { checkIn, checkOut },
+        { headers: { 'Content-Type': 'application/ld+json' } }
+      );
+      return { checkIn, checkOut };
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors de la mise à jour des horaires'
+      );
+    }
+  }
+);
+
 export const fetchAccommodation = createAsyncThunk(
   'accommodation/fetchOne',
   async (id: string, { rejectWithValue }) => {
@@ -244,6 +282,37 @@ const accommodationSlice = createSlice({
       })
       .addCase(addPhoto.rejected, (state, action) => {
         state.photoUploadStatus = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update price
+      .addCase(updatePrice.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updatePrice.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.price = action.payload.price;
+        }
+      })
+      .addCase(updatePrice.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Check-in/out
+      .addCase(setCheckInOut.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(setCheckInOut.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.checkIn = action.payload.checkIn;
+          state.current.checkOut = action.payload.checkOut;
+        }
+      })
+      .addCase(setCheckInOut.rejected, (state, action) => {
+        state.status = 'failed';
         state.error = action.payload as string;
       })
       // Fetch one

@@ -17,7 +17,10 @@ export interface Accommodation {
   singleBeds?: number;
   doubleBeds?: number;
   amenities?: string[];
+  checkIn?: string | null;
+  checkOut?: string | null;
   thumbnailUrl?: string | null;
+  photos?: { id: string; url: string }[];
 }
 
 export interface FormDrafts {
@@ -59,6 +62,17 @@ export interface SetCapacityPayload {
 export interface SetAmenitiesPayload {
   id: string;
   codes: string[];
+}
+
+export interface UpdatePricePayload {
+  id: string;
+  price: number;
+}
+
+export interface SetCheckInOutPayload {
+  id: string;
+  checkIn: string;
+  checkOut: string;
 }
 
 export type WizardStep = 'description' | 'capacity' | 'amenities' | 'address' | 'photos' | 'success';
