@@ -321,6 +321,8 @@
     "uploading": "Envoi en cours...",
     "uploadSuccess": "Photo(s) ajoutée(s)",
     "currentPhoto": "Photo actuelle",
-    "gallery": "Photos"
+    "gallery": "Photos",
+    "dragToReorder": "Glisser pour réordonner",
+    "uploadError": "Erreur lors de l'envoi de la photo"
   }
 }

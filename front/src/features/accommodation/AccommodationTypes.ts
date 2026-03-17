@@ -75,4 +75,9 @@ export interface SetCheckInOutPayload {
   checkOut: string;
 }
 
+export interface ReorderPhotosPayload {
+  id: string;
+  photoIds: string[];
+}
+
 export type WizardStep = 'description' | 'capacity' | 'amenities' | 'address' | 'photos' | 'success';

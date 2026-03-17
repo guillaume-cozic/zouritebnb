@@ -321,6 +321,8 @@
     "uploading": "Uploading...",
     "uploadSuccess": "Photo(s) uploaded",
     "currentPhoto": "Current photo",
-    "gallery": "Photos"
+    "gallery": "Photos",
+    "dragToReorder": "Drag to reorder",
+    "uploadError": "Error uploading photo"
   }
 }

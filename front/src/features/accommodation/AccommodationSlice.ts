@@ -9,6 +9,7 @@ import {
   AddPhotoPayload,
   UpdatePricePayload,
   SetCheckInOutPayload,
+  ReorderPhotosPayload,
   FormDrafts,
   WizardStep,
 } from './AccommodationTypes';
@@ -122,13 +123,35 @@ export const addPhoto = createAsyncThunk(
     try {
       const formData = new FormData();
       formData.append('file', file);
-      await api.post(`/api/accommodations/${id}/photos`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+      const response = await fetch(`${baseURL}/api/accommodations/${id}/photos`, {
+        method: 'POST',
+        body: formData,
       });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.detail || `Upload failed (${response.status})`);
+      }
       return file.name;
     } catch (err: any) {
+      return rejectWithValue(err.message || "Erreur lors de l'upload de la photo");
+    }
+  }
+);
+
+export const reorderPhotos = createAsyncThunk(
+  'accommodation/reorderPhotos',
+  async ({ id, photoIds }: ReorderPhotosPayload, { rejectWithValue }) => {
+    try {
+      await api.put(
+        `/api/accommodations/${id}/photos/reorder`,
+        { photoIds },
+        { headers: { 'Content-Type': 'application/ld+json' } }
+      );
+      return { photoIds };
+    } catch (err: any) {
       return rejectWithValue(
-        err.response?.data?.detail || "Erreur lors de l'upload de la photo"
+        err.response?.data?.detail || 'Erreur lors du réordonnancement des photos'
       );
     }
   }

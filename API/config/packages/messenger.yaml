@@ -7,6 +7,12 @@ framework:
         routing:
             App\Shared\Domain\Event\DomainEvent: async
 
+when@dev:
+    framework:
+        messenger:
+            transports:
+                async: 'sync://'
+
 when@test:
     framework:
         messenger:

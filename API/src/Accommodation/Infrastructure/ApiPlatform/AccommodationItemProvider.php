@@ -29,23 +29,53 @@ final readonly class AccommodationItemProvider implements ProviderInterface
             return $output;
         }
 
-        $sql = <<<'SQL'
+        // Fetch all photos for this accommodation
+        $photosSql = <<<'SQL'
             SELECT
                 BIN_TO_UUID(p.id) AS id,
                 p.filename
             FROM accommodation_photo p
             WHERE p.accommodation_id = UUID_TO_BIN(:accommodationId)
-            ORDER BY p.id ASC
             SQL;
 
-        $rows = $this->connection->executeQuery($sql, [
+        $rows = $this->connection->executeQuery($photosSql, [
             'accommodationId' => $output->id,
         ])->fetchAllAssociative();
 
-        $output->photos = array_map(static fn (array $row) => [
-            'id' => $row['id'],
-            'url' => '/uploads/photos/'.$row['filename'],
-        ], $rows);
+        $photosById = [];
+        foreach ($rows as $row) {
+            $photosById[$row['id']] = [
+                'id' => $row['id'],
+                'url' => '/uploads/photos/'.$row['filename'],
+            ];
+        }
+
+        // Fetch gallery order
+        $gallerySql = <<<'SQL'
+            SELECT photo_ids
+            FROM accommodation_gallery
+            WHERE accommodation_id = UUID_TO_BIN(:accommodationId)
+            SQL;
+
+        $galleryJson = $this->connection->executeQuery($gallerySql, [
+            'accommodationId' => $output->id,
+        ])->fetchOne();
+
+        if (false !== $galleryJson && null !== $galleryJson) {
+            /** @var string[] $orderedIds */
+            $orderedIds = json_decode($galleryJson, true);
+            $ordered = [];
+            foreach ($orderedIds as $photoId) {
+                if (isset($photosById[$photoId])) {
+                    $ordered[] = $photosById[$photoId];
+                    unset($photosById[$photoId]);
+                }
+            }
+            // Append any photos not in the gallery (shouldn't happen, but safe)
+            $output->photos = array_merge($ordered, array_values($photosById));
+        } else {
+            $output->photos = array_values($photosById);
+        }
 
         return $output;
     }

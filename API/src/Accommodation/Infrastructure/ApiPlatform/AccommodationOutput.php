@@ -282,6 +282,30 @@ use Symfony\Component\Serializer\Attribute\Groups;
             output: false,
             processor: DeleteAccommodationPhotoProcessor::class,
         ),
+        new Put(
+            uriTemplate: '/accommodations/{id}/photos/reorder',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Réordonner les photos d\'un hébergement',
+                description: 'Remplace l\'ordre des photos d\'un hébergement. Envoyer la liste complète des IDs de photos dans l\'ordre souhaité.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/ld+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: ['photoIds' => ['uuid-1', 'uuid-2', 'uuid-3']],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: ReorderAccommodationPhotosInput::class,
+            output: false,
+            processor: ReorderAccommodationPhotosProcessor::class,
+        ),
     ],
     provider: EntityProvider::class,
     stateOptions: new Options(entityClass: AccommodationEntity::class),
