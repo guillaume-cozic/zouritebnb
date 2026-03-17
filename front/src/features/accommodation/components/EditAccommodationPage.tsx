@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import {
   fetchAccommodation,
   updatePrice,
+  updateDescription,
   setLocation,
   setCapacity,
   setAmenities,
@@ -117,6 +118,12 @@ const EditAccommodationPage: React.FC = () => {
   });
   const capacityInitialized = useRef(false);
 
+  // Title & description local state
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const titleInitialized = useRef(false);
+  const descriptionInitialized = useRef(false);
+
   // CheckInOut local state
   const [checkInOut, setCheckInOutState] = useState({ checkIn: '16:00', checkOut: '12:00' });
   const checkInOutInitialized = useRef(false);
@@ -144,6 +151,14 @@ const EditAccommodationPage: React.FC = () => {
   // Populate all local state from accommodation
   useEffect(() => {
     if (!accommodation) return;
+    if (!titleInitialized.current) {
+      setTitle(accommodation.title ?? '');
+      titleInitialized.current = true;
+    }
+    if (!descriptionInitialized.current) {
+      setDescription(accommodation.description ?? '');
+      descriptionInitialized.current = true;
+    }
     if (!priceInitialized.current) {
       setPrice(accommodation.price ?? 0);
       priceInitialized.current = true;
@@ -192,6 +207,18 @@ const EditAccommodationPage: React.FC = () => {
   };
 
   // --- Auto-save handlers ---
+  const autoSaveDescription = useDebounce(async (t: string, d: string) => {
+    if (!accommodation?.id || !initialLoadDone.current) return;
+    if (!t.trim() || !d.trim()) return;
+    setSectionSaveStatus('description', 'saving');
+    try {
+      await dispatch(updateDescription({ id: accommodation.id, title: t, description: d })).unwrap();
+      setSectionSaveStatus('description', 'saved');
+    } catch {
+      setSectionSaveStatus('description', 'error');
+    }
+  }, AUTOSAVE_DELAY);
+
   const autoSavePrice = useDebounce(async (value: number) => {
     if (!accommodation?.id || !initialLoadDone.current || value <= 0) return;
     setSectionSaveStatus('price', 'saving');
@@ -259,6 +286,18 @@ const EditAccommodationPage: React.FC = () => {
   }, AUTOSAVE_DELAY);
 
   // --- Change handlers that trigger auto-save ---
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+    setTitle(v);
+    autoSaveDescription(v, description);
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const v = e.target.value;
+    setDescription(v);
+    autoSaveDescription(title, v);
+  };
+
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = Number(e.target.value);
     setPrice(v);
@@ -342,24 +381,35 @@ const EditAccommodationPage: React.FC = () => {
       }
     >
       <div className="space-y-6">
-        {/* Description (read-only) */}
+        {/* Description */}
         <div ref={(el) => { sectionRefs.current.description = el; }} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6 sm:p-8">
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gray-100 text-gray-600">
-              {SECTIONS[0].icon}
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gray-100 text-gray-600">
+                {SECTIONS[0].icon}
+              </div>
+              <h2 className="text-lg font-semibold">{t('edit.section.description')}</h2>
             </div>
-            <h2 className="text-lg font-semibold">{t('edit.section.description')}</h2>
+            <SaveStatusBadge status={sectionStatus.description ?? 'idle'} t={t} />
           </div>
           <div className="space-y-4">
+            {accommodation.photos && accommodation.photos.length > 0 && (
+              <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                <img
+                  src={`${API_BASE}${accommodation.photos[0].url}`}
+                  alt={accommodation.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('descriptionStep.titleLabel')}</label>
-              <input type="text" defaultValue={accommodation.title} disabled className={`${inputClass} opacity-60 cursor-not-allowed`} />
+              <input type="text" value={title} onChange={handleTitleChange} className={inputClass} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('descriptionStep.descriptionLabel')}</label>
-              <textarea defaultValue={accommodation.description} disabled rows={5} className={`${inputClass} h-auto py-3 opacity-60 cursor-not-allowed resize-none`} />
+              <textarea value={description} onChange={handleDescriptionChange} rows={5} className={`${inputClass} h-auto py-3`} />
             </div>
-            <p className="text-xs text-gray-400 italic">{t('edit.descriptionReadonly')}</p>
           </div>
         </div>
 
@@ -575,10 +625,10 @@ const EditAccommodationPage: React.FC = () => {
             </span>
           </div>
 
-          {accommodation.thumbnailUrl ? (
+          {accommodation.photos && accommodation.photos.length > 0 ? (
             <div className="relative w-full max-w-sm aspect-[3/2] rounded-xl overflow-hidden bg-gray-100">
               <img
-                src={`${API_BASE}${accommodation.thumbnailUrl}`}
+                src={`${API_BASE}${accommodation.photos[0].url}`}
                 alt={accommodation.title}
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />

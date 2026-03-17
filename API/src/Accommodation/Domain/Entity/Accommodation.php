@@ -8,6 +8,7 @@ use App\Accommodation\Domain\Event\AccommodationAddressUpdated;
 use App\Accommodation\Domain\Event\AccommodationAmenitiesUpdated;
 use App\Accommodation\Domain\Event\AccommodationCapacityUpdated;
 use App\Accommodation\Domain\Event\AccommodationCheckInOutUpdated;
+use App\Accommodation\Domain\Event\AccommodationDescriptionUpdated;
 use App\Accommodation\Domain\Event\AccommodationGeolocationUpdated;
 use App\Accommodation\Domain\Event\AccommodationPriceUpdated;
 use App\Accommodation\Domain\Event\AccommodationPublished;
@@ -20,8 +21,8 @@ final class Accommodation extends AggregateRoot
 {
     public function __construct(
         private readonly Uuid $id,
-        private readonly string $title,
-        private readonly string $description,
+        private string $title,
+        private string $description,
         private float $price,
         private AccommodationStatus $status = AccommodationStatus::Draft,
         private ?Address $address = null,
@@ -48,6 +49,13 @@ final class Accommodation extends AggregateRoot
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    public function updateDescription(string $title, string $description): void
+    {
+        $this->title = $title;
+        $this->description = $description;
+        $this->recordEvent(new AccommodationDescriptionUpdated($this->id));
     }
 
     public function getPrice(): float

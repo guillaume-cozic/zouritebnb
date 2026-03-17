@@ -224,6 +224,30 @@ use Symfony\Component\Serializer\Attribute\Groups;
             output: false,
             processor: UpdateAccommodationCheckInOutProcessor::class,
         ),
+        new Put(
+            uriTemplate: '/accommodations/{id}/description',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Modifier le titre et la description d\'un hébergement',
+                description: 'Met à jour le titre et la description d\'un hébergement.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/ld+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: ['title' => 'Mon hébergement', 'description' => 'Une description détaillée...'],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationDescriptionInput::class,
+            output: false,
+            processor: UpdateAccommodationDescriptionProcessor::class,
+        ),
         new Post(
             uriTemplate: '/accommodations',
             status: 201,

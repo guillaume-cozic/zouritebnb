@@ -80,4 +80,10 @@ export interface ReorderPhotosPayload {
   photoIds: string[];
 }
 
+export interface UpdateDescriptionPayload {
+  id: string;
+  title: string;
+  description: string;
+}
+
 export type WizardStep = 'description' | 'capacity' | 'amenities' | 'address' | 'photos' | 'success';

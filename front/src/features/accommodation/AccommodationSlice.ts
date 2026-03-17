@@ -10,6 +10,7 @@ import {
   UpdatePricePayload,
   SetCheckInOutPayload,
   ReorderPhotosPayload,
+  UpdateDescriptionPayload,
   FormDrafts,
   WizardStep,
 } from './AccommodationTypes';
@@ -193,6 +194,24 @@ export const setCheckInOut = createAsyncThunk(
   }
 );
 
+export const updateDescription = createAsyncThunk(
+  'accommodation/updateDescription',
+  async ({ id, title, description }: UpdateDescriptionPayload, { rejectWithValue }) => {
+    try {
+      await api.put(
+        `/api/accommodations/${id}/description`,
+        { title, description },
+        { headers: { 'Content-Type': 'application/ld+json' } }
+      );
+      return { title, description };
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors de la mise à jour de la description'
+      );
+    }
+  }
+);
+
 export const fetchAccommodation = createAsyncThunk(
   'accommodation/fetchOne',
   async (id: string, { rejectWithValue }) => {
@@ -335,6 +354,22 @@ const accommodationSlice = createSlice({
         }
       })
       .addCase(setCheckInOut.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update description
+      .addCase(updateDescription.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updateDescription.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.title = action.payload.title;
+          state.current.description = action.payload.description;
+        }
+      })
+      .addCase(updateDescription.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })
