@@ -34,6 +34,9 @@ services:
     App\Accommodation\Domain\Port\ImageTransformer:
         alias: App\Accommodation\Infrastructure\Gd\GdImageTransformer
 
+    App\SolidarityProject\Domain\Port\SolidarityProjectRepository:
+        alias: App\SolidarityProject\Infrastructure\Doctrine\DoctrineSolidarityProjectRepository
+
     App\Accommodation\Infrastructure\Filesystem\LocalPhotoStorage:
         arguments:
             $uploadDir: '%kernel.project_dir%/var/uploads/photos'

@@ -28,7 +28,7 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
 
         $statusFilter = $context['filters']['status'] ?? 'published';
         $allowedStatuses = ['published', 'draft', 'all'];
-        if (!in_array($statusFilter, $allowedStatuses, true)) {
+        if (!\in_array($statusFilter, $allowedStatuses, true)) {
             $statusFilter = 'published';
         }
 
