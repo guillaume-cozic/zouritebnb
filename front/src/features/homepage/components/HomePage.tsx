@@ -6,6 +6,7 @@ import { fetchPublishedAccommodations } from '../HomepageSlice';
 import { selectFilteredAccommodations, selectHomepageStatus, selectHomepageError } from '../HomepageSelectors';
 import HeroSection from './HeroSection';
 import AccommodationCard from './AccommodationCard';
+import SolidarityProjectsSection from '../../solidarityProject/components/SolidarityProjectsSection';
 
 const LoadingSkeleton: React.FC = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -242,130 +243,8 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Solidarity Projects */}
-      <section id="projects" className="py-16 scroll-mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">{t('projects.title')}</h2>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">{t('projects.subtitle')}</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Coral Reefs */}
-            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden flex flex-col group hover:shadow-lg transition-all">
-              <div className="aspect-[16/9] relative overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1546026423-cc4642628d2b?auto=format&fit=crop&q=80" alt={t('projects.coral.title')} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-              </div>
-              <div className="flex flex-col space-y-1.5 p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-                      <path d="M14 11a2 2 0 1 1-4 0 4 4 0 0 1 8 0 6 6 0 0 1-12 0 8 8 0 0 1 16 0 10 10 0 1 1-20 0 11.93 11.93 0 0 1 2.42-7.22 2 2 0 1 1 3.16 2.44" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold tracking-tight text-xl">{t('projects.coral.title')}</h3>
-                </div>
-              </div>
-              <div className="p-6 pt-0 flex flex-col flex-1">
-                <p className="text-gray-500 text-sm mb-4 flex-1">{t('projects.coral.description')}</p>
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                  <div className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="font-bold text-blue-600">5000+</div>
-                    <div className="text-xs text-gray-500">{t('projects.coral.stat1')}</div>
-                  </div>
-                  <div className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="font-bold text-blue-600">1000m&sup2;</div>
-                    <div className="text-xs text-gray-500">{t('projects.coral.stat2')}</div>
-                  </div>
-                  <div className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="font-bold text-blue-600">15</div>
-                    <div className="text-xs text-gray-500">{t('projects.coral.stat3')}</div>
-                  </div>
-                </div>
-                <button className="w-full inline-flex items-center justify-center rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-10 px-4 transition-colors">
-                  {t('projects.learnMore')}
-                </button>
-              </div>
-            </div>
+      <SolidarityProjectsSection />
 
-            {/* Turtle Reserve */}
-            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden flex flex-col group hover:shadow-lg transition-all">
-              <div className="aspect-[16/9] relative overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?auto=format&fit=crop&q=80" alt={t('projects.turtles.title')} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-              </div>
-              <div className="flex flex-col space-y-1.5 p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-                      <path d="m12 10 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a8 8 0 1 0-16 0v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3l2-4h4Z" />
-                      <path d="M4.82 7.9 8 10" /><path d="M15.18 7.9 12 10" />
-                      <path d="M16.93 10H20a2 2 0 0 1 0 4H2" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold tracking-tight text-xl">{t('projects.turtles.title')}</h3>
-                </div>
-              </div>
-              <div className="p-6 pt-0 flex flex-col flex-1">
-                <p className="text-gray-500 text-sm mb-4 flex-1">{t('projects.turtles.description')}</p>
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                  <div className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="font-bold text-blue-600">200+</div>
-                    <div className="text-xs text-gray-500">{t('projects.turtles.stat1')}</div>
-                  </div>
-                  <div className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="font-bold text-blue-600">30+</div>
-                    <div className="text-xs text-gray-500">{t('projects.turtles.stat2')}</div>
-                  </div>
-                  <div className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="font-bold text-blue-600">15000+</div>
-                    <div className="text-xs text-gray-500">{t('projects.turtles.stat3')}</div>
-                  </div>
-                </div>
-                <button className="w-full inline-flex items-center justify-center rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-10 px-4 transition-colors">
-                  {t('projects.learnMore')}
-                </button>
-              </div>
-            </div>
-
-            {/* Water Management */}
-            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden flex flex-col group hover:shadow-lg transition-all">
-              <div className="aspect-[16/9] relative overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1468421870903-4df1664ac249?auto=format&fit=crop&q=80" alt={t('projects.water.title')} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-              </div>
-              <div className="flex flex-col space-y-1.5 p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-                      <path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z" />
-                      <path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold tracking-tight text-xl">{t('projects.water.title')}</h3>
-                </div>
-              </div>
-              <div className="p-6 pt-0 flex flex-col flex-1">
-                <p className="text-gray-500 text-sm mb-4 flex-1">{t('projects.water.description')}</p>
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                  <div className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="font-bold text-blue-600">500k+</div>
-                    <div className="text-xs text-gray-500">{t('projects.water.stat1')}</div>
-                  </div>
-                  <div className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="font-bold text-blue-600">200+</div>
-                    <div className="text-xs text-gray-500">{t('projects.water.stat2')}</div>
-                  </div>
-                  <div className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="font-bold text-blue-600">50</div>
-                    <div className="text-xs text-gray-500">{t('projects.water.stat3')}</div>
-                  </div>
-                </div>
-                <button className="w-full inline-flex items-center justify-center rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-10 px-4 transition-colors">
-                  {t('projects.learnMore')}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400">

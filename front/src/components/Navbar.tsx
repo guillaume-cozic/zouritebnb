@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
             BnB
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link to="/#projects" className="hover:text-blue-600 transition-colors">
+            <Link to="/solidarity-projects" className="hover:text-blue-600 transition-colors">
               {t('projects.title')}
             </Link>
             <Link to="/admin/accommodations" className="hover:text-blue-600 transition-colors">

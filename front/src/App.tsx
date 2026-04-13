@@ -8,6 +8,8 @@ import EditAccommodationPage from './features/accommodation/components/EditAccom
 import AccommodationPhotosPage from './features/accommodation/components/AccommodationPhotosPage';
 import ManageAccommodationsPage from './features/accommodationManagement/components/ManageAccommodationsPage';
 import BackofficeLayout from './features/accommodationManagement/components/BackofficeLayout';
+import SolidarityProjectsPage from './features/solidarityProject/components/SolidarityProjectsPage';
+import SolidarityProjectDetailPage from './features/solidarityProject/components/SolidarityProjectDetailPage';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
       <div className="pt-16 min-h-screen">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/solidarity-projects" element={<SolidarityProjectsPage />} />
+          <Route path="/solidarity-projects/:id" element={<SolidarityProjectDetailPage />} />
           <Route path="/accommodations/:id" element={<AccommodationDetailPage />} />
           <Route path="/create" element={<CreateAccommodationWizard />} />
           <Route element={<BackofficeLayout />}>

@@ -78,27 +78,22 @@
   "projects": {
     "title": "Our Solidarity Projects",
     "subtitle": "Discover the local initiatives we support to preserve the environment and unique culture of Rodrigues.",
-    "learnMore": "Learn more",
-    "coral": {
-      "title": "Coral Reef Protection",
-      "description": "Rodrigues coral reef restoration programme through micro-fragmentation, in partnership with The Coral Planters. Help preserve our unique marine ecosystem.",
-      "stat1": "Corals planted",
-      "stat2": "Area restored",
-      "stat3": "Species preserved"
+    "viewAll": "View all projects",
+    "empty": "No solidarity project for the moment.",
+    "pageTitle": "Solidarity Projects",
+    "pageSubtitle": "All the initiatives we support in Rodrigues.",
+    "back": "Back to projects",
+    "category": "Solidarity",
+    "readingTime_one": "{{count}} min read",
+    "readingTime_other": "{{count}} min read",
+    "status": {
+      "active": "Active",
+      "closed": "Closed"
     },
-    "turtles": {
-      "title": "François Leguat Reserve",
-      "description": "Sanctuary dedicated to the protection and breeding of giant tortoises and endemic species of Rodrigues.",
-      "stat1": "Tortoises protected",
-      "stat2": "Endemic species",
-      "stat3": "Visitors/year"
-    },
-    "water": {
-      "title": "Napa Dilo - Freshwater Management",
-      "description": "Innovative freshwater recovery and sustainable management programme, aimed at strengthening Rodrigues' water self-sufficiency.",
-      "stat1": "Litres saved/year",
-      "stat2": "Beneficiary families",
-      "stat3": "Cisterns installed"
+    "cta": {
+      "title": "Want to support this project?",
+      "subtitle": "Every contribution makes a real difference for Rodrigues.",
+      "button": "Get involved"
     }
   },
   "edit": {

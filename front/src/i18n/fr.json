@@ -78,27 +78,22 @@
   "projects": {
     "title": "Nos Projets Solidaires",
     "subtitle": "Découvrez les initiatives locales que nous soutenons pour préserver l'environnement et la culture unique de Rodrigues.",
-    "learnMore": "En savoir plus",
-    "coral": {
-      "title": "Protection des Récifs Coralliens",
-      "description": "Programme de restauration des récifs coralliens de Rodrigues par micro-fragmentation, en partenariat avec The Coral Planters. Participez à la préservation de notre écosystème marin unique.",
-      "stat1": "Coraux plantés",
-      "stat2": "Surface restaurée",
-      "stat3": "Espèces préservées"
+    "viewAll": "Voir tous les projets",
+    "empty": "Aucun projet solidaire pour le moment.",
+    "pageTitle": "Projets Solidaires",
+    "pageSubtitle": "Toutes les initiatives que nous soutenons à Rodrigues.",
+    "back": "Retour aux projets",
+    "category": "Solidarité",
+    "readingTime_one": "{{count}} min de lecture",
+    "readingTime_other": "{{count}} min de lecture",
+    "status": {
+      "active": "En cours",
+      "closed": "Clôturé"
     },
-    "turtles": {
-      "title": "Réserve François Leguat",
-      "description": "Sanctuaire dédié à la protection et à la reproduction des tortues géantes et des espèces endémiques de Rodrigues.",
-      "stat1": "Tortues protégées",
-      "stat2": "Espèces endémiques",
-      "stat3": "Visiteurs/an"
-    },
-    "water": {
-      "title": "Napa Dilo - Gestion de l'Eau Douce",
-      "description": "Programme innovant de récupération et de gestion durable de l'eau douce, visant à renforcer l'autonomie hydrique de Rodrigues.",
-      "stat1": "Litres économisés/an",
-      "stat2": "Familles bénéficiaires",
-      "stat3": "Citernes installées"
+    "cta": {
+      "title": "Envie de soutenir ce projet ?",
+      "subtitle": "Chaque contribution fait une vraie différence pour Rodrigues.",
+      "button": "Participer"
     }
   },
   "edit": {

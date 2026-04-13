@@ -1,3 +1,48 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .prose-blog {
+    @apply text-gray-700 leading-relaxed;
+  }
+  .prose-blog > * + * {
+    @apply mt-5;
+  }
+  .prose-blog p {
+    @apply text-base sm:text-lg leading-[1.8];
+  }
+  .prose-blog p:first-of-type {
+    @apply text-lg sm:text-xl text-gray-800 leading-[1.7] font-medium;
+  }
+  .prose-blog h2 {
+    @apply text-2xl sm:text-3xl font-bold text-gray-900 mt-10 mb-4 tracking-tight;
+  }
+  .prose-blog h3 {
+    @apply text-xl sm:text-2xl font-semibold text-gray-900 mt-8 mb-3;
+  }
+  .prose-blog h4 {
+    @apply text-lg font-semibold text-gray-900 mt-6 mb-2;
+  }
+  .prose-blog ul {
+    @apply list-disc list-outside pl-6 space-y-2;
+  }
+  .prose-blog ol {
+    @apply list-decimal list-outside pl-6 space-y-2;
+  }
+  .prose-blog blockquote {
+    @apply border-l-4 border-blue-500 pl-5 italic text-gray-600 my-6;
+  }
+  .prose-blog a {
+    @apply text-blue-600 underline underline-offset-2 hover:text-blue-700;
+  }
+  .prose-blog strong {
+    @apply font-semibold text-gray-900;
+  }
+  .prose-blog img {
+    @apply rounded-xl my-6 w-full;
+  }
+  .prose-blog code {
+    @apply bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm;
+  }
+}

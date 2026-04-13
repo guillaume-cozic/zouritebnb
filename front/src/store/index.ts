@@ -3,6 +3,7 @@ import counterReducer from '../features/counter/counterSlice';
 import accommodationReducer from '../features/accommodation/AccommodationSlice';
 import homepageReducer from '../features/homepage/HomepageSlice';
 import accommodationManagementReducer from '../features/accommodationManagement/AccommodationManagementSlice';
+import solidarityProjectReducer from '../features/solidarityProject/SolidarityProjectSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     accommodation: accommodationReducer,
     homepage: homepageReducer,
     accommodationManagement: accommodationManagementReducer,
+    solidarityProject: solidarityProjectReducer,
   },
 });
 
