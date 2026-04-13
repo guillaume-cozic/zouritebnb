@@ -129,6 +129,8 @@
     "save": "Save",
     "guests": "guests",
     "bedrooms": "bedrooms",
+    "doubleBeds": "double bed(s)",
+    "singleBeds": "single bed(s)",
     "bathrooms": "bathrooms",
     "capacity": "Capacity",
     "withBathroom": "With bathroom",

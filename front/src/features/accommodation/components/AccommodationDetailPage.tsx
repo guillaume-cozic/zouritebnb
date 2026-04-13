@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import LocationMap from '../../../components/LocationMap';
+import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
 import { selectCurrentAccommodation, selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
 
@@ -14,8 +16,7 @@ const AccommodationDetailPage: React.FC = () => {
   const accommodation = useAppSelector(selectCurrentAccommodation);
   const status = useAppSelector(selectAccommodationStatus);
   const error = useAppSelector(selectAccommodationError);
-  const [activePhoto, setActivePhoto] = useState(0);
-
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   useEffect(() => {
     if (id) {
       dispatch(fetchAccommodation(id));
@@ -60,11 +61,7 @@ const AccommodationDetailPage: React.FC = () => {
 
   if (!accommodation) return null;
 
-  const thumbnailSrc = accommodation.thumbnailUrl
-    ? `${API_BASE}${accommodation.thumbnailUrl}`
-    : null;
-
-  const photos = thumbnailSrc ? [thumbnailSrc] : [];
+  const photos = (accommodation.photos ?? []).map((p) => `${API_BASE}${p.url}`);
 
   return (
     <main className="min-h-screen py-8">
@@ -72,7 +69,14 @@ const AccommodationDetailPage: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{accommodation.title}</h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold">{accommodation.title}</h1>
+              {accommodation.status && accommodation.status !== 'published' && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-amber-50 text-amber-700 border-amber-200">
+                  {accommodation.status}
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-4 text-gray-500">
               <div className="flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
@@ -106,57 +110,79 @@ const AccommodationDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left column */}
           <div className="lg:col-span-8">
-            {/* Photo carousel */}
+            {/* Photo gallery */}
             <div className="mb-6">
-              <div className="aspect-[2/1] relative rounded-2xl overflow-hidden bg-gray-100">
-                {photos.length > 0 ? (
-                  <img
-                    src={photos[activePhoto]}
-                    alt={`${accommodation.title} - Photo ${activePhoto + 1}`}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                )}
-                {photos.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => setActivePhoto((p) => Math.max(0, p - 1))}
-                      disabled={activePhoto === 0}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center disabled:opacity-50"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>
-                    </button>
-                    <button
-                      onClick={() => setActivePhoto((p) => Math.min(photos.length - 1, p + 1))}
-                      disabled={activePhoto === photos.length - 1}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center disabled:opacity-50"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
-                    </button>
-                  </>
-                )}
-              </div>
+              {photos.length === 0 ? (
+                <div className="aspect-[2/1] relative rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setLightboxIndex(0)}
+                    className="block w-full aspect-[2/1] rounded-2xl overflow-hidden bg-gray-100 group focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <img
+                      src={photos[0]}
+                      alt={`${accommodation.title} - 1`}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </button>
+                  {photos.length > 1 && (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                      {photos.slice(1).map((src, idx) => (
+                        <button
+                          key={src}
+                          onClick={() => setLightboxIndex(idx + 1)}
+                          className="aspect-square rounded-xl overflow-hidden bg-gray-100 group focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <img
+                            src={src}
+                            alt={`${accommodation.title} - ${idx + 2}`}
+                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+
+            {lightboxIndex !== null && (
+              <PhotoLightbox
+                photos={photos}
+                index={lightboxIndex}
+                onClose={() => setLightboxIndex(null)}
+                onChange={setLightboxIndex}
+              />
+            )}
 
             {/* Capacity */}
             <div className="border-b pb-8 mb-8">
-              <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div>
                   <div className="text-lg font-semibold">{accommodation.maxGuests ?? 0} {t('detail.guests')}</div>
-                  <div className="text-gray-500">{t('detail.capacity')}</div>
+                  <div className="text-gray-500 text-sm">{t('detail.capacity')}</div>
                 </div>
                 <div>
                   <div className="text-lg font-semibold">{accommodation.bedrooms ?? 0} {t('detail.bedrooms')}</div>
-                  <div className="text-gray-500">{t('detail.withBathroom')}</div>
+                  <div className="text-gray-500 text-sm">
+                    {[
+                      accommodation.doubleBeds ? `${accommodation.doubleBeds} ${t('detail.doubleBeds')}` : null,
+                      accommodation.singleBeds ? `${accommodation.singleBeds} ${t('detail.singleBeds')}` : null,
+                    ].filter(Boolean).join(' · ') || '—'}
+                  </div>
                 </div>
                 <div>
                   <div className="text-lg font-semibold">{accommodation.bathrooms ?? 0} {t('detail.bathrooms')}</div>
-                  <div className="text-gray-500">{t('detail.private')}</div>
+                  <div className="text-gray-500 text-sm">{t('detail.private')}</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold">{accommodation.price ?? 0}{'\u00A0'}€</div>
+                  <div className="text-gray-500 text-sm">/ {t('detail.night')}</div>
                 </div>
               </div>
 
@@ -164,11 +190,11 @@ const AccommodationDetailPage: React.FC = () => {
               <div className="flex items-center gap-8 mb-6">
                 <div className="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-                  <div><span className="font-medium">{t('detail.checkIn')} :</span><span className="ml-1">16:00</span></div>
+                  <div><span className="font-medium">{t('detail.checkIn')} :</span><span className="ml-1">{accommodation.checkIn ?? '—'}</span></div>
                 </div>
                 <div className="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-                  <div><span className="font-medium">{t('detail.checkOut')} :</span><span className="ml-1">12:00</span></div>
+                  <div><span className="font-medium">{t('detail.checkOut')} :</span><span className="ml-1">{accommodation.checkOut ?? '—'}</span></div>
                 </div>
               </div>
 
@@ -205,6 +231,15 @@ const AccommodationDetailPage: React.FC = () => {
                     <p className="text-gray-500">{[accommodation.zipCode, accommodation.city, accommodation.country].filter(Boolean).join(', ')}</p>
                   </div>
                 </div>
+                {accommodation.latitude !== undefined && accommodation.longitude !== undefined && (
+                  <div className="mt-6">
+                    <LocationMap
+                      latitude={accommodation.latitude}
+                      longitude={accommodation.longitude}
+                      label={accommodation.title}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>

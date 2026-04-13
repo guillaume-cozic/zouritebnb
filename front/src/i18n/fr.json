@@ -130,6 +130,8 @@
     "guests": "voyageurs",
     "bedrooms": "chambres",
     "bathrooms": "salles de bain",
+    "doubleBeds": "lit(s) double(s)",
+    "singleBeds": "lit(s) simple(s)",
     "capacity": "Capacité",
     "withBathroom": "Avec salle de bain",
     "private": "Privatives",

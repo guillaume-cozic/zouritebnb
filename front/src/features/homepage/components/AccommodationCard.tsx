@@ -18,7 +18,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation }) 
   return (
     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1">
       {/* Image */}
-      <div className="aspect-video relative overflow-hidden">
+      <Link to={`/accommodations/${accommodation.id}`} className="block aspect-video relative overflow-hidden cursor-pointer">
         {thumbnailSrc ? (
           <img
             src={thumbnailSrc}
@@ -55,7 +55,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation }) 
             <span className="text-xs font-medium text-gray-700">{accommodation.maxGuests}</span>
           </div>
         )}
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="p-5">

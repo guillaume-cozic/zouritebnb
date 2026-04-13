@@ -1,0 +1,35 @@
+import React from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
+interface LocationMapProps {
+  latitude: number;
+  longitude: number;
+  label?: string;
+  zoom?: number;
+  height?: number;
+}
+
+const LocationMap: React.FC<LocationMapProps> = ({ latitude, longitude, label, zoom = 14, height = 320 }) => (
+  <div className="rounded-2xl overflow-hidden border border-gray-100" style={{ height }}>
+    <MapContainer center={[latitude, longitude]} zoom={zoom} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <Marker position={[latitude, longitude]}>
+        {label && <Popup>{label}</Popup>}
+      </Marker>
+    </MapContainer>
+  </div>
+);
+
+export default LocationMap;
