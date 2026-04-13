@@ -44,6 +44,7 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
                 a.country,
                 a.max_guests,
                 a.status,
+                a.amenities,
                 (
                     SELECT p.filename
                     FROM accommodation_photo p
@@ -87,6 +88,9 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $output->country = $row['country'];
             $output->maxGuests = null !== $row['max_guests'] ? (int) $row['max_guests'] : null;
             $output->status = $row['status'];
+            $output->amenities = null !== $row['amenities']
+                ? (\is_array($decoded = json_decode((string) $row['amenities'], true)) ? $decoded : null)
+                : null;
             $output->thumbnailUrl = null !== $row['thumbnail_filename']
                 ? '/uploads/photos/'.$row['thumbnail_filename']
                 : null;

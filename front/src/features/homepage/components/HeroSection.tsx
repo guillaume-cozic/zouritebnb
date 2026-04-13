@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { fr } from 'date-fns/locale/fr';
@@ -26,6 +27,7 @@ const SLIDES = [
 const HeroSection: React.FC = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const filters = useAppSelector(selectHomepageFilters);
 
   const [current, setCurrent] = useState(0);
@@ -173,8 +175,40 @@ const HeroSection: React.FC = () => {
               </div>
             </div>
 
+            {/* Amenities quick filters */}
+            <div className="mb-3">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                {t('hero.amenities')}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {(['wifi', 'air_conditioning', 'private_pool', 'private_parking', 'sea_view', 'pets_allowed'] as const).map((code) => {
+                  const active = filters.amenities.includes(code);
+                  return (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => {
+                        const next = active
+                          ? filters.amenities.filter((c) => c !== code)
+                          : [...filters.amenities, code];
+                        dispatch(setFilters({ amenities: next }));
+                      }}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                        active
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-200 hover:border-blue-400'
+                      }`}
+                    >
+                      {t(`amenities.${code}`, code)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <button
               type="button"
+              onClick={() => navigate('/accommodations')}
               className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-2">

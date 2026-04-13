@@ -8,6 +8,7 @@ export interface AccommodationListItem {
   maxGuests: number | null;
   status: string;
   thumbnailUrl: string | null;
+  amenities: string[] | null;
 }
 
 export interface SearchFilters {
@@ -15,4 +16,5 @@ export interface SearchFilters {
   checkIn: string;
   checkOut: string;
   guests: number | null;
+  amenities: string[];
 }

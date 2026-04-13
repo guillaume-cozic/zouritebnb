@@ -40,7 +40,13 @@
     "guests": "Voyageurs",
     "searchPlaceholder": "Où allez-vous ?",
     "selectDates": "Sélectionner les dates",
+    "amenities": "Équipements",
     "search": "Rechercher"
+  },
+  "listing": {
+    "title": "Hébergements",
+    "subtitle": "Affinez votre recherche pour trouver le logement idéal",
+    "reset": "Réinitialiser les filtres"
   },
   "homepage": {
     "loading": "Chargement...",

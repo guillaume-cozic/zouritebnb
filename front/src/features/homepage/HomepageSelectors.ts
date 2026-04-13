@@ -5,7 +5,7 @@ export const selectAccommodations = (state: RootState) =>
   state.homepage?.accommodations ?? [];
 
 export const selectHomepageFilters = (state: RootState) =>
-  state.homepage?.filters ?? { city: '', checkIn: '', checkOut: '', guests: null };
+  state.homepage?.filters ?? { city: '', checkIn: '', checkOut: '', guests: null, amenities: [] };
 
 export const selectHomepageStatus = (state: RootState) =>
   state.homepage?.status ?? 'idle';
@@ -22,6 +22,12 @@ export const selectFilteredAccommodations = createSelector(
       }
       if (filters.guests !== null && item.maxGuests !== null && item.maxGuests < filters.guests) {
         return false;
+      }
+      if (filters.amenities.length > 0) {
+        const itemAmenities = item.amenities ?? [];
+        if (!filters.amenities.every((code) => itemAmenities.includes(code))) {
+          return false;
+        }
       }
       return true;
     });

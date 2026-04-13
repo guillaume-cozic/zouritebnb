@@ -40,7 +40,13 @@
     "guests": "Guests",
     "searchPlaceholder": "Where are you going?",
     "selectDates": "Select dates",
+    "amenities": "Amenities",
     "search": "Search"
+  },
+  "listing": {
+    "title": "Accommodations",
+    "subtitle": "Refine your search to find the perfect place",
+    "reset": "Reset filters"
   },
   "homepage": {
     "loading": "Loading...",

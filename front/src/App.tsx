@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HomePage from './features/homepage/components/HomePage';
+import AccommodationsListingPage from './features/homepage/components/AccommodationsListingPage';
 import CreateAccommodationWizard from './features/accommodation/components/CreateAccommodationWizard';
 import AccommodationDetailPage from './features/accommodation/components/AccommodationDetailPage';
 import EditAccommodationPage from './features/accommodation/components/EditAccommodationPage';
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/solidarity-projects" element={<SolidarityProjectsPage />} />
           <Route path="/solidarity-projects/:id" element={<SolidarityProjectDetailPage />} />
+          <Route path="/accommodations" element={<AccommodationsListingPage />} />
           <Route path="/accommodations/:id" element={<AccommodationDetailPage />} />
           <Route path="/create" element={<CreateAccommodationWizard />} />
           <Route element={<BackofficeLayout />}>

@@ -11,7 +11,7 @@ interface HomepageState {
 
 const initialState: HomepageState = {
   accommodations: [],
-  filters: { city: '', checkIn: '', checkOut: '', guests: null },
+  filters: { city: '', checkIn: '', checkOut: '', guests: null, amenities: [] },
   status: 'idle',
   error: null,
 };

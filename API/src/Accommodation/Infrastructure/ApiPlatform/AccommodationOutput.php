@@ -400,7 +400,7 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Nombre de lits doubles', example: 2)]
     public ?int $doubleBeds = null;
 
-    #[Groups(['accommodation:read'])]
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Liste des codes d\'équipements', example: ['private_pool', 'wifi', 'parking'])]
     public ?array $amenities = null;
 

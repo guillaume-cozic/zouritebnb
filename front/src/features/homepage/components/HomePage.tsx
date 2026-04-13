@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchPublishedAccommodations } from '../HomepageSlice';
-import { selectFilteredAccommodations, selectHomepageStatus, selectHomepageError } from '../HomepageSelectors';
+import { selectAccommodations, selectHomepageStatus, selectHomepageError } from '../HomepageSelectors';
 import HeroSection from './HeroSection';
 import AccommodationCard from './AccommodationCard';
 import SolidarityProjectsSection from '../../solidarityProject/components/SolidarityProjectsSection';
@@ -43,7 +43,7 @@ const EmptyState: React.FC<{ message: string }> = ({ message }) => (
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const accommodations = useAppSelector(selectFilteredAccommodations);
+  const accommodations = useAppSelector(selectAccommodations);
   const status = useAppSelector(selectHomepageStatus);
   const error = useAppSelector(selectHomepageError);
 
