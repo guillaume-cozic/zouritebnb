@@ -7,6 +7,7 @@ import {
   SetCapacityPayload,
   SetAmenitiesPayload,
   AddPhotoPayload,
+  DeletePhotoPayload,
   UpdatePricePayload,
   SetCheckInOutPayload,
   ReorderPhotosPayload,
@@ -136,6 +137,20 @@ export const addPhoto = createAsyncThunk(
       return file.name;
     } catch (err: any) {
       return rejectWithValue(err.message || "Erreur lors de l'upload de la photo");
+    }
+  }
+);
+
+export const deletePhoto = createAsyncThunk(
+  'accommodation/deletePhoto',
+  async ({ id, photoId }: DeletePhotoPayload, { rejectWithValue }) => {
+    try {
+      await api.delete(`/api/accommodations/${id}/photos/${photoId}`);
+      return { photoId };
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors de la suppression de la photo'
+      );
     }
   }
 );
@@ -324,6 +339,20 @@ const accommodationSlice = createSlice({
       })
       .addCase(addPhoto.rejected, (state, action) => {
         state.photoUploadStatus = 'failed';
+        state.error = action.payload as string;
+      })
+      // Delete photo
+      .addCase(deletePhoto.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(deletePhoto.fulfilled, (state, action) => {
+        if (state.current?.photos) {
+          state.current.photos = state.current.photos.filter(
+            (p) => p.id !== action.payload.photoId
+          );
+        }
+      })
+      .addCase(deletePhoto.rejected, (state, action) => {
         state.error = action.payload as string;
       })
       // Update price

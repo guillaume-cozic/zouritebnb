@@ -26,7 +26,15 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
         $itemsPerPage = 30;
         $offset = ($page - 1) * $itemsPerPage;
 
-        $sql = <<<'SQL'
+        $statusFilter = $context['filters']['status'] ?? 'published';
+        $allowedStatuses = ['published', 'draft', 'all'];
+        if (!in_array($statusFilter, $allowedStatuses, true)) {
+            $statusFilter = 'published';
+        }
+
+        $whereClause = 'all' === $statusFilter ? '1=1' : 'a.status = :status';
+
+        $sql = <<<SQL
             SELECT
                 BIN_TO_UUID(a.id) AS id,
                 a.title,
@@ -43,21 +51,30 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
                     LIMIT 1
                 ) AS thumbnail_filename
             FROM accommodation a
-            WHERE a.status = 'published'
+            WHERE {$whereClause}
             ORDER BY a.title ASC
             LIMIT :limit OFFSET :offset
             SQL;
 
-        $rows = $this->connection->executeQuery($sql, [
+        $params = [
             'limit' => $itemsPerPage,
             'offset' => $offset,
-        ], [
+        ];
+        $types = [
             'limit' => ParameterType::INTEGER,
             'offset' => ParameterType::INTEGER,
-        ])->fetchAllAssociative();
+        ];
+        if ('all' !== $statusFilter) {
+            $params['status'] = $statusFilter;
+        }
 
-        $countSql = "SELECT COUNT(*) FROM accommodation WHERE status = 'published'";
-        $totalItems = (int) $this->connection->executeQuery($countSql)->fetchOne();
+        $rows = $this->connection->executeQuery($sql, $params, $types)->fetchAllAssociative();
+
+        $countSql = 'all' === $statusFilter
+            ? 'SELECT COUNT(*) FROM accommodation'
+            : 'SELECT COUNT(*) FROM accommodation WHERE status = :status';
+        $countParams = 'all' === $statusFilter ? [] : ['status' => $statusFilter];
+        $totalItems = (int) $this->connection->executeQuery($countSql, $countParams)->fetchOne();
 
         $outputs = [];
         foreach ($rows as $row) {

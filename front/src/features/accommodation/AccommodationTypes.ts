@@ -75,6 +75,11 @@ export interface SetCheckInOutPayload {
   checkOut: string;
 }
 
+export interface DeletePhotoPayload {
+  id: string;
+  photoId: string;
+}
+
 export interface ReorderPhotosPayload {
   id: string;
   photoIds: string[];

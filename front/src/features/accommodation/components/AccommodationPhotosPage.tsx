@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchAccommodation, addPhoto, reorderPhotos } from '../AccommodationSlice';
+import { fetchAccommodation, addPhoto, reorderPhotos, deletePhoto } from '../AccommodationSlice';
 import { selectCurrentAccommodation, selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
 import EditLayout, { SECTIONS } from './EditLayout';
 
@@ -100,6 +100,17 @@ const AccommodationPhotosPage: React.FC = () => {
       }));
     }
   }, [dragIdx, dragOverIdx, localPhotos, accommodation?.id, dispatch]);
+
+  const handleDelete = async (photoId: string) => {
+    if (!accommodation?.id) return;
+    setLocalPhotos((prev) => prev.filter((p) => p.id !== photoId));
+    try {
+      await dispatch(deletePhoto({ id: accommodation.id, photoId })).unwrap();
+    } catch {
+      // Re-sync from store on error
+      if (accommodation.photos) setLocalPhotos(accommodation.photos);
+    }
+  };
 
   // Loading
   if (status === 'loading' && !accommodation) {
@@ -231,8 +242,17 @@ const AccommodationPhotosPage: React.FC = () => {
                   <div className="absolute top-2 left-2 flex items-center justify-center w-7 h-7 rounded-lg bg-black/50 text-white text-xs font-bold backdrop-blur-sm">
                     {idx + 1}
                   </div>
+                  {/* Delete button */}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleDelete(photo.id); }}
+                    className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-lg bg-black/50 hover:bg-red-600 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all"
+                    title={t('photos.delete')}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
+                  </button>
                   {/* Drag handle hint */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none">
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-lg"><circle cx="9" cy="5" r="1" /><circle cx="15" cy="5" r="1" /><circle cx="9" cy="12" r="1" /><circle cx="15" cy="12" r="1" /><circle cx="9" cy="19" r="1" /><circle cx="15" cy="19" r="1" /></svg>
                     </div>

@@ -1,7 +1,34 @@
 {
   "navbar": {
     "home": "Accueil",
-    "createAccommodation": "Créer un hébergement"
+    "createAccommodation": "Créer un hébergement",
+    "backoffice": "Back-office"
+  },
+  "backoffice": {
+    "title": "Gestion des hébergements",
+    "subtitle": "Liste complète de vos hébergements, brouillons inclus",
+    "menu": {
+      "title": "Administration",
+      "accommodations": "Hébergements"
+    },
+    "empty": "Aucun hébergement.",
+    "filter": {
+      "all": "Tous",
+      "published": "Publiés",
+      "draft": "Brouillons"
+    },
+    "col": {
+      "title": "Titre",
+      "city": "Ville",
+      "price": "Prix",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "action": {
+      "edit": "Éditer",
+      "publish": "Publier",
+      "unpublish": "Dépublier"
+    }
   },
   "hero": {
     "title": "Trouvez votre hébergement idéal",
@@ -323,6 +350,7 @@
     "currentPhoto": "Photo actuelle",
     "gallery": "Photos",
     "dragToReorder": "Glisser pour réordonner",
-    "uploadError": "Erreur lors de l'envoi de la photo"
+    "uploadError": "Erreur lors de l'envoi de la photo",
+    "delete": "Supprimer"
   }
 }

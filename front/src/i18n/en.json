@@ -1,7 +1,34 @@
 {
   "navbar": {
     "home": "Home",
-    "createAccommodation": "Create accommodation"
+    "createAccommodation": "Create accommodation",
+    "backoffice": "Back office"
+  },
+  "backoffice": {
+    "title": "Manage accommodations",
+    "subtitle": "Full list including drafts",
+    "menu": {
+      "title": "Administration",
+      "accommodations": "Accommodations"
+    },
+    "empty": "No accommodation.",
+    "filter": {
+      "all": "All",
+      "published": "Published",
+      "draft": "Drafts"
+    },
+    "col": {
+      "title": "Title",
+      "city": "City",
+      "price": "Price",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "action": {
+      "edit": "Edit",
+      "publish": "Publish",
+      "unpublish": "Unpublish"
+    }
   },
   "hero": {
     "title": "Find your perfect accommodation",
@@ -323,6 +350,7 @@
     "currentPhoto": "Current photo",
     "gallery": "Photos",
     "dragToReorder": "Drag to reorder",
-    "uploadError": "Error uploading photo"
+    "uploadError": "Error uploading photo",
+    "delete": "Delete"
   }
 }

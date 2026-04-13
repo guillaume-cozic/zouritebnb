@@ -22,6 +22,9 @@ const Navbar: React.FC = () => {
             <Link to="/#projects" className="hover:text-blue-600 transition-colors">
               {t('projects.title')}
             </Link>
+            <Link to="/admin/accommodations" className="hover:text-blue-600 transition-colors">
+              {t('navbar.backoffice')}
+            </Link>
           </nav>
         </div>
 
