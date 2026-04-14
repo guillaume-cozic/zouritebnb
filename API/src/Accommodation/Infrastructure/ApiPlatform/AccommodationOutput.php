@@ -94,6 +94,39 @@ use Symfony\Component\Serializer\Attribute\Groups;
             output: false,
             processor: UpdateAccommodationPriceProcessor::class,
         ),
+        new Patch(
+            uriTemplate: '/accommodations/{id}/weekly-promotion',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Modifier la promotion hebdomadaire d\'un hébergement',
+                description: 'Met à jour le pourcentage de réduction appliqué aux séjours d\'au moins 7 nuits. La valeur doit être strictement supérieure à 0 et inférieure ou égale à 100. Envoyer null pour désactiver la promotion.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/merge-patch+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: ['weeklyPromotionPercentage' => 10.0],
+                                ),
+                                'disable' => new Example(
+                                    summary: 'Désactiver la promotion',
+                                    value: ['weeklyPromotionPercentage' => null],
+                                ),
+                                'out_of_bounds' => new Example(
+                                    summary: 'Invalide : pourcentage hors bornes',
+                                    description: 'Retourne une erreur 422 car la valeur doit être dans ]0, 100].',
+                                    value: ['weeklyPromotionPercentage' => 150.0],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationWeeklyPromotionInput::class,
+            output: false,
+            processor: UpdateAccommodationWeeklyPromotionProcessor::class,
+        ),
         new Put(
             uriTemplate: '/accommodations/{id}/address',
             status: 204,
@@ -352,6 +385,10 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Prix par nuit en euros', example: 150.0)]
     public ?float $price = null;
 
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Pourcentage de réduction appliqué aux séjours d\'au moins 7 nuits', example: 10.0)]
+    public ?float $weeklyPromotionPercentage = null;
+
     #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Statut de publication', example: 'draft')]
     public ?string $status = null;
@@ -449,6 +486,7 @@ class AccommodationOutput implements FromEntityInterface
         $output->checkIn = $entity->getCheckIn();
         $output->checkOut = $entity->getCheckOut();
         $output->teamId = $entity->getTeamId()?->toRfc4122();
+        $output->weeklyPromotionPercentage = $entity->getWeeklyPromotionPercentage();
 
         return $output;
     }

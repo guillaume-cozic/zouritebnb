@@ -4,6 +4,7 @@ export interface Accommodation {
   title?: string;
   description?: string;
   price?: number;
+  weeklyPromotionPercentage?: number | null;
   status?: 'draft' | 'published';
   street?: string;
   city?: string;
@@ -68,6 +69,11 @@ export interface SetAmenitiesPayload {
 export interface UpdatePricePayload {
   id: string;
   price: number;
+}
+
+export interface UpdateWeeklyPromotionPayload {
+  id: string;
+  weeklyPromotionPercentage: number | null;
 }
 
 export interface SetCheckInOutPayload {

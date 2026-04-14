@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import {
   fetchAccommodation,
   updatePrice,
+  updateWeeklyPromotion,
   updateDescription,
   setLocation,
   setCapacity,
@@ -112,6 +113,10 @@ const EditAccommodationPage: React.FC = () => {
   const [price, setPrice] = useState<number>(0);
   const priceInitialized = useRef(false);
 
+  // Weekly promotion local state ('' = disabled / null)
+  const [weeklyPromotion, setWeeklyPromotion] = useState<string>('');
+  const weeklyPromotionInitialized = useRef(false);
+
   // Capacity local state
   const [capacityValues, setCapacityValues] = useState({
     bedrooms: 0, bathrooms: 0, maxGuests: 0, singleBeds: 0, doubleBeds: 0,
@@ -162,6 +167,14 @@ const EditAccommodationPage: React.FC = () => {
     if (!priceInitialized.current) {
       setPrice(accommodation.price ?? 0);
       priceInitialized.current = true;
+    }
+    if (!weeklyPromotionInitialized.current) {
+      setWeeklyPromotion(
+        accommodation.weeklyPromotionPercentage != null
+          ? String(accommodation.weeklyPromotionPercentage)
+          : ''
+      );
+      weeklyPromotionInitialized.current = true;
     }
     if (!capacityInitialized.current) {
       setCapacityValues({
@@ -224,6 +237,25 @@ const EditAccommodationPage: React.FC = () => {
     setSectionSaveStatus('price', 'saving');
     try {
       await dispatch(updatePrice({ id: accommodation.id, price: value })).unwrap();
+      setSectionSaveStatus('price', 'saved');
+    } catch {
+      setSectionSaveStatus('price', 'error');
+    }
+  }, AUTOSAVE_DELAY);
+
+  const autoSaveWeeklyPromotion = useDebounce(async (raw: string) => {
+    if (!accommodation?.id || !initialLoadDone.current) return;
+    let value: number | null;
+    if (raw === '') {
+      value = null;
+    } else {
+      const n = Number(raw);
+      if (!Number.isFinite(n) || n <= 0 || n > 100) return;
+      value = n;
+    }
+    setSectionSaveStatus('price', 'saving');
+    try {
+      await dispatch(updateWeeklyPromotion({ id: accommodation.id, weeklyPromotionPercentage: value })).unwrap();
       setSectionSaveStatus('price', 'saved');
     } catch {
       setSectionSaveStatus('price', 'error');
@@ -302,6 +334,12 @@ const EditAccommodationPage: React.FC = () => {
     const v = Number(e.target.value);
     setPrice(v);
     autoSavePrice(v);
+  };
+
+  const handleWeeklyPromotionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+    setWeeklyPromotion(v);
+    autoSaveWeeklyPromotion(v);
   };
 
   const handleCapacityChange = (field: string, value: number) => {
@@ -424,19 +462,60 @@ const EditAccommodationPage: React.FC = () => {
             </div>
             <SaveStatusBadge status={sectionStatus.price ?? 'idle'} t={t} />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('descriptionStep.priceLabel')}</label>
-            <div className="relative max-w-xs">
-              <input
-                type="number"
-                step="0.01"
-                value={price}
-                onChange={handlePriceChange}
-                className={`${inputClass} pr-20`}
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                <span className="text-gray-400 font-medium text-sm">{t('descriptionStep.priceUnit')}</span>
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('descriptionStep.priceLabel')}</label>
+              <div className="relative max-w-xs">
+                <input
+                  type="number"
+                  step="0.01"
+                  value={price}
+                  onChange={handlePriceChange}
+                  className={`${inputClass} pr-20`}
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                  <span className="text-gray-400 font-medium text-sm">{t('descriptionStep.priceUnit')}</span>
+                </div>
               </div>
+            </div>
+            <div className="pt-4 border-t border-gray-100">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('descriptionStep.weeklyPromotionLabel')}</label>
+              <div className="relative max-w-xs">
+                <input
+                  type="number"
+                  step="1"
+                  min={0}
+                  max={100}
+                  placeholder="0"
+                  value={weeklyPromotion}
+                  onChange={handleWeeklyPromotionChange}
+                  className={`${inputClass} pr-12`}
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                  <span className="text-gray-400 font-medium text-sm">{t('descriptionStep.weeklyPromotionUnit')}</span>
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-gray-500">{t('descriptionStep.weeklyPromotionHint')}</p>
+              {(() => {
+                const promo = weeklyPromotion === '' ? null : Number(weeklyPromotion);
+                if (promo === null || !Number.isFinite(promo) || promo <= 0 || promo > 100 || price <= 0) return null;
+                const discounted = price * (1 - promo / 100);
+                const weekTotal = discounted * 7;
+                const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                return (
+                  <div className="mt-3 inline-flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-2.5 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">{t('descriptionStep.discountedNightlyLabel')}</span>
+                      <span className="text-gray-400 line-through">{fmt(price)} €</span>
+                      <span className="font-semibold text-emerald-700">{fmt(discounted)} €</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">{t('descriptionStep.weeklyTotalLabel')}</span>
+                      <span className="font-semibold text-emerald-700">{fmt(weekTotal)} €</span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ import {
   AddPhotoPayload,
   DeletePhotoPayload,
   UpdatePricePayload,
+  UpdateWeeklyPromotionPayload,
   SetCheckInOutPayload,
   ReorderPhotosPayload,
   UpdateDescriptionPayload,
@@ -191,6 +192,24 @@ export const updatePrice = createAsyncThunk(
   }
 );
 
+export const updateWeeklyPromotion = createAsyncThunk(
+  'accommodation/updateWeeklyPromotion',
+  async ({ id, weeklyPromotionPercentage }: UpdateWeeklyPromotionPayload, { rejectWithValue }) => {
+    try {
+      await api.patch(
+        `/api/accommodations/${id}/weekly-promotion`,
+        { weeklyPromotionPercentage },
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return { weeklyPromotionPercentage };
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors de la mise à jour de la promotion'
+      );
+    }
+  }
+);
+
 export const setCheckInOut = createAsyncThunk(
   'accommodation/setCheckInOut',
   async ({ id, checkIn, checkOut }: SetCheckInOutPayload, { rejectWithValue }) => {
@@ -367,6 +386,21 @@ const accommodationSlice = createSlice({
         }
       })
       .addCase(updatePrice.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update weekly promotion
+      .addCase(updateWeeklyPromotion.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updateWeeklyPromotion.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.weeklyPromotionPercentage = action.payload.weeklyPromotionPercentage;
+        }
+      })
+      .addCase(updateWeeklyPromotion.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })

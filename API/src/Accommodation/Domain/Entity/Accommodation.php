@@ -13,7 +13,9 @@ use App\Accommodation\Domain\Event\AccommodationGeolocationUpdated;
 use App\Accommodation\Domain\Event\AccommodationPriceUpdated;
 use App\Accommodation\Domain\Event\AccommodationPublished;
 use App\Accommodation\Domain\Event\AccommodationUnpublished;
+use App\Accommodation\Domain\Event\AccommodationWeeklyPromotionUpdated;
 use App\Accommodation\Domain\Exception\InvalidPriceException;
+use App\Accommodation\Domain\Exception\InvalidWeeklyPromotionException;
 use App\Shared\Domain\Entity\AggregateRoot;
 use Symfony\Component\Uid\Uuid;
 
@@ -31,6 +33,7 @@ final class Accommodation extends AggregateRoot
         private ?Amenities $amenities = null,
         private ?CheckInOut $checkInOut = null,
         private ?Uuid $teamId = null,
+        private ?float $weeklyPromotionPercentage = null,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
@@ -149,5 +152,20 @@ final class Accommodation extends AggregateRoot
     public function getTeamId(): ?Uuid
     {
         return $this->teamId;
+    }
+
+    public function getWeeklyPromotionPercentage(): ?float
+    {
+        return $this->weeklyPromotionPercentage;
+    }
+
+    public function updateWeeklyPromotion(?float $percentage): void
+    {
+        if (null !== $percentage && ($percentage <= 0 || $percentage > 100)) {
+            throw InvalidWeeklyPromotionException::becauseOutOfBounds($percentage);
+        }
+
+        $this->weeklyPromotionPercentage = $percentage;
+        $this->recordEvent(new AccommodationWeeklyPromotionUpdated($this->id, $percentage));
     }
 }
