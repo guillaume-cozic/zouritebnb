@@ -30,6 +30,7 @@ final class Accommodation extends AggregateRoot
         private ?Capacity $capacity = null,
         private ?Amenities $amenities = null,
         private ?CheckInOut $checkInOut = null,
+        private ?Uuid $teamId = null,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
@@ -143,5 +144,10 @@ final class Accommodation extends AggregateRoot
     {
         $this->checkInOut = $checkInOut;
         $this->recordEvent(new AccommodationCheckInOutUpdated($this->id));
+    }
+
+    public function getTeamId(): ?Uuid
+    {
+        return $this->teamId;
     }
 }

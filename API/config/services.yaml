@@ -37,6 +37,15 @@ services:
     App\SolidarityProject\Domain\Port\SolidarityProjectRepository:
         alias: App\SolidarityProject\Infrastructure\Doctrine\DoctrineSolidarityProjectRepository
 
+    App\Team\Domain\Port\TeamRepository:
+        alias: App\Team\Infrastructure\Doctrine\DoctrineTeamRepository
+
+    App\User\Domain\Port\UserRepository:
+        alias: App\User\Infrastructure\Doctrine\DoctrineUserRepository
+
+    App\User\Domain\Port\PasswordHasher:
+        alias: App\User\Infrastructure\PasswordHasher\BcryptPasswordHasher
+
     App\Accommodation\Infrastructure\Filesystem\LocalPhotoStorage:
         arguments:
             $uploadDir: '%kernel.project_dir%/var/uploads/photos'

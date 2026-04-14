@@ -9,6 +9,9 @@ import EditAccommodationPage from './features/accommodation/components/EditAccom
 import AccommodationPhotosPage from './features/accommodation/components/AccommodationPhotosPage';
 import ManageAccommodationsPage from './features/accommodationManagement/components/ManageAccommodationsPage';
 import BackofficeLayout from './features/accommodationManagement/components/BackofficeLayout';
+import TeamSettingsPage from './features/team/components/TeamSettingsPage';
+import LoginPage from './features/auth/components/LoginPage';
+import RegisterPage from './features/auth/components/RegisterPage';
 import SolidarityProjectsPage from './features/solidarityProject/components/SolidarityProjectsPage';
 import SolidarityProjectDetailPage from './features/solidarityProject/components/SolidarityProjectDetailPage';
 
@@ -24,8 +27,11 @@ function App() {
           <Route path="/accommodations" element={<AccommodationsListingPage />} />
           <Route path="/accommodations/:id" element={<AccommodationDetailPage />} />
           <Route path="/create" element={<CreateAccommodationWizard />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route element={<BackofficeLayout />}>
             <Route path="/admin/accommodations" element={<ManageAccommodationsPage />} />
+            <Route path="/admin/team" element={<TeamSettingsPage />} />
             <Route path="/accommodations/:id/edit" element={<EditAccommodationPage />} />
             <Route path="/accommodations/:id/photos" element={<AccommodationPhotosPage />} />
           </Route>

@@ -9,12 +9,15 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Accommodation\Application\UseCase\CreateAccommodation;
 use App\Accommodation\Domain\Command\CreateAccommodationCommand;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @implements ProcessorInterface<AccommodationInput, AccommodationOutput>
  */
 final readonly class CreateAccommodationProcessor implements ProcessorInterface
 {
+    private const DEFAULT_TEAM_UUID = '00000000-0000-4000-8000-000000000001';
+
     public function __construct(
         private CreateAccommodation $createAccommodation,
         private TransactionalUseCaseHandler $handler,
@@ -30,6 +33,7 @@ final readonly class CreateAccommodationProcessor implements ProcessorInterface
             title: $data->title,
             description: $data->description,
             price: $data->price,
+            teamId: Uuid::fromString(self::DEFAULT_TEAM_UUID),
         )));
 
         $output = new AccommodationOutput();

@@ -84,7 +84,7 @@ const BackofficeAccommodationsPage: React.FC = () => {
         <div className="text-center py-12 text-gray-500">{t('backoffice.empty')}</div>
       )}
       {items.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>

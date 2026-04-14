@@ -4,6 +4,8 @@ import accommodationReducer from '../features/accommodation/AccommodationSlice';
 import homepageReducer from '../features/homepage/HomepageSlice';
 import accommodationManagementReducer from '../features/accommodationManagement/AccommodationManagementSlice';
 import solidarityProjectReducer from '../features/solidarityProject/SolidarityProjectSlice';
+import teamReducer from '../features/team/TeamSlice';
+import authReducer from '../features/auth/AuthSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +14,8 @@ export const store = configureStore({
     homepage: homepageReducer,
     accommodationManagement: accommodationManagementReducer,
     solidarityProject: solidarityProjectReducer,
+    team: teamReducer,
+    auth: authReducer,
   },
 });
 

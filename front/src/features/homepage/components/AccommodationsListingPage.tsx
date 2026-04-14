@@ -21,8 +21,8 @@ const AccommodationsListingPage: React.FC = () => {
   const filters = useAppSelector(selectHomepageFilters);
 
   useEffect(() => {
-    dispatch(fetchPublishedAccommodations());
-  }, [dispatch]);
+    dispatch(fetchPublishedAccommodations({ checkIn: filters.checkIn, checkOut: filters.checkOut }));
+  }, [dispatch, filters.checkIn, filters.checkOut]);
 
   const toggleAmenity = (code: string) => {
     const next = filters.amenities.includes(code)

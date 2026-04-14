@@ -26,6 +26,18 @@ doctrine:
                 dir: '%kernel.project_dir%/src/SolidarityProject/Infrastructure/Doctrine'
                 prefix: 'App\SolidarityProject\Infrastructure\Doctrine'
                 alias: SolidarityProject
+            Team:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Team/Infrastructure/Doctrine'
+                prefix: 'App\Team\Infrastructure\Doctrine'
+                alias: Team
+            User:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/User/Infrastructure/Doctrine'
+                prefix: 'App\User\Infrastructure\Doctrine'
+                alias: User
         controller_resolver:
             auto_mapping: false
 

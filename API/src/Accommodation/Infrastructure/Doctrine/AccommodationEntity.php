@@ -71,6 +71,9 @@ class AccommodationEntity
     #[ORM\Column(length: 5, nullable: true)]
     private ?string $checkOut = null;
 
+    #[ORM\Column(type: UuidType::NAME, nullable: true)]
+    private ?Uuid $teamId = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -298,4 +301,17 @@ class AccommodationEntity
 
         return $this;
     }
+
+    public function getTeamId(): ?Uuid
+    {
+        return $this->teamId;
+    }
+
+    public function setTeamId(?Uuid $teamId): static
+    {
+        $this->teamId = $teamId;
+
+        return $this;
+    }
+
 }

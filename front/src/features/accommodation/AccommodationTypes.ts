@@ -19,6 +19,7 @@ export interface Accommodation {
   amenities?: string[];
   checkIn?: string | null;
   checkOut?: string | null;
+  teamId?: string | null;
   thumbnailUrl?: string | null;
   photos?: { id: string; url: string }[];
 }

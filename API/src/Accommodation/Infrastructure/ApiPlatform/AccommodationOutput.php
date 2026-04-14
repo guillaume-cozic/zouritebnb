@@ -412,6 +412,10 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Heure de départ', example: '12:00')]
     public ?string $checkOut = null;
 
+    #[Groups(['accommodation:read', 'accommodation:list'])]
+    #[ApiProperty(description: 'Identifiant UUID de l\'équipe propriétaire', example: '019cf27a-96ba-7957-8622-eeccb7350e79')]
+    public ?string $teamId = null;
+
     #[Groups(['accommodation:list'])]
     #[ApiProperty(description: 'URL de la photo principale', example: '/uploads/photos/abc123.jpg')]
     public ?string $thumbnailUrl = null;
@@ -444,6 +448,7 @@ class AccommodationOutput implements FromEntityInterface
         $output->amenities = $entity->getAmenities();
         $output->checkIn = $entity->getCheckIn();
         $output->checkOut = $entity->getCheckOut();
+        $output->teamId = $entity->getTeamId()?->toRfc4122();
 
         return $output;
     }

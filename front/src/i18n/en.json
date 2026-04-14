@@ -2,14 +2,50 @@
   "navbar": {
     "home": "Home",
     "createAccommodation": "Create accommodation",
-    "backoffice": "Back office"
+    "backoffice": "Back office",
+    "menu": {
+      "notifications": "Notifications",
+      "myAccommodations": "My accommodations",
+      "settings": "My settings"
+    }
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "registerTitle": "Create an account",
+    "email": "Email",
+    "password": "Password",
+    "login": "Sign in",
+    "logout": "Sign out",
+    "register": "Sign up",
+    "loading": "Loading...",
+    "noAccount": "No account yet?",
+    "hasAccount": "Already registered?"
+  },
+  "team": {
+    "title": "Settings",
+    "loginRequired": "Sign in to manage your team.",
+    "subtitle": "Pick the solidarity project to feature on your accommodations",
+    "favoriteProjectLabel": "Featured solidarity project",
+    "favoriteProjectHelp": "This project is displayed on each of your accommodation pages and pre-selected in the booking form.",
+    "favoriteProjectNone": "No project selected",
+    "saving": "Saving...",
+    "autoSaving": "Saving...",
+    "saved": "Saved",
+    "saveError": "Save error",
+    "profileTitle": "Profile",
+    "profileHelp": "Your personal information",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "save": "Save"
   },
   "backoffice": {
     "title": "Manage accommodations",
     "subtitle": "Full list including drafts",
     "menu": {
       "title": "Administration",
-      "accommodations": "Accommodations"
+      "accommodations": "Accommodations",
+      "team": "My settings"
     },
     "empty": "No accommodation.",
     "filter": {
@@ -145,6 +181,15 @@
     "selectDates": "Select dates",
     "guestsLabel": "Guests",
     "reserve": "Reserve",
+    "nights_one": "{{count}} night",
+    "nights_other": "{{count}} nights",
+    "platformFee": "Platform fee ({{rate}}%)",
+    "solidarityFee": "Solidarity contribution ({{rate}}%)",
+    "total": "Total",
+    "solidarityProjectLabel": "Solidarity project to support",
+    "solidarityProjectPlaceholder": "Choose a project",
+    "favoriteProjectBadge": "Host's featured project",
+    "favoriteProjectDiscover": "Discover the project",
     "noCharge": "You won't be charged yet",
     "backToHome": "Back to home",
     "loading": "Loading...",

@@ -1,27 +1,91 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import { fr } from 'date-fns/locale/fr';
+import { enGB } from 'date-fns/locale/en-GB';
+import 'react-datepicker/dist/react-datepicker.css';
+import '../../../styles/datepicker-overrides.css';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { setFilters } from '../../homepage/HomepageSlice';
+import { selectHomepageFilters } from '../../homepage/HomepageSelectors';
+import { fetchSolidarityProjects } from '../../solidarityProject/SolidarityProjectSlice';
+import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
+import { fetchTeam } from '../../team/TeamSlice';
+import { selectCurrentTeam } from '../../team/TeamSelectors';
 import LocationMap from '../../../components/LocationMap';
 import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
 import { selectCurrentAccommodation, selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
 
+registerLocale('fr', fr);
+registerLocale('en', enGB);
+
+const toDate = (s: string): Date | null => (s ? new Date(s) : null);
+const toStr = (d: Date | null): string => (d ? d.toISOString().slice(0, 10) : '');
+
+const PLATFORM_COMMISSION_RATE = 0.08;
+const SOLIDARITY_RATE = 0.07;
+
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 const AccommodationDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const accommodation = useAppSelector(selectCurrentAccommodation);
   const status = useAppSelector(selectAccommodationStatus);
   const error = useAppSelector(selectAccommodationError);
+  const filters = useAppSelector(selectHomepageFilters);
+  const solidarityProjects = useAppSelector(selectSolidarityProjects);
+  const team = useAppSelector(selectCurrentTeam);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+
+  const startDate = toDate(filters.checkIn);
+  const endDate = toDate(filters.checkOut);
+  const guests = filters.guests ?? 1;
+
+  const handleDateChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    dispatch(setFilters({ checkIn: toStr(start), checkOut: toStr(end) }));
+  };
+
+  const nights = startDate && endDate
+    ? Math.max(0, Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)))
+    : 0;
+  const pricePerNight = accommodation?.price ?? 0;
+  const subtotal = pricePerNight * nights;
+  const platformFee = subtotal * PLATFORM_COMMISSION_RATE;
+  const solidarityFee = subtotal * SOLIDARITY_RATE;
+  const total = subtotal + platformFee + solidarityFee;
+  const formatPrice = (n: number) => `${n.toLocaleString(i18n.language, { maximumFractionDigits: 2 })}\u00A0€`;
   useEffect(() => {
     if (id) {
       dispatch(fetchAccommodation(id));
     }
   }, [dispatch, id]);
+
+  useEffect(() => {
+    dispatch(fetchSolidarityProjects());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (accommodation?.teamId) {
+      dispatch(fetchTeam(accommodation.teamId));
+    }
+  }, [dispatch, accommodation?.teamId]);
+
+  const activeProjects = solidarityProjects.filter((p) => p.status === 'active');
+  const favoriteProject = team?.favoriteSolidarityProjectId
+    ? activeProjects.find((p) => p.id === team.favoriteSolidarityProjectId) ?? null
+    : null;
+
+  useEffect(() => {
+    if (!selectedProjectId && favoriteProject) {
+      setSelectedProjectId(favoriteProject.id);
+    }
+  }, [favoriteProject, selectedProjectId]);
 
   // Loading
   if (status === 'loading') {
@@ -248,6 +312,42 @@ const AccommodationDetailPage: React.FC = () => {
                 )}
               </div>
             )}
+
+            {/* Favorite solidarity project */}
+            {favoriteProject && (
+              <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6 mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-rose-500">
+                    <path d="M19.5 12.572l-7.5 7.428l-7.5-7.428a5 5 0 1 1 7.5-6.566a5 5 0 1 1 7.5 6.572" />
+                  </svg>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-blue-700">
+                    {t('detail.favoriteProjectBadge')}
+                  </p>
+                </div>
+                <div className="flex gap-5">
+                  {favoriteProject.imageUrl && (
+                    <img
+                      src={favoriteProject.imageUrl}
+                      alt={favoriteProject.title}
+                      className="w-32 h-32 rounded-xl object-cover flex-shrink-0"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{favoriteProject.title}</h3>
+                    <p className="text-gray-600 text-sm line-clamp-3 mb-3">{favoriteProject.description}</p>
+                    <Link
+                      to={`/solidarity-projects/${favoriteProject.id}`}
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-700 hover:text-blue-800"
+                    >
+                      {t('detail.favoriteProjectDiscover')}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right column - Booking card */}
@@ -256,7 +356,7 @@ const AccommodationDetailPage: React.FC = () => {
               {/* Price + rating */}
               <div className="flex items-center justify-between mb-6">
                 <div className="text-2xl font-bold">
-                  {accommodation.price}{'\u00A0'}€ <span className="text-base font-normal">/ {t('detail.night')}</span>
+                  {formatPrice(pricePerNight)} <span className="text-base font-normal">/ {t('detail.night')}</span>
                 </div>
               </div>
 
@@ -264,12 +364,19 @@ const AccommodationDetailPage: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">{t('detail.datesLabel')}</label>
-                  <button className="inline-flex items-center w-full rounded-xl text-sm border border-gray-200 bg-gray-50 hover:bg-white h-11 px-4 text-left font-normal text-gray-500 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-gray-400">
-                      <path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" />
-                    </svg>
-                    <span>{t('detail.selectDates')}</span>
-                  </button>
+                  <DatePicker
+                    selectsRange
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={handleDateChange}
+                    locale={i18n.language}
+                    minDate={new Date()}
+                    monthsShown={2}
+                    placeholderText={t('detail.selectDates')}
+                    dateFormat="dd/MM/yyyy"
+                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                    isClearable
+                  />
                 </div>
 
                 {/* Guests */}
@@ -284,11 +391,49 @@ const AccommodationDetailPage: React.FC = () => {
                       type="number"
                       min={1}
                       max={accommodation.maxGuests ?? 99}
-                      defaultValue={1}
+                      value={guests}
+                      onChange={(e) => dispatch(setFilters({ guests: e.target.value ? Number(e.target.value) : 1 }))}
                       className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
                     />
                   </div>
                 </div>
+
+                {/* Solidarity project */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('detail.solidarityProjectLabel')}</label>
+                  <select
+                    value={selectedProjectId}
+                    onChange={(e) => setSelectedProjectId(e.target.value)}
+                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                  >
+                    <option value="">{t('detail.solidarityProjectPlaceholder')}</option>
+                    {activeProjects.map((p) => (
+                      <option key={p.id} value={p.id}>{p.title}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Price breakdown */}
+                {nights > 0 && (
+                  <div className="space-y-2 pt-4 border-t border-gray-100 text-sm">
+                    <div className="flex justify-between text-gray-600">
+                      <span>{formatPrice(pricePerNight)} × {t('detail.nights', { count: nights })}</span>
+                      <span>{formatPrice(subtotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>{t('detail.platformFee', { rate: Math.round(PLATFORM_COMMISSION_RATE * 100) })}</span>
+                      <span>{formatPrice(platformFee)}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>{t('detail.solidarityFee', { rate: Math.round(SOLIDARITY_RATE * 100) })}</span>
+                      <span>{formatPrice(solidarityFee)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100">
+                      <span>{t('detail.total')}</span>
+                      <span>{formatPrice(total)}</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Reserve button */}
                 <button className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40">

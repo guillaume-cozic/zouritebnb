@@ -24,10 +24,11 @@ final readonly class CreateAccommodation
         }
 
         $accommodation = new Accommodation(
-            UuidGenerator::generate(),
-            $command->title,
-            $command->description,
-            $command->price,
+            id: UuidGenerator::generate(),
+            title: $command->title,
+            description: $command->description,
+            price: $command->price,
+            teamId: $command->teamId,
         );
 
         $this->repository->save($accommodation);

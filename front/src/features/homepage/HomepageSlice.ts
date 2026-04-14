@@ -16,11 +16,17 @@ const initialState: HomepageState = {
   error: null,
 };
 
-export const fetchPublishedAccommodations = createAsyncThunk(
+export const fetchPublishedAccommodations = createAsyncThunk<
+  AccommodationListItem[],
+  { checkIn?: string; checkOut?: string } | void
+>(
   'homepage/fetchPublished',
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/accommodations');
+      const queryParams: Record<string, string> = {};
+      if (params?.checkIn) queryParams.checkIn = params.checkIn;
+      if (params?.checkOut) queryParams.checkOut = params.checkOut;
+      const response = await api.get('/api/accommodations', { params: queryParams });
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as AccommodationListItem[];
     } catch (err: any) {
