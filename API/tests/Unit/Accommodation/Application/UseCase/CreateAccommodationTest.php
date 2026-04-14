@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Accommodation\Application\UseCase;
 use App\Accommodation\Application\UseCase\CreateAccommodation;
 use App\Accommodation\Domain\Command\CreateAccommodationCommand;
 use App\Accommodation\Domain\Exception\InvalidPriceException;
-use App\Accommodation\Domain\Port\UuidGenerator;
+use App\Shared\Domain\Port\UuidGenerator;
 use App\Tests\Unit\Accommodation\Infrastructure\InMemoryAccommodationRepository;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;

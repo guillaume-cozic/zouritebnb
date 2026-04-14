@@ -8,4 +8,5 @@ api_platform:
     exception_to_status:
         App\Accommodation\Domain\Exception\AccommodationNotFoundException: 404
         App\Accommodation\Domain\Exception\PhotoNotFoundException: 404
+        App\Reservation\Domain\Exception\ReservationNotFoundException: 404
         DomainException: 422

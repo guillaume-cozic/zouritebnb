@@ -100,23 +100,60 @@ return static function (Config $config): void {
         ->should(new NotDependsOnTheseNamespaces(['App\Shared\Infrastructure']))
         ->because('domain and application layers must not depend on shared infrastructure');
 
+    // --- Reservation module (hexagonal architecture) ---
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Reservation\Domain'))
+        ->should(new NotDependsOnTheseNamespaces([
+            'App\Reservation\Application',
+            'App\Reservation\Infrastructure',
+        ]))
+        ->because('the domain layer must not depend on application or infrastructure (hexagonal architecture)');
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Reservation\Application'))
+        ->should(new NotDependsOnTheseNamespaces(['App\Reservation\Infrastructure']))
+        ->because('the application layer must not depend on infrastructure (hexagonal architecture)');
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Reservation\Domain', 'App\Reservation\Application'))
+        ->should(new NotDependsOnTheseNamespaces([
+            'Doctrine',
+            'ApiPlatform',
+            'Symfony\Bundle',
+            'Symfony\Component\HttpFoundation',
+            'Symfony\Component\HttpKernel',
+            'Symfony\Component\DependencyInjection',
+        ]))
+        ->because('domain and application layers must be framework-agnostic');
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Reservation\Domain', 'App\Reservation\Application'))
+        ->should(new NotDependsOnTheseNamespaces(['App\Shared\Infrastructure']))
+        ->because('domain and application layers must not depend on shared infrastructure');
+
     // --- Vertical slicing ---
 
     // Shared must not depend on any module
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Shared'))
-        ->should(new NotDependsOnTheseNamespaces(['App\Accommodation', 'App\SolidarityProject']))
+        ->should(new NotDependsOnTheseNamespaces(['App\Accommodation', 'App\SolidarityProject', 'App\Reservation']))
         ->because('the shared layer must not depend on any module');
 
     // Modules must not depend on each other
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Accommodation'))
-        ->should(new NotDependsOnTheseNamespaces(['App\SolidarityProject']))
+        ->should(new NotDependsOnTheseNamespaces(['App\SolidarityProject', 'App\Reservation']))
         ->because('modules must not depend on each other (vertical slicing)');
 
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\SolidarityProject'))
-        ->should(new NotDependsOnTheseNamespaces(['App\Accommodation']))
+        ->should(new NotDependsOnTheseNamespaces(['App\Accommodation', 'App\Reservation']))
+        ->because('modules must not depend on each other (vertical slicing)');
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Reservation'))
+        ->should(new NotDependsOnTheseNamespaces(['App\Accommodation', 'App\SolidarityProject']))
         ->because('modules must not depend on each other (vertical slicing)');
 
     $config->add($classSet, ...$rules);

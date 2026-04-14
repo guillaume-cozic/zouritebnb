@@ -128,6 +128,12 @@ const BackofficeAccommodationsPage: React.FC = () => {
                       >
                         {t('backoffice.action.edit')}
                       </Link>
+                      <Link
+                        to={`/admin/accommodations/${item.id}/calendar`}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                      >
+                        {t('backoffice.action.calendar')}
+                      </Link>
                       {item.status === 'published' ? (
                         <button
                           onClick={() => dispatch(unpublishAccommodation(item.id))}

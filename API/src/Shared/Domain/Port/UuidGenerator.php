@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Accommodation\Domain\Port;
+namespace App\Shared\Domain\Port;
 
 use Symfony\Component\Uid\Uuid;
 

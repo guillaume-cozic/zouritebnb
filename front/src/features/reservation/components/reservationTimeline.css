@@ -1,0 +1,66 @@
+.reservation-timeline .rct-outer {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.reservation-timeline .rct-header-root {
+  background: #f9fafb !important;
+  border-bottom: 1px solid #e5e7eb;
+}
+.reservation-timeline .rct-dateHeader,
+.reservation-timeline .rct-dateHeader-primary {
+  background: transparent !important;
+  border-color: #f3f4f6 !important;
+  color: #374151 !important;
+  font-size: 12px;
+  font-weight: 500;
+}
+.reservation-timeline .rct-sidebar {
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+}
+.reservation-timeline .rct-sidebar-row {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  border-bottom: 1px solid #f3f4f6;
+}
+.reservation-timeline .rct-vertical-lines .rct-vl {
+  border-color: #f3f4f6;
+}
+.reservation-timeline .rct-horizontal-lines > div {
+  border-color: #f3f4f6 !important;
+}
+.reservation-timeline .rct-horizontal-lines > div:nth-child(odd) {
+  background: #eff6ff !important;
+}
+.reservation-timeline .rct-horizontal-lines > div:nth-child(even) {
+  background: #ffffff !important;
+}
+.reservation-timeline .rct-sidebar > div > div:nth-child(odd),
+.reservation-timeline .rct-sidebar .rct-sidebar-row:nth-child(odd) {
+  background: #eff6ff !important;
+}
+.reservation-timeline .rct-sidebar > div > div:nth-child(even),
+.reservation-timeline .rct-sidebar .rct-sidebar-row:nth-child(even) {
+  background: #ffffff !important;
+}
+.reservation-timeline .rct-item {
+  border-radius: 9999px !important;
+  padding: 0 10px !important;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.reservation-timeline .rct-item .rct-item-content {
+  padding: 0 !important;
+}
+.reservation-timeline .rct-today {
+  background: rgba(37, 99, 235, 0.06) !important;
+}

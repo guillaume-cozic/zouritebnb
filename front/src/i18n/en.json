@@ -6,6 +6,7 @@
     "menu": {
       "notifications": "Notifications",
       "myAccommodations": "My accommodations",
+      "calendar": "Calendar",
       "settings": "My settings"
     }
   },
@@ -45,6 +46,7 @@
     "menu": {
       "title": "Administration",
       "accommodations": "Accommodations",
+      "calendar": "Calendar",
       "team": "My settings"
     },
     "empty": "No accommodation.",
@@ -63,7 +65,8 @@
     "action": {
       "edit": "Edit",
       "publish": "Publish",
-      "unpublish": "Unpublish"
+      "unpublish": "Unpublish",
+      "calendar": "Calendar"
     }
   },
   "hero": {
@@ -389,6 +392,41 @@
     "statusLabel": "Status",
     "draft": "Draft",
     "createAnother": "Create another accommodation"
+  },
+  "calendar": {
+    "title": "Reservations calendar",
+    "subtitle": "View and manage reservations",
+    "createTitle": "New reservation",
+    "guestName": "Guest name",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "accommodation": "Accommodation",
+    "submit": "Create",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "empty": "No reservations",
+    "error": "Error",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled"
+    },
+    "action": {
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
+    "filter": {
+      "accommodation": "Accommodation",
+      "all": "All accommodations"
+    },
+    "backToAll": "All accommodations",
+    "today": "Today",
+    "prev": "Previous",
+    "next": "Next",
+    "view": {
+      "month": "Month",
+      "week": "Week"
+    }
   },
   "photos": {
     "dropzone": "Drag your photos here or click to browse",

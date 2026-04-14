@@ -6,6 +6,7 @@ import accommodationManagementReducer from '../features/accommodationManagement/
 import solidarityProjectReducer from '../features/solidarityProject/SolidarityProjectSlice';
 import teamReducer from '../features/team/TeamSlice';
 import authReducer from '../features/auth/AuthSlice';
+import reservationReducer from '../features/reservation/ReservationSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     solidarityProject: solidarityProjectReducer,
     team: teamReducer,
     auth: authReducer,
+    reservation: reservationReducer,
   },
 });
 

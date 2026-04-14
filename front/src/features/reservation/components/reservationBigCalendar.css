@@ -1,0 +1,84 @@
+.rbc-toolbar {
+  font-size: 14px !important;
+  margin-bottom: 16px !important;
+  padding: 10px 14px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+}
+.rbc-toolbar .rbc-btn-group:first-child button:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+.rbc-toolbar .rbc-btn-group button {
+  border-radius: 0;
+}
+.rbc-toolbar .rbc-btn-group button:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+.rbc-toolbar .rbc-btn-group button:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+.rbc-toolbar .rbc-btn-group button {
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.rbc-toolbar .rbc-btn-group button:hover {
+  background: #f9fafb;
+}
+.rbc-toolbar .rbc-btn-group button.rbc-active,
+.rbc-toolbar .rbc-btn-group button.rbc-active:hover {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: none;
+}
+.rbc-toolbar-label {
+  font-weight: 600;
+  color: #111827;
+  font-size: 16px;
+}
+.rbc-header {
+  padding: 8px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #e5e7eb;
+}
+.rbc-month-view,
+.rbc-time-view {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.rbc-day-bg + .rbc-day-bg,
+.rbc-month-row + .rbc-month-row {
+  border-color: #f3f4f6;
+}
+.rbc-today {
+  background-color: #eff6ff !important;
+}
+.rbc-off-range-bg {
+  background-color: #fafafa;
+}
+.rbc-event {
+  border: none !important;
+  box-shadow: none !important;
+}
+.rbc-event-content {
+  font-size: 12px;
+  font-weight: 500;
+}
+.rbc-show-more {
+  color: #2563eb;
+  font-weight: 500;
+}

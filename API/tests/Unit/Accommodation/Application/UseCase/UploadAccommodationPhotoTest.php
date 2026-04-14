@@ -12,7 +12,7 @@ use App\Accommodation\Domain\Event\AccommodationPhotoUploaded;
 use App\Accommodation\Domain\Exception\AccommodationNotFoundException;
 use App\Accommodation\Domain\Exception\InvalidPhotoException;
 use App\Accommodation\Domain\Exception\TooManyPhotosException;
-use App\Accommodation\Domain\Port\UuidGenerator;
+use App\Shared\Domain\Port\UuidGenerator;
 use App\Tests\Unit\Accommodation\Infrastructure\InMemoryAccommodationRepository;
 use App\Tests\Unit\Accommodation\Infrastructure\InMemoryGalleryRepository;
 use App\Tests\Unit\Shared\Infrastructure\InMemoryEventBus;

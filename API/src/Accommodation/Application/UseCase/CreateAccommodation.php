@@ -8,7 +8,7 @@ use App\Accommodation\Domain\Command\CreateAccommodationCommand;
 use App\Accommodation\Domain\Entity\Accommodation;
 use App\Accommodation\Domain\Exception\InvalidPriceException;
 use App\Accommodation\Domain\Port\AccommodationRepository;
-use App\Accommodation\Domain\Port\UuidGenerator;
+use App\Shared\Domain\Port\UuidGenerator;
 
 final readonly class CreateAccommodation
 {

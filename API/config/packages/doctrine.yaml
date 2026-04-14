@@ -26,6 +26,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/SolidarityProject/Infrastructure/Doctrine'
                 prefix: 'App\SolidarityProject\Infrastructure\Doctrine'
                 alias: SolidarityProject
+            Reservation:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Reservation/Infrastructure/Doctrine'
+                prefix: 'App\Reservation\Infrastructure\Doctrine'
+                alias: Reservation
             Team:
                 type: attribute
                 is_bundle: false

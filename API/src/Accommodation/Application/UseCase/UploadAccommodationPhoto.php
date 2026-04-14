@@ -10,8 +10,8 @@ use App\Accommodation\Domain\Exception\AccommodationNotFoundException;
 use App\Accommodation\Domain\Exception\InvalidPhotoException;
 use App\Accommodation\Domain\Port\AccommodationRepository;
 use App\Accommodation\Domain\Port\GalleryRepository;
-use App\Accommodation\Domain\Port\UuidGenerator;
 use App\Shared\Domain\Port\EventBus;
+use App\Shared\Domain\Port\UuidGenerator;
 
 final readonly class UploadAccommodationPhoto
 {

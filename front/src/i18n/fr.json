@@ -6,6 +6,7 @@
     "menu": {
       "notifications": "Notifications",
       "myAccommodations": "Mes hébergements",
+      "calendar": "Calendrier",
       "settings": "Mes paramètres"
     }
   },
@@ -45,6 +46,7 @@
     "menu": {
       "title": "Administration",
       "accommodations": "Hébergements",
+      "calendar": "Calendrier",
       "team": "Mes paramètres"
     },
     "empty": "Aucun hébergement.",
@@ -63,7 +65,8 @@
     "action": {
       "edit": "Éditer",
       "publish": "Publier",
-      "unpublish": "Dépublier"
+      "unpublish": "Dépublier",
+      "calendar": "Calendrier"
     }
   },
   "hero": {
@@ -389,6 +392,41 @@
     "statusLabel": "Statut",
     "draft": "Brouillon",
     "createAnother": "Créer un autre hébergement"
+  },
+  "calendar": {
+    "title": "Calendrier des réservations",
+    "subtitle": "Visualisez et gérez les réservations",
+    "createTitle": "Nouvelle réservation",
+    "guestName": "Nom du voyageur",
+    "checkIn": "Arrivée",
+    "checkOut": "Départ",
+    "accommodation": "Hébergement",
+    "submit": "Créer",
+    "cancel": "Annuler",
+    "loading": "Chargement...",
+    "empty": "Aucune réservation",
+    "error": "Erreur",
+    "status": {
+      "pending": "En attente",
+      "confirmed": "Confirmée",
+      "cancelled": "Annulée"
+    },
+    "action": {
+      "confirm": "Confirmer",
+      "cancel": "Annuler"
+    },
+    "filter": {
+      "accommodation": "Hébergement",
+      "all": "Tous les hébergements"
+    },
+    "backToAll": "Tous les hébergements",
+    "today": "Aujourd'hui",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "view": {
+      "month": "Mois",
+      "week": "Semaine"
+    }
   },
   "photos": {
     "dropzone": "Glissez vos photos ici ou cliquez pour parcourir",
