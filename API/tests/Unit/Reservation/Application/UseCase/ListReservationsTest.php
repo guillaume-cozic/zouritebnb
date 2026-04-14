@@ -49,6 +49,7 @@ final class ListReservationsTest extends TestCase
             teamId: $teamId,
             dateRange: new DateRange(new \DateTimeImmutable($in), new \DateTimeImmutable($out)),
             guestName: new GuestName('Guest'),
+            price: new \App\Reservation\Domain\Entity\ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
         );
         $reservation->releaseEvents();
         $this->repository->save($reservation);

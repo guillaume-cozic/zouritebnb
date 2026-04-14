@@ -188,6 +188,7 @@
     "withBathroom": "With bathroom",
     "private": "Private",
     "night": "night",
+    "weeklyDiscountBadge": "{{percent}}% discount applied (stay ≥ 7 nights)",
     "checkIn": "Check-in",
     "checkOut": "Check-out",
     "amenitiesTitle": "Amenities",

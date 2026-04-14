@@ -9,6 +9,9 @@ export interface Reservation {
   checkOut: string;
   guestName: string;
   status: ReservationStatus;
+  totalPrice?: number;
+  pricePerNight?: number;
+  appliedDiscountPercentage?: number | null;
 }
 
 export interface CreateReservationPayload {

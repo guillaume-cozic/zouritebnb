@@ -8,6 +8,7 @@ use App\Reservation\Domain\Entity\DateRange;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation as DomainReservation;
 use App\Reservation\Domain\Entity\ReservationId;
+use App\Reservation\Domain\Entity\ReservationPrice;
 use App\Reservation\Domain\Entity\ReservationStatus;
 use App\Reservation\Domain\Port\ReservationRepository as ReservationRepositoryPort;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -36,7 +37,10 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             ->setCheckIn($reservation->getDateRange()->checkIn())
             ->setCheckOut($reservation->getDateRange()->checkOut())
             ->setGuestName($reservation->getGuestName()->toString())
-            ->setStatus($reservation->getStatus()->value);
+            ->setStatus($reservation->getStatus()->value)
+            ->setTotalPrice($reservation->getPrice()->totalPrice)
+            ->setPricePerNight($reservation->getPrice()->pricePerNight)
+            ->setAppliedDiscountPercentage($reservation->getPrice()->appliedDiscountPercentage);
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -90,6 +94,11 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             ),
             guestName: new GuestName($entity->getGuestName()),
             status: ReservationStatus::from($entity->getStatus()),
+            price: new ReservationPrice(
+                totalPrice: $entity->getTotalPrice(),
+                pricePerNight: $entity->getPricePerNight(),
+                appliedDiscountPercentage: $entity->getAppliedDiscountPercentage(),
+            ),
         );
     }
 }

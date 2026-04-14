@@ -188,6 +188,7 @@
     "withBathroom": "Avec salle de bain",
     "private": "Privatives",
     "night": "nuit",
+    "weeklyDiscountBadge": "Remise {{percent}}% appliquée (séjour ≥ 7 nuits)",
     "checkIn": "Arrivée",
     "checkOut": "Départ",
     "amenitiesTitle": "Équipements",

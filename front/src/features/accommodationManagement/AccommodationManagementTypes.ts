@@ -3,6 +3,7 @@ export interface ManagedAccommodation {
   title: string;
   description: string | null;
   price: number | null;
+  weeklyPromotionPercentage?: number | null;
   city: string | null;
   country: string | null;
   maxGuests: number | null;

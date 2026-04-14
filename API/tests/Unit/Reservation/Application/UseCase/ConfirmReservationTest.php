@@ -43,6 +43,7 @@ final class ConfirmReservationTest extends TestCase
             dateRange: new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-05')),
             guestName: new GuestName('John'),
             status: $status,
+            price: new \App\Reservation\Domain\Entity\ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
         );
 
         $this->repository->save($reservation);

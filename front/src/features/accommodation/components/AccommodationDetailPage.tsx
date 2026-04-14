@@ -55,7 +55,10 @@ const AccommodationDetailPage: React.FC = () => {
     ? Math.max(0, Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)))
     : 0;
   const pricePerNight = accommodation?.price ?? 0;
-  const subtotal = pricePerNight * nights;
+  const weeklyPromo = accommodation?.weeklyPromotionPercentage ?? null;
+  const promoApplies = nights >= 7 && weeklyPromo !== null && weeklyPromo !== undefined && weeklyPromo > 0;
+  const effectiveNightly = promoApplies ? pricePerNight * (1 - weeklyPromo / 100) : pricePerNight;
+  const subtotal = effectiveNightly * nights;
   const platformFee = subtotal * PLATFORM_COMMISSION_RATE;
   const solidarityFee = subtotal * SOLIDARITY_RATE;
   const total = subtotal + platformFee + solidarityFee;
@@ -416,8 +419,14 @@ const AccommodationDetailPage: React.FC = () => {
                 {/* Price breakdown */}
                 {nights > 0 && (
                   <div className="space-y-2 pt-4 border-t border-gray-100 text-sm">
+                    {promoApplies && (
+                      <div className="flex items-center justify-between rounded-lg bg-emerald-50 border border-emerald-100 px-3 py-2 text-emerald-700">
+                        <span className="text-xs font-medium">{t('detail.weeklyDiscountBadge', { percent: weeklyPromo })}</span>
+                        <span className="text-xs line-through text-emerald-500/70">{formatPrice(pricePerNight)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-gray-600">
-                      <span>{formatPrice(pricePerNight)} × {t('detail.nights', { count: nights })}</span>
+                      <span>{formatPrice(effectiveNightly)} × {t('detail.nights', { count: nights })}</span>
                       <span>{formatPrice(subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">

@@ -113,6 +113,7 @@ const CreateReservationModal: React.FC<Props> = ({
       ? Math.max(0, Math.round((endDate.getTime() - startDate.getTime()) / 86400000))
       : 0;
 
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4 overflow-y-auto">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl my-8">

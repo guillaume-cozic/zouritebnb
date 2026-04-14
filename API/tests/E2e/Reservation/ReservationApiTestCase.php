@@ -35,7 +35,10 @@ abstract class ReservationApiTestCase extends ApiTestCase
             ->setCheckIn(new \DateTimeImmutable($checkIn))
             ->setCheckOut(new \DateTimeImmutable($checkOut))
             ->setGuestName($guestName)
-            ->setStatus($status);
+            ->setStatus($status)
+            ->setTotalPrice(400.0)
+            ->setPricePerNight(100.0)
+            ->setAppliedDiscountPercentage(null);
 
         $em->persist($entity);
         $em->flush();

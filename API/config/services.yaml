@@ -72,6 +72,9 @@ services:
     App\Shared\Domain\Port\TransactionManager:
         alias: App\Shared\Infrastructure\Doctrine\DoctrineTransactionManager
 
+    App\Shared\Domain\Port\AccommodationPricingProvider:
+        alias: App\Accommodation\Infrastructure\Doctrine\DoctrineAccommodationPricingProvider
+
 when@dev:
     services:
         App\Tests\Fixtures\:

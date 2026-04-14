@@ -20,6 +20,7 @@ final class Reservation extends AggregateRoot
         private readonly DateRange $dateRange,
         private readonly GuestName $guestName,
         private ReservationStatus $status,
+        private readonly ReservationPrice $price,
     ) {
     }
 
@@ -29,6 +30,7 @@ final class Reservation extends AggregateRoot
         Uuid $teamId,
         DateRange $dateRange,
         GuestName $guestName,
+        ReservationPrice $price,
     ): self {
         $reservation = new self(
             id: $id,
@@ -37,6 +39,7 @@ final class Reservation extends AggregateRoot
             dateRange: $dateRange,
             guestName: $guestName,
             status: ReservationStatus::Confirmed,
+            price: $price,
         );
         $reservation->recordEvent(new ReservationCreated($id->toUuid()));
         $reservation->recordEvent(new ReservationConfirmed($id->toUuid()));
@@ -72,6 +75,11 @@ final class Reservation extends AggregateRoot
     public function getStatus(): ReservationStatus
     {
         return $this->status;
+    }
+
+    public function getPrice(): ReservationPrice
+    {
+        return $this->price;
     }
 
     public function confirm(): void

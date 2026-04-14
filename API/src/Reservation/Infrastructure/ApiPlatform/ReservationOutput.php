@@ -168,6 +168,18 @@ class ReservationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Statut de la réservation (pending, confirmed, cancelled)', example: 'pending')]
     public ?string $status = null;
 
+    #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Prix total du séjour (remise hebdomadaire incluse si applicable)', example: 400.0)]
+    public ?float $totalPrice = null;
+
+    #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Prix par nuit de l\'hébergement au moment de la réservation', example: 100.0)]
+    public ?float $pricePerNight = null;
+
+    #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Pourcentage de remise appliqué (null si aucune remise)', example: 20.0)]
+    public ?float $appliedDiscountPercentage = null;
+
     public static function fromEntity(object $entity): static
     {
         \assert($entity instanceof Reservation);
@@ -180,6 +192,9 @@ class ReservationOutput implements FromEntityInterface
         $output->checkOut = $entity->getDateRange()->checkOut()->format(\DateTimeInterface::ATOM);
         $output->guestName = $entity->getGuestName()->toString();
         $output->status = $entity->getStatus()->value;
+        $output->totalPrice = $entity->getPrice()->totalPrice;
+        $output->pricePerNight = $entity->getPrice()->pricePerNight;
+        $output->appliedDiscountPercentage = $entity->getPrice()->appliedDiscountPercentage;
 
         return $output;
     }

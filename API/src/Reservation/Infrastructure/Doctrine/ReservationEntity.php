@@ -35,6 +35,15 @@ class ReservationEntity
     #[ORM\Column(length: 20)]
     private ?string $status = null;
 
+    #[ORM\Column(options: ['default' => 0])]
+    private float $totalPrice = 0.0;
+
+    #[ORM\Column(options: ['default' => 0])]
+    private float $pricePerNight = 0.0;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $appliedDiscountPercentage = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -115,6 +124,42 @@ class ReservationEntity
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getTotalPrice(): float
+    {
+        return $this->totalPrice;
+    }
+
+    public function setTotalPrice(float $totalPrice): static
+    {
+        $this->totalPrice = $totalPrice;
+
+        return $this;
+    }
+
+    public function getPricePerNight(): float
+    {
+        return $this->pricePerNight;
+    }
+
+    public function setPricePerNight(float $pricePerNight): static
+    {
+        $this->pricePerNight = $pricePerNight;
+
+        return $this;
+    }
+
+    public function getAppliedDiscountPercentage(): ?float
+    {
+        return $this->appliedDiscountPercentage;
+    }
+
+    public function setAppliedDiscountPercentage(?float $appliedDiscountPercentage): static
+    {
+        $this->appliedDiscountPercentage = $appliedDiscountPercentage;
 
         return $this;
     }

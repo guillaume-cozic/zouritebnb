@@ -8,6 +8,7 @@ use App\Reservation\Domain\Entity\DateRange;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
+use App\Reservation\Domain\Entity\ReservationPrice;
 use App\Reservation\Domain\Entity\ReservationStatus;
 use App\Reservation\Domain\Port\ReservationRepository;
 use App\Tests\Integration\RepositoryTestCase;
@@ -38,6 +39,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
                 checkOut: new \DateTimeImmutable('2026-05-05'),
             ),
             guestName: new GuestName('John Doe'),
+            price: new ReservationPrice(totalPrice: 320.0, pricePerNight: 80.0, appliedDiscountPercentage: null),
         );
 
         $this->repository->save($reservation);
@@ -49,6 +51,9 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         self::assertEquals($teamId->toRfc4122(), $found->getTeamId()->toRfc4122());
         self::assertSame('John Doe', $found->getGuestName()->toString());
         self::assertSame(ReservationStatus::Confirmed, $found->getStatus());
+        self::assertSame(320.0, $found->getPrice()->totalPrice);
+        self::assertSame(80.0, $found->getPrice()->pricePerNight);
+        self::assertNull($found->getPrice()->appliedDiscountPercentage);
         self::assertEquals(new \DateTimeImmutable('2026-05-01'), $found->getDateRange()->checkIn());
         self::assertEquals(new \DateTimeImmutable('2026-05-05'), $found->getDateRange()->checkOut());
     }
@@ -72,6 +77,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
                 checkOut: new \DateTimeImmutable('2026-06-03'),
             ),
             guestName: new GuestName('Jane'),
+            price: new ReservationPrice(totalPrice: 200.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
         );
         $this->repository->save($reservation);
 
@@ -162,6 +168,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
                 checkOut: new \DateTimeImmutable($checkOut),
             ),
             guestName: new GuestName($guestName),
+            price: new ReservationPrice(totalPrice: 100.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
         );
         $this->repository->save($reservation);
     }
