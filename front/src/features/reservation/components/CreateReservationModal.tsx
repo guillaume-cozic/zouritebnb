@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import { fr } from 'date-fns/locale/fr';
+import { enGB } from 'date-fns/locale/en-GB';
+import 'react-datepicker/dist/react-datepicker.css';
+import '../../../styles/datepicker-overrides.css';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { createReservation, clearMutationError } from '../ReservationSlice';
 import {
@@ -9,6 +14,9 @@ import {
 import { selectManagedAccommodations } from '../../accommodationManagement/AccommodationManagementSelectors';
 import { fetchAllAccommodations } from '../../accommodationManagement/AccommodationManagementSlice';
 
+registerLocale('fr', fr);
+registerLocale('en', enGB);
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -17,16 +25,23 @@ interface Props {
   accommodationId?: string;
 }
 
-const toLocalDateTimeInput = (iso: string): string => {
-  if (!iso) return '';
-  // expects YYYY-MM-DDTHH:mm:ss → trim seconds for input[type=datetime-local]
-  return iso.length >= 16 ? iso.substring(0, 16) : iso;
+const parseIso = (iso: string): Date | null => {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? null : d;
 };
 
-const fromInputToApi = (value: string): string => {
-  if (!value) return '';
-  // datetime-local returns YYYY-MM-DDTHH:mm
-  return value.length === 16 ? `${value}:00` : value;
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const toApiDateTime = (date: Date, time: string): string => {
+  const [hh, mm] = time.split(':');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${hh}:${mm}:00`;
+};
+
+const extractTime = (iso: string, fallback: string): string => {
+  const d = parseIso(iso);
+  if (!d) return fallback;
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
 const CreateReservationModal: React.FC<Props> = ({
@@ -36,23 +51,27 @@ const CreateReservationModal: React.FC<Props> = ({
   initialCheckOut,
   accommodationId,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const accommodations = useAppSelector(selectManagedAccommodations);
   const mutationStatus = useAppSelector(selectReservationMutationStatus);
   const mutationError = useAppSelector(selectReservationMutationError);
 
   const [guestName, setGuestName] = useState('');
-  const [checkIn, setCheckIn] = useState(toLocalDateTimeInput(initialCheckIn));
-  const [checkOut, setCheckOut] = useState(toLocalDateTimeInput(initialCheckOut));
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [checkInTime, setCheckInTime] = useState('15:00');
+  const [checkOutTime, setCheckOutTime] = useState('11:00');
   const [chosenAccommodation, setChosenAccommodation] = useState(accommodationId ?? '');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setGuestName('');
-      setCheckIn(toLocalDateTimeInput(initialCheckIn));
-      setCheckOut(toLocalDateTimeInput(initialCheckOut));
+      setStartDate(parseIso(initialCheckIn));
+      setEndDate(parseIso(initialCheckOut));
+      setCheckInTime(extractTime(initialCheckIn, '15:00'));
+      setCheckOutTime(extractTime(initialCheckOut, '11:00'));
       setChosenAccommodation(accommodationId ?? '');
       dispatch(clearMutationError());
       if (!accommodationId && accommodations.length === 0) {
@@ -63,16 +82,22 @@ const CreateReservationModal: React.FC<Props> = ({
 
   if (!isOpen) return null;
 
+  const handleRangeChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    setStartDate(start);
+    setEndDate(end);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const targetId = accommodationId ?? chosenAccommodation;
-    if (!targetId || !guestName || !checkIn || !checkOut) return;
+    if (!targetId || !guestName || !startDate || !endDate) return;
     setSubmitting(true);
     const result = await dispatch(
       createReservation({
         accommodationId: targetId,
-        checkIn: fromInputToApi(checkIn),
-        checkOut: fromInputToApi(checkOut),
+        checkIn: toApiDateTime(startDate, checkInTime),
+        checkOut: toApiDateTime(endDate, checkOutTime),
         guestName,
       })
     );
@@ -82,11 +107,22 @@ const CreateReservationModal: React.FC<Props> = ({
     }
   };
 
+  const locale = i18n.language.startsWith('fr') ? 'fr' : 'en';
+  const nights =
+    startDate && endDate
+      ? Math.max(0, Math.round((endDate.getTime() - startDate.getTime()) / 86400000))
+      : 0;
+
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
-        <div className="px-6 py-4 border-b border-gray-100">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl my-8">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">{t('calendar.createTitle')}</h2>
+          {nights > 0 && (
+            <span className="text-sm text-gray-500">
+              {nights} {nights > 1 ? 'nuits' : 'nuit'}
+            </span>
+          )}
         </div>
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
           {!accommodationId && (
@@ -121,15 +157,33 @@ const CreateReservationModal: React.FC<Props> = ({
               required
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('calendar.checkIn')} → {t('calendar.checkOut')}
+            </label>
+            <div className="flex justify-center">
+              <DatePicker
+                selected={startDate}
+                onChange={handleRangeChange}
+                startDate={startDate ?? undefined}
+                endDate={endDate ?? undefined}
+                selectsRange
+                inline
+                monthsShown={2}
+                locale={locale}
+                minDate={new Date()}
+              />
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('calendar.checkIn')}
               </label>
               <input
-                type="datetime-local"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
+                type="time"
+                value={checkInTime}
+                onChange={(e) => setCheckInTime(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
                 required
               />
@@ -139,9 +193,9 @@ const CreateReservationModal: React.FC<Props> = ({
                 {t('calendar.checkOut')}
               </label>
               <input
-                type="datetime-local"
-                value={checkOut}
-                onChange={(e) => setCheckOut(e.target.value)}
+                type="time"
+                value={checkOutTime}
+                onChange={(e) => setCheckOutTime(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
                 required
               />
@@ -162,7 +216,7 @@ const CreateReservationModal: React.FC<Props> = ({
             </button>
             <button
               type="submit"
-              disabled={submitting || mutationStatus === 'loading'}
+              disabled={submitting || mutationStatus === 'loading' || !startDate || !endDate}
               className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
             >
               {t('calendar.submit')}
