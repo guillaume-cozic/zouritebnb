@@ -38,7 +38,19 @@
     "firstName": "First name",
     "lastName": "Last name",
     "email": "Email",
-    "save": "Save"
+    "save": "Save",
+    "coHostsTitle": "Co-hosts",
+    "coHostsHelp": "Invite co-hosts by email to share accommodation management.",
+    "inviteEmailPlaceholder": "email@example.com",
+    "inviteButton": "Invite",
+    "inviting": "Sending...",
+    "invitationSent": "Invitation sent",
+    "pendingInvitations": "Pending invitations",
+    "noPendingInvitations": "No pending invitations.",
+    "invitationPending": "Pending",
+    "cancelInvitation": "Cancel",
+    "confirmCancelInvitation": "Cancel this invitation?",
+    "keep": "Keep"
   },
   "backoffice": {
     "title": "Manage accommodations",

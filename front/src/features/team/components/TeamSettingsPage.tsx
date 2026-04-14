@@ -1,8 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchTeam, updateTeamFavoriteProject } from '../TeamSlice';
-import { selectCurrentTeam, selectTeamError, selectTeamStatus } from '../TeamSelectors';
+import { fetchTeam, updateTeamFavoriteProject, fetchTeamInvitations, inviteCoHost, cancelTeamInvitation, clearInviteStatus } from '../TeamSlice';
+import {
+  selectCurrentTeam,
+  selectTeamError,
+  selectTeamStatus,
+  selectTeamInvitations,
+  selectInviteStatus,
+  selectInviteError,
+} from '../TeamSelectors';
 import { fetchSolidarityProjects } from '../../solidarityProject/SolidarityProjectSlice';
 import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
 import { selectAuthTeamId, selectAuthUser } from '../../auth/AuthSelectors';
@@ -19,6 +26,12 @@ const TeamSettingsPage: React.FC = () => {
   const projects = useAppSelector(selectSolidarityProjects);
   const teamId = useAppSelector(selectAuthTeamId);
   const user = useAppSelector(selectAuthUser);
+  const invitations = useAppSelector(selectTeamInvitations);
+  const inviteStatus = useAppSelector(selectInviteStatus);
+  const inviteError = useAppSelector(selectInviteError);
+
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [invitationToCancel, setInvitationToCancel] = useState<{ id: string; email: string } | null>(null);
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -40,9 +53,22 @@ const TeamSettingsPage: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    if (teamId) dispatch(fetchTeam(teamId));
+    if (teamId) {
+      dispatch(fetchTeam(teamId));
+      dispatch(fetchTeamInvitations(teamId));
+    }
     dispatch(fetchSolidarityProjects());
   }, [dispatch, teamId]);
+
+  const handleInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!teamId || !inviteEmail.trim()) return;
+    const result = await dispatch(inviteCoHost({ teamId, email: inviteEmail.trim() }));
+    if (inviteCoHost.fulfilled.match(result)) {
+      setInviteEmail('');
+      window.setTimeout(() => dispatch(clearInviteStatus()), 2000);
+    }
+  };
 
   // Autosave profil (debounce 800ms)
   useEffect(() => {
@@ -173,6 +199,109 @@ const TeamSettingsPage: React.FC = () => {
               <option key={p.id} value={p.id}>{p.title}</option>
             ))}
           </select>
+        </div>
+      )}
+
+      {team && (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">{t('team.coHostsTitle')}</h2>
+            <p className="text-xs text-gray-500">{t('team.coHostsHelp')}</p>
+          </div>
+
+          <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2 mb-4">
+            <input
+              type="email"
+              required
+              placeholder={t('team.inviteEmailPlaceholder')}
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              className="flex-1 h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
+            />
+            <button
+              type="submit"
+              disabled={inviteStatus === 'loading' || !inviteEmail.trim()}
+              className="h-11 px-5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
+            >
+              {inviteStatus === 'loading' ? t('team.inviting') : t('team.inviteButton')}
+            </button>
+          </form>
+
+          {inviteStatus === 'succeeded' && (
+            <div className="mb-4 text-sm text-green-600">{t('team.invitationSent')}</div>
+          )}
+          {inviteStatus === 'failed' && inviteError && (
+            <div className="mb-4 text-sm text-red-600">{inviteError}</div>
+          )}
+
+          <h3 className="text-sm font-medium text-gray-700 mb-2">{t('team.pendingInvitations')}</h3>
+          {invitations.length === 0 ? (
+            <p className="text-sm text-gray-400">{t('team.noPendingInvitations')}</p>
+          ) : (
+            <ul className="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
+              {invitations.map((inv) => (
+                <li key={inv.id} className="flex items-center justify-between px-4 py-3 bg-gray-50/50">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-900">{inv.email}</span>
+                    <span className="text-xs text-gray-400">
+                      {new Date(inv.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                      {t('team.invitationPending')}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setInvitationToCancel({ id: inv.id, email: inv.email })}
+                      className="text-sm text-red-600 hover:text-red-700 hover:underline"
+                    >
+                      {t('team.cancelInvitation')}
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {invitationToCancel && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setInvitationToCancel(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-900">{t('team.cancelInvitation')}</h2>
+            </div>
+            <div className="px-6 py-5 space-y-2">
+              <p className="text-sm text-gray-700">{t('team.confirmCancelInvitation')}</p>
+              <p className="text-sm font-medium text-gray-900">{invitationToCancel.email}</p>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setInvitationToCancel(null)}
+                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                {t('team.keep')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  dispatch(cancelTeamInvitation(invitationToCancel.id));
+                  setInvitationToCancel(null);
+                }}
+                className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700"
+              >
+                {t('team.cancelInvitation')}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -38,7 +38,19 @@
     "firstName": "Prénom",
     "lastName": "Nom",
     "email": "Email",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "coHostsTitle": "Co-hôtes",
+    "coHostsHelp": "Invitez des co-hôtes par email pour partager la gestion de vos hébergements.",
+    "inviteEmailPlaceholder": "email@exemple.com",
+    "inviteButton": "Inviter",
+    "inviting": "Envoi...",
+    "invitationSent": "Invitation envoyée",
+    "pendingInvitations": "Invitations en attente",
+    "noPendingInvitations": "Aucune invitation en attente.",
+    "invitationPending": "En attente",
+    "cancelInvitation": "Annuler",
+    "confirmCancelInvitation": "Annuler cette invitation ?",
+    "keep": "Ne pas annuler"
   },
   "backoffice": {
     "title": "Gestion des hébergements",

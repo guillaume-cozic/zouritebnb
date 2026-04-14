@@ -43,6 +43,9 @@ services:
     App\Team\Domain\Port\TeamRepository:
         alias: App\Team\Infrastructure\Doctrine\DoctrineTeamRepository
 
+    App\Team\Domain\Port\TeamInvitationRepository:
+        alias: App\Team\Infrastructure\Doctrine\DoctrineTeamInvitationRepository
+
     App\User\Domain\Port\UserRepository:
         alias: App\User\Infrastructure\Doctrine\DoctrineUserRepository
 
