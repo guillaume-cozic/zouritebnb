@@ -14,8 +14,11 @@ registerLocale('fr', fr);
 registerLocale('en', enGB);
 
 const toDate = (s: string): Date | null => (s ? new Date(s) : null);
-const toStr = (d: Date | null): string =>
-  d ? d.toISOString().slice(0, 10) : '';
+const toStr = (d: Date | null): string => {
+  if (!d) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 
 const SLIDES = [
   'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?auto=format&fit=crop&q=80&w=2000',
@@ -46,6 +49,12 @@ const HeroSection: React.FC = () => {
 
   const handleDateChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
+    // Cas: une date de début existe, pas de fin, et l'utilisateur clique avant la date de début.
+    // react-datepicker réinitialise avec [clique, null] — on interprète plutôt comme "fin avant début" et on swap.
+    if (startDate && !endDate && start && !end && start < startDate) {
+      dispatch(setFilters({ checkIn: toStr(start), checkOut: toStr(startDate) }));
+      return;
+    }
     dispatch(setFilters({ checkIn: toStr(start), checkOut: toStr(end) }));
   };
 
