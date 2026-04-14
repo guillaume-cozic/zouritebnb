@@ -16,8 +16,8 @@ final readonly class ReservationPrice
         if ($this->totalPrice < 0) {
             throw InvalidReservationException::becauseNegativeTotalPrice($this->totalPrice);
         }
-        if ($this->pricePerNight <= 0) {
-            throw InvalidReservationException::becauseNegativeOrZeroPricePerNight($this->pricePerNight);
+        if ($this->pricePerNight < 0) {
+            throw InvalidReservationException::becauseNegativePricePerNight($this->pricePerNight);
         }
     }
 }

@@ -16,8 +16,8 @@ final class InvalidReservationException extends \DomainException
         return new self(\sprintf('Total price must be greater than or equal to zero, got %s.', $totalPrice));
     }
 
-    public static function becauseNegativeOrZeroPricePerNight(float $pricePerNight): self
+    public static function becauseNegativePricePerNight(float $pricePerNight): self
     {
-        return new self(\sprintf('Price per night must be strictly positive, got %s.', $pricePerNight));
+        return new self(\sprintf('Price per night must be greater than or equal to zero, got %s.', $pricePerNight));
     }
 }
