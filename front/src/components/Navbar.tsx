@@ -88,29 +88,27 @@ const Navbar: React.FC = () => {
                 onClick={() => setMenuOpen((v) => !v)}
                 className="relative flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md pl-1.5 pr-3 text-sm font-medium"
               >
-                <span className="relative">
-                  <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
-                    {initial}
-                  </span>
-                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center">
-                    3
-                  </span>
+                <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
+                  {initial}
                 </span>
                 <span className="max-w-[120px] truncate">{displayName}</span>
+                <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center">
+                  3
+                </span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${menuOpen ? 'rotate-180' : ''}`}>
                   <path d="m6 9 6 6 6-6" />
                 </svg>
               </button>
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-60 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-100">
+                <div className="absolute right-0 mt-2 w-[350px] bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+                  <div className="px-5 py-3 border-b border-gray-100">
                     <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
                     <p className="text-xs text-gray-500 truncate">{user.email}</p>
                   </div>
                   <nav className="py-1 text-sm">
                     <button
                       type="button"
-                      className="flex items-center justify-between w-full px-4 py-2 text-gray-700 hover:bg-gray-50"
+                      className="flex items-center justify-between w-full px-5 py-3 text-gray-700 hover:bg-gray-50"
                     >
                       <span className="flex items-center gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -124,7 +122,7 @@ const Navbar: React.FC = () => {
                     <Link
                       to="/admin/accommodations"
                       onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50"
+                      className="flex items-center gap-3 px-5 py-3 text-gray-700 hover:bg-gray-50"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z" />
@@ -134,7 +132,7 @@ const Navbar: React.FC = () => {
                     <Link
                       to="/admin/team"
                       onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50"
+                      className="flex items-center gap-3 px-5 py-3 text-gray-700 hover:bg-gray-50"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
@@ -145,7 +143,7 @@ const Navbar: React.FC = () => {
                   <div className="border-t border-gray-100 py-1">
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      className="flex items-center gap-3 w-full text-left px-5 py-3 text-sm text-red-600 hover:bg-red-50"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" x2="9" y1="12" y2="12" />
@@ -168,7 +166,7 @@ const Navbar: React.FC = () => {
           )}
 
           {/* Mobile menu */}
-          <button className="inline-flex items-center justify-center rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 h-10 px-4 py-2 md:hidden">
+          <button className="inline-flex items-center justify-center rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 h-10 px-5 py-3 md:hidden">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
               <path d="M4 5h16" />
               <path d="M4 12h16" />
