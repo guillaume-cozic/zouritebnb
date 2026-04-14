@@ -22,7 +22,11 @@ registerLocale('fr', fr);
 registerLocale('en', enGB);
 
 const toDate = (s: string): Date | null => (s ? new Date(s) : null);
-const toStr = (d: Date | null): string => (d ? d.toISOString().slice(0, 10) : '');
+const toStr = (d: Date | null): string => {
+  if (!d) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 
 const PLATFORM_COMMISSION_RATE = 0.08;
 const SOLIDARITY_RATE = 0.07;
@@ -48,6 +52,10 @@ const AccommodationDetailPage: React.FC = () => {
 
   const handleDateChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
+    if (startDate && !endDate && start && !end && start < startDate) {
+      dispatch(setFilters({ checkIn: toStr(start), checkOut: toStr(startDate) }));
+      return;
+    }
     dispatch(setFilters({ checkIn: toStr(start), checkOut: toStr(end) }));
   };
 
