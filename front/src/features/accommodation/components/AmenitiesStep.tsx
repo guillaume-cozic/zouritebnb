@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import WizardNavigation from '../../../components/WizardNavigation';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setAmenities, goToStep, saveDraft } from '../AccommodationSlice';
+import { setAmenities, wizardStepLeft } from '../AccommodationSlice';
 import {
   selectCurrentAccommodation,
   selectAccommodationStatus,
@@ -101,8 +101,12 @@ function AmenitiesStep() {
       )}
 
       <WizardNavigation
-        onBack={() => { dispatch(saveDraft({ amenities: Array.from(selectedCodes) })); dispatch(goToStep('capacity')); }}
-        onSkip={() => { dispatch(saveDraft({ amenities: Array.from(selectedCodes) })); dispatch(goToStep('address')); }}
+        onBack={() =>
+          dispatch(wizardStepLeft({ draft: { amenities: Array.from(selectedCodes) }, target: 'capacity' }))
+        }
+        onSkip={() =>
+          dispatch(wizardStepLeft({ draft: { amenities: Array.from(selectedCodes) }, target: 'address' }))
+        }
         isLoading={isLoading}
       />
     </form>

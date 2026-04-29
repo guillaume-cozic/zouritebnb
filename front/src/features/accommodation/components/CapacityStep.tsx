@@ -6,7 +6,7 @@ import { useForm, useWatch, Control } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setCapacity, goToStep, saveDraft } from '../AccommodationSlice';
+import { setCapacity, wizardStepLeft } from '../AccommodationSlice';
 import {
   selectCurrentAccommodation,
   selectAccommodationStatus,
@@ -180,8 +180,7 @@ function CapacityStep() {
   });
 
   const saveAndGoBack = () => {
-    dispatch(saveDraft({ capacity: getValues() }));
-    dispatch(goToStep('description'));
+    dispatch(wizardStepLeft({ draft: { capacity: getValues() }, target: 'description' }));
   };
 
   const onSubmit = (data: FormData) => {
@@ -234,7 +233,9 @@ function CapacityStep() {
 
       <WizardNavigation
         onBack={saveAndGoBack}
-        onSkip={() => { dispatch(saveDraft({ capacity: getValues() })); dispatch(goToStep('amenities')); }}
+        onSkip={() =>
+          dispatch(wizardStepLeft({ draft: { capacity: getValues() }, target: 'amenities' }))
+        }
         isLoading={isLoading}
       />
     </form>

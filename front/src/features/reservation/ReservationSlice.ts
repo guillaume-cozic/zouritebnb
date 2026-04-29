@@ -1,10 +1,14 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import {
   CreateReservationPayload,
   FetchReservationsParams,
   Reservation,
 } from './ReservationTypes';
+
+export const reservationModalOpened = createAction<{ accommodationId?: string }>(
+  'reservation/modalOpened'
+);
 
 type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
 
@@ -143,6 +147,10 @@ const reservationSlice = createSlice({
       })
       .addCase(cancelReservation.rejected, (state, action) => {
         state.mutationError = (action.payload as string) || null;
+      })
+      .addCase(reservationModalOpened, (state) => {
+        state.mutationError = null;
+        state.mutationStatus = 'idle';
       });
   },
 });

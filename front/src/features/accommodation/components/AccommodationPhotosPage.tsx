@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchAccommodation, addPhoto, reorderPhotos, deletePhoto } from '../AccommodationSlice';
+import { fetchAccommodation, uploadPhotos, reorderPhotos, deletePhoto } from '../AccommodationSlice';
 import { selectCurrentAccommodation, selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
 import EditLayout, { SECTIONS } from './EditLayout';
 
@@ -44,12 +44,9 @@ const AccommodationPhotosPage: React.FC = () => {
     setUploadSuccess(false);
     setUploadError(null);
     try {
-      for (let i = 0; i < files.length; i++) {
-        await dispatch(addPhoto({ id: accommodation.id, file: files[i] })).unwrap();
-      }
+      await dispatch(uploadPhotos({ id: accommodation.id, files: Array.from(files) })).unwrap();
       setUploadSuccess(true);
       setTimeout(() => setUploadSuccess(false), 3000);
-      dispatch(fetchAccommodation(accommodation.id));
     } catch (err: any) {
       setUploadError(typeof err === 'string' ? err : err?.message || t('photos.uploadError'));
     } finally {

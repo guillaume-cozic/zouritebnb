@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchTeam, updateTeamFavoriteProject, fetchTeamInvitations, inviteCoHost, cancelTeamInvitation, clearInviteStatus } from '../TeamSlice';
+import { updateTeamFavoriteProject, inviteCoHost, cancelTeamInvitation, teamSettingsPageOpened } from '../TeamSlice';
 import {
   selectCurrentTeam,
   selectTeamError,
@@ -10,7 +10,6 @@ import {
   selectInviteStatus,
   selectInviteError,
 } from '../TeamSelectors';
-import { fetchSolidarityProjects } from '../../solidarityProject/SolidarityProjectSlice';
 import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
 import { selectAuthTeamId, selectAuthUser } from '../../auth/AuthSelectors';
 import { updateUserProfile } from '../../auth/AuthSlice';
@@ -53,11 +52,7 @@ const TeamSettingsPage: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    if (teamId) {
-      dispatch(fetchTeam(teamId));
-      dispatch(fetchTeamInvitations(teamId));
-    }
-    dispatch(fetchSolidarityProjects());
+    dispatch(teamSettingsPageOpened({ teamId }));
   }, [dispatch, teamId]);
 
   const handleInvite = async (e: React.FormEvent) => {
@@ -66,7 +61,6 @@ const TeamSettingsPage: React.FC = () => {
     const result = await dispatch(inviteCoHost({ teamId, email: inviteEmail.trim() }));
     if (inviteCoHost.fulfilled.match(result)) {
       setInviteEmail('');
-      window.setTimeout(() => dispatch(clearInviteStatus()), 2000);
     }
   };
 

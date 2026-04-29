@@ -15,6 +15,7 @@ import {
   UpdateDescriptionPayload,
   FormDrafts,
   WizardStep,
+  AddressDraft,
 } from './AccommodationTypes';
 
 interface AccommodationState {
@@ -260,6 +261,21 @@ export const fetchAccommodation = createAsyncThunk(
   }
 );
 
+export const uploadPhotos = createAsyncThunk(
+  'accommodation/uploadPhotos',
+  async ({ id, files }: { id: string; files: File[] }, { dispatch, rejectWithValue }) => {
+    try {
+      for (const file of files) {
+        await dispatch(addPhoto({ id, file })).unwrap();
+      }
+      await dispatch(fetchAccommodation(id));
+      return { count: files.length };
+    } catch (err: any) {
+      return rejectWithValue(typeof err === 'string' ? err : err?.message || "Erreur lors de l'upload");
+    }
+  }
+);
+
 const accommodationSlice = createSlice({
   name: 'accommodation',
   initialState,
@@ -273,6 +289,22 @@ const accommodationSlice = createSlice({
     },
     resetWizard() {
       return initialState;
+    },
+    wizardStepLeft(
+      state,
+      action: PayloadAction<{ draft?: Partial<FormDrafts>; target: WizardStep }>
+    ) {
+      if (action.payload.draft) {
+        Object.assign(state.formDrafts, action.payload.draft);
+      }
+      state.wizardStep = action.payload.target;
+      state.error = null;
+    },
+    addressSubmitted(
+      state,
+      action: PayloadAction<{ id: string; address: AddressDraft }>
+    ) {
+      state.formDrafts.address = action.payload.address;
     },
   },
   extraReducers: (builder) => {
@@ -452,5 +484,11 @@ const accommodationSlice = createSlice({
   },
 });
 
-export const { goToStep, saveDraft, resetWizard } = accommodationSlice.actions;
+export const {
+  goToStep,
+  saveDraft,
+  resetWizard,
+  wizardStepLeft,
+  addressSubmitted,
+} = accommodationSlice.actions;
 export default accommodationSlice.reducer;

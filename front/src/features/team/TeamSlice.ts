@@ -1,6 +1,10 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import { Team, TeamInvitation } from './TeamTypes';
+
+export const teamSettingsPageOpened = createAction<{ teamId: string | null }>(
+  'team/settingsPageOpened'
+);
 
 interface TeamState {
   current: Team | null;

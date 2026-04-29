@@ -6,13 +6,12 @@ import { enGB } from 'date-fns/locale/en-GB';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../../../styles/datepicker-overrides.css';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { createReservation, clearMutationError } from '../ReservationSlice';
+import { createReservation, reservationModalOpened } from '../ReservationSlice';
 import {
   selectReservationMutationError,
   selectReservationMutationStatus,
 } from '../ReservationSelectors';
 import { selectManagedAccommodations } from '../../accommodationManagement/AccommodationManagementSelectors';
-import { fetchAllAccommodations } from '../../accommodationManagement/AccommodationManagementSlice';
 
 registerLocale('fr', fr);
 registerLocale('en', enGB);
@@ -73,12 +72,9 @@ const CreateReservationModal: React.FC<Props> = ({
       setCheckInTime(extractTime(initialCheckIn, '15:00'));
       setCheckOutTime(extractTime(initialCheckOut, '11:00'));
       setChosenAccommodation(accommodationId ?? '');
-      dispatch(clearMutationError());
-      if (!accommodationId && accommodations.length === 0) {
-        dispatch(fetchAllAccommodations('all'));
-      }
+      dispatch(reservationModalOpened({ accommodationId }));
     }
-  }, [isOpen, initialCheckIn, initialCheckOut, accommodationId, dispatch, accommodations.length]);
+  }, [isOpen, initialCheckIn, initialCheckOut, accommodationId, dispatch]);
 
   if (!isOpen) return null;
 
@@ -162,6 +158,13 @@ const CreateReservationModal: React.FC<Props> = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {t('calendar.checkIn')} → {t('calendar.checkOut')}
             </label>
+            {(startDate || endDate) && (
+              <div className="mb-2 text-sm text-gray-700">
+                {startDate ? startDate.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB') : '—'}
+                {' → '}
+                {endDate ? endDate.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB') : '—'}
+              </div>
+            )}
             <div className="flex justify-center">
               <DatePicker
                 selected={startDate}

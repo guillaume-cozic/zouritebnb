@@ -25,10 +25,19 @@ export interface Accommodation {
   photos?: { id: string; url: string }[];
 }
 
+export interface AddressDraft {
+  street: string;
+  city: string;
+  zipCode: string;
+  country: string;
+  latitude?: number;
+  longitude?: number;
+}
+
 export interface FormDrafts {
   capacity?: { bedrooms: number; bathrooms: number; maxGuests: number; singleBeds: number; doubleBeds: number };
   amenities?: string[];
-  address?: { street: string; city: string; zipCode: string; country: string; latitude?: number; longitude?: number };
+  address?: AddressDraft;
 }
 
 export interface CreateAccommodationPayload {

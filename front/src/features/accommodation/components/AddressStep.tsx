@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setLocation, goToStep, saveDraft } from '../AccommodationSlice';
+import { addressSubmitted, wizardStepLeft } from '../AccommodationSlice';
 import {
   selectCurrentAccommodation,
   selectAccommodationStatus,
@@ -75,18 +75,7 @@ function AddressStep() {
 
   const onSubmit = (data: FormData) => {
     if (!accommodation?.id) return;
-    dispatch(saveDraft({ address: data }));
-    dispatch(
-      setLocation({
-        id: accommodation.id,
-        street: data.street,
-        city: data.city,
-        zipCode: data.zipCode,
-        country: data.country,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      })
-    );
+    dispatch(addressSubmitted({ id: accommodation.id, address: data }));
   };
 
   const inputClass = (hasError: boolean) =>
@@ -111,7 +100,7 @@ function AddressStep() {
 
         <div>
           <label htmlFor="street" className="block text-sm font-semibold text-gray-700 mb-1.5">
-            {t('addressStep.streetLabel')}
+            {t('addressStep.street')}
           </label>
           <input
             id="street"
@@ -128,7 +117,7 @@ function AddressStep() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="city" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              {t('addressStep.cityLabel')}
+              {t('addressStep.city')}
             </label>
             <input
               id="city"
@@ -143,7 +132,7 @@ function AddressStep() {
           </div>
           <div>
             <label htmlFor="zipCode" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              {t('addressStep.zipCodeLabel')}
+              {t('addressStep.zipCode')}
             </label>
             <input
               id="zipCode"
@@ -160,7 +149,7 @@ function AddressStep() {
 
         <div>
           <label htmlFor="country" className="block text-sm font-semibold text-gray-700 mb-1.5">
-            {t('addressStep.countryLabel')}
+            {t('addressStep.country')}
           </label>
           <input
             id="country"
@@ -213,7 +202,7 @@ function AddressStep() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="latitude" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              {t('addressStep.latitudeLabel')}
+              {t('addressStep.latitude')}
             </label>
             <input
               id="latitude"
@@ -229,7 +218,7 @@ function AddressStep() {
           </div>
           <div>
             <label htmlFor="longitude" className="block text-sm font-semibold text-gray-700 mb-1.5">
-              {t('addressStep.longitudeLabel')}
+              {t('addressStep.longitude')}
             </label>
             <input
               id="longitude"
@@ -256,7 +245,7 @@ function AddressStep() {
       )}
 
       <WizardNavigation
-        onBack={() => { dispatch(saveDraft({ address: getValues() })); dispatch(goToStep('amenities')); }}
+        onBack={() => dispatch(wizardStepLeft({ draft: { address: getValues() }, target: 'amenities' }))}
         isLoading={isLoading}
       />
     </form>

@@ -7,6 +7,8 @@ import solidarityProjectReducer from '../features/solidarityProject/SolidarityPr
 import teamReducer from '../features/team/TeamSlice';
 import authReducer from '../features/auth/AuthSlice';
 import reservationReducer from '../features/reservation/ReservationSlice';
+import { listenerMiddleware } from './listenerMiddleware';
+import './registerListeners';
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +21,8 @@ export const store = configureStore({
     auth: authReducer,
     reservation: reservationReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().prepend(listenerMiddleware.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
