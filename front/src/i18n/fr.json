@@ -95,10 +95,13 @@
     }
   },
   "auth": {
-    "loginTitle": "Connexion",
-    "registerTitle": "Créer un compte",
+    "loginTitle": "Bon retour parmi nous",
+    "loginSubtitle": "Connectez-vous pour gérer votre gîte et vos réservations.",
+    "registerTitle": "Créer votre compte",
+    "registerSubtitle": "Rejoignez la communauté des hôtes de Rodrigues.",
     "email": "Email",
     "password": "Mot de passe",
+    "passwordHint": "Au moins 8 caractères.",
     "login": "Se connecter",
     "logout": "Déconnexion",
     "register": "S'inscrire",

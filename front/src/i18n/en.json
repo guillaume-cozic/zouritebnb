@@ -95,10 +95,13 @@
     }
   },
   "auth": {
-    "loginTitle": "Sign in",
-    "registerTitle": "Create an account",
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to manage your gîte and reservations.",
+    "registerTitle": "Create your account",
+    "registerSubtitle": "Join Rodrigues' community of hosts.",
     "email": "Email",
     "password": "Password",
+    "passwordHint": "At least 8 characters.",
     "login": "Sign in",
     "logout": "Sign out",
     "register": "Sign up",
