@@ -75,6 +75,18 @@ services:
     App\Shared\Domain\Port\AccommodationPricingProvider:
         alias: App\Accommodation\Infrastructure\Doctrine\DoctrineAccommodationPricingProvider
 
+    App\Shared\Domain\Port\ReservationSummaryProvider:
+        alias: App\Reservation\Infrastructure\Doctrine\DoctrineReservationSummaryProvider
+
+    App\Shared\Domain\Port\TeamMembershipChecker:
+        alias: App\User\Infrastructure\Doctrine\DoctrineTeamMembershipChecker
+
+    App\Shared\Domain\Port\UserTeamProvider:
+        alias: App\User\Infrastructure\Doctrine\DoctrineUserTeamProvider
+
+    App\Shared\Domain\Port\Clock:
+        alias: App\Shared\Infrastructure\SystemClock
+
 when@dev:
     services:
         App\Tests\Fixtures\:
