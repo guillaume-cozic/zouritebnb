@@ -131,7 +131,9 @@ const AllAccommodationsCalendarPage: React.FC = () => {
             title: r.guestName,
             start_time: moment(r.checkIn).valueOf(),
             end_time: moment(r.checkOut).valueOf(),
+            className: `reservation-item-${r.status}`,
             itemProps: {
+              className: `reservation-item-${r.status}`,
               style: {
                 backgroundColor: c.backgroundColor,
                 color: c.textColor,
@@ -263,6 +265,7 @@ const AllAccommodationsCalendarPage: React.FC = () => {
               }}
               onCanvasClick={handleCanvasClick}
               onItemClick={handleItemClick}
+              onItemSelect={handleItemClick}
               canMove={false}
               canResize={false}
               stackItems

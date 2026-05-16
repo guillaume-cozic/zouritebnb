@@ -7,6 +7,7 @@ import solidarityProjectReducer from '../features/solidarityProject/SolidarityPr
 import teamReducer from '../features/team/TeamSlice';
 import authReducer from '../features/auth/AuthSlice';
 import reservationReducer from '../features/reservation/ReservationSlice';
+import conversationReducer from '../features/conversation/ConversationSlice';
 import { listenerMiddleware } from './listenerMiddleware';
 import './registerListeners';
 
@@ -20,6 +21,7 @@ export const store = configureStore({
     team: teamReducer,
     auth: authReducer,
     reservation: reservationReducer,
+    conversation: conversationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),

@@ -11,15 +11,16 @@ interface Props {
 }
 
 const ReservationEventPopover: React.FC<Props> = ({ reservation, onClose }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const colors = colorForStatus(reservation.status);
 
   const canConfirm = reservation.status === 'pending';
   const canCancel = reservation.status === 'pending' || reservation.status === 'confirmed';
 
+  const dateLocale = i18n.language.startsWith('fr') ? 'fr-FR' : 'en-GB';
   const fmt = (iso: string) =>
-    iso ? new Date(iso).toLocaleString() : '';
+    iso ? new Date(iso).toLocaleString(dateLocale) : '';
 
   const handleConfirm = async () => {
     await dispatch(confirmReservation(reservation.id));

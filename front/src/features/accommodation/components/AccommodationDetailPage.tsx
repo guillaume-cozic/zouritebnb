@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { fr } from 'date-fns/locale/fr';
@@ -13,6 +13,8 @@ import { fetchSolidarityProjects } from '../../solidarityProject/SolidarityProje
 import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
 import { fetchTeam } from '../../team/TeamSlice';
 import { selectCurrentTeam } from '../../team/TeamSelectors';
+import { selectAuthUser } from '../../auth/AuthSelectors';
+import RequestReservationModal from '../../reservation/components/RequestReservationModal';
 import LocationMap from '../../../components/LocationMap';
 import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
@@ -45,6 +47,10 @@ const AccommodationDetailPage: React.FC = () => {
   const team = useAppSelector(selectCurrentTeam);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
+  const user = useAppSelector(selectAuthUser);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const startDate = toDate(filters.checkIn);
   const endDate = toDate(filters.checkOut);
@@ -453,7 +459,20 @@ const AccommodationDetailPage: React.FC = () => {
                 )}
 
                 {/* Reserve button */}
-                <button className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40">
+                <button
+                  type="button"
+                  disabled={!startDate || !endDate || !accommodation}
+                  onClick={() => {
+                    if (!startDate || !endDate || !accommodation) return;
+                    if (!user) {
+                      const returnTo = encodeURIComponent(location.pathname + location.search);
+                      navigate(`/login?returnTo=${returnTo}`);
+                      return;
+                    }
+                    setRequestModalOpen(true);
+                  }}
+                  className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700"
+                >
                   {t('detail.reserve')}
                 </button>
                 <p className="text-center text-sm text-gray-500">{t('detail.noCharge')}</p>
@@ -462,6 +481,16 @@ const AccommodationDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {accommodation?.id && (
+        <RequestReservationModal
+          isOpen={requestModalOpen}
+          onClose={() => setRequestModalOpen(false)}
+          accommodationId={accommodation.id}
+          initialCheckIn={filters.checkIn || undefined}
+          initialCheckOut={filters.checkOut || undefined}
+        />
+      )}
     </main>
   );
 };

@@ -172,7 +172,7 @@ export interface Accommodation {
   title: string;
   description: string;
   price: number;
-  status: 'draft' | 'published';
+  status: 'draft' | 'published'; 
   street?: string;
   city?: string;
   zipCode?: string;

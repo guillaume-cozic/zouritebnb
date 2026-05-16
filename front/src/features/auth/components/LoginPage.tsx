@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { loginUser } from '../AuthSlice';
@@ -9,6 +9,7 @@ const LoginPage: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const status = useAppSelector(selectAuthStatus);
   const error = useAppSelector(selectAuthError);
   const [email, setEmail] = useState('');
@@ -18,7 +19,8 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     const result = await dispatch(loginUser({ email, password }));
     if (loginUser.fulfilled.match(result)) {
-      navigate('/');
+      const returnTo = searchParams.get('returnTo');
+      navigate(returnTo ? decodeURIComponent(returnTo) : '/');
     }
   };
 

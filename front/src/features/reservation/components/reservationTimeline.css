@@ -61,6 +61,21 @@
 .reservation-timeline .rct-item .rct-item-content {
   padding: 0 !important;
 }
+.reservation-timeline .rct-item {
+  border-color: transparent !important;
+}
+.reservation-timeline .rct-item.reservation-item-pending {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+}
+.reservation-timeline .rct-item.reservation-item-confirmed {
+  background: #86efac !important;
+  color: #14532d !important;
+}
+.reservation-timeline .rct-item.reservation-item-cancelled {
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
+}
 .reservation-timeline .rct-today {
   background: rgba(37, 99, 235, 0.06) !important;
 }

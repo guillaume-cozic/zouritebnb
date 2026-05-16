@@ -4,6 +4,7 @@ import {
   CreateReservationPayload,
   FetchReservationsParams,
   Reservation,
+  RequestReservationPayload,
 } from './ReservationTypes';
 
 export const reservationModalOpened = createAction<{ accommodationId?: string }>(
@@ -63,6 +64,40 @@ export const createReservation = createAsyncThunk(
   }
 );
 
+export const requestReservation = createAsyncThunk(
+  'reservation/request',
+  async (payload: RequestReservationPayload, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/api/reservations/request', payload, {
+        headers: { 'Content-Type': 'application/ld+json' },
+      });
+      return response.data as Reservation;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors de la demande de réservation'
+      );
+    }
+  }
+);
+
+export const refuseReservation = createAsyncThunk(
+  'reservation/refuse',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await api.patch(
+        `/api/reservations/${id}/refuse`,
+        {},
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return response.data as Reservation;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors du refus'
+      );
+    }
+  }
+);
+
 export const confirmReservation = createAsyncThunk(
   'reservation/confirm',
   async (id: string, { rejectWithValue }) => {
@@ -76,6 +111,20 @@ export const confirmReservation = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(
         err.response?.data?.detail || 'Erreur lors de la confirmation'
+      );
+    }
+  }
+);
+
+export const fetchReservationById = createAsyncThunk(
+  'reservation/fetchById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/api/reservations/${id}`);
+      return response.data as Reservation;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Réservation introuvable'
       );
     }
   }
@@ -133,6 +182,30 @@ const reservationSlice = createSlice({
       .addCase(createReservation.rejected, (state, action) => {
         state.mutationStatus = 'failed';
         state.mutationError = (action.payload as string) || null;
+      })
+      .addCase(requestReservation.pending, (state) => {
+        state.mutationStatus = 'loading';
+        state.mutationError = null;
+      })
+      .addCase(requestReservation.fulfilled, (state, action) => {
+        state.mutationStatus = 'succeeded';
+        state.items.push(action.payload);
+      })
+      .addCase(requestReservation.rejected, (state, action) => {
+        state.mutationStatus = 'failed';
+        state.mutationError = (action.payload as string) || null;
+      })
+      .addCase(refuseReservation.fulfilled, (state, action) => {
+        const idx = state.items.findIndex((r) => r.id === action.payload.id);
+        if (idx >= 0) state.items[idx] = action.payload;
+      })
+      .addCase(refuseReservation.rejected, (state, action) => {
+        state.mutationError = (action.payload as string) || null;
+      })
+      .addCase(fetchReservationById.fulfilled, (state, action) => {
+        const idx = state.items.findIndex((r) => r.id === action.payload.id);
+        if (idx >= 0) state.items[idx] = action.payload;
+        else state.items.push(action.payload);
       })
       .addCase(confirmReservation.fulfilled, (state, action) => {
         const idx = state.items.findIndex((r) => r.id === action.payload.id);

@@ -11,10 +11,10 @@ export const colorForStatus = (status: ReservationStatus): EventColor => {
   switch (status) {
     case 'confirmed':
       return {
-        backgroundColor: '#dcfce7',
-        borderColor: '#dcfce7',
-        textColor: '#166534',
-        badgeClass: 'bg-green-100 text-green-800',
+        backgroundColor: '#86efac',
+        borderColor: '#86efac',
+        textColor: '#14532d',
+        badgeClass: 'bg-green-200 text-green-900',
       };
     case 'cancelled':
       return {

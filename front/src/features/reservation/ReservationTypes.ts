@@ -1,10 +1,11 @@
-export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled';
+export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled' | 'refused';
 
 export interface Reservation {
   '@id'?: string;
   id: string;
   accommodationId: string;
   teamId: string;
+  guestUserId?: string | null;
   checkIn: string;
   checkOut: string;
   guestName: string;
@@ -19,6 +20,15 @@ export interface CreateReservationPayload {
   checkIn: string;
   checkOut: string;
   guestName: string;
+}
+
+export interface RequestReservationPayload {
+  accommodationId: string;
+  guestUserId: string;
+  checkIn: string;
+  checkOut: string;
+  guestName: string;
+  note?: string;
 }
 
 export interface FetchReservationsParams {

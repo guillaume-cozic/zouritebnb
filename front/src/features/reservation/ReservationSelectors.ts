@@ -13,3 +13,8 @@ export const selectReservationsForAccommodation = (accommodationId: string) =>
   createSelector(selectReservations, (items) =>
     items.filter((r) => r.accommodationId === accommodationId)
   );
+
+export const selectReservationById = (id: string | undefined) =>
+  createSelector(selectReservations, (items) =>
+    id ? items.find((r) => r.id === id) ?? null : null
+  );

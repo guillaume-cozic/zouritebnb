@@ -45,4 +45,8 @@
   .prose-blog code {
     @apply bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm;
   }
+  .prose-blog--editorial p:first-of-type::first-letter {
+    @apply float-left text-6xl sm:text-7xl font-bold text-blue-600 mr-3 mt-1;
+    line-height: 0.85;
+  }
 }

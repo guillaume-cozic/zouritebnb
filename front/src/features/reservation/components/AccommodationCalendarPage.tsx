@@ -136,6 +136,7 @@ const AccommodationCalendarPage: React.FC = () => {
   const eventPropGetter = (event: ReservationEvent) => {
     const c = colorForStatus(event.resource.status);
     return {
+      className: `reservation-event-${event.resource.status}`,
       style: {
         backgroundColor: c.backgroundColor,
         color: c.textColor,
@@ -222,7 +223,7 @@ const AccommodationCalendarPage: React.FC = () => {
             onView={(v) => setView(v)}
             date={visibleDate}
             onNavigate={(d) => setVisibleDate(d)}
-            selectable
+            selectable="ignoreEvents"
             onSelectSlot={handleSelectSlot}
             onSelectEvent={handleSelectEvent}
             eventPropGetter={eventPropGetter}

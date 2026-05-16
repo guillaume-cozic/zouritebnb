@@ -6,6 +6,7 @@ import { fetchPublishedAccommodations } from '../HomepageSlice';
 import { selectAccommodations, selectHomepageStatus, selectHomepageError } from '../HomepageSelectors';
 import HeroSection from './HeroSection';
 import AccommodationCard from './AccommodationCard';
+import RodriguesMap from './RodriguesMap';
 import SolidarityProjectsSection from '../../solidarityProject/components/SolidarityProjectsSection';
 
 const LoadingSkeleton: React.FC = () => (
@@ -242,6 +243,8 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <RodriguesMap />
 
       <SolidarityProjectsSection />
 
