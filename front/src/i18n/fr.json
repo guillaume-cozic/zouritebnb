@@ -150,7 +150,7 @@
     "title": "Gestion des hébergements",
     "subtitle": "Liste complète de vos hébergements, brouillons inclus",
     "menu": {
-      "title": "Administration",
+      "title": "Espace hôte",
       "home": "Accueil",
       "accommodations": "Hébergements",
       "calendar": "Calendrier",
@@ -158,6 +158,7 @@
       "conversations": "Conversations",
       "team": "Mes paramètres"
     },
+    "sidebarFooter": "Votre gîte, votre univers. Prenez soin de chaque voyageur.",
     "empty": "Aucun hébergement.",
     "filter": {
       "all": "Tous",
@@ -180,6 +181,11 @@
   },
   "hostHome": {
     "subtitle": "Voici ce qui se passe chez vous aujourd'hui et dans les prochains jours.",
+    "tabs": {
+      "today": "Aujourd'hui",
+      "upcoming": "À venir",
+      "leaving": "Départs"
+    },
     "greeting": {
       "morning": "Bonjour",
       "afternoon": "Bon après-midi",

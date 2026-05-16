@@ -170,10 +170,15 @@ const TeamSettingsPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">{t('team.title')}</h1>
+      <header className="mb-8 relative">
+        <div className="absolute -left-4 top-0 bottom-2 w-1 bg-gradient-to-b from-blue-500 via-blue-400 to-transparent rounded-full" aria-hidden="true" />
+        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-700">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          {t('backoffice.menu.title')}
+        </div>
+        <h1 className="mt-2 text-3xl font-bold text-gray-900 tracking-tight">{t('team.title')}</h1>
         <p className="text-gray-500 mt-1">{t('team.subtitle')}</p>
-      </div>
+      </header>
 
       {!teamId && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">

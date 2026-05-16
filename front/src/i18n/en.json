@@ -150,7 +150,7 @@
     "title": "Manage accommodations",
     "subtitle": "Full list including drafts",
     "menu": {
-      "title": "Administration",
+      "title": "Host space",
       "home": "Home",
       "accommodations": "Accommodations",
       "calendar": "Calendar",
@@ -158,6 +158,7 @@
       "conversations": "Conversations",
       "team": "My settings"
     },
+    "sidebarFooter": "Your gîte, your world. Take care of every guest.",
     "empty": "No accommodation.",
     "filter": {
       "all": "All",
@@ -180,6 +181,11 @@
   },
   "hostHome": {
     "subtitle": "Here's what's happening at your place today and in the coming days.",
+    "tabs": {
+      "today": "Today",
+      "upcoming": "Upcoming",
+      "leaving": "Departures"
+    },
     "greeting": {
       "morning": "Good morning",
       "afternoon": "Good afternoon",
