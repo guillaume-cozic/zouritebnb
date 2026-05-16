@@ -11,6 +11,11 @@ final class InvalidReservationException extends \DomainException
         return new self('Accommodation not found.');
     }
 
+    public static function becauseAccommodationHasNoTeam(): self
+    {
+        return new self('Accommodation has no owning team.');
+    }
+
     public static function becauseNegativeTotalPrice(float $totalPrice): self
     {
         return new self(\sprintf('Total price must be greater than or equal to zero, got %s.', $totalPrice));

@@ -9,6 +9,8 @@ use App\Reservation\Domain\Event\ReservationConfirmed;
 use App\Reservation\Domain\Event\ReservationCreated;
 use App\Reservation\Domain\Exception\InvalidReservationStateException;
 use App\Shared\Domain\Entity\AggregateRoot;
+use App\Shared\Domain\Event\ReservationRefused;
+use App\Shared\Domain\Event\ReservationRequested;
 use Symfony\Component\Uid\Uuid;
 
 final class Reservation extends AggregateRoot
@@ -21,6 +23,7 @@ final class Reservation extends AggregateRoot
         private readonly GuestName $guestName,
         private ReservationStatus $status,
         private readonly ReservationPrice $price,
+        private readonly ?Uuid $guestUserId = null,
     ) {
     }
 
@@ -43,6 +46,32 @@ final class Reservation extends AggregateRoot
         );
         $reservation->recordEvent(new ReservationCreated($id->toUuid()));
         $reservation->recordEvent(new ReservationConfirmed($id->toUuid()));
+
+        return $reservation;
+    }
+
+    public static function request(
+        ReservationId $id,
+        Uuid $accommodationId,
+        Uuid $teamId,
+        DateRange $dateRange,
+        GuestName $guestName,
+        ReservationPrice $price,
+        Uuid $guestUserId,
+        ?string $note = null,
+    ): self {
+        $reservation = new self(
+            id: $id,
+            accommodationId: $accommodationId,
+            teamId: $teamId,
+            dateRange: $dateRange,
+            guestName: $guestName,
+            status: ReservationStatus::Pending,
+            price: $price,
+            guestUserId: $guestUserId,
+        );
+        $reservation->recordEvent(new ReservationCreated($id->toUuid()));
+        $reservation->recordEvent(new ReservationRequested($id->toUuid(), $guestUserId, $note));
 
         return $reservation;
     }
@@ -82,6 +111,11 @@ final class Reservation extends AggregateRoot
         return $this->price;
     }
 
+    public function getGuestUserId(): ?Uuid
+    {
+        return $this->guestUserId;
+    }
+
     public function confirm(): void
     {
         if (ReservationStatus::Confirmed === $this->status) {
@@ -89,6 +123,9 @@ final class Reservation extends AggregateRoot
         }
         if (ReservationStatus::Cancelled === $this->status) {
             throw InvalidReservationStateException::becauseCancelledCannotBeConfirmed();
+        }
+        if (ReservationStatus::Refused === $this->status) {
+            throw InvalidReservationStateException::becauseRefusedCannotBeConfirmed();
         }
 
         $this->status = ReservationStatus::Confirmed;
@@ -103,5 +140,18 @@ final class Reservation extends AggregateRoot
 
         $this->status = ReservationStatus::Cancelled;
         $this->recordEvent(new ReservationCancelled($this->id->toUuid()));
+    }
+
+    public function refuse(bool $automatic = false): void
+    {
+        if (ReservationStatus::Refused === $this->status) {
+            throw InvalidReservationStateException::becauseAlreadyRefused();
+        }
+        if (ReservationStatus::Pending !== $this->status) {
+            throw InvalidReservationStateException::becauseOnlyPendingCanBeRefused();
+        }
+
+        $this->status = ReservationStatus::Refused;
+        $this->recordEvent(new ReservationRefused($this->id->toUuid(), $automatic));
     }
 }

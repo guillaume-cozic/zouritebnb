@@ -34,6 +34,7 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             ->setId($id)
             ->setAccommodationId($reservation->getAccommodationId())
             ->setTeamId($reservation->getTeamId())
+            ->setGuestUserId($reservation->getGuestUserId())
             ->setCheckIn($reservation->getDateRange()->checkIn())
             ->setCheckOut($reservation->getDateRange()->checkOut())
             ->setGuestName($reservation->getGuestName()->toString())
@@ -99,6 +100,7 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
                 pricePerNight: $entity->getPricePerNight(),
                 appliedDiscountPercentage: $entity->getAppliedDiscountPercentage(),
             ),
+            guestUserId: $entity->getGuestUserId(),
         );
     }
 }

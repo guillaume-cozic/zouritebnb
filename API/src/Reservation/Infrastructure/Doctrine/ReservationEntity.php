@@ -23,6 +23,9 @@ class ReservationEntity
     #[ORM\Column(type: UuidType::NAME)]
     private ?Uuid $teamId = null;
 
+    #[ORM\Column(type: UuidType::NAME, nullable: true)]
+    private ?Uuid $guestUserId = null;
+
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $checkIn = null;
 
@@ -76,6 +79,18 @@ class ReservationEntity
     public function setTeamId(Uuid $teamId): static
     {
         $this->teamId = $teamId;
+
+        return $this;
+    }
+
+    public function getGuestUserId(): ?Uuid
+    {
+        return $this->guestUserId;
+    }
+
+    public function setGuestUserId(?Uuid $guestUserId): static
+    {
+        $this->guestUserId = $guestUserId;
 
         return $this;
     }

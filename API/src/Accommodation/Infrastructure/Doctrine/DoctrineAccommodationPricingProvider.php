@@ -26,6 +26,7 @@ final readonly class DoctrineAccommodationPricingProvider implements Accommodati
         return new AccommodationPricing(
             pricePerNight: (float) $entity->getPrice(),
             weeklyPromotionPercentage: $entity->getWeeklyPromotionPercentage(),
+            teamId: $entity->getTeamId(),
         );
     }
 }

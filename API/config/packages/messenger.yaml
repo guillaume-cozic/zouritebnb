@@ -12,6 +12,7 @@ framework:
 
         routing:
             App\Shared\Domain\Event\DomainEvent: async
+            App\Reservation\Infrastructure\Messenger\ExpireReservationMessage: async
 
 when@dev:
     framework:

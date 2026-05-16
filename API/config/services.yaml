@@ -87,6 +87,9 @@ services:
     App\Shared\Domain\Port\Clock:
         alias: App\Shared\Infrastructure\SystemClock
 
+    App\Reservation\Infrastructure\Messenger\ScheduleReservationExpiry:
+        tags: [messenger.message_handler]
+
 when@dev:
     services:
         App\Tests\Fixtures\:

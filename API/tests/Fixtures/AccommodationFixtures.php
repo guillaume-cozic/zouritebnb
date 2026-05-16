@@ -13,6 +13,8 @@ use Symfony\Component\Uid\Uuid;
 
 class AccommodationFixtures extends Fixture
 {
+    public const string DEFAULT_TEAM_UUID = '00000000-0000-4000-8000-000000000001';
+
     private const AMENITY_CODES = [
         'wifi', 'air_conditioning', 'heating', 'fan', 'fireplace', 'safe', 'iron',
         'equipped_kitchen', 'fridge', 'oven', 'microwave', 'dishwasher', 'coffee_maker',
@@ -88,6 +90,7 @@ class AccommodationFixtures extends Fixture
 
             $accommodation = (new AccommodationEntity())
                 ->setId($accommodationId)
+                ->setTeamId(Uuid::fromString(self::DEFAULT_TEAM_UUID))
                 ->setTitle($template['title'])
                 ->setDescription($template['description'])
                 ->setPrice($faker->randomFloat(0, 50, 500))

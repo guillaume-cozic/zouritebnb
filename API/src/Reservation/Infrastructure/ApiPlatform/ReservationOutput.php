@@ -136,6 +136,60 @@ use Symfony\Component\Serializer\Attribute\Groups;
             input: false,
             processor: CancelReservationProcessor::class,
         ),
+        new Post(
+            uriTemplate: '/reservations/request',
+            status: 201,
+            openapi: new OpenApiOperation(
+                summary: 'Demander une réservation (parcours B2C)',
+                description: 'Crée une demande de réservation en statut "pending" depuis le parcours public. Une conversation entre l\'hôte et le loueur est ouverte automatiquement. L\'hôte dispose de 24h pour accepter ou refuser. La date de départ doit être strictement postérieure à la date d\'arrivée.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/ld+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: [
+                                        'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
+                                        'guestUserId' => '01961e2f-dead-7000-beef-0000000000c1',
+                                        'checkIn' => '2026-05-01T15:00:00+00:00',
+                                        'checkOut' => '2026-05-05T11:00:00+00:00',
+                                        'guestName' => 'Jean Dupont',
+                                    ],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['reservation:write']],
+            normalizationContext: ['groups' => ['reservation:read']],
+            input: RequestReservationInput::class,
+            processor: RequestReservationProcessor::class,
+        ),
+        new Patch(
+            uriTemplate: '/reservations/{id}/refuse',
+            read: false,
+            openapi: new OpenApiOperation(
+                summary: 'Refuser une réservation (hôte)',
+                description: 'L\'hôte refuse une réservation en statut "pending". Passe au statut "refused". Retourne 404 si introuvable, 422 si la réservation n\'est pas en "pending".',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/merge-patch+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: new \ArrayObject(),
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['reservation:write']],
+            normalizationContext: ['groups' => ['reservation:read']],
+            input: false,
+            processor: RefuseReservationProcessor::class,
+        ),
     ],
 )]
 class ReservationOutput implements FromEntityInterface
@@ -153,6 +207,10 @@ class ReservationOutput implements FromEntityInterface
     public ?string $teamId = null;
 
     #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Identifiant UUID de l\'utilisateur loueur (null pour les réservations créées en back office)', example: '01961e2f-dead-7000-beef-0000000000c1')]
+    public ?string $guestUserId = null;
+
+    #[Groups(['reservation:read'])]
     #[ApiProperty(description: 'Date et heure d\'arrivée (ISO 8601)', example: '2026-05-01T15:00:00+00:00')]
     public ?string $checkIn = null;
 
@@ -165,7 +223,7 @@ class ReservationOutput implements FromEntityInterface
     public ?string $guestName = null;
 
     #[Groups(['reservation:read'])]
-    #[ApiProperty(description: 'Statut de la réservation (pending, confirmed, cancelled)', example: 'pending')]
+    #[ApiProperty(description: 'Statut de la réservation (pending, confirmed, cancelled, refused)', example: 'pending')]
     public ?string $status = null;
 
     #[Groups(['reservation:read'])]
@@ -188,6 +246,7 @@ class ReservationOutput implements FromEntityInterface
         $output->id = $entity->getId()->toString();
         $output->accommodationId = $entity->getAccommodationId()->toRfc4122();
         $output->teamId = $entity->getTeamId()->toRfc4122();
+        $output->guestUserId = $entity->getGuestUserId()?->toRfc4122();
         $output->checkIn = $entity->getDateRange()->checkIn()->format(\DateTimeInterface::ATOM);
         $output->checkOut = $entity->getDateRange()->checkOut()->format(\DateTimeInterface::ATOM);
         $output->guestName = $entity->getGuestName()->toString();
