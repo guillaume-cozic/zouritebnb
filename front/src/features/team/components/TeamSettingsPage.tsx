@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { updateTeamFavoriteProject, inviteCoHost, cancelTeamInvitation, teamSettingsPageOpened } from '../TeamSlice';
+import { updateTeamFavoriteProject, inviteCoHost, cancelTeamInvitation, teamSettingsPageOpened, updateTeamBankAccount } from '../TeamSlice';
 import {
   selectCurrentTeam,
   selectTeamError,
@@ -13,6 +13,7 @@ import {
 import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
 import { selectAuthTeamId, selectAuthUser } from '../../auth/AuthSelectors';
 import { updateUserProfile } from '../../auth/AuthSlice';
+import { DEFAULT_TEAM_ID } from '../TeamTypes';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -23,7 +24,7 @@ const TeamSettingsPage: React.FC = () => {
   const teamStatus = useAppSelector(selectTeamStatus);
   const teamError = useAppSelector(selectTeamError);
   const projects = useAppSelector(selectSolidarityProjects);
-  const teamId = useAppSelector(selectAuthTeamId);
+  const teamId = useAppSelector(selectAuthTeamId) ?? DEFAULT_TEAM_ID;
   const user = useAppSelector(selectAuthUser);
   const invitations = useAppSelector(selectTeamInvitations);
   const inviteStatus = useAppSelector(selectInviteStatus);
@@ -40,6 +41,14 @@ const TeamSettingsPage: React.FC = () => {
   const profileTimer = useRef<number | null>(null);
   const isHydrating = useRef(true);
 
+  const [iban, setIban] = useState('');
+  const [bic, setBic] = useState('');
+  const [holderName, setHolderName] = useState('');
+  const [bankState, setBankState] = useState<SaveState>('idle');
+  const [bankError, setBankError] = useState<string | null>(null);
+  const bankTimer = useRef<number | null>(null);
+  const isBankHydrating = useRef(true);
+
   useEffect(() => {
     if (user) {
       isHydrating.current = true;
@@ -54,6 +63,52 @@ const TeamSettingsPage: React.FC = () => {
   useEffect(() => {
     dispatch(teamSettingsPageOpened({ teamId }));
   }, [dispatch, teamId]);
+
+  useEffect(() => {
+    if (team) {
+      isBankHydrating.current = true;
+      setIban(team.iban ?? '');
+      setBic(team.bic ?? '');
+      setHolderName(team.bankAccountHolderName ?? '');
+      const handle = window.setTimeout(() => { isBankHydrating.current = false; }, 0);
+      return () => window.clearTimeout(handle);
+    }
+  }, [team]);
+
+  useEffect(() => {
+    if (!team || isBankHydrating.current) return;
+    if (bankTimer.current) window.clearTimeout(bankTimer.current);
+    bankTimer.current = window.setTimeout(async () => {
+      const ibanTrimmed = iban.trim();
+      const holderTrimmed = holderName.trim();
+
+      if ('' !== ibanTrimmed && '' === holderTrimmed) {
+        setBankState('idle');
+        return;
+      }
+
+      setBankState('saving');
+      setBankError(null);
+      const result = await dispatch(updateTeamBankAccount({
+        id: team.id,
+        payload: {
+          iban: '' === ibanTrimmed ? null : ibanTrimmed,
+          bic: '' === bic.trim() ? null : bic.trim(),
+          holderName: '' === holderTrimmed ? null : holderTrimmed,
+        },
+      }));
+      if (updateTeamBankAccount.fulfilled.match(result)) {
+        setBankState('saved');
+        window.setTimeout(() => setBankState('idle'), 1500);
+      } else {
+        setBankState('error');
+        setBankError((result.payload as string) ?? null);
+      }
+    }, 800);
+    return () => {
+      if (bankTimer.current) window.clearTimeout(bankTimer.current);
+    };
+  }, [iban, bic, holderName, team, dispatch]);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,6 +248,68 @@ const TeamSettingsPage: React.FC = () => {
               <option key={p.id} value={p.id}>{p.title}</option>
             ))}
           </select>
+        </div>
+      )}
+
+      {team && (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+          <div className="flex items-start justify-between mb-1">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">{t('team.bankAccount.title')}</h2>
+              <p className="text-xs text-gray-500">{t('team.bankAccount.help')}</p>
+            </div>
+            <SaveIndicator state={bankState} />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium mb-2">{t('team.bankAccount.iban')}</label>
+              <input
+                type="text"
+                value={iban}
+                onChange={(e) => setIban(e.target.value)}
+                placeholder="FR76 3000 1007 9412 3456 7890 185"
+                spellCheck={false}
+                autoComplete="off"
+                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">{t('team.bankAccount.holderName')}</label>
+              <input
+                type="text"
+                value={holderName}
+                onChange={(e) => setHolderName(e.target.value)}
+                placeholder={t('team.bankAccount.holderNamePlaceholder') as string}
+                autoComplete="off"
+                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {t('team.bankAccount.bic')}{' '}
+                <span className="text-xs font-normal text-gray-400">({t('team.bankAccount.optional')})</span>
+              </label>
+              <input
+                type="text"
+                value={bic}
+                onChange={(e) => setBic(e.target.value)}
+                placeholder="BDFEFRPPCCT"
+                spellCheck={false}
+                autoComplete="off"
+                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
+              />
+            </div>
+          </div>
+          {iban.trim() !== '' && holderName.trim() === '' && (
+            <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              {t('team.bankAccount.holderRequired')}
+            </p>
+          )}
+          {bankState === 'error' && bankError && (
+            <p className="mt-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+              {bankError}
+            </p>
+          )}
         </div>
       )}
 

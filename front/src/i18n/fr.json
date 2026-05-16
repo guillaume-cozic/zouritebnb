@@ -134,7 +134,17 @@
     "invitationPending": "En attente",
     "cancelInvitation": "Annuler",
     "confirmCancelInvitation": "Annuler cette invitation ?",
-    "keep": "Ne pas annuler"
+    "keep": "Ne pas annuler",
+    "bankAccount": {
+      "title": "Compte bancaire",
+      "help": "IBAN sur lequel vous recevrez les virements de vos réservations. Laissez l'IBAN vide pour retirer le compte.",
+      "iban": "IBAN",
+      "bic": "BIC / SWIFT",
+      "optional": "optionnel",
+      "holderName": "Titulaire du compte",
+      "holderNamePlaceholder": "Nom complet du titulaire",
+      "holderRequired": "Le nom du titulaire est requis quand vous renseignez un IBAN."
+    }
   },
   "backoffice": {
     "title": "Gestion des hébergements",

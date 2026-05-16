@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
-import { Team, TeamInvitation } from './TeamTypes';
+import { BankAccountPayload, Team, TeamInvitation } from './TeamTypes';
 
 export const teamSettingsPageOpened = createAction<{ teamId: string | null }>(
   'team/settingsPageOpened'
@@ -50,6 +50,22 @@ export const updateTeamFavoriteProject = createAsyncThunk(
       return { favoriteSolidarityProjectId };
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.detail || 'Erreur lors de la mise à jour');
+    }
+  }
+);
+
+export const updateTeamBankAccount = createAsyncThunk(
+  'team/updateBankAccount',
+  async ({ id, payload }: { id: string; payload: BankAccountPayload }, { rejectWithValue }) => {
+    try {
+      await api.patch(
+        `/api/teams/${id}/bank-account`,
+        payload,
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return payload;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.detail || 'Erreur lors de la mise à jour du compte bancaire');
     }
   }
 );
@@ -122,6 +138,14 @@ const teamSlice = createSlice({
       .addCase(updateTeamFavoriteProject.fulfilled, (state, action) => {
         if (state.current) {
           state.current.favoriteSolidarityProjectId = action.payload.favoriteSolidarityProjectId;
+        }
+      })
+      .addCase(updateTeamBankAccount.fulfilled, (state, action) => {
+        if (state.current) {
+          const { iban, bic, holderName } = action.payload;
+          state.current.iban = iban;
+          state.current.bic = bic;
+          state.current.bankAccountHolderName = holderName;
         }
       })
       .addCase(fetchTeamInvitations.pending, (state) => {

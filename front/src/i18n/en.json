@@ -134,7 +134,17 @@
     "invitationPending": "Pending",
     "cancelInvitation": "Cancel",
     "confirmCancelInvitation": "Cancel this invitation?",
-    "keep": "Keep"
+    "keep": "Keep",
+    "bankAccount": {
+      "title": "Bank account",
+      "help": "IBAN where you'll receive payouts from your reservations. Leave the IBAN empty to remove the account.",
+      "iban": "IBAN",
+      "bic": "BIC / SWIFT",
+      "optional": "optional",
+      "holderName": "Account holder",
+      "holderNamePlaceholder": "Full holder name",
+      "holderRequired": "The account holder name is required when you provide an IBAN."
+    }
   },
   "backoffice": {
     "title": "Manage accommodations",

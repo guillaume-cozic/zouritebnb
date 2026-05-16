@@ -1,6 +1,15 @@
 export interface Team {
   id: string;
   favoriteSolidarityProjectId: string | null;
+  iban: string | null;
+  bic: string | null;
+  bankAccountHolderName: string | null;
+}
+
+export interface BankAccountPayload {
+  iban: string | null;
+  bic: string | null;
+  holderName: string | null;
 }
 
 export interface TeamInvitation {

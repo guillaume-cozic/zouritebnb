@@ -19,6 +19,15 @@ class TeamEntity
     #[ORM\Column(type: UuidType::NAME, nullable: true)]
     private ?Uuid $favoriteSolidarityProjectId = null;
 
+    #[ORM\Column(length: 34, nullable: true)]
+    private ?string $iban = null;
+
+    #[ORM\Column(length: 11, nullable: true)]
+    private ?string $bic = null;
+
+    #[ORM\Column(length: 70, nullable: true)]
+    private ?string $bankAccountHolderName = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -39,6 +48,42 @@ class TeamEntity
     public function setFavoriteSolidarityProjectId(?Uuid $favoriteSolidarityProjectId): static
     {
         $this->favoriteSolidarityProjectId = $favoriteSolidarityProjectId;
+
+        return $this;
+    }
+
+    public function getIban(): ?string
+    {
+        return $this->iban;
+    }
+
+    public function setIban(?string $iban): static
+    {
+        $this->iban = $iban;
+
+        return $this;
+    }
+
+    public function getBic(): ?string
+    {
+        return $this->bic;
+    }
+
+    public function setBic(?string $bic): static
+    {
+        $this->bic = $bic;
+
+        return $this;
+    }
+
+    public function getBankAccountHolderName(): ?string
+    {
+        return $this->bankAccountHolderName;
+    }
+
+    public function setBankAccountHolderName(?string $bankAccountHolderName): static
+    {
+        $this->bankAccountHolderName = $bankAccountHolderName;
 
         return $this;
     }

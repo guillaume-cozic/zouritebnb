@@ -58,6 +58,38 @@ use Symfony\Component\Serializer\Attribute\Groups;
             output: false,
             processor: UpdateTeamFavoriteSolidarityProjectProcessor::class,
         ),
+        new Patch(
+            uriTemplate: '/teams/{id}/bank-account',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Mettre à jour le compte bancaire de l\'équipe',
+                description: 'Enregistre ou met à jour l\'IBAN, le BIC (optionnel) et le nom du titulaire utilisés pour recevoir les virements. Envoyer un iban vide ou null pour retirer le compte.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/merge-patch+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: [
+                                        'iban' => 'FR7630001007941234567890185',
+                                        'bic' => 'BDFEFRPPCCT',
+                                        'holderName' => 'Marie Hôte',
+                                    ],
+                                ),
+                                'clear' => new Example(
+                                    summary: 'Retirer le compte bancaire',
+                                    value: ['iban' => null],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['team:write-bank-account']],
+            input: UpdateTeamBankAccountInput::class,
+            output: false,
+            processor: UpdateTeamBankAccountProcessor::class,
+        ),
     ],
     stateOptions: new Options(entityClass: TeamEntity::class),
 )]
@@ -71,12 +103,27 @@ class TeamOutput implements FromEntityInterface
     #[ApiProperty(description: 'Identifiant UUID du projet solidaire coup de cœur', example: '019cf27a-96ba-7957-8622-eeccb764b67f')]
     public ?string $favoriteSolidarityProjectId = null;
 
+    #[Groups(['team:read'])]
+    #[ApiProperty(description: 'IBAN du compte bancaire utilisé pour les virements', example: 'FR7630001007941234567890185')]
+    public ?string $iban = null;
+
+    #[Groups(['team:read'])]
+    #[ApiProperty(description: 'BIC du compte bancaire (optionnel)', example: 'BDFEFRPPCCT')]
+    public ?string $bic = null;
+
+    #[Groups(['team:read'])]
+    #[ApiProperty(description: 'Nom du titulaire du compte bancaire', example: 'Marie Hôte')]
+    public ?string $bankAccountHolderName = null;
+
     public static function fromEntity(object $entity): static
     {
         /** @var TeamEntity $entity */
         $output = new static();
         $output->id = $entity->getId()?->toRfc4122();
         $output->favoriteSolidarityProjectId = $entity->getFavoriteSolidarityProjectId()?->toRfc4122();
+        $output->iban = $entity->getIban();
+        $output->bic = $entity->getBic();
+        $output->bankAccountHolderName = $entity->getBankAccountHolderName();
 
         return $output;
     }
