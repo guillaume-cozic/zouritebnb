@@ -141,6 +141,7 @@
     "subtitle": "Liste complète de vos hébergements, brouillons inclus",
     "menu": {
       "title": "Administration",
+      "home": "Accueil",
       "accommodations": "Hébergements",
       "calendar": "Calendrier",
       "reservations": "Réservations",
@@ -165,6 +166,39 @@
       "publish": "Publier",
       "unpublish": "Dépublier",
       "calendar": "Calendrier"
+    }
+  },
+  "hostHome": {
+    "subtitle": "Voici ce qui se passe chez vous aujourd'hui et dans les prochains jours.",
+    "greeting": {
+      "morning": "Bonjour",
+      "afternoon": "Bon après-midi",
+      "evening": "Bonsoir",
+      "night": "Bonne nuit"
+    },
+    "viewCalendar": "Voir le calendrier",
+    "nightsOne": "1 nuit",
+    "nightsOther": "{{count}} nuits",
+    "current": {
+      "title": "Chez nous aujourd'hui",
+      "subtitle": "Les voyageurs qui séjournent en ce moment.",
+      "empty": "Personne ne séjourne chez vous aujourd'hui.",
+      "dayCount": "Jour {{day}} / {{total}}",
+      "leavingTomorrow": "Part demain"
+    },
+    "arriving": {
+      "title": "Prochaines arrivées",
+      "subtitle": "Réservations confirmées dans les 14 prochains jours.",
+      "empty": "Aucune arrivée prévue dans les deux prochaines semaines.",
+      "today": "Arrive aujourd'hui",
+      "tomorrow": "Arrive demain",
+      "inDays": "Dans {{count}} jours"
+    },
+    "leaving": {
+      "title": "Au revoir",
+      "subtitle": "Les voyageurs qui partent aujourd'hui — pensez à les remercier.",
+      "empty": "Aucun départ prévu aujourd'hui.",
+      "today": "Part aujourd'hui"
     }
   },
   "hero": {

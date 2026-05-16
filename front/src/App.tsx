@@ -9,6 +9,7 @@ import EditAccommodationPage from './features/accommodation/components/EditAccom
 import AccommodationPhotosPage from './features/accommodation/components/AccommodationPhotosPage';
 import ManageAccommodationsPage from './features/accommodationManagement/components/ManageAccommodationsPage';
 import BackofficeLayout from './features/accommodationManagement/components/BackofficeLayout';
+import HostHomePage from './features/accommodationManagement/components/HostHomePage';
 import TeamSettingsPage from './features/team/components/TeamSettingsPage';
 import LoginPage from './features/auth/components/LoginPage';
 import RegisterPage from './features/auth/components/RegisterPage';
@@ -16,6 +17,11 @@ import SolidarityProjectsPage from './features/solidarityProject/components/Soli
 import SolidarityProjectDetailPage from './features/solidarityProject/components/SolidarityProjectDetailPage';
 import AccommodationCalendarPage from './features/reservation/components/AccommodationCalendarPage';
 import AllAccommodationsCalendarPage from './features/reservation/components/AllAccommodationsCalendarPage';
+import ProtectedRoute from './features/auth/components/ProtectedRoute';
+import ConversationsListPage from './features/conversation/components/ConversationsListPage';
+import ConversationDetailPage from './features/conversation/components/ConversationDetailPage';
+import AdminReservationsPage from './features/reservation/components/AdminReservationsPage';
+import AdminConversationsPage from './features/conversation/components/AdminConversationsPage';
 
 function App() {
   return (
@@ -31,11 +37,19 @@ function App() {
           <Route path="/create" element={<CreateAccommodationWizard />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/conversations" element={<ConversationsListPage />} />
+            <Route path="/conversations/:id" element={<ConversationDetailPage />} />
+          </Route>
           <Route element={<BackofficeLayout />}>
+            <Route path="/admin" element={<HostHomePage />} />
             <Route path="/admin/accommodations" element={<ManageAccommodationsPage />} />
             <Route path="/admin/team" element={<TeamSettingsPage />} />
             <Route path="/admin/calendar" element={<AllAccommodationsCalendarPage />} />
             <Route path="/admin/accommodations/:id/calendar" element={<AccommodationCalendarPage />} />
+            <Route path="/admin/reservations" element={<AdminReservationsPage />} />
+            <Route path="/admin/conversations" element={<AdminConversationsPage />} />
+            <Route path="/admin/conversations/:id" element={<AdminConversationsPage />} />
             <Route path="/accommodations/:id/edit" element={<EditAccommodationPage />} />
             <Route path="/accommodations/:id/photos" element={<AccommodationPhotosPage />} />
           </Route>

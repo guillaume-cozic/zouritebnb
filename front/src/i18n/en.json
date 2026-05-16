@@ -141,6 +141,7 @@
     "subtitle": "Full list including drafts",
     "menu": {
       "title": "Administration",
+      "home": "Home",
       "accommodations": "Accommodations",
       "calendar": "Calendar",
       "reservations": "Reservations",
@@ -165,6 +166,39 @@
       "publish": "Publish",
       "unpublish": "Unpublish",
       "calendar": "Calendar"
+    }
+  },
+  "hostHome": {
+    "subtitle": "Here's what's happening at your place today and in the coming days.",
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening",
+      "night": "Good night"
+    },
+    "viewCalendar": "View calendar",
+    "nightsOne": "1 night",
+    "nightsOther": "{{count}} nights",
+    "current": {
+      "title": "Staying with us today",
+      "subtitle": "Guests currently in your accommodations.",
+      "empty": "No one is staying with you today.",
+      "dayCount": "Day {{day}} / {{total}}",
+      "leavingTomorrow": "Leaving tomorrow"
+    },
+    "arriving": {
+      "title": "Upcoming arrivals",
+      "subtitle": "Confirmed reservations within the next 14 days.",
+      "empty": "No arrivals scheduled in the next two weeks.",
+      "today": "Arriving today",
+      "tomorrow": "Arriving tomorrow",
+      "inDays": "In {{count}} days"
+    },
+    "leaving": {
+      "title": "Farewell",
+      "subtitle": "Guests checking out today — don't forget to thank them.",
+      "empty": "No departures scheduled today.",
+      "today": "Leaving today"
     }
   },
   "hero": {
