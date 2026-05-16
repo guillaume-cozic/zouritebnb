@@ -87,6 +87,15 @@ services:
     App\Shared\Domain\Port\Clock:
         alias: App\Shared\Infrastructure\SystemClock
 
+    App\Conversation\Domain\Port\ConversationRepository:
+        alias: App\Conversation\Infrastructure\Doctrine\DoctrineConversationRepository
+
+    App\Conversation\Application\Listener\StartConversationOnReservationRequested:
+        tags: [messenger.message_handler]
+
+    App\Conversation\Application\Listener\PostRefusalSystemMessageOnReservationRefused:
+        tags: [messenger.message_handler]
+
     App\Reservation\Infrastructure\Messenger\ScheduleReservationExpiry:
         tags: [messenger.message_handler]
 

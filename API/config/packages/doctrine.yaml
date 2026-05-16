@@ -44,6 +44,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/User/Infrastructure/Doctrine'
                 prefix: 'App\User\Infrastructure\Doctrine'
                 alias: User
+            Conversation:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Conversation/Infrastructure/Doctrine'
+                prefix: 'App\Conversation\Infrastructure\Doctrine'
+                alias: Conversation
         controller_resolver:
             auto_mapping: false
 
