@@ -1,4 +1,87 @@
 {
+  "request": {
+    "title": "Demander une réservation",
+    "subtitle": "L'hôte sera notifié et dispose de 24h pour accepter ou refuser.",
+    "guestName": "Nom du voyageur principal",
+    "dates": "Dates du séjour",
+    "arrivalTime": "Heure d'arrivée",
+    "departureTime": "Heure de départ",
+    "note": "Message à l'hôte",
+    "optional": "optionnel",
+    "notePlaceholder": "Présentez-vous, précisez si vous voyagez avec des enfants, un animal, etc.",
+    "hostHas24h": "Aucun paiement n'est demandé à cette étape. Vous serez notifié dès que l'hôte aura répondu.",
+    "cancel": "Annuler",
+    "submit": "Envoyer la demande",
+    "submitting": "Envoi…",
+    "night": "nuit",
+    "nights": "nuits"
+  },
+  "admin": {
+    "reservations": {
+      "title": "Réservations",
+      "subtitle": "Toutes les réservations de votre équipe, du plus récent au plus ancien.",
+      "loading": "Chargement…",
+      "empty": "Aucune réservation pour ce filtre.",
+      "openConversation": "Ouvrir la conversation",
+      "pendingBadge_one": "{{count}} demande en attente",
+      "pendingBadge_other": "{{count}} demandes en attente",
+      "filter": {
+        "all": "Toutes",
+        "pending": "En attente",
+        "confirmed": "Acceptées",
+        "refused": "Refusées",
+        "cancelled": "Annulées"
+      },
+      "status": {
+        "pending": "En attente",
+        "confirmed": "Acceptée",
+        "refused": "Refusée",
+        "cancelled": "Annulée"
+      }
+    },
+    "conversations": {
+      "title": "Conversations",
+      "subtitle": "Échanges avec les loueurs",
+      "empty": "Aucune conversation pour le moment.",
+      "noMatch": "Aucune conversation ne correspond à votre recherche.",
+      "noNeedsAction": "Aucune conversation à traiter.",
+      "needsActionToggle": "À traiter",
+      "itemTitle": "Demande de réservation",
+      "searchPlaceholder": "Rechercher…",
+      "placeholderTitle": "Sélectionnez une conversation",
+      "placeholderSubtitle": "Choisissez une conversation dans la liste pour consulter les messages et répondre."
+    }
+  },
+  "host": {
+    "panel": {
+      "title": "Détail de la réservation",
+      "guest": "Voyageur",
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
+      "total": "Total",
+      "pendingNotice": "Vous avez 24h pour accepter ou refuser cette demande.",
+      "accept": "Accepter",
+      "refuse": "Refuser"
+    }
+  },
+  "conversation": {
+    "inboxTitle": "Mes conversations",
+    "inboxSubtitle": "Retrouvez ici l'échange avec chaque hôte pour vos demandes de réservation.",
+    "empty": "Vous n'avez encore aucune conversation. Faites votre première demande de réservation depuis une annonce.",
+    "itemTitle": "Demande de réservation",
+    "needsActionBadge": "À traiter",
+    "detailTitle": "Conversation",
+    "backToList": "Retour aux conversations",
+    "reservation": "Réservation",
+    "viewAccommodation": "Voir l'hébergement",
+    "loading": "Chargement…",
+    "placeholder": "Écrivez votre message…",
+    "send": "Envoyer",
+    "readOnly": "Mode lecture seule — connectez-vous pour répondre.",
+    "login": "Se connecter",
+    "host": "Hôte",
+    "guest": "Loueur"
+  },
   "navbar": {
     "home": "Accueil",
     "createAccommodation": "Créer un hébergement",
@@ -7,6 +90,7 @@
       "notifications": "Notifications",
       "myAccommodations": "Mes hébergements",
       "calendar": "Calendrier",
+      "conversations": "Conversations",
       "settings": "Mes paramètres"
     }
   },
@@ -59,6 +143,8 @@
       "title": "Administration",
       "accommodations": "Hébergements",
       "calendar": "Calendrier",
+      "reservations": "Réservations",
+      "conversations": "Conversations",
       "team": "Mes paramètres"
     },
     "empty": "Aucun hébergement.",
@@ -151,7 +237,19 @@
       "title": "Envie de soutenir ce projet ?",
       "subtitle": "Chaque contribution fait une vraie différence pour Rodrigues.",
       "button": "Participer"
-    }
+    },
+    "share": {
+      "label": "Partager",
+      "copy": "Copier le lien",
+      "copied": "Lien copié !",
+      "twitter": "Partager sur Twitter",
+      "facebook": "Partager sur Facebook"
+    },
+    "related": {
+      "title": "Découvrir d'autres initiatives",
+      "subtitle": "D'autres projets que nous soutenons à Rodrigues."
+    },
+    "location": "Rodrigues, Maurice"
   },
   "edit": {
     "title": "Modifier l'hébergement",
