@@ -236,7 +236,17 @@
   "listing": {
     "title": "Accommodations",
     "subtitle": "Refine your search to find the perfect place",
-    "reset": "Reset filters"
+    "reset": "Clear all",
+    "activeFilters": "Active filters",
+    "resultCount_one": "{{count}} stay",
+    "resultCount_other": "{{count}} stays",
+    "advanced": {
+      "toggle": "Advanced filters",
+      "priceRange": "Price per night",
+      "priceMin": "Min",
+      "priceMax": "Max",
+      "priceHelp": "Leave empty to skip this filter."
+    }
   },
   "homepage": {
     "loading": "Loading...",

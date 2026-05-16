@@ -17,4 +17,6 @@ export interface SearchFilters {
   checkOut: string;
   guests: number | null;
   amenities: string[];
+  priceMin: number | null;
+  priceMax: number | null;
 }

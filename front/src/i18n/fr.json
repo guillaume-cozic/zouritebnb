@@ -236,7 +236,17 @@
   "listing": {
     "title": "Hébergements",
     "subtitle": "Affinez votre recherche pour trouver le logement idéal",
-    "reset": "Réinitialiser les filtres"
+    "reset": "Tout effacer",
+    "activeFilters": "Filtres actifs",
+    "resultCount_one": "{{count}} hébergement",
+    "resultCount_other": "{{count}} hébergements",
+    "advanced": {
+      "toggle": "Filtres avancés",
+      "priceRange": "Prix par nuit",
+      "priceMin": "Min",
+      "priceMax": "Max",
+      "priceHelp": "Laissez vide pour ne pas filtrer."
+    }
   },
   "homepage": {
     "loading": "Chargement...",
