@@ -9,6 +9,7 @@ import {
   selectHomepageFilters,
 } from '../HomepageSelectors';
 import AccommodationCard from './AccommodationCard';
+import Footer from '../../../components/Footer';
 
 const QUICK_AMENITIES = ['wifi', 'air_conditioning', 'private_pool', 'private_parking', 'sea_view', 'pets_allowed'] as const;
 
@@ -81,6 +82,7 @@ const AccommodationsListingPage: React.FC = () => {
   })();
 
   return (
+    <>
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{t('listing.title')}</h1>
@@ -314,6 +316,8 @@ const AccommodationsListingPage: React.FC = () => {
         </>
       )}
     </section>
+    <Footer />
+    </>
   );
 };
 

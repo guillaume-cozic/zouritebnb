@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import '../../../styles/datepicker-overrides.css';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setFilters } from '../../homepage/HomepageSlice';
+import Footer from '../../../components/Footer';
 import { selectHomepageFilters } from '../../homepage/HomepageSelectors';
 import { fetchSolidarityProjects } from '../../solidarityProject/SolidarityProjectSlice';
 import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
@@ -145,6 +146,7 @@ const AccommodationDetailPage: React.FC = () => {
   const photos = (accommodation.photos ?? []).map((p) => `${API_BASE}${p.url}`);
 
   return (
+    <>
     <main className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -492,6 +494,8 @@ const AccommodationDetailPage: React.FC = () => {
         />
       )}
     </main>
+    <Footer />
+    </>
   );
 };
 

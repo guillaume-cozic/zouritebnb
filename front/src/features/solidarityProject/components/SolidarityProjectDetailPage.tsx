@@ -15,6 +15,7 @@ import {
 } from '../SolidarityProjectSelectors';
 import { SolidarityProject } from '../SolidarityProjectTypes';
 import SolidarityProjectCard from './SolidarityProjectCard';
+import Footer from '../../../components/Footer';
 
 const formatDate = (iso: string, locale: string): string => {
   try {
@@ -521,6 +522,7 @@ const SolidarityProjectDetailPage: React.FC = () => {
       {status === 'succeeded' && project && (
         <Article project={project} related={related} />
       )}
+      <Footer />
     </div>
   );
 };
