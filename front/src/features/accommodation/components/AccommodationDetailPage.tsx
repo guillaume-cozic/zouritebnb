@@ -98,12 +98,14 @@ const AccommodationDetailPage: React.FC = () => {
   const favoriteProject = team?.favoriteSolidarityProjectId
     ? activeProjects.find((p) => p.id === team.favoriteSolidarityProjectId) ?? null
     : null;
+  const platformDefaultProject = activeProjects.find((p) => p.isDefault) ?? null;
+  const preselectedProject = favoriteProject ?? platformDefaultProject ?? activeProjects[0] ?? null;
 
   useEffect(() => {
-    if (!selectedProjectId && favoriteProject) {
-      setSelectedProjectId(favoriteProject.id);
+    if (!selectedProjectId && preselectedProject) {
+      setSelectedProjectId(preselectedProject.id);
     }
-  }, [favoriteProject, selectedProjectId]);
+  }, [preselectedProject, selectedProjectId]);
 
   // Loading
   if (status === 'loading') {
@@ -401,19 +403,44 @@ const AccommodationDetailPage: React.FC = () => {
                 {/* Guests */}
                 <div>
                   <label className="block text-sm font-medium mb-2">{t('detail.guestsLabel')}</label>
-                  <div className="relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <div className="h-11 flex items-center justify-between gap-2 rounded-xl border border-gray-200 bg-gray-50 pl-3 pr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0">
                       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                       <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
-                    <input
-                      type="number"
-                      min={1}
-                      max={accommodation.maxGuests ?? 99}
-                      value={guests}
-                      onChange={(e) => dispatch(setFilters({ guests: e.target.value ? Number(e.target.value) : 1 }))}
-                      className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
-                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => dispatch(setFilters({ guests: Math.max(1, guests - 1) }))}
+                        disabled={guests <= 1}
+                        aria-label="decrement guests"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12h14" />
+                        </svg>
+                      </button>
+                      <span className="min-w-[24px] text-center text-sm font-semibold text-gray-900 tabular-nums">
+                        {guests}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const max = accommodation.maxGuests ?? 99;
+                          dispatch(setFilters({ guests: Math.min(max, guests + 1) }));
+                        }}
+                        disabled={!!(accommodation.maxGuests && guests >= accommodation.maxGuests)}
+                        aria-label="increment guests"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 5v14" />
+                          <path d="M5 12h14" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -430,6 +457,40 @@ const AccommodationDetailPage: React.FC = () => {
                       <option key={p.id} value={p.id}>{p.title}</option>
                     ))}
                   </select>
+                  {(() => {
+                    const selected = activeProjects.find((p) => p.id === selectedProjectId);
+                    if (!selected) return null;
+                    return (
+                      <div className="mt-3 rounded-xl bg-blue-50/60 border border-blue-100 p-3">
+                        <div className="flex gap-3">
+                          {selected.imageUrl && (
+                            <img
+                              src={selected.imageUrl}
+                              alt={selected.title}
+                              className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                              loading="lazy"
+                            />
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold text-gray-900 leading-tight">{selected.title}</p>
+                            <p className="text-xs text-gray-600 mt-1 leading-relaxed line-clamp-3">
+                              {selected.description}
+                            </p>
+                            <Link
+                              to={`/solidarity-projects/${selected.id}`}
+                              className="inline-flex items-center gap-1 mt-1.5 text-xs font-medium text-blue-700 hover:text-blue-800"
+                            >
+                              {t('detail.solidarityProjectLearnMore')}
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M7 17 17 7" />
+                                <path d="M7 7h10v10" />
+                              </svg>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Price breakdown */}

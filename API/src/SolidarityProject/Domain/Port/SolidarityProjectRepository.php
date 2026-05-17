@@ -17,4 +17,6 @@ interface SolidarityProjectRepository
      * @return SolidarityProject[]
      */
     public function findAllActive(): array;
+
+    public function markAsDefault(Uuid $id): void;
 }

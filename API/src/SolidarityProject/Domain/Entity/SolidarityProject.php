@@ -25,6 +25,7 @@ final readonly class SolidarityProject
         ?string $imageUrl,
         private string $status,
         private \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
+        private bool $isDefault = false,
     ) {
         $title = trim($title);
         if ('' === $title) {
@@ -80,5 +81,10 @@ final readonly class SolidarityProject
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function isDefault(): bool
+    {
+        return $this->isDefault;
     }
 }

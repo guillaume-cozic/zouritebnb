@@ -8,6 +8,7 @@ use App\SolidarityProject\Domain\Entity\SolidarityProject;
 use App\SolidarityProject\Domain\Port\SolidarityProjectRepository as SolidarityProjectRepositoryPort;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -28,11 +29,23 @@ class DoctrineSolidarityProjectRepository extends ServiceEntityRepository implem
             ->setDescription($project->getDescription())
             ->setImageUrl($project->getImageUrl())
             ->setStatus($project->getStatus())
-            ->setCreatedAt($project->getCreatedAt());
+            ->setCreatedAt($project->getCreatedAt())
+            ->setIsDefault($project->isDefault());
 
         $em = $this->getEntityManager();
         $em->persist($entity);
         $em->flush();
+    }
+
+    public function markAsDefault(Uuid $id): void
+    {
+        $em = $this->getEntityManager();
+        $em->createQuery('UPDATE '.SolidarityProjectEntity::class.' p SET p.isDefault = false WHERE p.isDefault = true')
+            ->execute();
+        $em->createQuery('UPDATE '.SolidarityProjectEntity::class.' p SET p.isDefault = true WHERE p.id = :id')
+            ->setParameter('id', $id, UuidType::NAME)
+            ->execute();
+        $em->clear();
     }
 
     public function findById(Uuid $id): ?SolidarityProject
@@ -66,6 +79,7 @@ class DoctrineSolidarityProjectRepository extends ServiceEntityRepository implem
             imageUrl: $entity->getImageUrl(),
             status: $entity->getStatus(),
             createdAt: $entity->getCreatedAt(),
+            isDefault: $entity->isDefault(),
         );
     }
 }

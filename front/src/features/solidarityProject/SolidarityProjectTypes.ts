@@ -5,4 +5,5 @@ export interface SolidarityProject {
   imageUrl: string | null;
   status: 'active' | 'closed';
   createdAt: string;
+  isDefault: boolean;
 }

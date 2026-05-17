@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use App\Shared\ApiPlatform\State\EntityProvider;
 use App\Shared\ApiPlatform\State\FromEntityInterface;
@@ -36,6 +37,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
             normalizationContext: ['groups' => ['solidarity_project:list']],
             provider: ActiveSolidarityProjectProvider::class,
             paginationEnabled: false,
+        ),
+        new Patch(
+            uriTemplate: '/solidarity_projects/{id}/mark-default',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Définir le projet solidaire par défaut de la plateforme',
+                description: 'Marque ce projet comme le projet par défaut affiché sur les hébergements quand l\'équipe hôte n\'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut.',
+            ),
+            denormalizationContext: ['groups' => ['solidarity_project:mark-default']],
+            input: false,
+            output: false,
+            processor: MarkSolidarityProjectAsDefaultProcessor::class,
+            read: false,
         ),
     ],
     stateOptions: new Options(entityClass: SolidarityProjectEntity::class),
@@ -66,6 +80,10 @@ class SolidarityProjectOutput implements FromEntityInterface
     #[ApiProperty(description: 'Date de création du projet (ISO 8601)', example: '2026-04-13T10:00:00+00:00')]
     public ?string $createdAt = null;
 
+    #[Groups(['solidarity_project:read', 'solidarity_project:list'])]
+    #[ApiProperty(description: 'Vrai si ce projet est marqué comme défaut de la plateforme', example: false)]
+    public ?bool $isDefault = null;
+
     public static function fromEntity(object $entity): static
     {
         /** @var SolidarityProjectEntity $entity */
@@ -76,6 +94,7 @@ class SolidarityProjectOutput implements FromEntityInterface
         $output->imageUrl = $entity->getImageUrl();
         $output->status = $entity->getStatus();
         $output->createdAt = $entity->getCreatedAt()?->format(\DateTimeInterface::ATOM);
+        $output->isDefault = $entity->isDefault();
 
         return $output;
     }
