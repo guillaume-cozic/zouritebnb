@@ -42,8 +42,13 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Logo + Nav links */}
         <div className="flex items-center gap-6">
-          <Link to="/" className="text-2xl font-bold text-blue-600">
-            BnB
+          <Link to="/" className="flex items-center" aria-label="ZouriteBnb">
+            <img
+              src="/logo.png"
+              alt="ZouriteBnb"
+              className="h-14 w-auto object-contain"
+              loading="eager"
+            />
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
             <Link to="/solidarity-projects" className="hover:text-blue-600 transition-colors">
