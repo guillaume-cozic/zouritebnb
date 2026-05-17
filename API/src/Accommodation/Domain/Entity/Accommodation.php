@@ -34,10 +34,16 @@ final class Accommodation extends AggregateRoot
         private ?CheckInOut $checkInOut = null,
         private ?Uuid $teamId = null,
         private ?float $weeklyPromotionPercentage = null,
+        private ?Uuid $regionId = null,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
         }
+    }
+
+    public function getRegionId(): ?Uuid
+    {
+        return $this->regionId;
     }
 
     public function getId(): Uuid

@@ -29,6 +29,7 @@ final readonly class CreateAccommodation
             description: $command->description,
             price: $command->price,
             teamId: $command->teamId,
+            regionId: $command->regionId,
         );
 
         $this->repository->save($accommodation);

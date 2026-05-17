@@ -13,6 +13,7 @@ final readonly class CreateAccommodationCommand
         public string $description,
         public ?float $price,
         public ?Uuid $teamId = null,
+        public ?Uuid $regionId = null,
     ) {
     }
 }

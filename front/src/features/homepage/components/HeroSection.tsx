@@ -9,6 +9,7 @@ import '../../../styles/datepicker-overrides.css';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setFilters } from '../HomepageSlice';
 import { selectHomepageFilters } from '../HomepageSelectors';
+import LocalitySuggestions from './LocalitySuggestions';
 
 registerLocale('fr', fr);
 registerLocale('en', enGB);
@@ -35,6 +36,7 @@ const HeroSection: React.FC = () => {
 
   const [current, setCurrent] = useState(0);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [cityOpen, setCityOpen] = useState(false);
 
   const advancedCount =
     filters.amenities.length +
@@ -129,8 +131,22 @@ const HeroSection: React.FC = () => {
                     type="text"
                     placeholder={t('hero.searchPlaceholder')}
                     value={filters.city}
-                    onChange={(e) => dispatch(setFilters({ city: e.target.value }))}
+                    onChange={(e) => {
+                      dispatch(setFilters({ city: e.target.value }));
+                      setCityOpen(true);
+                    }}
+                    onFocus={() => setCityOpen(true)}
+                    onBlur={() => setCityOpen(false)}
+                    autoComplete="off"
                     className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                  />
+                  <LocalitySuggestions
+                    value={filters.city}
+                    open={cityOpen}
+                    onSelect={(city) => {
+                      dispatch(setFilters({ city }));
+                      setCityOpen(false);
+                    }}
                   />
                 </div>
               </div>

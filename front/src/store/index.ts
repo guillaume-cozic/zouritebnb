@@ -8,6 +8,7 @@ import teamReducer from '../features/team/TeamSlice';
 import authReducer from '../features/auth/AuthSlice';
 import reservationReducer from '../features/reservation/ReservationSlice';
 import conversationReducer from '../features/conversation/ConversationSlice';
+import geographyReducer from '../features/geography/GeographySlice';
 import { listenerMiddleware } from './listenerMiddleware';
 import './registerListeners';
 
@@ -22,6 +23,7 @@ export const store = configureStore({
     auth: authReducer,
     reservation: reservationReducer,
     conversation: conversationReducer,
+    geography: geographyReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),

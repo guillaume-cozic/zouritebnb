@@ -50,6 +50,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Conversation/Infrastructure/Doctrine'
                 prefix: 'App\Conversation\Infrastructure\Doctrine'
                 alias: Conversation
+            Geography:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Geography/Infrastructure/Doctrine'
+                prefix: 'App\Geography\Infrastructure\Doctrine'
+                alias: Geography
         controller_resolver:
             auto_mapping: false
 

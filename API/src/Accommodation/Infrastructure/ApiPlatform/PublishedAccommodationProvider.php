@@ -9,6 +9,7 @@ use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @implements ProviderInterface<AccommodationOutput>
@@ -17,22 +18,75 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
 {
     public function __construct(
         private Connection $connection,
+        private RequestStack $requestStack,
     ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): TraversablePaginator
     {
-        $page = (int) ($context['filters']['page'] ?? 1);
+        $request = $this->requestStack->getCurrentRequest();
+        $query = $request?->query;
+
+        $page = (int) ($query?->get('page') ?? 1);
         $itemsPerPage = 30;
         $offset = ($page - 1) * $itemsPerPage;
 
-        $statusFilter = $context['filters']['status'] ?? 'published';
+        $statusFilter = $query?->get('status') ?? 'published';
         $allowedStatuses = ['published', 'draft', 'all'];
         if (!\in_array($statusFilter, $allowedStatuses, true)) {
             $statusFilter = 'published';
         }
 
-        $whereClause = 'all' === $statusFilter ? '1=1' : 'a.status = :status';
+        $clauses = [];
+        $params = [];
+        $types = [];
+
+        if ('all' !== $statusFilter) {
+            $clauses[] = 'a.status = :status';
+            $params['status'] = $statusFilter;
+        }
+
+        $cityRaw = $query?->get('city');
+        if (\is_string($cityRaw) && '' !== trim($cityRaw)) {
+            $clauses[] = "REPLACE(LOWER(a.city), '-', ' ') LIKE REPLACE(LOWER(:city), '-', ' ')";
+            $params['city'] = '%'.trim($cityRaw).'%';
+        }
+
+        $guestsRaw = $query?->get('guests');
+        if (null !== $guestsRaw && '' !== $guestsRaw && (int) $guestsRaw > 0) {
+            $clauses[] = '(a.max_guests IS NULL OR a.max_guests >= :guests)';
+            $params['guests'] = (int) $guestsRaw;
+            $types['guests'] = ParameterType::INTEGER;
+        }
+
+        $priceMinRaw = $query?->get('priceMin');
+        if (null !== $priceMinRaw && '' !== $priceMinRaw && is_numeric($priceMinRaw)) {
+            $clauses[] = 'a.price >= :priceMin';
+            $params['priceMin'] = (float) $priceMinRaw;
+        }
+
+        $priceMaxRaw = $query?->get('priceMax');
+        if (null !== $priceMaxRaw && '' !== $priceMaxRaw && is_numeric($priceMaxRaw)) {
+            $clauses[] = 'a.price <= :priceMax';
+            $params['priceMax'] = (float) $priceMaxRaw;
+        }
+
+        // amenities[] (or comma-separated) — accommodation must contain ALL of them
+        $amenitiesRaw = $query?->all('amenities') ?? [];
+        if (\is_string($amenitiesRaw)) {
+            $amenitiesRaw = explode(',', $amenitiesRaw);
+        }
+        $amenities = array_values(array_filter(array_map(
+            static fn ($v) => \is_string($v) ? trim($v) : '',
+            (array) $amenitiesRaw
+        ), static fn ($v) => '' !== $v));
+        foreach ($amenities as $i => $code) {
+            $paramName = 'amenity'.$i;
+            $clauses[] = "JSON_CONTAINS(a.amenities, JSON_QUOTE(:{$paramName}))";
+            $params[$paramName] = $code;
+        }
+
+        $whereSql = [] === $clauses ? '1=1' : implode(' AND ', $clauses);
 
         $sql = <<<SQL
             SELECT
@@ -52,30 +106,24 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
                     LIMIT 1
                 ) AS thumbnail_filename
             FROM accommodation a
-            WHERE {$whereClause}
+            WHERE {$whereSql}
             ORDER BY a.title ASC
             LIMIT :limit OFFSET :offset
             SQL;
 
-        $params = [
+        $dataParams = $params + [
             'limit' => $itemsPerPage,
             'offset' => $offset,
         ];
-        $types = [
+        $dataTypes = $types + [
             'limit' => ParameterType::INTEGER,
             'offset' => ParameterType::INTEGER,
         ];
-        if ('all' !== $statusFilter) {
-            $params['status'] = $statusFilter;
-        }
 
-        $rows = $this->connection->executeQuery($sql, $params, $types)->fetchAllAssociative();
+        $rows = $this->connection->executeQuery($sql, $dataParams, $dataTypes)->fetchAllAssociative();
 
-        $countSql = 'all' === $statusFilter
-            ? 'SELECT COUNT(*) FROM accommodation'
-            : 'SELECT COUNT(*) FROM accommodation WHERE status = :status';
-        $countParams = 'all' === $statusFilter ? [] : ['status' => $statusFilter];
-        $totalItems = (int) $this->connection->executeQuery($countSql, $countParams)->fetchOne();
+        $countSql = "SELECT COUNT(*) FROM accommodation a WHERE {$whereSql}";
+        $totalItems = (int) $this->connection->executeQuery($countSql, $params, $types)->fetchOne();
 
         $outputs = [];
         foreach ($rows as $row) {

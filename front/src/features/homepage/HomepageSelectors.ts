@@ -1,4 +1,3 @@
-import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 
 export const selectAccommodations = (state: RootState) =>
@@ -13,29 +12,6 @@ export const selectHomepageStatus = (state: RootState) =>
 export const selectHomepageError = (state: RootState) =>
   state.homepage?.error ?? null;
 
-export const selectFilteredAccommodations = createSelector(
-  [selectAccommodations, selectHomepageFilters],
-  (accommodations, filters) => {
-    return accommodations.filter((item) => {
-      if (filters.city && !item.city?.toLowerCase().includes(filters.city.toLowerCase())) {
-        return false;
-      }
-      if (filters.guests !== null && item.maxGuests !== null && item.maxGuests < filters.guests) {
-        return false;
-      }
-      if (filters.priceMin !== null && item.price !== null && item.price < filters.priceMin) {
-        return false;
-      }
-      if (filters.priceMax !== null && item.price !== null && item.price > filters.priceMax) {
-        return false;
-      }
-      if (filters.amenities.length > 0) {
-        const itemAmenities = item.amenities ?? [];
-        if (!filters.amenities.every((code) => itemAmenities.includes(code))) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }
-);
+// Filters are now applied server-side by the API; the selector is a pass-through
+// kept as a named export so callers don't need to switch imports.
+export const selectFilteredAccommodations = selectAccommodations;

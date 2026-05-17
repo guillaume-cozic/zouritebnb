@@ -77,6 +77,9 @@ class AccommodationEntity
     #[ORM\Column(nullable: true)]
     private ?float $weeklyPromotionPercentage = null;
 
+    #[ORM\Column(type: UuidType::NAME, nullable: true)]
+    private ?Uuid $regionId = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -325,6 +328,18 @@ class AccommodationEntity
     public function setWeeklyPromotionPercentage(?float $weeklyPromotionPercentage): static
     {
         $this->weeklyPromotionPercentage = $weeklyPromotionPercentage;
+
+        return $this;
+    }
+
+    public function getRegionId(): ?Uuid
+    {
+        return $this->regionId;
+    }
+
+    public function setRegionId(?Uuid $regionId): static
+    {
+        $this->regionId = $regionId;
 
         return $this;
     }

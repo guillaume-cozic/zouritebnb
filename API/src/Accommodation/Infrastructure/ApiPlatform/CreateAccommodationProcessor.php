@@ -17,6 +17,7 @@ use Symfony\Component\Uid\Uuid;
 final readonly class CreateAccommodationProcessor implements ProcessorInterface
 {
     private const DEFAULT_TEAM_UUID = '00000000-0000-4000-8000-000000000001';
+    private const DEFAULT_REGION_UUID = '00000000-0000-4000-8000-00000000000a';
 
     public function __construct(
         private CreateAccommodation $createAccommodation,
@@ -34,6 +35,7 @@ final readonly class CreateAccommodationProcessor implements ProcessorInterface
             description: $data->description,
             price: $data->price,
             teamId: Uuid::fromString(self::DEFAULT_TEAM_UUID),
+            regionId: Uuid::fromString(self::DEFAULT_REGION_UUID),
         )));
 
         $output = new AccommodationOutput();

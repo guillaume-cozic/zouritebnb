@@ -10,6 +10,7 @@ import {
 } from '../HomepageSelectors';
 import AccommodationCard from './AccommodationCard';
 import Footer from '../../../components/Footer';
+import LocalitySuggestions from './LocalitySuggestions';
 
 const QUICK_AMENITIES = ['wifi', 'air_conditioning', 'private_pool', 'private_parking', 'sea_view', 'pets_allowed'] as const;
 
@@ -44,10 +45,20 @@ const AccommodationsListingPage: React.FC = () => {
   const filters = useAppSelector(selectHomepageFilters);
 
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [cityOpen, setCityOpen] = useState(false);
 
+  const amenitiesKey = filters.amenities.join(',');
   useEffect(() => {
-    dispatch(fetchPublishedAccommodations({ checkIn: filters.checkIn, checkOut: filters.checkOut }));
-  }, [dispatch, filters.checkIn, filters.checkOut]);
+    dispatch(fetchPublishedAccommodations({
+      checkIn: filters.checkIn,
+      checkOut: filters.checkOut,
+      city: filters.city,
+      guests: filters.guests,
+      priceMin: filters.priceMin,
+      priceMax: filters.priceMax,
+      amenities: filters.amenities,
+    }));
+  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, amenitiesKey]);
 
   const toggleAmenity = (code: string) => {
     const next = filters.amenities.includes(code)
@@ -82,8 +93,8 @@ const AccommodationsListingPage: React.FC = () => {
   })();
 
   return (
-    <>
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col">
+    <section className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{t('listing.title')}</h1>
         <p className="text-gray-500 mt-1">{t('listing.subtitle')}</p>
@@ -92,7 +103,7 @@ const AccommodationsListingPage: React.FC = () => {
       <div className="mb-6">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_auto] divide-y md:divide-y-0 md:divide-x divide-gray-100">
-            <label className="group flex items-center gap-3 px-5 py-3 cursor-text">
+            <label className="group relative flex items-center gap-3 px-5 py-3 cursor-text">
               <svg className="text-gray-400 group-focus-within:text-blue-500 transition-colors flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
                 <circle cx="12" cy="10" r="3" />
@@ -105,10 +116,24 @@ const AccommodationsListingPage: React.FC = () => {
                   type="text"
                   placeholder={t('hero.searchPlaceholder')}
                   value={filters.city}
-                  onChange={(e) => dispatch(setFilters({ city: e.target.value }))}
+                  onChange={(e) => {
+                    dispatch(setFilters({ city: e.target.value }));
+                    setCityOpen(true);
+                  }}
+                  onFocus={() => setCityOpen(true)}
+                  onBlur={() => setCityOpen(false)}
+                  autoComplete="off"
                   className="w-full text-sm text-gray-900 placeholder:text-gray-400 bg-transparent border-0 p-0 focus:outline-none focus:ring-0"
                 />
               </div>
+              <LocalitySuggestions
+                value={filters.city}
+                open={cityOpen}
+                onSelect={(city) => {
+                  dispatch(setFilters({ city }));
+                  setCityOpen(false);
+                }}
+              />
             </label>
 
             <div className="flex items-center gap-3 px-5 py-3">
@@ -317,7 +342,7 @@ const AccommodationsListingPage: React.FC = () => {
       )}
     </section>
     <Footer />
-    </>
+    </div>
   );
 };
 

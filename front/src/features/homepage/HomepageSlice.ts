@@ -16,16 +16,37 @@ const initialState: HomepageState = {
   error: null,
 };
 
+interface FetchPublishedParams {
+  checkIn?: string;
+  checkOut?: string;
+  city?: string;
+  guests?: number | null;
+  priceMin?: number | null;
+  priceMax?: number | null;
+  amenities?: string[];
+}
+
 export const fetchPublishedAccommodations = createAsyncThunk<
   AccommodationListItem[],
-  { checkIn?: string; checkOut?: string } | void
+  FetchPublishedParams | void
 >(
   'homepage/fetchPublished',
   async (params, { rejectWithValue }) => {
     try {
-      const queryParams: Record<string, string> = {};
+      const queryParams: Record<string, string | string[]> = {};
       if (params?.checkIn) queryParams.checkIn = params.checkIn;
       if (params?.checkOut) queryParams.checkOut = params.checkOut;
+      if (params?.city) queryParams.city = params.city;
+      if (params?.guests) queryParams.guests = String(params.guests);
+      if (params?.priceMin !== undefined && params.priceMin !== null) {
+        queryParams.priceMin = String(params.priceMin);
+      }
+      if (params?.priceMax !== undefined && params.priceMax !== null) {
+        queryParams.priceMax = String(params.priceMax);
+      }
+      if (params?.amenities && params.amenities.length > 0) {
+        queryParams['amenities[]'] = params.amenities;
+      }
       const response = await api.get('/api/accommodations', { params: queryParams });
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as AccommodationListItem[];
