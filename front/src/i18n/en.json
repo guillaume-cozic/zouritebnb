@@ -16,6 +16,23 @@
     "night": "night",
     "nights": "nights"
   },
+  "confirm": {
+    "eyebrow": "Confirmation",
+    "back": "Back to listing",
+    "missingDates": "Missing dates. Go back to the listing to pick your stay dates.",
+    "tripDetails": "Your stay",
+    "dates": "Dates",
+    "guestInfo": "Your information",
+    "payment": {
+      "title": "Payment method",
+      "subtitle": "Card details are required to confirm, but nothing will be charged until the host accepts your request.",
+      "cardName": "Cardholder name",
+      "cardNamePlaceholder": "Name on card",
+      "cardNumber": "Card number",
+      "expiry": "Expiry",
+      "cvc": "CVC"
+    }
+  },
   "admin": {
     "reservations": {
       "title": "Reservations",

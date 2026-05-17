@@ -22,6 +22,7 @@ import ConversationsListPage from './features/conversation/components/Conversati
 import ConversationDetailPage from './features/conversation/components/ConversationDetailPage';
 import AdminReservationsPage from './features/reservation/components/AdminReservationsPage';
 import AdminConversationsPage from './features/conversation/components/AdminConversationsPage';
+import ReservationConfirmationPage from './features/reservation/components/ReservationConfirmationPage';
 
 function App() {
   return (
@@ -34,6 +35,9 @@ function App() {
           <Route path="/solidarity-projects/:id" element={<SolidarityProjectDetailPage />} />
           <Route path="/accommodations" element={<AccommodationsListingPage />} />
           <Route path="/accommodations/:id" element={<AccommodationDetailPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/accommodations/:id/book" element={<ReservationConfirmationPage />} />
+          </Route>
           <Route path="/create" element={<CreateAccommodationWizard />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
