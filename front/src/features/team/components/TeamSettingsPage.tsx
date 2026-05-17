@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { updateTeamFavoriteProject, inviteCoHost, cancelTeamInvitation, teamSettingsPageOpened, updateTeamBankAccount } from '../TeamSlice';
@@ -20,6 +21,8 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 const TeamSettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const isTravelerMode = location.pathname.startsWith('/account');
   const team = useAppSelector(selectCurrentTeam);
   const teamStatus = useAppSelector(selectTeamStatus);
   const teamError = useAppSelector(selectTeamError);
@@ -234,7 +237,7 @@ const TeamSettingsPage: React.FC = () => {
         <div className="text-center py-12 text-red-500">{teamError}</div>
       )}
 
-      {team && (
+      {team && !isTravelerMode && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-start justify-between mb-3">
             <div>
@@ -256,7 +259,7 @@ const TeamSettingsPage: React.FC = () => {
         </div>
       )}
 
-      {team && (
+      {team && !isTravelerMode && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
           <div className="flex items-start justify-between mb-1">
             <div>
@@ -318,7 +321,7 @@ const TeamSettingsPage: React.FC = () => {
         </div>
       )}
 
-      {team && (
+      {team && !isTravelerMode && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-gray-900">{t('team.coHostsTitle')}</h2>

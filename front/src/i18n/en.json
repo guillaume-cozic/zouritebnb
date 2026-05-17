@@ -86,6 +86,8 @@
     "home": "Home",
     "createAccommodation": "Create accommodation",
     "backoffice": "Back office",
+    "switchToHost": "Hosting mode",
+    "switchToTraveler": "Traveler mode",
     "menu": {
       "notifications": "Notifications",
       "myAccommodations": "My accommodations",
@@ -154,6 +156,7 @@
     "subtitle": "Full list including drafts",
     "menu": {
       "title": "Host space",
+      "travelerTitle": "Traveler space",
       "home": "Home",
       "accommodations": "Accommodations",
       "calendar": "Calendar",
@@ -162,6 +165,7 @@
       "team": "My settings"
     },
     "sidebarFooter": "Your gîte, your world. Take care of every guest.",
+    "travelerSidebarFooter": "Your messages and personal info, all in one quiet place.",
     "empty": "No accommodation.",
     "filter": {
       "all": "All",

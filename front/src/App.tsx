@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HomePage from './features/homepage/components/HomePage';
 import AccommodationsListingPage from './features/homepage/components/AccommodationsListingPage';
@@ -37,10 +37,8 @@ function App() {
           <Route path="/create" element={<CreateAccommodationWizard />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/conversations" element={<ConversationsListPage />} />
-            <Route path="/conversations/:id" element={<ConversationDetailPage />} />
-          </Route>
+          <Route path="/conversations" element={<Navigate to="/account/conversations" replace />} />
+          <Route path="/conversations/:id" element={<Navigate to="/account/conversations" replace />} />
           <Route element={<BackofficeLayout />}>
             <Route path="/admin" element={<HostHomePage />} />
             <Route path="/admin/accommodations" element={<ManageAccommodationsPage />} />
@@ -52,6 +50,12 @@ function App() {
             <Route path="/admin/conversations/:id" element={<AdminConversationsPage />} />
             <Route path="/accommodations/:id/edit" element={<EditAccommodationPage />} />
             <Route path="/accommodations/:id/photos" element={<AccommodationPhotosPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/account" element={<Navigate to="/account/conversations" replace />} />
+              <Route path="/account/conversations" element={<ConversationsListPage />} />
+              <Route path="/account/conversations/:id" element={<ConversationDetailPage />} />
+              <Route path="/account/settings" element={<TeamSettingsPage />} />
+            </Route>
           </Route>
         </Routes>
       </div>

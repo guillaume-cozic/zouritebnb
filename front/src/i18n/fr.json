@@ -86,6 +86,8 @@
     "home": "Accueil",
     "createAccommodation": "Créer un hébergement",
     "backoffice": "Back-office",
+    "switchToHost": "Mode hôte",
+    "switchToTraveler": "Mode voyageur",
     "menu": {
       "notifications": "Notifications",
       "myAccommodations": "Mes hébergements",
@@ -154,6 +156,7 @@
     "subtitle": "Liste complète de vos hébergements, brouillons inclus",
     "menu": {
       "title": "Espace hôte",
+      "travelerTitle": "Espace voyageur",
       "home": "Accueil",
       "accommodations": "Hébergements",
       "calendar": "Calendrier",
@@ -162,6 +165,7 @@
       "team": "Mes paramètres"
     },
     "sidebarFooter": "Votre gîte, votre univers. Prenez soin de chaque voyageur.",
+    "travelerSidebarFooter": "Vos messages et vos infos personnelles, au calme.",
     "empty": "Aucun hébergement.",
     "filter": {
       "all": "Tous",

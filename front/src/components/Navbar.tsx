@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../features/auth/AuthSlice';
@@ -10,6 +10,8 @@ const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector(selectAuthUser);
+  const location = useLocation();
+  const isHostMode = location.pathname.startsWith('/admin');
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -75,16 +77,42 @@ const Navbar: React.FC = () => {
             </button>
           </div>
 
-          {/* Create button */}
-          <Link to="/create">
-            <button className="justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md px-3 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                <path d="M5 12h14" />
-                <path d="M12 5v14" />
-              </svg>
-              <span className="hidden sm:inline">{t('navbar.createAccommodation')}</span>
-            </button>
-          </Link>
+          {/* Create button (host mode only) */}
+          {isHostMode && (
+            <Link to="/create">
+              <button className="justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md px-3 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                  <path d="M5 12h14" />
+                  <path d="M12 5v14" />
+                </svg>
+                <span className="hidden sm:inline">{t('navbar.createAccommodation')}</span>
+              </button>
+            </Link>
+          )}
+
+          {/* Mode switch (host ↔ traveler), authenticated users only */}
+          {user && (
+            <Link
+              to={isHostMode ? '/account' : '/admin'}
+              className="hidden sm:inline-flex items-center gap-2 h-9 rounded-full px-4 text-sm font-semibold border transition-colors bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+              title={isHostMode ? t('navbar.switchToTraveler') as string : t('navbar.switchToHost') as string}
+            >
+              {isHostMode ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                  <path d="M2 12h20" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z" />
+                </svg>
+              )}
+              <span>
+                {isHostMode ? t('navbar.switchToTraveler') : t('navbar.switchToHost')}
+              </span>
+            </Link>
+          )}
 
           {/* Auth */}
           {user ? (
