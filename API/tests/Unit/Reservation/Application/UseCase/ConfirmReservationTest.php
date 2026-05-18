@@ -11,7 +11,7 @@ use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Entity\ReservationStatus;
-use App\Reservation\Domain\Event\ReservationConfirmed;
+use App\Shared\Domain\Event\ReservationConfirmed;
 use App\Reservation\Domain\Exception\InvalidReservationStateException;
 use App\Reservation\Domain\Exception\ReservationNotFoundException;
 use App\Tests\Unit\Reservation\Infrastructure\InMemoryReservationRepository;

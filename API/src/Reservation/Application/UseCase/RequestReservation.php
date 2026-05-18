@@ -66,6 +66,7 @@ final readonly class RequestReservation
             price: $price,
             guestUserId: $command->guestUserId,
             note: $command->note,
+            paymentIntentId: $command->paymentIntentId,
         );
 
         $this->repository->save($reservation);

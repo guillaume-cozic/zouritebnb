@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Reservation\Domain\Entity;
 
-use App\Reservation\Domain\Event\ReservationCancelled;
-use App\Reservation\Domain\Event\ReservationConfirmed;
 use App\Reservation\Domain\Event\ReservationCreated;
 use App\Reservation\Domain\Exception\InvalidReservationStateException;
 use App\Shared\Domain\Entity\AggregateRoot;
+use App\Shared\Domain\Event\ReservationCancelled;
+use App\Shared\Domain\Event\ReservationConfirmed;
 use App\Shared\Domain\Event\ReservationRefused;
 use App\Shared\Domain\Event\ReservationRequested;
 use Symfony\Component\Uid\Uuid;
@@ -59,6 +59,7 @@ final class Reservation extends AggregateRoot
         ReservationPrice $price,
         Uuid $guestUserId,
         ?string $note = null,
+        ?string $paymentIntentId = null,
     ): self {
         $reservation = new self(
             id: $id,
@@ -71,7 +72,7 @@ final class Reservation extends AggregateRoot
             guestUserId: $guestUserId,
         );
         $reservation->recordEvent(new ReservationCreated($id->toUuid()));
-        $reservation->recordEvent(new ReservationRequested($id->toUuid(), $guestUserId, $note));
+        $reservation->recordEvent(new ReservationRequested($id->toUuid(), $guestUserId, $note, $paymentIntentId));
 
         return $reservation;
     }

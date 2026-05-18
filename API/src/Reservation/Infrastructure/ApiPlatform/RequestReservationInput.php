@@ -33,6 +33,10 @@ final readonly class RequestReservationInput
         #[Groups(['reservation:write'])]
         #[ApiProperty(description: 'Message libre envoyé à l\'hôte (optionnel). Sera ajouté au premier message de la conversation.', example: 'Bonjour, nous voyageons avec un bébé de 6 mois.')]
         public ?string $note = null,
+
+        #[Groups(['reservation:write'])]
+        #[ApiProperty(description: 'Identifiant Stripe PaymentIntent autorisé côté client (capture différée à l\'acceptation). Optionnel.', example: 'pi_3OZk9X2eZvKYlo2C0XYZ123')]
+        public ?string $paymentIntentId = null,
     ) {
     }
 }

@@ -26,11 +26,7 @@
     "payment": {
       "title": "Payment method",
       "subtitle": "Card details are required to confirm, but nothing will be charged until the host accepts your request.",
-      "cardName": "Cardholder name",
-      "cardNamePlaceholder": "Name on card",
-      "cardNumber": "Card number",
-      "expiry": "Expiry",
-      "cvc": "CVC"
+      "cardLabel": "Bank card"
     }
   },
   "admin": {

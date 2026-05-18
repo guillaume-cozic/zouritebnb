@@ -26,11 +26,7 @@
     "payment": {
       "title": "Moyen de paiement",
       "subtitle": "Vos informations de carte sont nécessaires pour confirmer mais aucun montant ne sera prélevé tant que l'hôte n'aura pas accepté votre demande.",
-      "cardName": "Titulaire de la carte",
-      "cardNamePlaceholder": "Nom inscrit sur la carte",
-      "cardNumber": "Numéro de carte",
-      "expiry": "Expiration",
-      "cvc": "CVC"
+      "cardLabel": "Carte bancaire"
     }
   },
   "admin": {

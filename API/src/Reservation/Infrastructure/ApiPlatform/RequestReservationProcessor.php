@@ -37,6 +37,7 @@ final readonly class RequestReservationProcessor implements ProcessorInterface
             checkOut: new \DateTimeImmutable($data->checkOut),
             guestName: $data->guestName,
             note: $data->note,
+            paymentIntentId: $data->paymentIntentId,
         )));
 
         $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));

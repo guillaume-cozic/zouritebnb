@@ -29,6 +29,7 @@ export interface RequestReservationPayload {
   checkOut: string;
   guestName: string;
   note?: string;
+  paymentIntentId?: string;
 }
 
 export interface FetchReservationsParams {

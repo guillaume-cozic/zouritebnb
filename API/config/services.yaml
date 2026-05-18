@@ -105,6 +105,30 @@ services:
     App\Geography\Domain\Port\LocalityRepository:
         alias: App\Geography\Infrastructure\Doctrine\DoctrineLocalityRepository
 
+    App\Payment\Domain\Port\PaymentRepository:
+        alias: App\Payment\Infrastructure\Doctrine\DoctrinePaymentRepository
+
+    App\Payment\Domain\Port\PaymentGateway:
+        alias: App\Payment\Infrastructure\Stripe\StripePaymentGateway
+
+    Stripe\StripeClient:
+        arguments: ['%env(STRIPE_SECRET_KEY)%']
+
+    App\Payment\Infrastructure\Stripe\StripeWebhookSignatureVerifier:
+        arguments: ['%env(STRIPE_WEBHOOK_SECRET)%']
+
+    App\Payment\Application\Listener\CapturePaymentOnReservationConfirmed:
+        tags: [messenger.message_handler]
+
+    App\Payment\Application\Listener\CancelPaymentOnReservationRefused:
+        tags: [messenger.message_handler]
+
+    App\Payment\Application\Listener\CancelPaymentOnReservationCancelled:
+        tags: [messenger.message_handler]
+
+    App\Payment\Application\Listener\LinkPaymentOnReservationRequested:
+        tags: [messenger.message_handler]
+
 when@dev:
     services:
         App\Tests\Fixtures\:

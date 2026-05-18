@@ -8,7 +8,7 @@ use App\Reservation\Application\UseCase\CreateReservation;
 use App\Reservation\Domain\Command\CreateReservationCommand;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Entity\ReservationStatus;
-use App\Reservation\Domain\Event\ReservationConfirmed;
+use App\Shared\Domain\Event\ReservationConfirmed;
 use App\Reservation\Domain\Event\ReservationCreated;
 use App\Reservation\Domain\Exception\InvalidDateRangeException;
 use App\Reservation\Domain\Exception\InvalidGuestNameException;

@@ -15,6 +15,7 @@ final readonly class RequestReservationCommand
         public \DateTimeImmutable $checkOut,
         public string $guestName,
         public ?string $note = null,
+        public ?string $paymentIntentId = null,
     ) {
     }
 }
