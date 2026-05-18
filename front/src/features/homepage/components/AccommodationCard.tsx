@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AccommodationListItem } from '../HomepageTypes';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const PHOTO_CYCLE_MS = 1200;
 
 interface AccommodationCardProps {
   accommodation: AccommodationListItem;
@@ -11,20 +12,71 @@ interface AccommodationCardProps {
 
 const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation }) => {
   const { t } = useTranslation();
-  const thumbnailSrc = accommodation.thumbnailUrl
-    ? `${API_BASE}${accommodation.thumbnailUrl}`
-    : null;
+
+  const photos = (accommodation.photoUrls && accommodation.photoUrls.length > 0)
+    ? accommodation.photoUrls
+    : (accommodation.thumbnailUrl ? [accommodation.thumbnailUrl] : []);
+  const absolutePhotos = photos.map((u) => `${API_BASE}${u}`);
+
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!isHovering || absolutePhotos.length <= 1) {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
+    intervalRef.current = window.setInterval(() => {
+      setPhotoIndex((i) => (i + 1) % absolutePhotos.length);
+    }, PHOTO_CYCLE_MS);
+    return () => {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isHovering, absolutePhotos.length]);
+
+  useEffect(() => {
+    if (!isHovering) setPhotoIndex(0);
+  }, [isHovering]);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1">
+    <div
+      className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       {/* Image */}
       <Link to={`/accommodations/${accommodation.id}`} className="block aspect-video relative overflow-hidden cursor-pointer">
-        {thumbnailSrc ? (
-          <img
-            src={thumbnailSrc}
-            alt={accommodation.title}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-          />
+        {absolutePhotos.length > 0 ? (
+          <>
+            {absolutePhotos.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt={accommodation.title}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${i === photoIndex ? 'opacity-100' : 'opacity-0'} ${i === photoIndex && isHovering ? 'scale-105' : ''} transform-gpu`}
+              />
+            ))}
+            {absolutePhotos.length > 1 && isHovering && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {absolutePhotos.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1 rounded-full transition-all duration-300 ${
+                      i === photoIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/60'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">

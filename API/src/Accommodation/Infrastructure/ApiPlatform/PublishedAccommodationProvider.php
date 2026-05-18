@@ -7,6 +7,7 @@ namespace App\Accommodation\Infrastructure\ApiPlatform;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -125,6 +126,8 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
         $countSql = "SELECT COUNT(*) FROM accommodation a WHERE {$whereSql}";
         $totalItems = (int) $this->connection->executeQuery($countSql, $params, $types)->fetchOne();
 
+        $photoUrlsByAccommodation = $this->loadPhotoUrlsByAccommodation(array_column($rows, 'id'));
+
         $outputs = [];
         foreach ($rows as $row) {
             $output = new AccommodationOutput();
@@ -142,6 +145,7 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $output->thumbnailUrl = null !== $row['thumbnail_filename']
                 ? '/uploads/photos/'.$row['thumbnail_filename']
                 : null;
+            $output->photoUrls = $photoUrlsByAccommodation[$row['id']] ?? [];
             $outputs[] = $output;
         }
 
@@ -151,5 +155,39 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             (float) $itemsPerPage,
             (float) $totalItems,
         );
+    }
+
+    /**
+     * @param string[] $accommodationIds UUIDs as text
+     *
+     * @return array<string, string[]> map of accommodationId → ordered list of photo URLs
+     */
+    private function loadPhotoUrlsByAccommodation(array $accommodationIds): array
+    {
+        if ([] === $accommodationIds) {
+            return [];
+        }
+
+        $binaryIds = array_map(static fn (string $id): string => hex2bin(str_replace('-', '', $id)), $accommodationIds);
+
+        $sql = <<<SQL
+            SELECT BIN_TO_UUID(p.accommodation_id) AS accommodation_id, p.filename
+            FROM accommodation_photo p
+            WHERE p.accommodation_id IN (?)
+            ORDER BY p.accommodation_id, p.id
+            SQL;
+
+        $rows = $this->connection->executeQuery(
+            $sql,
+            [$binaryIds],
+            [ArrayParameterType::BINARY],
+        )->fetchAllAssociative();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row['accommodation_id']][] = '/uploads/photos/'.$row['filename'];
+        }
+
+        return $map;
     }
 }

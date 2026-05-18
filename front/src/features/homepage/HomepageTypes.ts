@@ -8,6 +8,7 @@ export interface AccommodationListItem {
   maxGuests: number | null;
   status: string;
   thumbnailUrl: string | null;
+  photoUrls: string[];
   amenities: string[] | null;
 }
 

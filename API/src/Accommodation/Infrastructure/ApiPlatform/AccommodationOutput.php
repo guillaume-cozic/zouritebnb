@@ -457,6 +457,11 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'URL de la photo principale', example: '/uploads/photos/abc123.jpg')]
     public ?string $thumbnailUrl = null;
 
+    /** @var string[] */
+    #[Groups(['accommodation:list'])]
+    #[ApiProperty(description: 'URLs ordonnées de toutes les photos de l\'hébergement (utilisées pour le carrousel de la carte de liste)', example: ['/uploads/photos/abc123.jpg', '/uploads/photos/def456.jpg'])]
+    public array $photoUrls = [];
+
     /** @var array<array{id: string, url: string}>|null */
     #[Groups(['accommodation:read'])]
     #[ApiProperty(description: 'Liste des photos de l\'hébergement')]
