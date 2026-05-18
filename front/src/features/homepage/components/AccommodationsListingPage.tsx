@@ -69,7 +69,7 @@ const AccommodationsListingPage: React.FC = () => {
 
   const activeCount =
     (filters.city ? 1 : 0) +
-    (filters.guests !== null ? 1 : 0) +
+    (filters.guests !== null && filters.guests > 1 ? 1 : 0) +
     filters.amenities.length +
     (filters.priceMin !== null ? 1 : 0) +
     (filters.priceMax !== null ? 1 : 0);
@@ -80,7 +80,7 @@ const AccommodationsListingPage: React.FC = () => {
     (filters.priceMax !== null ? 1 : 0);
 
   const resetAll = () => {
-    dispatch(setFilters({ city: '', guests: null, amenities: [], priceMin: null, priceMax: null }));
+    dispatch(setFilters({ city: '', guests: 1, amenities: [], priceMin: null, priceMax: null }));
   };
 
   const priceChipLabel = (() => {
@@ -150,9 +150,8 @@ const AccommodationsListingPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    const current = filters.guests ?? 0;
-                    const next = current > 1 ? current - 1 : null;
-                    dispatch(setFilters({ guests: next }));
+                    const current = filters.guests ?? 1;
+                    dispatch(setFilters({ guests: Math.max(1, current - 1) }));
                   }}
                   disabled={!filters.guests || filters.guests <= 1}
                   aria-label="decrement guests"
@@ -163,7 +162,7 @@ const AccommodationsListingPage: React.FC = () => {
                   </svg>
                 </button>
                 <span className="min-w-[28px] text-center text-sm font-semibold text-gray-900 tabular-nums">
-                  {filters.guests ?? '–'}
+                  {filters.guests ?? 1}
                 </span>
                 <button
                   type="button"
@@ -289,10 +288,10 @@ const AccommodationsListingPage: React.FC = () => {
             {filters.city && (
               <Chip label={filters.city} onRemove={() => dispatch(setFilters({ city: '' }))} />
             )}
-            {filters.guests !== null && (
+            {filters.guests !== null && filters.guests > 1 && (
               <Chip
                 label={`${filters.guests} ${t('hero.guests').toLowerCase()}`}
-                onRemove={() => dispatch(setFilters({ guests: null }))}
+                onRemove={() => dispatch(setFilters({ guests: 1 }))}
               />
             )}
             {priceChipLabel && (

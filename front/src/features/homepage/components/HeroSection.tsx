@@ -196,9 +196,8 @@ const HeroSection: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        const current = filters.guests ?? 0;
-                        const next = current > 1 ? current - 1 : null;
-                        dispatch(setFilters({ guests: next }));
+                        const current = filters.guests ?? 1;
+                        dispatch(setFilters({ guests: Math.max(1, current - 1) }));
                       }}
                       disabled={!filters.guests || filters.guests <= 1}
                       aria-label="decrement guests"
@@ -209,7 +208,7 @@ const HeroSection: React.FC = () => {
                       </svg>
                     </button>
                     <span className="min-w-[24px] text-center text-sm font-semibold text-gray-900 tabular-nums">
-                      {filters.guests ?? '–'}
+                      {filters.guests ?? 1}
                     </span>
                     <button
                       type="button"
