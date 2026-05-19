@@ -43,6 +43,10 @@ jobs:
           extensions: mbstring, intl, pdo_mysql
           coverage: none
 
+      - name: Seed API .env from dist
+        working-directory: API
+        run: cp .env.dist .env
+
       - name: Install API dependencies
         working-directory: API
         run: composer install --no-interaction --prefer-dist --no-progress

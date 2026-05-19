@@ -48,6 +48,9 @@ WORKDIR /var/www/html
 COPY --chown=www-data:www-data --from=vendor /app/vendor ./vendor
 COPY --chown=www-data:www-data . .
 
+# Symfony Dotenv exige un .env (les vraies valeurs sont surchargees via env_file en prod)
+RUN cp .env.dist .env
+
 # Autoloader optimisé + assets bundles + warmup du cache prod
 # (DATABASE_URL factice acceptable: aucun warmer ne touche la BDD)
 RUN DATABASE_URL="mysql://build:build@127.0.0.1:3306/build?serverVersion=8.4" \
