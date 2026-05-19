@@ -58,11 +58,18 @@ jobs:
           extensions: mbstring, intl, pdo_mysql
           coverage: none
 
-      - name: Seed API .env from dist
+      - name: Seed API .env for CI
         working-directory: API
         run: |
           cp .env.dist .env
-          echo 'DATABASE_URL="mysql://app:secret@127.0.0.1:3306/app?serverVersion=8.4"' > .env.test.local
+          # MySQL service is reachable on the runner host, not on the docker-network "mysql" hostname
+          sed -i 's|@mysql:3306|@127.0.0.1:3306|g' .env
+
+      - name: Verify DATABASE_URL resolution
+        working-directory: API
+        run: |
+          echo "--- .env DATABASE_URL ---"
+          grep DATABASE_URL .env
 
       - name: Install API dependencies
         working-directory: API
