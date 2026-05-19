@@ -50,13 +50,9 @@ final readonly class StartConversation
             accommodationId: $summary->accommodationId,
             teamId: $summary->teamId,
             guestUserId: $summary->guestUserId,
+            openingMessageId: new MessageId(UuidGenerator::generate()),
+            openingMessageBody: new MessageBody($this->buildOpeningMessage($summary->checkIn, $summary->checkOut, $summary->guestName, $command->note)),
             createdAt: $now,
-        );
-
-        $conversation->postSystemMessage(
-            messageId: new MessageId(UuidGenerator::generate()),
-            body: new MessageBody($this->buildOpeningMessage($summary->checkIn, $summary->checkOut, $summary->guestName, $command->note)),
-            sentAt: $now,
         );
 
         $this->repository->save($conversation);

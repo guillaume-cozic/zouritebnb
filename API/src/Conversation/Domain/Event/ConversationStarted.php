@@ -12,6 +12,7 @@ final readonly class ConversationStarted implements DomainEvent
     public function __construct(
         public Uuid $conversationId,
         public Uuid $reservationId,
+        public Uuid $openingMessageId,
     ) {
     }
 }

@@ -137,6 +137,7 @@ final class <Entity> extends AggregateRoot
 - `final` — not extendable. Use `readonly` on individual immutable properties.
 - Entities with mutation methods extend the `AggregateRoot` abstract class to record domain events
 - Mutation methods call `$this->recordEvent(new <Event>(...))` after state change
+- **One event per method** — each mutation or factory records **at most one** event. Fuse two events into one richer event rather than emitting both (e.g. `ReservationConfirmed` instead of `ReservationCreated` + `ReservationConfirmed`). See the `domain-code` skill for the full rationale.
 - Validation logic lives in the **constructor** (guard clauses)
 - Throws domain exceptions on invariant violations
 - Dependencies: `Symfony\Component\Uid\Uuid`, `App\Shared\Domain\Entity\AggregateRoot`
@@ -293,6 +294,7 @@ final readonly class <Action><Entity>
 - Uses `UuidGenerator::generate()` from `App\Shared\Domain\Port\UuidGenerator`
 - Injects `EventBus` from `App\Shared\Domain\Port\EventBus` to dispatch domain events after save
 - After `$this->repository->save($entity)`, call `$this->eventBus->dispatch($entity->releaseEvents())`
+- **One event per `handle()`** — a use case dispatches the events of a single aggregate mutation. If `handle()` would chain two aggregate methods that each record an event, fuse them into one aggregate method emitting a single event. For genuinely independent follow-up actions, use a **listener** on the first event rather than chaining inside `handle()`.
 - No return value — command pattern (fire and forget)
 - Can throw domain exceptions (from entity constructor or explicit checks)
 

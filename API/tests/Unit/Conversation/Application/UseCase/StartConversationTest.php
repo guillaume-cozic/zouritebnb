@@ -81,8 +81,10 @@ final class StartConversationTest extends TestCase
         self::assertStringContainsString('15/06/2026', $message->getBody()->toString());
 
         $events = $this->eventBus->getDispatchedEvents();
-        self::assertCount(2, $events);
+        self::assertCount(1, $events);
         self::assertInstanceOf(ConversationStarted::class, $events[0]);
+        self::assertTrue($conversationId->equals($events[0]->conversationId));
+        self::assertTrue($messageId->equals($events[0]->openingMessageId));
     }
 
     public function testShouldAppendGuestNoteToOpeningMessage(): void

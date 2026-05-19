@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Reservation\Domain\Entity;
 
-use App\Reservation\Domain\Event\ReservationCreated;
 use App\Reservation\Domain\Exception\InvalidReservationStateException;
 use App\Shared\Domain\Entity\AggregateRoot;
 use App\Shared\Domain\Event\ReservationCancelled;
@@ -44,7 +43,6 @@ final class Reservation extends AggregateRoot
             status: ReservationStatus::Confirmed,
             price: $price,
         );
-        $reservation->recordEvent(new ReservationCreated($id->toUuid()));
         $reservation->recordEvent(new ReservationConfirmed($id->toUuid()));
 
         return $reservation;
@@ -71,7 +69,6 @@ final class Reservation extends AggregateRoot
             price: $price,
             guestUserId: $guestUserId,
         );
-        $reservation->recordEvent(new ReservationCreated($id->toUuid()));
         $reservation->recordEvent(new ReservationRequested($id->toUuid(), $guestUserId, $note, $paymentIntentId));
 
         return $reservation;

@@ -111,7 +111,7 @@ class ReservationConversationFixtures extends Fixture implements DependentFixtur
         // 4. For each accommodation, create 2-4 reservations + conversations
         foreach ($accommodations as $accommodation) {
             $count = $faker->numberBetween(2, 4);
-            for ($i = 0; $i < $count; $i++) {
+            for ($i = 0; $i < $count; ++$i) {
                 /** @var UserEntity $guest */
                 $guest = $faker->randomElement($guestUsers);
 
@@ -175,9 +175,9 @@ class ReservationConversationFixtures extends Fixture implements DependentFixtur
                 // 2-6 alternating user messages, starting with host
                 $messageCount = $faker->numberBetween(2, 6);
                 $lastSentAt = $createdAt;
-                for ($j = 0; $j < $messageCount; $j++) {
+                for ($j = 0; $j < $messageCount; ++$j) {
                     $lastSentAt = $lastSentAt->modify('+'.$faker->numberBetween(10, 240).' minutes');
-                    $isHost = $j % 2 === 0;
+                    $isHost = 0 === $j % 2;
                     $body = $isHost
                         ? $faker->randomElement(self::HOST_MESSAGES)
                         : $faker->randomElement(self::GUEST_MESSAGES);

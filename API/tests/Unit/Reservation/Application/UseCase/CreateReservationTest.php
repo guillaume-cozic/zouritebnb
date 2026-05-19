@@ -8,11 +8,10 @@ use App\Reservation\Application\UseCase\CreateReservation;
 use App\Reservation\Domain\Command\CreateReservationCommand;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Entity\ReservationStatus;
-use App\Shared\Domain\Event\ReservationConfirmed;
-use App\Reservation\Domain\Event\ReservationCreated;
 use App\Reservation\Domain\Exception\InvalidDateRangeException;
 use App\Reservation\Domain\Exception\InvalidGuestNameException;
 use App\Reservation\Domain\Exception\InvalidReservationException;
+use App\Shared\Domain\Event\ReservationConfirmed;
 use App\Shared\Domain\Port\UuidGenerator;
 use App\Tests\Unit\Reservation\Infrastructure\InMemoryAccommodationPricingProvider;
 use App\Tests\Unit\Reservation\Infrastructure\InMemoryReservationRepository;
@@ -67,11 +66,9 @@ final class CreateReservationTest extends TestCase
         self::assertSame(ReservationStatus::Confirmed, $reservation->getStatus());
 
         $events = $this->eventBus->getDispatchedEvents();
-        self::assertCount(2, $events);
-        self::assertInstanceOf(ReservationCreated::class, $events[0]);
+        self::assertCount(1, $events);
+        self::assertInstanceOf(ReservationConfirmed::class, $events[0]);
         self::assertTrue($reservationId->equals($events[0]->reservationId));
-        self::assertInstanceOf(ReservationConfirmed::class, $events[1]);
-        self::assertTrue($reservationId->equals($events[1]->reservationId));
     }
 
     public function testShouldComputeTotalPriceForFiveNightsWithoutPromotion(): void

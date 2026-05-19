@@ -31,10 +31,13 @@ final class Conversation extends AggregateRoot
         Uuid $accommodationId,
         Uuid $teamId,
         Uuid $guestUserId,
+        MessageId $openingMessageId,
+        MessageBody $openingMessageBody,
         \DateTimeImmutable $createdAt,
     ): self {
         $conversation = new self($id, $reservationId, $accommodationId, $teamId, $guestUserId, $createdAt);
-        $conversation->recordEvent(new ConversationStarted($id->toUuid(), $reservationId));
+        $conversation->messages[] = Message::system($openingMessageId, $openingMessageBody, $createdAt);
+        $conversation->recordEvent(new ConversationStarted($id->toUuid(), $reservationId, $openingMessageId->toUuid()));
 
         return $conversation;
     }

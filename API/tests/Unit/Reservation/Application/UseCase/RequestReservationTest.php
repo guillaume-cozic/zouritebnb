@@ -8,7 +8,6 @@ use App\Reservation\Application\UseCase\RequestReservation;
 use App\Reservation\Domain\Command\RequestReservationCommand;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Entity\ReservationStatus;
-use App\Reservation\Domain\Event\ReservationCreated;
 use App\Reservation\Domain\Exception\InvalidDateRangeException;
 use App\Reservation\Domain\Exception\InvalidGuestNameException;
 use App\Reservation\Domain\Exception\InvalidReservationException;
@@ -70,11 +69,10 @@ final class RequestReservationTest extends TestCase
         self::assertTrue($guestUserId->equals($reservation->getGuestUserId()));
 
         $events = $this->eventBus->getDispatchedEvents();
-        self::assertCount(2, $events);
-        self::assertInstanceOf(ReservationCreated::class, $events[0]);
-        self::assertInstanceOf(ReservationRequested::class, $events[1]);
-        self::assertTrue($reservationId->equals($events[1]->reservationId));
-        self::assertTrue($guestUserId->equals($events[1]->guestUserId));
+        self::assertCount(1, $events);
+        self::assertInstanceOf(ReservationRequested::class, $events[0]);
+        self::assertTrue($reservationId->equals($events[0]->reservationId));
+        self::assertTrue($guestUserId->equals($events[0]->guestUserId));
     }
 
     public function testShouldComputeTotalPriceAndApplyWeeklyPromotion(): void

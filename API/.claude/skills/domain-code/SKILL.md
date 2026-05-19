@@ -125,6 +125,7 @@ final class <Entity> extends AggregateRoot
 - **Domain mutation methods** are named after the business action (`publish()`, `cancel()`, `activate()`), never generic (`withStatus()`, `setField()`)
 - Mutation methods change state **in place** (`void` return), they do NOT return a new instance
 - Mutation methods call `$this->recordEvent(new <Event>(...))` to record domain events
+- **One event per method** — a mutation or factory method records **at most one** domain event. If a business action seems to imply two events, fuse them into a single, semantically-richer event (see "Single event per method" below)
 - No setters — state changes only through domain methods with business meaning
 - Use **value objects** for fields with validation rules (Price, Email, etc.)
 - Use **scalar types** for simple fields without invariants (title, description)
@@ -159,6 +160,29 @@ final readonly class <Entity><Action> implements DomainEvent
 - Implements `App\Shared\Domain\Event\DomainEvent` marker interface
 - Public promoted properties for event data (entity ID, relevant values)
 - Named after the business fact that occurred: `AccommodationPublished`, `BookingCancelled`
+
+### Single event per method
+
+A mutation method, factory method, **and** a use case `handle()` records/dispatches **at most one** domain event. Two events in the same method is a smell that the model is leaking implementation steps instead of describing a business fact.
+
+**Fusion rules:**
+
+1. **Two events on the same aggregate mutation → fuse into one richer event.**
+   Bad: `Reservation::create()` records `ReservationCreated` + `ReservationConfirmed`.
+   Good: `Reservation::create()` records only `ReservationConfirmed` (the meaningful fact). If the "creation" carried info needed by listeners, move those fields into `ReservationConfirmed`.
+
+2. **Two aggregate methods called back-to-back in a use case → fuse into a single aggregate method.**
+   Bad: `StartConversation::handle()` calls `Conversation::start()` (records `ConversationStarted`) then `Conversation::postOpeningMessage()` (records `MessagePosted`).
+   Good: `Conversation::start(..., MessageId, MessageBody)` posts the opening message internally and records a single `ConversationStarted` enriched with `openingMessageId`.
+
+**Why:**
+- Multiple events per state change leak implementation detail to listeners.
+- Listeners must deduplicate or coordinate which event to react to.
+- The event log becomes harder to read — one business fact should produce one record.
+- Forces the modeler to name the actual business event (`ReservationConfirmed`) rather than dumping low-level steps (`Created` + `Confirmed`).
+
+**When NOT to fuse:**
+- Two genuinely independent business actions chained for convenience in a use case — but in that case, the second action belongs in a **listener** reacting to the first event, not in the same `handle()`. Example: `RefuseReservation::handle()` records `ReservationRefused`; a listener on `ReservationRefused` then triggers `PostSystemMessage` (which records `MessagePosted` in its own use case).
 
 ### Exception
 

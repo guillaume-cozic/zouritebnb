@@ -43,8 +43,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/reservations',
             status: 201,
             openapi: new OpenApiOperation(
-                summary: 'Créer une réservation',
-                description: 'Crée une nouvelle réservation en statut "pending". La date de départ doit être strictement postérieure à la date d\'arrivée et le nom du voyageur ne peut pas être vide.',
+                summary: 'Créer une réservation (back-office)',
+                description: 'Crée une réservation directement en statut "confirmed" depuis le back-office hôte, sans étape d\'approbation (aucun loueur associé : guestUserId reste null). Pour le parcours public où un loueur soumet une demande à valider par l\'hôte, utiliser POST /reservations/request. La date de départ doit être strictement postérieure à la date d\'arrivée et le nom du voyageur ne peut pas être vide.',
                 requestBody: new RequestBody(
                     content: new \ArrayObject([
                         'application/ld+json' => new MediaType(
