@@ -62,22 +62,19 @@ jobs:
         working-directory: API
         run: |
           cp .env.dist .env
-          # MySQL service is reachable on the runner host, not on the docker-network "mysql" hostname
-          sed -i 's|@mysql:3306|@127.0.0.1:3306|g' .env
-
-      - name: Verify DATABASE_URL resolution
-        working-directory: API
-        run: |
-          echo "--- .env DATABASE_URL ---"
-          grep DATABASE_URL .env
+          # The MySQL service is reachable on the runner host (127.0.0.1), not on
+          # the docker-network "mysql" hostname. root can create the _test database.
+          sed -i 's#^DATABASE_URL=.*#DATABASE_URL="mysql://root:root@127.0.0.1:3306/app?serverVersion=8.4"#' .env
 
       - name: Install API dependencies
         working-directory: API
         run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Run doctrine migrations (test schema)
+      - name: Prepare test database
         working-directory: API
-        run: bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --env=test
+        run: |
+          bin/console doctrine:database:create --env=test --if-not-exists
+          bin/console doctrine:schema:create --env=test
 
       - name: Run PHPUnit
         working-directory: API
