@@ -58,6 +58,21 @@ export const fetchPublishedAccommodations = createAsyncThunk<
   }
 );
 
+export const fetchHomepageFeatured = createAsyncThunk<AccommodationListItem[]>(
+  'homepage/fetchFeatured',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/api/accommodations', { params: { itemsPerPage: '9' } });
+      const data = response.data;
+      return (data['hydra:member'] ?? data['member'] ?? []) as AccommodationListItem[];
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.detail || 'Erreur lors du chargement des hébergements'
+      );
+    }
+  }
+);
+
 const homepageSlice = createSlice({
   name: 'homepage',
   initialState,
@@ -77,6 +92,18 @@ const homepageSlice = createSlice({
         state.accommodations = action.payload;
       })
       .addCase(fetchPublishedAccommodations.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      .addCase(fetchHomepageFeatured.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchHomepageFeatured.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.accommodations = action.payload;
+      })
+      .addCase(fetchHomepageFeatured.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       });

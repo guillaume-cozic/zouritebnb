@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchPublishedAccommodations } from '../HomepageSlice';
+import { fetchHomepageFeatured } from '../HomepageSlice';
 import { selectAccommodations, selectHomepageStatus, selectHomepageError } from '../HomepageSelectors';
 import HeroSection from './HeroSection';
 import AccommodationCard from './AccommodationCard';
@@ -50,7 +50,7 @@ const HomePage: React.FC = () => {
   const error = useAppSelector(selectHomepageError);
 
   useEffect(() => {
-    dispatch(fetchPublishedAccommodations());
+    dispatch(fetchHomepageFeatured());
   }, [dispatch]);
 
   return (

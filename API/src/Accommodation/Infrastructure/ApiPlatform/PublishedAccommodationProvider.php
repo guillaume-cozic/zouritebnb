@@ -29,7 +29,8 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
         $query = $request?->query;
 
         $page = (int) ($query?->get('page') ?? 1);
-        $itemsPerPage = 30;
+        $itemsPerPageRaw = (int) ($query?->get('itemsPerPage') ?? 30);
+        $itemsPerPage = max(1, min(30, $itemsPerPageRaw));
         $offset = ($page - 1) * $itemsPerPage;
 
         $statusFilter = $query?->get('status') ?? 'published';
