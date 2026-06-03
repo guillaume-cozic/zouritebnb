@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .prose-article {
+    @apply max-w-none text-gray-700 leading-relaxed;
+  }
+  .prose-article h2 {
+    @apply text-2xl font-bold text-gray-900 mt-10 mb-4;
+  }
+  .prose-article h3 {
+    @apply text-xl font-semibold text-gray-900 mt-8 mb-3;
+  }
+  .prose-article p {
+    @apply mb-5 text-lg;
+  }
+  .prose-article ul {
+    @apply list-disc list-outside pl-6 mb-5 space-y-2 text-lg;
+  }
+  .prose-article ol {
+    @apply list-decimal list-outside pl-6 mb-5 space-y-2 text-lg;
+  }
+  .prose-article strong {
+    @apply font-semibold text-gray-900;
+  }
+  .prose-article a {
+    @apply text-blue-600 underline hover:text-blue-700;
+  }
+}
