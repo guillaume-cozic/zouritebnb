@@ -257,6 +257,9 @@
     "activeFilters": "Filtres actifs",
     "resultCount_one": "{{count}} hébergement",
     "resultCount_other": "{{count}} hébergements",
+    "showMap": "Afficher la carte",
+    "hideMap": "Masquer la carte",
+    "mapEmpty": "Aucun hébergement géolocalisé à afficher.",
     "advanced": {
       "toggle": "Filtres avancés",
       "priceRange": "Prix par nuit",

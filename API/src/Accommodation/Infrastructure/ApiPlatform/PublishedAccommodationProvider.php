@@ -98,6 +98,8 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
                 a.price,
                 a.city,
                 a.country,
+                a.latitude,
+                a.longitude,
                 a.max_guests,
                 a.status,
                 a.amenities,
@@ -138,6 +140,8 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $output->price = null !== $row['price'] ? (float) $row['price'] : null;
             $output->city = $row['city'];
             $output->country = $row['country'];
+            $output->latitude = null !== $row['latitude'] ? (float) $row['latitude'] : null;
+            $output->longitude = null !== $row['longitude'] ? (float) $row['longitude'] : null;
             $output->maxGuests = null !== $row['max_guests'] ? (int) $row['max_guests'] : null;
             $output->status = $row['status'];
             $output->amenities = null !== $row['amenities']

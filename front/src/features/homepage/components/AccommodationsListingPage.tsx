@@ -9,6 +9,7 @@ import {
   selectHomepageFilters,
 } from '../HomepageSelectors';
 import AccommodationCard from './AccommodationCard';
+import AccommodationsMap from './AccommodationsMap';
 import Footer from '../../../components/Footer';
 import LocalitySuggestions from './LocalitySuggestions';
 
@@ -46,6 +47,8 @@ const AccommodationsListingPage: React.FC = () => {
 
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const amenitiesKey = filters.amenities.join(',');
   useEffect(() => {
@@ -94,7 +97,7 @@ const AccommodationsListingPage: React.FC = () => {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col">
-    <section className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <section className={`flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 ${mapOpen ? 'max-w-none' : 'max-w-7xl'}`}>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{t('listing.title')}</h1>
         <p className="text-gray-500 mt-1">{t('listing.subtitle')}</p>
@@ -329,14 +332,55 @@ const AccommodationsListingPage: React.FC = () => {
       )}
       {accommodations.length > 0 && (
         <>
-          <p className="text-sm text-gray-500 mb-4">
-            {t('listing.resultCount', { count: accommodations.length })}
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {accommodations.map((item) => (
-              <AccommodationCard key={item.id} accommodation={item} />
-            ))}
+          <div className="flex items-center justify-between mb-4 gap-3">
+            <p className="text-sm text-gray-500">
+              {t('listing.resultCount', { count: accommodations.length })}
+            </p>
+            <button
+              type="button"
+              onClick={() => setMapOpen((v) => !v)}
+              aria-pressed={mapOpen}
+              className={`inline-flex items-center gap-2 h-10 px-4 rounded-xl text-sm font-semibold border transition-colors ${
+                mapOpen
+                  ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18l-6 3V6l6-3m0 15l6 3m-6-3V3m6 18l6-3V3l-6 3m0 15V6" />
+              </svg>
+              {mapOpen ? t('listing.hideMap') : t('listing.showMap')}
+            </button>
           </div>
+
+          {mapOpen ? (
+            <div className="flex flex-col lg:flex-row gap-6 items-start">
+              <div className="flex-1 min-w-0 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {accommodations.map((item) => (
+                    <AccommodationCard
+                      key={item.id}
+                      accommodation={item}
+                      onHoverChange={(hovered) => setHoveredId(hovered ? item.id : null)}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="w-full lg:w-1/2 lg:sticky lg:top-24 flex-shrink-0">
+                <AccommodationsMap
+                  accommodations={accommodations}
+                  height="calc(100vh - 8rem)"
+                  highlightedId={hoveredId}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {accommodations.map((item) => (
+                <AccommodationCard key={item.id} accommodation={item} />
+              ))}
+            </div>
+          )}
         </>
       )}
     </section>

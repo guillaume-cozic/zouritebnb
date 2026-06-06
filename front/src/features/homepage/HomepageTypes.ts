@@ -5,6 +5,8 @@ export interface AccommodationListItem {
   price: number | null;
   city: string | null;
   country: string | null;
+  latitude: number | null;
+  longitude: number | null;
   maxGuests: number | null;
   status: string;
   thumbnailUrl: string | null;

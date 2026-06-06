@@ -8,9 +8,10 @@ const PHOTO_CYCLE_MS = 1200;
 
 interface AccommodationCardProps {
   accommodation: AccommodationListItem;
+  onHoverChange?: (hovered: boolean) => void;
 }
 
-const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation }) => {
+const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, onHoverChange }) => {
   const { t } = useTranslation();
 
   const photos = (accommodation.photoUrls && accommodation.photoUrls.length > 0)
@@ -48,8 +49,8 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation }) 
   return (
     <div
       className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1"
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
+      onMouseEnter={() => { setIsHovering(true); onHoverChange?.(true); }}
+      onMouseLeave={() => { setIsHovering(false); onHoverChange?.(false); }}
     >
       {/* Image */}
       <Link to={`/accommodations/${accommodation.id}`} className="block aspect-video relative overflow-hidden cursor-pointer">

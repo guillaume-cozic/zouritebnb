@@ -409,11 +409,11 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Pays', example: 'France')]
     public ?string $country = null;
 
-    #[Groups(['accommodation:read'])]
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Latitude GPS', example: 48.8566)]
     public ?float $latitude = null;
 
-    #[Groups(['accommodation:read'])]
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Longitude GPS', example: 2.3522)]
     public ?float $longitude = null;
 

@@ -257,6 +257,9 @@
     "activeFilters": "Active filters",
     "resultCount_one": "{{count}} stay",
     "resultCount_other": "{{count}} stays",
+    "showMap": "Show map",
+    "hideMap": "Hide map",
+    "mapEmpty": "No geolocated accommodations to display.",
     "advanced": {
       "toggle": "Advanced filters",
       "priceRange": "Price per night",
