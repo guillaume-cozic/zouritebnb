@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\E2e\Accommodation;
 
+use App\Tests\E2e\AssertsOpenApiContract;
+
 final class GetAccommodationTest extends AccommodationApiTestCase
 {
+    use AssertsOpenApiContract;
+
     public function testShouldGetAccommodation(): void
     {
         $id = $this->insertAccommodation('Beach Villa', 'Luxury beach villa', 320.0);
 
-        static::createClient()->request('GET', '/api/accommodations/'.$id);
+        $response = static::createClient()->request('GET', '/api/accommodations/'.$id);
 
         self::assertResponseIsSuccessful();
         self::assertJsonContains([
@@ -19,6 +23,7 @@ final class GetAccommodationTest extends AccommodationApiTestCase
             'description' => 'Luxury beach villa',
             'price' => 320,
         ]);
+        $this->assertResponseMatchesOpenApiContract($response, 'GET', '/api/accommodations/{id}');
     }
 
     public function testShouldNotGetUnknownAccommodation(): void
