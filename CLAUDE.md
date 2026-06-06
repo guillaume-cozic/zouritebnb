@@ -23,6 +23,7 @@ Skills are split across both projects. **Always consult the relevant skills befo
 | `integration-test` | Writing integration tests for Doctrine repositories |
 | `unit-test` | Writing unit tests for use cases |
 | `openapi-doc` | Enriching OpenAPI descriptions, examples, summaries |
+| `contract-test` | OpenAPI contract tests between API and front (provider + consumer) |
 | `feature-team` | Implementing a full vertical slice (spawns 3 agents) |
 
 ### Frontend — `front/.claude/skills/`

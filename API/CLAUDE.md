@@ -74,6 +74,7 @@ Skills in `.claude/skills/` define the conventions and patterns for this project
 | `integration-test` | Writing integration tests for Doctrine repositories |
 | `unit-test` | Writing unit tests for use cases |
 | `openapi-doc` | Enriching OpenAPI descriptions, examples, summaries |
+| `contract-test` | Adding/maintaining OpenAPI contract tests between API and front |
 | `feature-team` | Implementing a full vertical slice (spawns 3 agents) |
 
 **When creating a new feature or module** (e.g. "create the Image module", "add reviews"), **always use the `feature-team` skill**. It orchestrates 3 agents that cover domain, infrastructure (with integration tests), and API layers in parallel.
