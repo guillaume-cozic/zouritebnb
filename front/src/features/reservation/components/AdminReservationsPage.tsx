@@ -12,6 +12,9 @@ import { fetchConversationsForTeam } from '../../conversation/ConversationSlice'
 import { selectConversations } from '../../conversation/ConversationSelectors';
 import { selectAuthTeamId } from '../../auth/AuthSelectors';
 import { Reservation, ReservationStatus } from '../ReservationTypes';
+import { isStayCompleted } from '../../review/reviewEligibility';
+import { selectSubmittedReviews } from '../../review/ReviewSelectors';
+import ReviewModal from '../../review/components/ReviewModal';
 
 const STATUS_FILTERS: Array<{ key: 'all' | ReservationStatus; labelKey: string }> = [
   { key: 'all', labelKey: 'admin.reservations.filter.all' },
@@ -45,8 +48,20 @@ const AdminReservationsPage: React.FC = () => {
   const status = useAppSelector(selectReservationsStatus);
   const error = useAppSelector(selectReservationsError);
   const conversations = useAppSelector(selectConversations);
+  const submittedReviews = useAppSelector(selectSubmittedReviews);
 
   const [statusFilter, setStatusFilter] = useState<'all' | ReservationStatus>('all');
+  const [reviewing, setReviewing] = useState<Reservation | null>(null);
+
+  const reviewedReservationIds = useMemo(
+    () =>
+      new Set(
+        submittedReviews
+          .filter((r) => r.target === 'guest')
+          .map((r) => r.reservationId)
+      ),
+    [submittedReviews]
+  );
 
   useEffect(() => {
     dispatch(fetchReservations({}));
@@ -123,6 +138,9 @@ const AdminReservationsPage: React.FC = () => {
           <ul className="divide-y divide-gray-100">
             {filtered.map((r: Reservation) => {
               const conversationId = conversationByReservation.get(r.id);
+              const canReviewGuest =
+                isStayCompleted(r) && !!r.guestUserId && !reviewedReservationIds.has(r.id);
+              const alreadyReviewed = reviewedReservationIds.has(r.id);
               const row = (
                 <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-gray-50/70 transition-colors">
                   <div className="flex-1 min-w-0">
@@ -157,12 +175,47 @@ const AdminReservationsPage: React.FC = () => {
                   ) : (
                     row
                   )}
+                  {(canReviewGuest || alreadyReviewed) && (
+                    <div className="px-5 pb-4 -mt-1 flex justify-end">
+                      {alreadyReviewed ? (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 6 9 17l-5-5" />
+                          </svg>
+                          {t('review.alreadyReviewedGuest')}
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setReviewing(r)}
+                          className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                          </svg>
+                          {t('review.rateGuest')}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </li>
               );
             })}
           </ul>
         )}
       </div>
+
+      {reviewing && reviewing.guestUserId && (
+        <ReviewModal
+          open={!!reviewing}
+          target="guest"
+          reservationId={reviewing.id}
+          accommodationId={reviewing.accommodationId}
+          guestUserId={reviewing.guestUserId}
+          subjectName={reviewing.guestName}
+          onClose={() => setReviewing(null)}
+        />
+      )}
     </div>
   );
 };

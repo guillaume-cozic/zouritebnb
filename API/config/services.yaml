@@ -111,6 +111,12 @@ services:
     App\Payment\Domain\Port\PaymentGateway:
         alias: App\Payment\Infrastructure\Stripe\StripePaymentGateway
 
+    App\Review\Domain\Port\ReviewRepository:
+        alias: App\Review\Infrastructure\Doctrine\DoctrineReviewRepository
+
+    App\Review\Domain\Port\CompletedStayChecker:
+        alias: App\Review\Infrastructure\Doctrine\DbalCompletedStayChecker
+
     Stripe\StripeClient:
         arguments: ['%env(STRIPE_SECRET_KEY)%']
 

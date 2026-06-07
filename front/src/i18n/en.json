@@ -257,6 +257,8 @@
     "activeFilters": "Active filters",
     "resultCount_one": "{{count}} stay",
     "resultCount_other": "{{count}} stays",
+    "loadingMore": "Loading more…",
+    "endOfResults": "You have seen all accommodations.",
     "showMap": "Show map",
     "hideMap": "Hide map",
     "mapEmpty": "No geolocated accommodations to display.",
@@ -639,5 +641,29 @@
     "dragToReorder": "Drag to reorder",
     "uploadError": "Error uploading photo",
     "delete": "Delete"
+  },
+  "review": {
+    "titleAccommodation": "Rate your stay",
+    "titleGuest": "Rate the guest",
+    "ratingLabel": "Your rating",
+    "commentLabel": "Your comment",
+    "commentPlaceholder": "Share your experience (50 characters minimum)…",
+    "charsRemaining_one": "{{count}} more character before you can post",
+    "charsRemaining_other": "{{count}} more characters before you can post",
+    "charsCount_one": "{{count}} character",
+    "charsCount_other": "{{count}} characters",
+    "submit": "Post my review",
+    "submitting": "Submitting…",
+    "cancel": "Cancel",
+    "rateAccommodation": "Rate the accommodation",
+    "rateGuest": "Rate the guest",
+    "alreadyReviewedAccommodation": "Review posted",
+    "alreadyReviewedGuest": "Guest rated",
+    "error": {
+      "validation": "Check your rating (1 to 5) and your comment (50 characters minimum).",
+      "forbidden": "You are not allowed to leave this review.",
+      "unauthenticated": "You must be logged in to leave a review.",
+      "generic": "Something went wrong while submitting your review."
+    }
   }
 }

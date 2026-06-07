@@ -10,6 +10,7 @@ import reservationReducer from '../features/reservation/ReservationSlice';
 import conversationReducer from '../features/conversation/ConversationSlice';
 import geographyReducer from '../features/geography/GeographySlice';
 import paymentReducer from '../features/payment/PaymentSlice';
+import reviewReducer from '../features/review/ReviewSlice';
 import { listenerMiddleware } from './listenerMiddleware';
 import './registerListeners';
 
@@ -26,6 +27,7 @@ export const store = configureStore({
     conversation: conversationReducer,
     geography: geographyReducer,
     payment: paymentReducer,
+    review: reviewReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),

@@ -48,7 +48,6 @@ final class ConfirmReservationTest extends TestCase
         );
 
         $this->repository->save($reservation);
-
     }
 
     public function test_should_confirm_pending_reservation(): void

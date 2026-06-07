@@ -62,6 +62,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Payment/Infrastructure/Doctrine'
                 prefix: 'App\Payment\Infrastructure\Doctrine'
                 alias: Payment
+            Review:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Review/Infrastructure/Doctrine'
+                prefix: 'App\Review\Infrastructure\Doctrine'
+                alias: Review
         controller_resolver:
             auto_mapping: false
 

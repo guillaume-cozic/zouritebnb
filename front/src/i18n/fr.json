@@ -257,6 +257,8 @@
     "activeFilters": "Filtres actifs",
     "resultCount_one": "{{count}} hébergement",
     "resultCount_other": "{{count}} hébergements",
+    "loadingMore": "Chargement…",
+    "endOfResults": "Vous avez vu tous les hébergements.",
     "showMap": "Afficher la carte",
     "hideMap": "Masquer la carte",
     "mapEmpty": "Aucun hébergement géolocalisé à afficher.",
@@ -639,5 +641,29 @@
     "dragToReorder": "Glisser pour réordonner",
     "uploadError": "Erreur lors de l'envoi de la photo",
     "delete": "Supprimer"
+  },
+  "review": {
+    "titleAccommodation": "Noter votre séjour",
+    "titleGuest": "Noter le voyageur",
+    "ratingLabel": "Votre note",
+    "commentLabel": "Votre commentaire",
+    "commentPlaceholder": "Partagez votre expérience (50 caractères minimum)…",
+    "charsRemaining_one": "Encore {{count}} caractère avant de pouvoir publier",
+    "charsRemaining_other": "Encore {{count}} caractères avant de pouvoir publier",
+    "charsCount_one": "{{count}} caractère",
+    "charsCount_other": "{{count}} caractères",
+    "submit": "Publier mon avis",
+    "submitting": "Envoi…",
+    "cancel": "Annuler",
+    "rateAccommodation": "Noter le logement",
+    "rateGuest": "Noter le voyageur",
+    "alreadyReviewedAccommodation": "Avis publié",
+    "alreadyReviewedGuest": "Voyageur noté",
+    "error": {
+      "validation": "Vérifiez votre note (1 à 5) et votre commentaire (50 caractères minimum).",
+      "forbidden": "Vous n'êtes pas autorisé à laisser cet avis.",
+      "unauthenticated": "Vous devez être connecté pour laisser un avis.",
+      "generic": "Une erreur est survenue lors de l'envoi de votre avis."
+    }
   }
 }
