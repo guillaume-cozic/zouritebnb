@@ -4,12 +4,27 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 COMPOSE=(docker compose -f "$SCRIPT_DIR/API/docker-compose.yml")
 
+# Charge nvm pour aligner la version de Node (le blog .nvmrc demande Node 20).
+if [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]; then
+  # shellcheck disable=SC1091
+  . "${NVM_DIR:-$HOME/.nvm}/nvm.sh"
+  if [ -f "$SCRIPT_DIR/blog/.nvmrc" ]; then
+    (cd "$SCRIPT_DIR/blog" && nvm use >/dev/null) || nvm use 20 >/dev/null
+  fi
+fi
+
 cmd="${1:-start}"
 
 case "$cmd" in
   start)
+    BLOG_PID=""
     cleanup() {
       echo
+      if [ -n "$BLOG_PID" ] && kill -0 "$BLOG_PID" 2>/dev/null; then
+        echo "==> Arrêt du blog (pid $BLOG_PID)..."
+        kill "$BLOG_PID" 2>/dev/null || true
+        wait "$BLOG_PID" 2>/dev/null || true
+      fi
       echo "==> Arrêt du backend..."
       "${COMPOSE[@]}" stop
     }
@@ -33,6 +48,14 @@ case "$cmd" in
       exit 1
     fi
     echo "==> API prête."
+
+    echo "==> Démarrage du blog sur http://localhost:4321/blog/ ..."
+    if [ ! -d "$SCRIPT_DIR/blog/node_modules" ]; then
+      echo "==> Installation des dépendances du blog..."
+      (cd "$SCRIPT_DIR/blog" && npm install)
+    fi
+    (cd "$SCRIPT_DIR/blog" && npm run dev) &
+    BLOG_PID=$!
 
     echo "==> Démarrage du frontend sur http://localhost:3000 ..."
     cd "$SCRIPT_DIR/front"

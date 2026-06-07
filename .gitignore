@@ -27,6 +27,7 @@ front/coverage/
 front/build/
 front/src/tailwind.output.css
 front/.env.local
+front/.env
 front/.env.development.local
 front/.env.test.local
 front/.env.production.local
@@ -39,3 +40,6 @@ client/node_modules/
 
 # OS
 .DS_Store
+
+blog/.env
+blog/.env.development

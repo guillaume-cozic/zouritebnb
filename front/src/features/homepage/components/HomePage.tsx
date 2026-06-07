@@ -10,6 +10,14 @@ import RodriguesMap from './RodriguesMap';
 import SolidarityProjectsSection from '../../solidarityProject/components/SolidarityProjectsSection';
 import Footer from '../../../components/Footer';
 
+const BLOG_URL = process.env.REACT_APP_BLOG_URL ?? '/blog';
+const ACTIVITY_LINKS = {
+  diving: `${BLOG_URL}/#tag=Snorkeling`,
+  hiking: `${BLOG_URL}/#cat-randonnees`,
+  excursions: `${BLOG_URL}/#tag=Bateau`,
+  gastronomy: `${BLOG_URL}/#tag=Gastronomie`,
+};
+
 const LoadingSkeleton: React.FC = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     {[1, 2, 3].map((i) => (
@@ -108,7 +116,7 @@ const HomePage: React.FC = () => {
           <h2 className="text-3xl font-bold mb-12 text-center">{t('activities.title')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Diving */}
-            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
+            <a href={ACTIVITY_LINKS.diving} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
                 <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
@@ -124,10 +132,10 @@ const HomePage: React.FC = () => {
               <div className="p-6 pt-0">
                 <p className="text-gray-500 text-sm">{t('activities.divingDesc')}</p>
               </div>
-            </div>
+            </a>
 
             {/* Hiking */}
-            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
+            <a href={ACTIVITY_LINKS.hiking} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
                 <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
@@ -141,10 +149,10 @@ const HomePage: React.FC = () => {
               <div className="p-6 pt-0">
                 <p className="text-gray-500 text-sm">{t('activities.hikingDesc')}</p>
               </div>
-            </div>
+            </a>
 
             {/* Excursions */}
-            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
+            <a href={ACTIVITY_LINKS.excursions} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
                 <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
@@ -159,10 +167,10 @@ const HomePage: React.FC = () => {
               <div className="p-6 pt-0">
                 <p className="text-gray-500 text-sm">{t('activities.excursionsDesc')}</p>
               </div>
-            </div>
+            </a>
 
             {/* Gastronomy */}
-            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
+            <a href={ACTIVITY_LINKS.gastronomy} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
                 <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
@@ -178,7 +186,7 @@ const HomePage: React.FC = () => {
               <div className="p-6 pt-0">
                 <p className="text-gray-500 text-sm">{t('activities.gastronomyDesc')}</p>
               </div>
-            </div>
+            </a>
           </div>
         </div>
       </section>
