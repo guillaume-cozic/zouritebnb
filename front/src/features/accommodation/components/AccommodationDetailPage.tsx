@@ -97,6 +97,8 @@ const AccommodationDetailPage: React.FC = () => {
     : null;
   const platformDefaultProject = activeProjects.find((p) => p.isDefault) ?? null;
   const preselectedProject = favoriteProject ?? platformDefaultProject ?? activeProjects[0] ?? null;
+  // The host's featured project, or the platform's default project when the host has none.
+  const highlightedProject = favoriteProject ?? platformDefaultProject;
 
   useEffect(() => {
     if (!selectedProjectId && preselectedProject) {
@@ -143,6 +145,8 @@ const AccommodationDetailPage: React.FC = () => {
   if (!accommodation) return null;
 
   const photos = (accommodation.photos ?? []).map((p) => `${API_BASE}${p.url}`);
+  // Only members of the accommodation's owning team may edit it.
+  const canEditAccommodation = !!(user && accommodation.teamId && user.teamId === accommodation.teamId);
 
   return (
     <>
@@ -176,15 +180,17 @@ const AccommodationDetailPage: React.FC = () => {
               </svg>
               {t('detail.save')}
             </button>
-            <Link
-              to={`/accommodations/${accommodation.id}/edit`}
-              className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
-              </svg>
-              {t('edit.title')}
-            </Link>
+            {canEditAccommodation && (
+              <Link
+                to={`/accommodations/${accommodation.id}/edit`}
+                className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 h-10 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                </svg>
+                {t('edit.title')}
+              </Link>
+            )}
           </div>
         </div>
 
@@ -331,30 +337,30 @@ const AccommodationDetailPage: React.FC = () => {
               </div>
             )}
 
-            {/* Favorite solidarity project */}
-            {favoriteProject && (
+            {/* Host's featured / supported solidarity project */}
+            {highlightedProject && (
               <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6 mb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-rose-500">
                     <path d="M19.5 12.572l-7.5 7.428l-7.5-7.428a5 5 0 1 1 7.5-6.566a5 5 0 1 1 7.5 6.572" />
                   </svg>
                   <p className="text-xs font-semibold uppercase tracking-wider text-blue-700">
-                    {t('detail.favoriteProjectBadge')}
+                    {favoriteProject ? t('detail.favoriteProjectBadge') : t('detail.defaultProjectBadge')}
                   </p>
                 </div>
                 <div className="flex gap-5">
-                  {favoriteProject.imageUrl && (
+                  {highlightedProject.imageUrl && (
                     <img
-                      src={favoriteProject.imageUrl}
-                      alt={favoriteProject.title}
+                      src={highlightedProject.imageUrl}
+                      alt={highlightedProject.title}
                       className="w-32 h-32 rounded-xl object-cover flex-shrink-0"
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{favoriteProject.title}</h3>
-                    <p className="text-gray-600 text-sm line-clamp-3 mb-3">{favoriteProject.description}</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{highlightedProject.title}</h3>
+                    <p className="text-gray-600 text-sm line-clamp-3 mb-3">{highlightedProject.description}</p>
                     <Link
-                      to={`/solidarity-projects/${favoriteProject.id}`}
+                      to={`/solidarity-projects/${highlightedProject.id}`}
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-700 hover:text-blue-800"
                     >
                       {t('detail.favoriteProjectDiscover')}
