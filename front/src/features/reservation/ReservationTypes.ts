@@ -24,7 +24,6 @@ export interface CreateReservationPayload {
 
 export interface RequestReservationPayload {
   accommodationId: string;
-  guestUserId: string;
   checkIn: string;
   checkOut: string;
   guestName: string;

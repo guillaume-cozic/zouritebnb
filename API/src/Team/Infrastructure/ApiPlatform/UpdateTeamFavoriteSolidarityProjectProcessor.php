@@ -6,9 +6,11 @@ namespace App\Team\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use App\Team\Application\UseCase\UpdateTeamFavoriteSolidarityProject;
 use App\Team\Domain\Command\UpdateTeamFavoriteSolidarityProjectCommand;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -19,17 +21,26 @@ final readonly class UpdateTeamFavoriteSolidarityProjectProcessor implements Pro
     public function __construct(
         private UpdateTeamFavoriteSolidarityProject $useCase,
         private TransactionalUseCaseHandler $handler,
+        private CurrentUser $currentUser,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        \assert($data instanceof UpdateTeamFavoriteSolidarityProjectInput);
+
+        $teamId = $this->currentUser->teamId();
+
+        if (!$teamId->equals(Uuid::fromString($uriVariables['id']))) {
+            throw new AccessDeniedHttpException('You can only manage the favorite solidarity project of your own team.');
+        }
+
         $projectId = null !== $data->favoriteSolidarityProjectId && '' !== $data->favoriteSolidarityProjectId
             ? Uuid::fromString($data->favoriteSolidarityProjectId)
             : null;
 
         $this->handler->execute(fn () => $this->useCase->handle(new UpdateTeamFavoriteSolidarityProjectCommand(
-            teamId: Uuid::fromString($uriVariables['id']),
+            teamId: $teamId,
             favoriteSolidarityProjectId: $projectId,
         )));
     }

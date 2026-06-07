@@ -43,9 +43,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
             status: 204,
             openapi: new OpenApiOperation(
                 summary: 'Définir le projet solidaire par défaut de la plateforme',
-                description: 'Marque ce projet comme le projet par défaut affiché sur les hébergements quand l\'équipe hôte n\'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut.',
+                description: 'Marque ce projet comme le projet par défaut affiché sur les hébergements quand l\'équipe hôte n\'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut. Réservé aux utilisateurs authentifiés.',
             ),
             denormalizationContext: ['groups' => ['solidarity_project:mark-default']],
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             input: false,
             output: false,
             processor: MarkSolidarityProjectAsDefaultProcessor::class,

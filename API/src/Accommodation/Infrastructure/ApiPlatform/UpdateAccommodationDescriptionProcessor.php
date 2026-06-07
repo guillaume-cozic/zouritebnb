@@ -17,6 +17,7 @@ final readonly class UpdateAccommodationDescriptionProcessor implements Processo
 {
     public function __construct(
         private UpdateAccommodationDescription $updateAccommodationDescription,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
@@ -24,8 +25,11 @@ final readonly class UpdateAccommodationDescriptionProcessor implements Processo
     {
         \assert($data instanceof UpdateAccommodationDescriptionInput);
 
+        $id = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($id);
+
         $this->updateAccommodationDescription->handle(new UpdateAccommodationDescriptionCommand(
-            id: Uuid::fromString($uriVariables['id']),
+            id: $id,
             title: $data->title,
             description: $data->description,
         ));

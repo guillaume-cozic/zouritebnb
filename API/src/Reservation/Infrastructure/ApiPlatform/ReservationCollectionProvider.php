@@ -7,6 +7,7 @@ namespace App\Reservation\Infrastructure\ApiPlatform;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Reservation\Application\UseCase\ListReservations;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -14,10 +15,9 @@ use Symfony\Component\Uid\Uuid;
  */
 final readonly class ReservationCollectionProvider implements ProviderInterface
 {
-    private const string DEFAULT_TEAM_UUID = '00000000-0000-4000-8000-000000000001';
-
     public function __construct(
         private ListReservations $listReservations,
+        private CurrentUser $currentUser,
     ) {
     }
 
@@ -52,7 +52,8 @@ final readonly class ReservationCollectionProvider implements ProviderInterface
         }
 
         $reservations = $this->listReservations->handle(
-            teamId: Uuid::fromString(self::DEFAULT_TEAM_UUID),
+            teamId: $this->currentUser->teamId(),
+            guestUserId: $this->currentUser->id(),
             accommodationId: $accommodationId,
             from: $from,
             to: $to,

@@ -17,6 +17,7 @@ final readonly class ReorderAccommodationPhotosProcessor implements ProcessorInt
 {
     public function __construct(
         private ReorderAccommodationPhotos $reorderAccommodationPhotos,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
@@ -24,8 +25,11 @@ final readonly class ReorderAccommodationPhotosProcessor implements ProcessorInt
     {
         \assert($data instanceof ReorderAccommodationPhotosInput);
 
+        $accommodationId = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($accommodationId);
+
         $this->reorderAccommodationPhotos->handle(new ReorderAccommodationPhotosCommand(
-            accommodationId: Uuid::fromString($uriVariables['id']),
+            accommodationId: $accommodationId,
             photoIds: array_map(static fn (string $id) => Uuid::fromString($id), $data->photoIds),
         ));
     }

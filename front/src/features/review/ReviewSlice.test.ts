@@ -33,7 +33,6 @@ describe('submitAccommodationReview', () => {
   const args = {
     reservationId: 'res-1',
     payload: {
-      authorUserId: 'user-1',
       accommodationId: 'acc-1',
       rating: 5,
       comment: 'Séjour vraiment agréable, logement propre et bien situé, hôte réactif.',
@@ -76,7 +75,6 @@ describe('submitGuestReview', () => {
   const args = {
     reservationId: 'res-2',
     payload: {
-      authorUserId: 'host-1',
       accommodationId: 'acc-1',
       guestUserId: 'guest-1',
       rating: 4,

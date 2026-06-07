@@ -35,7 +35,7 @@ final class CreateReservationTest extends ReservationApiTestCase
         $accommodationId = $this->insertAccommodation(100.0);
 
         self::createClient()->request('POST', '/api/reservations', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'accommodationId' => $accommodationId,
                 'checkIn' => '2026-05-01T15:00:00+00:00',
@@ -50,7 +50,25 @@ final class CreateReservationTest extends ReservationApiTestCase
             'status' => 'confirmed',
             'totalPrice' => 400,
             'pricePerNight' => 100,
+            'teamId' => self::DEFAULT_TEAM_UUID,
         ]);
+    }
+
+    public function test_should_return401_when_not_authenticated(): void
+    {
+        $accommodationId = $this->insertAccommodation(100.0);
+
+        self::createClient()->request('POST', '/api/reservations', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'accommodationId' => $accommodationId,
+                'checkIn' => '2026-05-01T15:00:00+00:00',
+                'checkOut' => '2026-05-05T11:00:00+00:00',
+                'guestName' => 'Jean Dupont',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
     }
 
     public function test_should_apply_weekly_promotion_for_stay_of_seven_nights_or_more(): void
@@ -58,7 +76,7 @@ final class CreateReservationTest extends ReservationApiTestCase
         $accommodationId = $this->insertAccommodation(100.0, 20.0);
 
         self::createClient()->request('POST', '/api/reservations', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'accommodationId' => $accommodationId,
                 'checkIn' => '2026-05-01T15:00:00+00:00',
@@ -80,7 +98,7 @@ final class CreateReservationTest extends ReservationApiTestCase
         $accommodationId = $this->insertAccommodation();
 
         self::createClient()->request('POST', '/api/reservations', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'accommodationId' => $accommodationId,
                 'checkIn' => '2026-05-10T15:00:00+00:00',
@@ -97,7 +115,7 @@ final class CreateReservationTest extends ReservationApiTestCase
         $accommodationId = $this->insertAccommodation();
 
         self::createClient()->request('POST', '/api/reservations', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'accommodationId' => $accommodationId,
                 'checkIn' => '2026-05-01T15:00:00+00:00',
@@ -112,7 +130,7 @@ final class CreateReservationTest extends ReservationApiTestCase
     public function test_should_return422_when_accommodation_does_not_exist(): void
     {
         self::createClient()->request('POST', '/api/reservations', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'accommodationId' => Uuid::v7()->toRfc4122(),
                 'checkIn' => '2026-05-01T15:00:00+00:00',

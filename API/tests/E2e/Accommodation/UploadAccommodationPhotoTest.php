@@ -10,6 +10,24 @@ final class UploadAccommodationPhotoTest extends AccommodationApiTestCase
 {
     public function test_should_upload_photo(): void
     {
+        $headers = $this->authenticatedOwnerHeaders();
+        $id = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
+
+        $tmpFile = $this->createTempImage();
+        $uploadedFile = new UploadedFile($tmpFile, 'test.jpg', 'image/jpeg', test: true);
+
+        self::createClient()->request('POST', '/api/accommodations/'.$id.'/photos', [
+            'headers' => $headers + ['Content-Type' => 'multipart/form-data'],
+            'extra' => [
+                'files' => ['file' => $uploadedFile],
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(201);
+    }
+
+    public function test_should_return_401_when_not_authenticated(): void
+    {
         $id = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
 
         $tmpFile = $this->createTempImage();
@@ -22,16 +40,37 @@ final class UploadAccommodationPhotoTest extends AccommodationApiTestCase
             ],
         ]);
 
-        self::assertResponseStatusCodeSame(201);
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function test_should_return_403_when_user_is_not_owner(): void
+    {
+        $this->createAuthUser(email: 'intruder@example.com', teamId: '019cf27a-96ba-7957-8622-aaaaaaaaaaaa');
+        $headers = $this->authHeaders('intruder@example.com');
+        $id = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
+
+        $tmpFile = $this->createTempImage();
+        $uploadedFile = new UploadedFile($tmpFile, 'test.jpg', 'image/jpeg', test: true);
+
+        self::createClient()->request('POST', '/api/accommodations/'.$id.'/photos', [
+            'headers' => $headers + ['Content-Type' => 'multipart/form-data'],
+            'extra' => [
+                'files' => ['file' => $uploadedFile],
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(403);
     }
 
     public function test_should_not_upload_when_accommodation_not_found(): void
     {
+        $headers = $this->authenticatedOwnerHeaders();
+
         $tmpFile = $this->createTempImage();
         $uploadedFile = new UploadedFile($tmpFile, 'test.jpg', 'image/jpeg', test: true);
 
         self::createClient()->request('POST', '/api/accommodations/00000000-0000-0000-0000-000000000000/photos', [
-            'headers' => ['Content-Type' => 'multipart/form-data'],
+            'headers' => $headers + ['Content-Type' => 'multipart/form-data'],
             'extra' => [
                 'files' => ['file' => $uploadedFile],
             ],
@@ -42,6 +81,7 @@ final class UploadAccommodationPhotoTest extends AccommodationApiTestCase
 
     public function test_should_not_upload_with_invalid_mime_type(): void
     {
+        $headers = $this->authenticatedOwnerHeaders();
         $id = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
 
         $tmpFile = tempnam(sys_get_temp_dir(), 'photo_test_');
@@ -49,7 +89,7 @@ final class UploadAccommodationPhotoTest extends AccommodationApiTestCase
         $uploadedFile = new UploadedFile($tmpFile, 'test.txt', 'text/plain', test: true);
 
         self::createClient()->request('POST', '/api/accommodations/'.$id.'/photos', [
-            'headers' => ['Content-Type' => 'multipart/form-data'],
+            'headers' => $headers + ['Content-Type' => 'multipart/form-data'],
             'extra' => [
                 'files' => ['file' => $uploadedFile],
             ],
@@ -60,10 +100,11 @@ final class UploadAccommodationPhotoTest extends AccommodationApiTestCase
 
     public function test_should_not_upload_without_file(): void
     {
+        $headers = $this->authenticatedOwnerHeaders();
         $id = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
 
         self::createClient()->request('POST', '/api/accommodations/'.$id.'/photos', [
-            'headers' => ['Content-Type' => 'multipart/form-data'],
+            'headers' => $headers + ['Content-Type' => 'multipart/form-data'],
         ]);
 
         self::assertResponseStatusCodeSame(500);

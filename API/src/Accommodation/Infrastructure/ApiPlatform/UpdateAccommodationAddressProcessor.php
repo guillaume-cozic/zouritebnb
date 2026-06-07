@@ -19,13 +19,17 @@ final readonly class UpdateAccommodationAddressProcessor implements ProcessorInt
     public function __construct(
         private UpdateAccommodationAddress $updateAccommodationAddress,
         private TransactionalUseCaseHandler $handler,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        $id = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($id);
+
         $this->handler->execute(fn () => $this->updateAccommodationAddress->handle(new UpdateAccommodationAddressCommand(
-            id: Uuid::fromString($uriVariables['id']),
+            id: $id,
             street: $data->street,
             city: $data->city,
             zipCode: $data->zipCode,

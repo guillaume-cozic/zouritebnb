@@ -30,19 +30,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/login',
             openapi: new OpenApiOperation(
                 summary: 'Authentification d\'un utilisateur',
-                description: 'Vérifie email + mot de passe et retourne l\'utilisateur (pas de token pour l\'instant).',
+                description: 'Vérifie email + mot de passe et retourne l\'utilisateur ainsi qu\'un JWT (champ `token`) à utiliser comme Bearer.',
             ),
-            normalizationContext: ['groups' => ['user:read']],
+            normalizationContext: ['groups' => ['user:read', 'user:token']],
             denormalizationContext: ['groups' => ['user:write']],
             input: LoginUserInput::class,
             processor: LoginUserProcessor::class,
         ),
         new Patch(
-            uriTemplate: '/users/{id}/profile',
+            uriTemplate: '/users/profile',
             status: 204,
             openapi: new OpenApiOperation(
-                summary: 'Mettre à jour le profil d\'un utilisateur',
-                description: 'Met à jour le prénom, le nom et l\'email d\'un utilisateur.',
+                summary: 'Mettre à jour le profil de l\'utilisateur courant',
+                description: 'Met à jour le prénom, le nom et l\'email de l\'utilisateur authentifié (identifié via le JWT).',
             ),
             denormalizationContext: ['groups' => ['user:write']],
             read: false,
@@ -73,4 +73,8 @@ class UserOutput
     #[Groups(['user:read'])]
     #[ApiProperty(description: 'Nom', example: 'Dupont')]
     public ?string $lastName = null;
+
+    #[Groups(['user:token'])]
+    #[ApiProperty(description: 'JWT Bearer à placer dans l\'en-tête Authorization pour les requêtes authentifiées', example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...')]
+    public ?string $token = null;
 }

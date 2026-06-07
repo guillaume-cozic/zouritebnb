@@ -5,7 +5,10 @@ security:
 
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        app_user_provider:
+            entity:
+                class: App\User\Infrastructure\Doctrine\UserEntity
+                property: email
 
     firewalls:
         dev:
@@ -14,18 +17,36 @@ security:
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            stateless: true
+            provider: app_user_provider
+            jwt: ~
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Note: Only the *first* matching rule is applied
+    # Note: Only the *first* matching rule is applied.
+    # Default-deny on the API: everything under /api requires authentication
+    # unless explicitly whitelisted as PUBLIC_ACCESS above.
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # OpenAPI documentation is public
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+
+        # CORS preflight requests must never require authentication
+        - { path: ^/api, methods: [OPTIONS], roles: PUBLIC_ACCESS }
+
+        # Public auth routes
+        - { path: ^/api/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register$, roles: PUBLIC_ACCESS }
+
+        # Stripe webhook is authenticated by HMAC signature verification (Stripe-Signature
+        # header), not by a JWT. It must stay public so Stripe's servers can reach it.
+        - { path: ^/api/stripe/webhook$, methods: [POST], roles: PUBLIC_ACCESS }
+
+        # Public read access (browsing the marketplace without an account)
+        - { path: ^/api/accommodations, methods: [GET], roles: PUBLIC_ACCESS }
+        - { path: ^/api/solidarity_projects, methods: [GET], roles: PUBLIC_ACCESS }
+        - { path: ^/api/regions, methods: [GET], roles: PUBLIC_ACCESS }
+        - { path: ^/api/localities, methods: [GET], roles: PUBLIC_ACCESS }
+
+        # Everything else under /api requires a valid JWT
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:

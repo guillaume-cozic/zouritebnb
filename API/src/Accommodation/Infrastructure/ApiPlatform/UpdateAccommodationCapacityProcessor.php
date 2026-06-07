@@ -19,13 +19,17 @@ final readonly class UpdateAccommodationCapacityProcessor implements ProcessorIn
     public function __construct(
         private UpdateAccommodationCapacity $updateAccommodationCapacity,
         private TransactionalUseCaseHandler $handler,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        $id = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($id);
+
         $this->handler->execute(fn () => $this->updateAccommodationCapacity->handle(new UpdateAccommodationCapacityCommand(
-            id: Uuid::fromString($uriVariables['id']),
+            id: $id,
             bedrooms: $data->bedrooms,
             bathrooms: $data->bathrooms,
             maxGuests: $data->maxGuests,

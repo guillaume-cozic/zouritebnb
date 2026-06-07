@@ -32,9 +32,7 @@ const AdminConversationsPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
 
-  const DEFAULT_TEAM_UUID = '00000000-0000-4000-8000-000000000001';
   const user = useAppSelector(selectAuthUser);
-  const teamId = DEFAULT_TEAM_UUID;
   const readOnly = !user;
   const conversations = useAppSelector(selectConversations);
   const listStatus = useAppSelector(selectConversationsStatus);
@@ -54,9 +52,9 @@ const AdminConversationsPage: React.FC = () => {
   }, [reservations]);
 
   useEffect(() => {
-    dispatch(fetchConversationsForTeam(teamId));
+    dispatch(fetchConversationsForTeam());
     dispatch(fetchReservations({}));
-  }, [dispatch, teamId]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (id) {

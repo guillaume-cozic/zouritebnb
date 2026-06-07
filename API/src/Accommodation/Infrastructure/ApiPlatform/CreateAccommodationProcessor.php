@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Accommodation\Application\UseCase\CreateAccommodation;
 use App\Accommodation\Domain\Command\CreateAccommodationCommand;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use Symfony\Component\Uid\Uuid;
 
@@ -16,12 +17,12 @@ use Symfony\Component\Uid\Uuid;
  */
 final readonly class CreateAccommodationProcessor implements ProcessorInterface
 {
-    private const DEFAULT_TEAM_UUID = '00000000-0000-4000-8000-000000000001';
     private const DEFAULT_REGION_UUID = '00000000-0000-4000-8000-00000000000a';
 
     public function __construct(
         private CreateAccommodation $createAccommodation,
         private TransactionalUseCaseHandler $handler,
+        private CurrentUser $currentUser,
     ) {
     }
 
@@ -34,7 +35,7 @@ final readonly class CreateAccommodationProcessor implements ProcessorInterface
             title: $data->title,
             description: $data->description,
             price: $data->price,
-            teamId: Uuid::fromString(self::DEFAULT_TEAM_UUID),
+            teamId: $this->currentUser->teamId(),
             regionId: Uuid::fromString(self::DEFAULT_REGION_UUID),
         )));
 

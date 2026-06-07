@@ -10,6 +10,7 @@ use App\Reservation\Application\UseCase\CreateReservation;
 use App\Reservation\Domain\Command\CreateReservationCommand;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Port\ReservationRepository;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use Symfony\Component\Uid\Uuid;
 
@@ -18,12 +19,11 @@ use Symfony\Component\Uid\Uuid;
  */
 final readonly class CreateReservationProcessor implements ProcessorInterface
 {
-    private const string DEFAULT_TEAM_UUID = '00000000-0000-4000-8000-000000000001';
-
     public function __construct(
         private CreateReservation $createReservation,
         private ReservationRepository $repository,
         private TransactionalUseCaseHandler $handler,
+        private CurrentUser $currentUser,
     ) {
     }
 
@@ -34,7 +34,7 @@ final readonly class CreateReservationProcessor implements ProcessorInterface
         /** @var string $id */
         $id = $this->handler->execute(fn () => $this->createReservation->handle(new CreateReservationCommand(
             accommodationId: Uuid::fromString($data->accommodationId),
-            teamId: Uuid::fromString(self::DEFAULT_TEAM_UUID),
+            teamId: $this->currentUser->teamId(),
             checkIn: new \DateTimeImmutable($data->checkIn),
             checkOut: new \DateTimeImmutable($data->checkOut),
             guestName: $data->guestName,

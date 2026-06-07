@@ -4,23 +4,25 @@ declare(strict_types=1);
 
 namespace App\Tests\E2e\Review;
 
+use App\Tests\E2e\AuthenticatedClientTrait;
 use Symfony\Component\Uid\Uuid;
 
 final class SubmitGuestReviewTest extends ReviewApiTestCase
 {
+    use AuthenticatedClientTrait;
+
     private const string VALID_COMMENT = 'Voyageur exemplaire : communication parfaite, logement laissé impeccable et respect total du règlement intérieur.';
 
     public function test_should_submit_guest_review(): void
     {
         $accommodationId = Uuid::v7()->toRfc4122();
         $guestUserId = Uuid::v7()->toRfc4122();
-        $hostUserId = $this->insertUser(self::DEFAULT_TEAM_UUID);
+        $this->createAuthUser(email: 'host@example.com', teamId: self::DEFAULT_TEAM_UUID);
         $this->insertCompletedStay($accommodationId, $guestUserId, self::DEFAULT_TEAM_UUID);
 
         self::createClient()->request('POST', '/api/reviews/guest', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'authorUserId' => $hostUserId,
                 'accommodationId' => $accommodationId,
                 'guestUserId' => $guestUserId,
                 'rating' => 5,
@@ -35,13 +37,12 @@ final class SubmitGuestReviewTest extends ReviewApiTestCase
     {
         $accommodationId = Uuid::v7()->toRfc4122();
         $guestUserId = Uuid::v7()->toRfc4122();
-        $hostUserId = $this->insertUser(self::DEFAULT_TEAM_UUID);
+        $this->createAuthUser(email: 'host@example.com', teamId: self::DEFAULT_TEAM_UUID);
         $this->insertCompletedStay($accommodationId, $guestUserId, self::DEFAULT_TEAM_UUID);
 
         self::createClient()->request('POST', '/api/reviews/guest', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'authorUserId' => $hostUserId,
                 'accommodationId' => $accommodationId,
                 'guestUserId' => $guestUserId,
                 'rating' => 5,
@@ -56,13 +57,12 @@ final class SubmitGuestReviewTest extends ReviewApiTestCase
     {
         $accommodationId = Uuid::v7()->toRfc4122();
         $guestUserId = Uuid::v7()->toRfc4122();
-        $hostUserId = $this->insertUser(self::DEFAULT_TEAM_UUID);
+        $this->createAuthUser(email: 'host@example.com', teamId: self::DEFAULT_TEAM_UUID);
         $this->insertCompletedStay($accommodationId, $guestUserId, self::DEFAULT_TEAM_UUID);
 
         self::createClient()->request('POST', '/api/reviews/guest', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'authorUserId' => $hostUserId,
                 'accommodationId' => $accommodationId,
                 'guestUserId' => $guestUserId,
                 'rating' => 0,
@@ -77,14 +77,13 @@ final class SubmitGuestReviewTest extends ReviewApiTestCase
     {
         $accommodationId = Uuid::v7()->toRfc4122();
         $guestUserId = Uuid::v7()->toRfc4122();
-        $hostUserId = $this->insertUser(self::DEFAULT_TEAM_UUID);
+        $this->createAuthUser(email: 'host@example.com', teamId: self::DEFAULT_TEAM_UUID);
         // Reservation exists (so the team can be resolved) but is still pending: the stay is not completed.
         $this->insertCompletedStay($accommodationId, $guestUserId, self::DEFAULT_TEAM_UUID, status: 'pending');
 
         self::createClient()->request('POST', '/api/reviews/guest', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'authorUserId' => $hostUserId,
                 'accommodationId' => $accommodationId,
                 'guestUserId' => $guestUserId,
                 'rating' => 4,
@@ -99,13 +98,12 @@ final class SubmitGuestReviewTest extends ReviewApiTestCase
     {
         $accommodationId = Uuid::v7()->toRfc4122();
         $guestUserId = Uuid::v7()->toRfc4122();
-        $hostUserId = $this->insertUser(self::DEFAULT_TEAM_UUID);
+        $this->createAuthUser(email: 'host@example.com', teamId: self::DEFAULT_TEAM_UUID);
         $this->insertCompletedStay($accommodationId, $guestUserId, self::DEFAULT_TEAM_UUID);
 
         $payload = [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'authorUserId' => $hostUserId,
                 'accommodationId' => $accommodationId,
                 'guestUserId' => $guestUserId,
                 'rating' => 5,
@@ -125,13 +123,13 @@ final class SubmitGuestReviewTest extends ReviewApiTestCase
         $accommodationId = Uuid::v7()->toRfc4122();
         $guestUserId = Uuid::v7()->toRfc4122();
         $otherTeamId = Uuid::v7()->toRfc4122();
-        $outsiderUserId = $this->insertUser($otherTeamId);
+        // Authenticated user belongs to a different team than the one hosting the stay.
+        $this->createAuthUser(email: 'outsider@example.com', teamId: $otherTeamId);
         $this->insertCompletedStay($accommodationId, $guestUserId, self::DEFAULT_TEAM_UUID);
 
         self::createClient()->request('POST', '/api/reviews/guest', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('outsider@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'authorUserId' => $outsiderUserId,
                 'accommodationId' => $accommodationId,
                 'guestUserId' => $guestUserId,
                 'rating' => 5,
@@ -151,7 +149,6 @@ final class SubmitGuestReviewTest extends ReviewApiTestCase
         self::createClient()->request('POST', '/api/reviews/guest', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'authorUserId' => '',
                 'accommodationId' => $accommodationId,
                 'guestUserId' => $guestUserId,
                 'rating' => 5,

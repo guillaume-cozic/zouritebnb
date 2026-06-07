@@ -11,10 +11,6 @@ final readonly class SubmitAccommodationReviewInput
 {
     public function __construct(
         #[Groups(['review:write'])]
-        #[ApiProperty(description: 'Identifiant UUID du voyageur qui rédige l\'avis (utilisateur courant authentifié). Doit correspondre à un séjour confirmé et terminé sur l\'hébergement.', example: '01961e2f-dead-7000-beef-0000000000c1')]
-        public string $authorUserId = '',
-
-        #[Groups(['review:write'])]
         #[ApiProperty(description: 'Identifiant UUID de l\'hébergement noté.', example: '01961e2f-dead-7000-beef-000000000001')]
         public string $accommodationId = '',
 

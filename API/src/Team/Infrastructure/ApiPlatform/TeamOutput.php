@@ -13,7 +13,6 @@ use ApiPlatform\OpenApi\Model\Example;
 use ApiPlatform\OpenApi\Model\MediaType;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\RequestBody;
-use App\Shared\ApiPlatform\State\EntityProvider;
 use App\Shared\ApiPlatform\State\FromEntityInterface;
 use App\Team\Infrastructure\Doctrine\TeamEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -25,10 +24,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/teams/{id}',
             openapi: new OpenApiOperation(
                 summary: 'Récupérer une équipe',
-                description: 'Retourne une équipe et son projet solidaire coup de cœur.',
+                description: 'Retourne une équipe et son projet solidaire coup de cœur. Réservé aux membres de l\'équipe.',
             ),
             normalizationContext: ['groups' => ['team:read']],
-            provider: EntityProvider::class,
+            security: 'is_authenticated()',
+            provider: TeamItemProvider::class,
         ),
         new Patch(
             uriTemplate: '/teams/{id}/favorite-solidarity-project',
@@ -54,6 +54,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
                 ),
             ),
             denormalizationContext: ['groups' => ['team:write']],
+            security: 'is_authenticated()',
             input: UpdateTeamFavoriteSolidarityProjectInput::class,
             output: false,
             processor: UpdateTeamFavoriteSolidarityProjectProcessor::class,
@@ -86,6 +87,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
                 ),
             ),
             denormalizationContext: ['groups' => ['team:write-bank-account']],
+            security: 'is_authenticated()',
             input: UpdateTeamBankAccountInput::class,
             output: false,
             processor: UpdateTeamBankAccountProcessor::class,

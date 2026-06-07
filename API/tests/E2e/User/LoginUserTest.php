@@ -15,7 +15,7 @@ final class LoginUserTest extends UserApiTestCase
             lastName: 'Dupont',
         );
 
-        self::createClient()->request('POST', '/api/login', [
+        $response = self::createClient()->request('POST', '/api/login', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'email' => 'host@example.com',
@@ -30,6 +30,10 @@ final class LoginUserTest extends UserApiTestCase
             'firstName' => 'Marie',
             'lastName' => 'Dupont',
         ]);
+
+        $data = $response->toArray();
+        self::assertArrayHasKey('token', $data);
+        self::assertNotEmpty($data['token']);
     }
 
     public function test_should_return422_when_password_is_wrong(): void

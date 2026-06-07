@@ -2,7 +2,6 @@ export type ReviewTarget = 'accommodation' | 'guest';
 
 /** Payload sent to POST /api/reviews/accommodation (traveler rates the accommodation). */
 export interface SubmitAccommodationReviewPayload {
-  authorUserId: string;
   accommodationId: string;
   rating: number;
   comment: string;
@@ -10,7 +9,6 @@ export interface SubmitAccommodationReviewPayload {
 
 /** Payload sent to POST /api/reviews/guest (host rates the guest). */
 export interface SubmitGuestReviewPayload {
-  authorUserId: string;
   accommodationId: string;
   guestUserId: string;
   rating: number;

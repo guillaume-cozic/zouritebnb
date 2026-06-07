@@ -10,6 +10,7 @@ use App\Reservation\Application\UseCase\RequestReservation;
 use App\Reservation\Domain\Command\RequestReservationCommand;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Port\ReservationRepository;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use Symfony\Component\Uid\Uuid;
 
@@ -22,6 +23,7 @@ final readonly class RequestReservationProcessor implements ProcessorInterface
         private RequestReservation $requestReservation,
         private ReservationRepository $repository,
         private TransactionalUseCaseHandler $handler,
+        private CurrentUser $currentUser,
     ) {
     }
 
@@ -32,7 +34,7 @@ final readonly class RequestReservationProcessor implements ProcessorInterface
         /** @var string $id */
         $id = $this->handler->execute(fn () => $this->requestReservation->handle(new RequestReservationCommand(
             accommodationId: Uuid::fromString($data->accommodationId),
-            guestUserId: Uuid::fromString($data->guestUserId),
+            guestUserId: $this->currentUser->id(),
             checkIn: new \DateTimeImmutable($data->checkIn),
             checkOut: new \DateTimeImmutable($data->checkOut),
             guestName: $data->guestName,

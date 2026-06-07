@@ -28,9 +28,10 @@ const initialState: ConversationState = {
 
 export const fetchConversationsForUser = createAsyncThunk(
   'conversation/fetchForUser',
-  async (userId: string, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/conversations', { params: { userId } });
+      // The backend scopes the collection to the authenticated user (JWT).
+      const response = await api.get('/api/conversations');
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as Conversation[];
     } catch (err: any) {
@@ -43,9 +44,10 @@ export const fetchConversationsForUser = createAsyncThunk(
 
 export const fetchConversationsForTeam = createAsyncThunk(
   'conversation/fetchForTeam',
-  async (teamId: string, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/conversations', { params: { teamId } });
+      // The backend scopes the collection to the authenticated user's team (JWT).
+      const response = await api.get('/api/conversations');
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as Conversation[];
     } catch (err: any) {
@@ -76,7 +78,7 @@ export const sendMessage = createAsyncThunk(
     try {
       const response = await api.post(
         `/api/conversations/${payload.conversationId}/messages`,
-        { authorUserId: payload.authorUserId, body: payload.body },
+        { body: payload.body },
         { headers: { 'Content-Type': 'application/ld+json' } }
       );
       return {

@@ -93,24 +93,43 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
     {
         $teamA = Uuid::v4();
         $teamB = Uuid::v4();
+        $noGuest = Uuid::v4();
         $this->saveReservation($teamA, Uuid::v4(), '2026-07-01', '2026-07-05', 'A');
         $this->saveReservation($teamB, Uuid::v4(), '2026-07-01', '2026-07-05', 'B');
 
-        $result = $this->repository->list($teamA, null, null, null);
+        $result = $this->repository->list($teamA, $noGuest, null, null, null);
 
         self::assertCount(1, $result);
         self::assertSame('A', $result[0]->getGuestName()->toString());
     }
 
+    public function test_should_list_reservations_where_user_is_guest(): void
+    {
+        $teamA = Uuid::v4();
+        $teamB = Uuid::v4();
+        $guestUser = Uuid::v4();
+        // Reservation hosted by teamA.
+        $this->saveReservation($teamA, Uuid::v4(), '2026-07-01', '2026-07-05', 'Host');
+        // Reservation hosted by teamB but where the user is the guest.
+        $this->saveReservation($teamB, Uuid::v4(), '2026-07-10', '2026-07-15', 'AsGuest', $guestUser);
+
+        $result = $this->repository->list($teamA, $guestUser, null, null, null);
+
+        $names = array_map(static fn ($r) => $r->getGuestName()->toString(), $result);
+        sort($names);
+        self::assertSame(['AsGuest', 'Host'], $names);
+    }
+
     public function test_should_list_filters_by_accommodation_id(): void
     {
         $teamId = Uuid::v4();
+        $noGuest = Uuid::v4();
         $accommodation1 = Uuid::v4();
         $accommodation2 = Uuid::v4();
         $this->saveReservation($teamId, $accommodation1, '2026-08-01', '2026-08-05', 'One');
         $this->saveReservation($teamId, $accommodation2, '2026-08-01', '2026-08-05', 'Two');
 
-        $result = $this->repository->list($teamId, $accommodation1, null, null);
+        $result = $this->repository->list($teamId, $noGuest, $accommodation1, null, null);
 
         self::assertCount(1, $result);
         self::assertSame('One', $result[0]->getGuestName()->toString());
@@ -133,7 +152,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
 
         $from = new \DateTimeImmutable('2026-09-01');
         $to = new \DateTimeImmutable('2026-10-01');
-        $result = $this->repository->list($teamId, null, $from, $to);
+        $result = $this->repository->list($teamId, Uuid::v4(), null, $from, $to);
 
         $names = array_map(static fn ($r) => $r->getGuestName()->toString(), $result);
         sort($names);
@@ -147,7 +166,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         $this->saveReservation($teamId, Uuid::v4(), '2026-02-01', '2026-02-05', 'R2');
         $this->saveReservation($teamId, Uuid::v4(), '2026-03-01', '2026-03-05', 'R3');
 
-        $result = $this->repository->list($teamId, null, null, null);
+        $result = $this->repository->list($teamId, Uuid::v4(), null, null, null);
 
         self::assertCount(3, $result);
     }
@@ -158,18 +177,34 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         string $checkIn,
         string $checkOut,
         string $guestName,
+        ?Uuid $guestUserId = null,
     ): void {
-        $reservation = Reservation::create(
-            id: new ReservationId(Uuid::v4()),
-            accommodationId: $accommodationId,
-            teamId: $teamId,
-            dateRange: new DateRange(
-                checkIn: new \DateTimeImmutable($checkIn),
-                checkOut: new \DateTimeImmutable($checkOut),
-            ),
-            guestName: new GuestName($guestName),
-            price: new ReservationPrice(totalPrice: 100.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
-        );
+        if (null === $guestUserId) {
+            $reservation = Reservation::create(
+                id: new ReservationId(Uuid::v4()),
+                accommodationId: $accommodationId,
+                teamId: $teamId,
+                dateRange: new DateRange(
+                    checkIn: new \DateTimeImmutable($checkIn),
+                    checkOut: new \DateTimeImmutable($checkOut),
+                ),
+                guestName: new GuestName($guestName),
+                price: new ReservationPrice(totalPrice: 100.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
+            );
+        } else {
+            $reservation = Reservation::request(
+                id: new ReservationId(Uuid::v4()),
+                accommodationId: $accommodationId,
+                teamId: $teamId,
+                dateRange: new DateRange(
+                    checkIn: new \DateTimeImmutable($checkIn),
+                    checkOut: new \DateTimeImmutable($checkOut),
+                ),
+                guestName: new GuestName($guestName),
+                price: new ReservationPrice(totalPrice: 100.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
+                guestUserId: $guestUserId,
+            );
+        }
         $this->repository->save($reservation);
     }
 }

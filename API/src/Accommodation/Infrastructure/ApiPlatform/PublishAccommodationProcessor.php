@@ -19,13 +19,17 @@ final readonly class PublishAccommodationProcessor implements ProcessorInterface
     public function __construct(
         private PublishAccommodation $publishAccommodation,
         private TransactionalUseCaseHandler $handler,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        $id = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($id);
+
         $this->handler->execute(fn () => $this->publishAccommodation->handle(new PublishAccommodationCommand(
-            id: Uuid::fromString($uriVariables['id']),
+            id: $id,
         )));
     }
 }

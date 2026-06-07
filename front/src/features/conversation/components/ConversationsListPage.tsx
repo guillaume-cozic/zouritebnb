@@ -20,7 +20,7 @@ const ConversationsListPage: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      dispatch(fetchConversationsForUser(user.id));
+      dispatch(fetchConversationsForUser());
     }
   }, [dispatch, user]);
 

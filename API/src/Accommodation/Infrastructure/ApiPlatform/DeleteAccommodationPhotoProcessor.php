@@ -19,13 +19,17 @@ final readonly class DeleteAccommodationPhotoProcessor implements ProcessorInter
     public function __construct(
         private DeleteAccommodationPhoto $deleteAccommodationPhoto,
         private TransactionalUseCaseHandler $handler,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        $accommodationId = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($accommodationId);
+
         $this->handler->execute(fn () => $this->deleteAccommodationPhoto->handle(new DeleteAccommodationPhotoCommand(
-            accommodationId: Uuid::fromString($uriVariables['id']),
+            accommodationId: $accommodationId,
             photoId: Uuid::fromString($uriVariables['photoId']),
         )));
     }

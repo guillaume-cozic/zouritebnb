@@ -8,6 +8,8 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Port\ReservationRepository;
+use App\Reservation\Infrastructure\Security\ReservationAccessGuard;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -17,6 +19,8 @@ final readonly class ReservationItemProvider implements ProviderInterface
 {
     public function __construct(
         private ReservationRepository $repository,
+        private CurrentUser $currentUser,
+        private ReservationAccessGuard $accessGuard,
     ) {
     }
 
@@ -30,6 +34,12 @@ final readonly class ReservationItemProvider implements ProviderInterface
 
         $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($idString)));
 
-        return null === $reservation ? null : ReservationOutput::fromEntity($reservation);
+        if (null === $reservation) {
+            return null;
+        }
+
+        $this->accessGuard->assertHostOrGuest($reservation, $this->currentUser);
+
+        return ReservationOutput::fromEntity($reservation);
     }
 }

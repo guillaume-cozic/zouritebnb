@@ -23,18 +23,20 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new Get(
             uriTemplate: '/reservations/{id}',
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Récupérer une réservation',
-                description: 'Retourne le détail complet d\'une réservation par son identifiant UUID. Retourne 404 si la réservation est introuvable.',
+                description: 'Retourne le détail complet d\'une réservation par son identifiant UUID. Accessible uniquement au voyageur de la réservation ou à un membre de l\'équipe loueur (403 sinon). Retourne 404 si la réservation est introuvable.',
             ),
             normalizationContext: ['groups' => ['reservation:read']],
             provider: ReservationItemProvider::class,
         ),
         new GetCollection(
             uriTemplate: '/reservations',
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Lister les réservations',
-                description: 'Retourne la liste des réservations de l\'équipe courante. Filtres optionnels : accommodationId (UUID de l\'hébergement), from et to (intervalle de dates ISO 8601 — les réservations qui chevauchent cet intervalle sont retournées).',
+                description: 'Retourne les réservations visibles par l\'utilisateur courant : celles de son équipe (en tant que loueur) et celles où il est le voyageur. Filtres optionnels : accommodationId (UUID de l\'hébergement), from et to (intervalle de dates ISO 8601 — les réservations qui chevauchent cet intervalle sont retournées).',
             ),
             normalizationContext: ['groups' => ['reservation:read']],
             provider: ReservationCollectionProvider::class,
@@ -42,9 +44,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Post(
             uriTemplate: '/reservations',
             status: 201,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Créer une réservation (back-office)',
-                description: 'Crée une réservation directement en statut "confirmed" depuis le back-office hôte, sans étape d\'approbation (aucun loueur associé : guestUserId reste null). Pour le parcours public où un loueur soumet une demande à valider par l\'hôte, utiliser POST /reservations/request. La date de départ doit être strictement postérieure à la date d\'arrivée et le nom du voyageur ne peut pas être vide.',
+                description: 'Crée une réservation directement en statut "confirmed" depuis le back-office hôte, sans étape d\'approbation (aucun loueur associé : guestUserId reste null). La réservation est rattachée à l\'équipe de l\'utilisateur authentifié. Pour le parcours public où un loueur soumet une demande à valider par l\'hôte, utiliser POST /reservations/request. La date de départ doit être strictement postérieure à la date d\'arrivée et le nom du voyageur ne peut pas être vide.',
                 requestBody: new RequestBody(
                     content: new \ArrayObject([
                         'application/ld+json' => new MediaType(
@@ -91,9 +94,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Patch(
             uriTemplate: '/reservations/{id}/confirm',
             read: false,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Confirmer une réservation',
-                description: 'Passe une réservation du statut "pending" au statut "confirmed". Retourne 404 si la réservation est introuvable, 422 si elle est déjà confirmée ou annulée.',
+                description: 'L\'équipe loueur passe une réservation du statut "pending" au statut "confirmed". Réservé aux membres de l\'équipe propriétaire (403 sinon). Retourne 404 si la réservation est introuvable, 422 si elle est déjà confirmée ou annulée.',
                 requestBody: new RequestBody(
                     content: new \ArrayObject([
                         'application/merge-patch+json' => new MediaType(
@@ -115,9 +119,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Patch(
             uriTemplate: '/reservations/{id}/cancel',
             read: false,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Annuler une réservation',
-                description: 'Passe une réservation au statut "cancelled". Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée.',
+                description: 'Passe une réservation au statut "cancelled". Accessible au voyageur de la réservation ou à un membre de l\'équipe loueur (403 sinon). Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée.',
                 requestBody: new RequestBody(
                     content: new \ArrayObject([
                         'application/merge-patch+json' => new MediaType(
@@ -139,9 +144,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Post(
             uriTemplate: '/reservations/request',
             status: 201,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Demander une réservation (parcours B2C)',
-                description: 'Crée une demande de réservation en statut "pending" depuis le parcours public. Une conversation entre l\'hôte et le loueur est ouverte automatiquement. L\'hôte dispose de 24h pour accepter ou refuser. La date de départ doit être strictement postérieure à la date d\'arrivée.',
+                description: 'Crée une demande de réservation en statut "pending" depuis le parcours public. Le voyageur est l\'utilisateur authentifié (déduit du JWT). Une conversation entre l\'hôte et le loueur est ouverte automatiquement. L\'hôte dispose de 24h pour accepter ou refuser. La date de départ doit être strictement postérieure à la date d\'arrivée.',
                 requestBody: new RequestBody(
                     content: new \ArrayObject([
                         'application/ld+json' => new MediaType(
@@ -150,7 +156,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
                                     summary: 'Requête valide',
                                     value: [
                                         'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
-                                        'guestUserId' => '01961e2f-dead-7000-beef-0000000000c1',
                                         'checkIn' => '2026-05-01T15:00:00+00:00',
                                         'checkOut' => '2026-05-05T11:00:00+00:00',
                                         'guestName' => 'Jean Dupont',
@@ -169,9 +174,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Patch(
             uriTemplate: '/reservations/{id}/refuse',
             read: false,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Refuser une réservation (hôte)',
-                description: 'L\'hôte refuse une réservation en statut "pending". Passe au statut "refused". Retourne 404 si introuvable, 422 si la réservation n\'est pas en "pending".',
+                description: 'L\'hôte refuse une réservation en statut "pending". Réservé aux membres de l\'équipe propriétaire (403 sinon). Passe au statut "refused". Retourne 404 si introuvable, 422 si la réservation n\'est pas en "pending".',
                 requestBody: new RequestBody(
                     content: new \ArrayObject([
                         'application/merge-patch+json' => new MediaType(

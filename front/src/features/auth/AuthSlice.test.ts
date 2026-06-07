@@ -1,7 +1,18 @@
-jest.mock('../../services/api', () => ({
-  __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
-}));
+jest.mock('../../services/api', () => {
+  const AUTH_TOKEN_KEY = 'auth.token';
+  const AUTH_USER_KEY = 'auth.user';
+  return {
+    __esModule: true,
+    default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+    AUTH_TOKEN_KEY,
+    AUTH_USER_KEY,
+    setStoredToken: (token: string) => globalThis.localStorage.setItem(AUTH_TOKEN_KEY, token),
+    clearStoredAuth: () => {
+      globalThis.localStorage.removeItem(AUTH_TOKEN_KEY);
+      globalThis.localStorage.removeItem(AUTH_USER_KEY);
+    },
+  };
+});
 
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer, {
@@ -17,6 +28,7 @@ const mockedApi = api as jest.Mocked<typeof api>;
 const buildStore = () => configureStore({ reducer: { auth: authReducer } });
 
 const user = { id: 'u-1', email: 'a@b.fr', firstName: null, lastName: null };
+const userWithToken = { ...user, token: 'jwt-abc-123' };
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -34,6 +46,18 @@ describe('loginUser', () => {
     expect(state.status).toBe('succeeded');
     expect(state.user).toEqual(user);
     expect(JSON.parse(localStorage.getItem('auth.user')!)).toEqual(user);
+  });
+
+  test('le store persiste le token JWT renvoyé au login', async () => {
+    mockedApi.post.mockResolvedValue({ data: userWithToken });
+    const store = buildStore();
+
+    await store.dispatch(loginUser({ email: 'a@b.fr', password: 'secret' }));
+
+    const state = store.getState().auth;
+    expect(state.user?.token).toBe('jwt-abc-123');
+    // The raw token is persisted under its own key for the request interceptor.
+    expect(localStorage.getItem('auth.token')).toBe('jwt-abc-123');
   });
 
   test('le store passe à failed avec le message d\'erreur après rejected', async () => {
@@ -79,8 +103,8 @@ describe('updateUserProfile', () => {
 });
 
 describe('logout', () => {
-  test('le store vide l\'utilisateur et nettoie le localStorage', async () => {
-    mockedApi.post.mockResolvedValue({ data: user });
+  test('le store vide l\'utilisateur et nettoie le localStorage (user + token)', async () => {
+    mockedApi.post.mockResolvedValue({ data: userWithToken });
     const store = buildStore();
     await store.dispatch(loginUser({ email: 'a@b.fr', password: 'secret' }));
 
@@ -88,5 +112,6 @@ describe('logout', () => {
 
     expect(store.getState().auth.user).toBeNull();
     expect(localStorage.getItem('auth.user')).toBeNull();
+    expect(localStorage.getItem('auth.token')).toBeNull();
   });
 });

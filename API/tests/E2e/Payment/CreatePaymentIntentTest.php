@@ -12,9 +12,10 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
+        $this->createAuthUser(email: 'traveller@example.com');
 
         $client->request('POST', '/api/payment-intents', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'amountCents' => 25000,
                 'currency' => 'eur',
@@ -44,9 +45,10 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
+        $this->createAuthUser(email: 'traveller@example.com');
 
         $client->request('POST', '/api/payment-intents', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'amountCents' => 12000,
                 'currency' => 'EUR',
@@ -64,13 +66,32 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
         self::assertSame([], $gateway->calls[0]['metadata']);
     }
 
-    public function test_should_return422_when_amount_is_zero(): void
+    public function test_should_return401_when_not_authenticated(): void
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
 
         $client->request('POST', '/api/payment-intents', [
             'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'amountCents' => 25000,
+                'currency' => 'eur',
+                'description' => 'Réservation sans authentification',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
+        self::assertCount(0, $gateway->calls);
+    }
+
+    public function test_should_return422_when_amount_is_zero(): void
+    {
+        $gateway = new FakePaymentGateway();
+        $client = $this->createClientWithFakeGateway($gateway);
+        $this->createAuthUser(email: 'traveller@example.com');
+
+        $client->request('POST', '/api/payment-intents', [
+            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'amountCents' => 0,
                 'currency' => 'eur',
@@ -85,9 +106,10 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
+        $this->createAuthUser(email: 'traveller@example.com');
 
         $client->request('POST', '/api/payment-intents', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'amountCents' => -100,
                 'currency' => 'eur',
@@ -102,9 +124,10 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
+        $this->createAuthUser(email: 'traveller@example.com');
 
         $client->request('POST', '/api/payment-intents', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
+            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'amountCents' => 25000,
                 'currency' => 'EUROS',

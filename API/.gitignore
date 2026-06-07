@@ -27,3 +27,7 @@
 ###> claude ###
 .claude/settings.local.json
 ###< claude ###
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

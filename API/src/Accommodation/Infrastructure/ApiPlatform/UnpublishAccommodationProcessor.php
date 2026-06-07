@@ -19,13 +19,17 @@ final readonly class UnpublishAccommodationProcessor implements ProcessorInterfa
     public function __construct(
         private UnpublishAccommodation $unpublishAccommodation,
         private TransactionalUseCaseHandler $handler,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        $id = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($id);
+
         $this->handler->execute(fn () => $this->unpublishAccommodation->handle(new UnpublishAccommodationCommand(
-            id: Uuid::fromString($uriVariables['id']),
+            id: $id,
         )));
     }
 }

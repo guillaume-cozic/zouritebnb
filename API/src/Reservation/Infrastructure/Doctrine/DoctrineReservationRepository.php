@@ -57,13 +57,15 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
 
     public function list(
         Uuid $teamId,
+        Uuid $guestUserId,
         ?Uuid $accommodationId,
         ?\DateTimeImmutable $from,
         ?\DateTimeImmutable $to,
     ): array {
         $qb = $this->createQueryBuilder('r')
-            ->andWhere('r.teamId = :teamId')
-            ->setParameter('teamId', $teamId, \Symfony\Bridge\Doctrine\Types\UuidType::NAME);
+            ->andWhere('r.teamId = :teamId OR r.guestUserId = :guestUserId')
+            ->setParameter('teamId', $teamId, \Symfony\Bridge\Doctrine\Types\UuidType::NAME)
+            ->setParameter('guestUserId', $guestUserId, \Symfony\Bridge\Doctrine\Types\UuidType::NAME);
 
         if (null !== $accommodationId) {
             $qb->andWhere('r.accommodationId = :accommodationId')

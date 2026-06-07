@@ -1,8 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import api from '../../services/api';
+import api, {
+  AUTH_USER_KEY,
+  clearStoredAuth,
+  setStoredToken,
+} from '../../services/api';
 import { AuthUser } from './AuthTypes';
 
-const STORAGE_KEY = 'auth.user';
+const STORAGE_KEY = AUTH_USER_KEY;
 
 const loadUser = (): AuthUser | null => {
   try {
@@ -75,7 +79,9 @@ const authSlice = createSlice({
   reducers: {
     logout(state) {
       state.user = null;
-      localStorage.removeItem(STORAGE_KEY);
+      state.status = 'idle';
+      state.error = null;
+      clearStoredAuth();
     },
   },
   extraReducers: (builder) => {
@@ -87,6 +93,9 @@ const authSlice = createSlice({
       state.status = 'succeeded';
       state.user = action.payload;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(action.payload));
+      if (action.payload.token) {
+        setStoredToken(action.payload.token);
+      }
     };
     const handleRejected = (state: AuthState, action: { payload?: unknown }) => {
       state.status = 'failed';

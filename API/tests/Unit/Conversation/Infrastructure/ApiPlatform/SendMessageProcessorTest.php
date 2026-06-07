@@ -14,14 +14,17 @@ use App\Conversation\Infrastructure\ApiPlatform\SendMessageInput;
 use App\Conversation\Infrastructure\ApiPlatform\SendMessageProcessor;
 use App\Shared\Domain\Port\TransactionManager;
 use App\Shared\Domain\Port\UuidGenerator;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use App\Tests\Unit\Conversation\Infrastructure\FixedClock;
 use App\Tests\Unit\Conversation\Infrastructure\InMemoryConversationRepository;
 use App\Tests\Unit\Conversation\Infrastructure\InMemoryTeamMembershipChecker;
 use App\Tests\Unit\Shared\Infrastructure\InMemoryEventBus;
+use App\User\Infrastructure\Doctrine\UserEntity;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Uuid;
 
 final class SendMessageProcessorTest extends TestCase
@@ -73,10 +76,15 @@ final class SendMessageProcessorTest extends TestCase
 
     public function test_should_return_the_created_message_output(): void
     {
-        $processor = new SendMessageProcessor($this->sendMessage, $this->repository, $this->handler);
+        $processor = new SendMessageProcessor(
+            $this->sendMessage,
+            $this->repository,
+            $this->handler,
+            $this->currentUserWithId($this->guestUserId),
+        );
 
         $output = $processor->process(
-            new SendMessageInput(authorUserId: $this->guestUserId->toRfc4122(), body: 'Bonjour'),
+            new SendMessageInput(body: 'Bonjour'),
             new Post(),
             ['id' => $this->conversationId->toRfc4122()],
         );
@@ -130,15 +138,34 @@ final class SendMessageProcessorTest extends TestCase
             }
         };
 
-        $processor = new SendMessageProcessor($this->sendMessage, $emptyReloadRepository, $this->handler);
+        $processor = new SendMessageProcessor(
+            $this->sendMessage,
+            $emptyReloadRepository,
+            $this->handler,
+            $this->currentUserWithId($this->guestUserId),
+        );
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Message was created but could not be reloaded.');
 
         $processor->process(
-            new SendMessageInput(authorUserId: $this->guestUserId->toRfc4122(), body: 'Bonjour'),
+            new SendMessageInput(body: 'Bonjour'),
             new Post(),
             ['id' => $this->conversationId->toRfc4122()],
         );
+    }
+
+    private function currentUserWithId(Uuid $userId): CurrentUser
+    {
+        $user = new UserEntity()
+            ->setId($userId)
+            ->setEmail('author@example.com')
+            ->setHashedPassword('hash')
+            ->setTeamId(Uuid::v7());
+
+        $security = $this->createStub(Security::class);
+        $security->method('getUser')->willReturn($user);
+
+        return new CurrentUser($security);
     }
 }

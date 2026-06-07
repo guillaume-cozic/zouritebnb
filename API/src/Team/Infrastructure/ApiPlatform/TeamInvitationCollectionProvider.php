@@ -6,7 +6,9 @@ namespace App\Team\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use App\Team\Domain\Port\TeamInvitationRepository;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -16,6 +18,7 @@ final readonly class TeamInvitationCollectionProvider implements ProviderInterfa
 {
     public function __construct(
         private TeamInvitationRepository $repository,
+        private CurrentUser $currentUser,
     ) {
     }
 
@@ -25,6 +28,11 @@ final readonly class TeamInvitationCollectionProvider implements ProviderInterfa
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $teamId = Uuid::fromString($uriVariables['id']);
+
+        if (!$teamId->equals($this->currentUser->teamId())) {
+            throw new AccessDeniedHttpException('You can only list invitations of your own team.');
+        }
+
         $invitations = $this->repository->findPendingByTeam($teamId);
 
         return array_map(

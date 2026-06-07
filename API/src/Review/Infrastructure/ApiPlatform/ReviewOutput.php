@@ -17,12 +17,13 @@ use ApiPlatform\OpenApi\Model\RequestBody;
         new Post(
             uriTemplate: '/reviews/accommodation',
             status: 201,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Noter un hébergement (voyageur)',
                 description: 'Permet à un voyageur connecté de noter l\'hébergement où il a séjourné. '
-                    .'L\'auteur (authorUserId) est l\'utilisateur courant authentifié et doit avoir un séjour confirmé '
-                    .'dont la date de départ est passée. La note doit être un entier entre 1 et 5, et le commentaire '
-                    .'doit contenir au moins 50 caractères. '
+                    .'L\'auteur de l\'avis est l\'utilisateur courant authentifié (dérivé du jeton JWT, jamais fourni dans le corps) '
+                    .'et doit avoir un séjour confirmé dont la date de départ est passée. La note doit être un entier entre 1 et 5, '
+                    .'et le commentaire doit contenir au moins 50 caractères. '
                     .'Retourne 401 si aucun utilisateur authentifié n\'est fourni, '
                     .'422 si les règles métier sont violées (note hors bornes, commentaire trop court, séjour non terminé, avis déjà déposé).',
                 requestBody: new RequestBody(
@@ -32,7 +33,6 @@ use ApiPlatform\OpenApi\Model\RequestBody;
                                 'valid' => new Example(
                                     summary: 'Requête valide',
                                     value: [
-                                        'authorUserId' => '01961e2f-dead-7000-beef-0000000000c1',
                                         'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
                                         'rating' => 5,
                                         'comment' => 'Séjour vraiment agréable, logement propre, bien situé et hôte très réactif. Je recommande sans hésiter.',
@@ -42,7 +42,6 @@ use ApiPlatform\OpenApi\Model\RequestBody;
                                     summary: 'Invalide : commentaire trop court',
                                     description: 'Retourne 422 car le commentaire fait moins de 50 caractères.',
                                     value: [
-                                        'authorUserId' => '01961e2f-dead-7000-beef-0000000000c1',
                                         'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
                                         'rating' => 5,
                                         'comment' => 'Très bien.',
@@ -52,7 +51,6 @@ use ApiPlatform\OpenApi\Model\RequestBody;
                                     summary: 'Invalide : note hors bornes',
                                     description: 'Retourne 422 car la note doit être comprise entre 1 et 5.',
                                     value: [
-                                        'authorUserId' => '01961e2f-dead-7000-beef-0000000000c1',
                                         'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
                                         'rating' => 7,
                                         'comment' => 'Séjour vraiment agréable, logement propre, bien situé et hôte très réactif. Je recommande sans hésiter.',
@@ -62,20 +60,9 @@ use ApiPlatform\OpenApi\Model\RequestBody;
                                     summary: 'Invalide : séjour non terminé',
                                     description: 'Retourne 422 car aucun séjour confirmé et terminé ne correspond à ce voyageur et cet hébergement.',
                                     value: [
-                                        'authorUserId' => '01961e2f-dead-7000-beef-0000000000c2',
                                         'accommodationId' => '01961e2f-dead-7000-beef-000000000099',
                                         'rating' => 4,
                                         'comment' => 'Séjour correct dans l\'ensemble, je reviendrais probablement lors d\'un prochain passage dans la région.',
-                                    ],
-                                ),
-                                'unauthenticated' => new Example(
-                                    summary: 'Invalide : utilisateur non authentifié',
-                                    description: 'Retourne 401 car aucun utilisateur authentifié (authorUserId) n\'est fourni.',
-                                    value: [
-                                        'authorUserId' => '',
-                                        'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
-                                        'rating' => 5,
-                                        'comment' => 'Séjour vraiment agréable, logement propre, bien situé et hôte très réactif. Je recommande sans hésiter.',
                                     ],
                                 ),
                             ]),
@@ -92,10 +79,12 @@ use ApiPlatform\OpenApi\Model\RequestBody;
         new Post(
             uriTemplate: '/reviews/guest',
             status: 201,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Noter un voyageur (loueur)',
                 description: 'Permet à un loueur connecté, membre de l\'équipe hôte de l\'hébergement, de noter un voyageur '
-                    .'ayant effectué un séjour terminé. L\'auteur (authorUserId) est l\'utilisateur courant authentifié. '
+                    .'ayant effectué un séjour terminé. L\'auteur de l\'avis est l\'utilisateur courant authentifié '
+                    .'(dérivé du jeton JWT, jamais fourni dans le corps). '
                     .'La note doit être un entier entre 1 et 5, et le commentaire doit contenir au moins 50 caractères. '
                     .'Retourne 401 si aucun utilisateur authentifié n\'est fourni, '
                     .'403 si l\'auteur n\'est pas membre de l\'équipe hôte de l\'hébergement, '
@@ -107,7 +96,6 @@ use ApiPlatform\OpenApi\Model\RequestBody;
                                 'valid' => new Example(
                                     summary: 'Requête valide',
                                     value: [
-                                        'authorUserId' => '01961e2f-dead-7000-beef-0000000000a1',
                                         'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
                                         'guestUserId' => '01961e2f-dead-7000-beef-0000000000c1',
                                         'rating' => 5,
@@ -118,7 +106,6 @@ use ApiPlatform\OpenApi\Model\RequestBody;
                                     summary: 'Invalide : commentaire trop court',
                                     description: 'Retourne 422 car le commentaire fait moins de 50 caractères.',
                                     value: [
-                                        'authorUserId' => '01961e2f-dead-7000-beef-0000000000a1',
                                         'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
                                         'guestUserId' => '01961e2f-dead-7000-beef-0000000000c1',
                                         'rating' => 5,
@@ -129,7 +116,6 @@ use ApiPlatform\OpenApi\Model\RequestBody;
                                     summary: 'Invalide : note hors bornes',
                                     description: 'Retourne 422 car la note doit être comprise entre 1 et 5.',
                                     value: [
-                                        'authorUserId' => '01961e2f-dead-7000-beef-0000000000a1',
                                         'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
                                         'guestUserId' => '01961e2f-dead-7000-beef-0000000000c1',
                                         'rating' => 0,
@@ -138,20 +124,8 @@ use ApiPlatform\OpenApi\Model\RequestBody;
                                 ),
                                 'not_in_host_team' => new Example(
                                     summary: 'Invalide : auteur hors équipe hôte',
-                                    description: 'Retourne 403 car l\'auteur n\'est pas membre de l\'équipe hôte de l\'hébergement.',
+                                    description: 'Retourne 403 car l\'utilisateur authentifié n\'est pas membre de l\'équipe hôte de l\'hébergement.',
                                     value: [
-                                        'authorUserId' => '01961e2f-dead-7000-beef-0000000000b9',
-                                        'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
-                                        'guestUserId' => '01961e2f-dead-7000-beef-0000000000c1',
-                                        'rating' => 5,
-                                        'comment' => 'Voyageur exemplaire : communication parfaite, logement laissé impeccable et respect total du règlement intérieur.',
-                                    ],
-                                ),
-                                'unauthenticated' => new Example(
-                                    summary: 'Invalide : utilisateur non authentifié',
-                                    description: 'Retourne 401 car aucun utilisateur authentifié (authorUserId) n\'est fourni.',
-                                    value: [
-                                        'authorUserId' => '',
                                         'accommodationId' => '01961e2f-dead-7000-beef-000000000001',
                                         'guestUserId' => '01961e2f-dead-7000-beef-0000000000c1',
                                         'rating' => 5,

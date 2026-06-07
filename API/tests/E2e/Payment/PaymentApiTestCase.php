@@ -7,10 +7,13 @@ namespace App\Tests\E2e\Payment;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Payment\Domain\Port\PaymentGateway;
+use App\Tests\E2e\AuthenticatedClientTrait;
 use App\Tests\Unit\Payment\Infrastructure\FakePaymentGateway;
 
 abstract class PaymentApiTestCase extends ApiTestCase
 {
+    use AuthenticatedClientTrait;
+
     protected static ?bool $alwaysBootKernel = true;
 
     /**

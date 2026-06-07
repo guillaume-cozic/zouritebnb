@@ -8,15 +8,15 @@ use Symfony\Component\Uid\Uuid;
 
 final class GetConversationCollectionTest extends ConversationApiTestCase
 {
-    public function test_should_list_conversations_for_team(): void
+    public function test_should_list_conversations_for_authenticated_host(): void
     {
-        $teamId = Uuid::fromString(self::DEFAULT_TEAM_UUID);
-        $accommodationId = $this->insertAccommodation($teamId);
-        $guestUserId = $this->insertUser(teamId: Uuid::v7());
+        $guestUserId = $this->createAuthUser(email: 'guest@example.com', teamId: Uuid::v7()->toRfc4122());
+        $this->createAuthUser(email: 'host@example.com', teamId: self::DEFAULT_TEAM_UUID);
+        $this->seedConversation(guestUserId: $guestUserId, teamId: self::DEFAULT_TEAM_UUID);
 
-        $this->requestReservationViaApi($accommodationId, $guestUserId);
-
-        $response = self::createClient()->request('GET', '/api/conversations?teamId='.$teamId->toRfc4122());
+        $response = self::createClient()->request('GET', '/api/conversations', [
+            'headers' => $this->authHeaders('host@example.com'),
+        ]);
 
         self::assertResponseIsSuccessful();
         $members = $response->toArray()['member'];
@@ -24,21 +24,42 @@ final class GetConversationCollectionTest extends ConversationApiTestCase
         self::assertSame($guestUserId, $members[0]['guestUserId']);
     }
 
-    public function test_should_return_empty_collection_when_no_filter_provided(): void
+    public function test_should_list_conversations_for_authenticated_guest(): void
     {
-        $accommodationId = $this->insertAccommodation();
-        $guestUserId = $this->insertUser(teamId: Uuid::v7());
-        $this->requestReservationViaApi($accommodationId, $guestUserId);
+        $guestUserId = $this->createAuthUser(email: 'guest@example.com', teamId: Uuid::v7()->toRfc4122());
+        $this->seedConversation(guestUserId: $guestUserId, teamId: self::DEFAULT_TEAM_UUID);
 
-        $response = self::createClient()->request('GET', '/api/conversations');
+        $response = self::createClient()->request('GET', '/api/conversations', [
+            'headers' => $this->authHeaders('guest@example.com'),
+        ]);
 
         self::assertResponseIsSuccessful();
-        self::assertSame([], $response->toArray()['member']);
+        $members = $response->toArray()['member'];
+        self::assertCount(1, $members);
+        self::assertSame($guestUserId, $members[0]['guestUserId']);
     }
 
-    public function test_should_return_empty_collection_for_unknown_team(): void
+    public function test_should_require_authentication(): void
     {
-        $response = self::createClient()->request('GET', '/api/conversations?teamId='.Uuid::v7()->toRfc4122());
+        self::createClient()->request('GET', '/api/conversations');
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function test_should_ignore_client_supplied_identity_filters(): void
+    {
+        // A user passing someone else's userId/teamId must still only see their own
+        // conversations: the identity is taken from the token, not the query string.
+        $guestUserId = $this->createAuthUser(email: 'guest@example.com', teamId: Uuid::v7()->toRfc4122());
+        $otherGuestId = $this->createAuthUser(email: 'other@example.com', teamId: Uuid::v7()->toRfc4122());
+        $this->createAuthUser(email: 'outsider@example.com', teamId: Uuid::v7()->toRfc4122());
+
+        $this->seedConversation(guestUserId: $guestUserId, teamId: self::DEFAULT_TEAM_UUID);
+        $this->seedConversation(guestUserId: $otherGuestId, teamId: self::DEFAULT_TEAM_UUID);
+
+        $response = self::createClient()->request('GET', '/api/conversations?userId='.$guestUserId.'&teamId='.self::DEFAULT_TEAM_UUID, [
+            'headers' => $this->authHeaders('outsider@example.com'),
+        ]);
 
         self::assertResponseIsSuccessful();
         self::assertSame([], $response->toArray()['member']);

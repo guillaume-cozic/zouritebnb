@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\User\Domain\Entity;
 
 use App\Shared\Domain\Entity\AggregateRoot;
+use App\User\Domain\Event\IdentityVerified;
 use App\User\Domain\Event\UserRegistered;
+use App\User\Domain\Exception\IdentityVerificationException;
 use Symfony\Component\Uid\Uuid;
 
 final class User extends AggregateRoot
@@ -17,6 +19,11 @@ final class User extends AggregateRoot
         private readonly Uuid $teamId,
         private ?string $firstName = null,
         private ?string $lastName = null,
+        private VerificationStatus $verificationStatus = VerificationStatus::NotStarted,
+        private ?Uuid $identityDocumentId = null,
+        private ?Uuid $selfieId = null,
+        private ?IdentityDocumentType $documentType = null,
+        private ?\DateTimeImmutable $verifiedAt = null,
     ) {
     }
 
@@ -63,5 +70,65 @@ final class User extends AggregateRoot
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->email = $email;
+    }
+
+    public function getVerificationStatus(): VerificationStatus
+    {
+        return $this->verificationStatus;
+    }
+
+    public function getDocumentType(): ?IdentityDocumentType
+    {
+        return $this->documentType;
+    }
+
+    public function getIdentityDocumentId(): ?Uuid
+    {
+        return $this->identityDocumentId;
+    }
+
+    public function getSelfieId(): ?Uuid
+    {
+        return $this->selfieId;
+    }
+
+    public function getVerifiedAt(): ?\DateTimeImmutable
+    {
+        return $this->verifiedAt;
+    }
+
+    /**
+     * Submits the identity document + selfie and (simulated automatic check) marks the user as
+     * verified in one step. Records a single IdentityVerified event carrying the file bytes so a
+     * listener can persist them to secure storage.
+     */
+    public function submitAndVerifyIdentity(
+        Uuid $documentId,
+        Uuid $selfieId,
+        IdentityDocumentType $documentType,
+        IdentityDocument $document,
+        IdentityDocument $selfie,
+        \DateTimeImmutable $verifiedAt,
+    ): void {
+        if (VerificationStatus::Verified === $this->verificationStatus) {
+            throw IdentityVerificationException::becauseAlreadyVerified($this->id->toRfc4122());
+        }
+
+        $documentFilename = \sprintf('%s.%s', $documentId->toRfc4122(), $document->extension());
+        $selfieFilename = \sprintf('%s.%s', $selfieId->toRfc4122(), $selfie->extension());
+
+        $this->identityDocumentId = $documentId;
+        $this->selfieId = $selfieId;
+        $this->documentType = $documentType;
+        $this->verificationStatus = VerificationStatus::Verified;
+        $this->verifiedAt = $verifiedAt;
+
+        $this->recordEvent(new IdentityVerified(
+            userId: $this->id,
+            documentFilename: $documentFilename,
+            documentContent: $document->getContent(),
+            selfieFilename: $selfieFilename,
+            selfieContent: $selfie->getContent(),
+        ));
     }
 }

@@ -19,6 +19,7 @@ final readonly class UpdateAccommodationCheckInOutProcessor implements Processor
     public function __construct(
         private UpdateAccommodationCheckInOut $updateAccommodationCheckInOut,
         private TransactionalUseCaseHandler $handler,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
@@ -26,8 +27,11 @@ final readonly class UpdateAccommodationCheckInOutProcessor implements Processor
     {
         \assert($data instanceof UpdateAccommodationCheckInOutInput);
 
+        $id = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($id);
+
         $this->handler->execute(fn () => $this->updateAccommodationCheckInOut->handle(new UpdateAccommodationCheckInOutCommand(
-            id: Uuid::fromString($uriVariables['id']),
+            id: $id,
             checkIn: $data->checkIn,
             checkOut: $data->checkOut,
         )));

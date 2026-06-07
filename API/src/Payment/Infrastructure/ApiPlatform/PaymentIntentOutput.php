@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             input: PaymentIntentInput::class,
             output: PaymentIntentOutput::class,
             processor: CreatePaymentIntentProcessor::class,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
             read: false,
         ),
     ],

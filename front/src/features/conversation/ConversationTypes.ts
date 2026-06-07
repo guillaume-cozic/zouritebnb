@@ -19,6 +19,5 @@ export interface Conversation {
 
 export interface SendMessagePayload {
   conversationId: string;
-  authorUserId: string;
   body: string;
 }

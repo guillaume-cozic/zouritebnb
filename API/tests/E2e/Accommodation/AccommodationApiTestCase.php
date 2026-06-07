@@ -8,14 +8,22 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Accommodation\Infrastructure\Doctrine\AccommodationEntity;
 use App\Accommodation\Infrastructure\Doctrine\GalleryEntity;
 use App\Accommodation\Infrastructure\Doctrine\PhotoEntity;
+use App\Tests\E2e\AuthenticatedClientTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
 abstract class AccommodationApiTestCase extends ApiTestCase
 {
+    use AuthenticatedClientTrait;
+
     protected static ?bool $alwaysBootKernel = true;
 
-    protected function insertAccommodation(string $title, string $description, float $price, string $status = 'draft'): string
+    /**
+     * Team UUID used by default for the authenticated host and the accommodations they own.
+     */
+    protected const OWNER_TEAM_ID = '019cf27a-96ba-7957-8622-eeccb7350e79';
+
+    protected function insertAccommodation(string $title, string $description, float $price, string $status = 'draft', ?string $teamId = self::OWNER_TEAM_ID): string
     {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine.orm.entity_manager');
@@ -25,12 +33,26 @@ abstract class AccommodationApiTestCase extends ApiTestCase
             ->setTitle($title)
             ->setDescription($description)
             ->setPrice($price)
-            ->setStatus($status);
+            ->setStatus($status)
+            ->setTeamId(null === $teamId ? null : Uuid::fromString($teamId));
 
         $em->persist($entity);
         $em->flush();
 
         return $entity->getId()->toRfc4122();
+    }
+
+    /**
+     * Persists the authenticated host user (member of OWNER_TEAM_ID) and returns the
+     * Authorization header to act as the owner of accommodations created via insertAccommodation().
+     *
+     * @return array{Authorization: string}
+     */
+    protected function authenticatedOwnerHeaders(string $email = 'owner@example.com'): array
+    {
+        $this->createAuthUser(email: $email, teamId: self::OWNER_TEAM_ID);
+
+        return $this->authHeaders($email);
     }
 
     protected function insertPhoto(string $accommodationId, string $filename = 'photo.jpg', string $originalName = 'photo.jpg', string $mimeType = 'image/jpeg', int $size = 1024): string

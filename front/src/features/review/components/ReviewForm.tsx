@@ -68,7 +68,6 @@ const ReviewForm: React.FC<Props> = ({
           target: 'accommodation',
           reservationId,
           payload: {
-            authorUserId: user.id,
             accommodationId,
             rating,
             comment: comment.trim(),
@@ -82,7 +81,6 @@ const ReviewForm: React.FC<Props> = ({
           target: 'guest',
           reservationId,
           payload: {
-            authorUserId: user.id,
             accommodationId,
             guestUserId,
             rating,

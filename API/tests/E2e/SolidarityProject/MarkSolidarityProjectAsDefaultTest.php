@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\Tests\E2e\SolidarityProject;
 
+use App\Tests\E2e\AuthenticatedClientTrait;
+
 final class MarkSolidarityProjectAsDefaultTest extends SolidarityProjectApiTestCase
 {
+    use AuthenticatedClientTrait;
+
     public function test_should_mark_solidarity_project_as_default(): void
     {
+        $this->createAuthUser(email: 'host@example.com');
         $id = $this->insertSolidarityProject('Reforestation', 'Plant 10 000 trees', null, 'active');
 
         self::createClient()->request('PATCH', '/api/solidarity_projects/'.$id.'/mark-default', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'],
             'json' => [],
         ]);
 
@@ -28,6 +33,9 @@ final class MarkSolidarityProjectAsDefaultTest extends SolidarityProjectApiTestC
 
     public function test_should_unmark_the_previous_default_project(): void
     {
+        $this->createAuthUser(email: 'host@example.com');
+        $headers = $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'];
+
         $previousDefaultId = $this->insertSolidarityProject(
             'Ancien projet',
             'Projet par défaut historique',
@@ -37,7 +45,7 @@ final class MarkSolidarityProjectAsDefaultTest extends SolidarityProjectApiTestC
         );
 
         self::createClient()->request('PATCH', '/api/solidarity_projects/'.$previousDefaultId.'/mark-default', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $headers,
             'json' => [],
         ]);
         self::assertResponseStatusCodeSame(204);
@@ -51,7 +59,7 @@ final class MarkSolidarityProjectAsDefaultTest extends SolidarityProjectApiTestC
         );
 
         self::createClient()->request('PATCH', '/api/solidarity_projects/'.$newDefaultId.'/mark-default', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $headers,
             'json' => [],
         ]);
         self::assertResponseStatusCodeSame(204);
@@ -73,11 +81,43 @@ final class MarkSolidarityProjectAsDefaultTest extends SolidarityProjectApiTestC
 
     public function test_should_return422_when_project_does_not_exist(): void
     {
+        $this->createAuthUser(email: 'host@example.com');
+
         self::createClient()->request('PATCH', '/api/solidarity_projects/00000000-0000-0000-0000-000000000000/mark-default', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'],
             'json' => [],
         ]);
 
         self::assertResponseStatusCodeSame(422);
+    }
+
+    public function test_should_return401_when_not_authenticated(): void
+    {
+        $id = $this->insertSolidarityProject('Reforestation', 'Plant 10 000 trees', null, 'active');
+
+        self::createClient()->request('PATCH', '/api/solidarity_projects/'.$id.'/mark-default', [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [],
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function test_should_not_mark_as_default_when_not_authenticated(): void
+    {
+        $id = $this->insertSolidarityProject('Reforestation', 'Plant 10 000 trees', null, 'active');
+
+        self::createClient()->request('PATCH', '/api/solidarity_projects/'.$id.'/mark-default', [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [],
+        ]);
+        self::assertResponseStatusCodeSame(401);
+
+        self::createClient()->request('GET', '/api/solidarity_projects/'.$id);
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            'id' => $id,
+            'isDefault' => false,
+        ]);
     }
 }

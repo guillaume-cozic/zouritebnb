@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\User\Infrastructure\Doctrine;
 
+use App\User\Domain\Entity\IdentityDocumentType;
 use App\User\Domain\Entity\User as DomainUser;
+use App\User\Domain\Entity\VerificationStatus;
 use App\User\Domain\Port\UserRepository as UserRepositoryPort;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -42,7 +44,12 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
             ->setHashedPassword($user->getHashedPassword())
             ->setTeamId($user->getTeamId())
             ->setFirstName($user->getFirstName())
-            ->setLastName($user->getLastName());
+            ->setLastName($user->getLastName())
+            ->setVerificationStatus($user->getVerificationStatus()->value)
+            ->setIdentityDocumentId($user->getIdentityDocumentId())
+            ->setSelfieId($user->getSelfieId())
+            ->setDocumentType($user->getDocumentType()?->value)
+            ->setVerifiedAt($user->getVerifiedAt());
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -51,6 +58,8 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
 
     private function toDomain(UserEntity $entity): DomainUser
     {
+        $documentType = $entity->getDocumentType();
+
         $user = new DomainUser(
             id: $entity->getId(),
             email: (string) $entity->getEmail(),
@@ -58,6 +67,11 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
             teamId: $entity->getTeamId(),
             firstName: $entity->getFirstName(),
             lastName: $entity->getLastName(),
+            verificationStatus: VerificationStatus::from($entity->getVerificationStatus()),
+            identityDocumentId: $entity->getIdentityDocumentId(),
+            selfieId: $entity->getSelfieId(),
+            documentType: null !== $documentType ? IdentityDocumentType::from($documentType) : null,
+            verifiedAt: $entity->getVerifiedAt(),
         );
         $user->releaseEvents();
 

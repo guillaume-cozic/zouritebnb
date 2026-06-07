@@ -19,13 +19,17 @@ final readonly class UpdateAccommodationWeeklyPromotionProcessor implements Proc
     public function __construct(
         private UpdateAccommodationWeeklyPromotion $updateAccommodationWeeklyPromotion,
         private TransactionalUseCaseHandler $handler,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        $id = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($id);
+
         $this->handler->execute(fn () => $this->updateAccommodationWeeklyPromotion->handle(new UpdateAccommodationWeeklyPromotionCommand(
-            accommodationId: Uuid::fromString($uriVariables['id']),
+            accommodationId: $id,
             weeklyPromotionPercentage: $data->weeklyPromotionPercentage,
         )));
     }

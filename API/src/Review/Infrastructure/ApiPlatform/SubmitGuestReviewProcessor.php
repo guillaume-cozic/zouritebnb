@@ -9,10 +9,10 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Review\Application\UseCase\SubmitGuestReview;
 use App\Review\Domain\Command\SubmitGuestReviewCommand;
 use App\Shared\Domain\Port\TeamMembershipChecker;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -25,6 +25,7 @@ final readonly class SubmitGuestReviewProcessor implements ProcessorInterface
         private TeamMembershipChecker $teamMembershipChecker,
         private Connection $connection,
         private TransactionalUseCaseHandler $handler,
+        private CurrentUser $currentUser,
     ) {
     }
 
@@ -32,11 +33,7 @@ final readonly class SubmitGuestReviewProcessor implements ProcessorInterface
     {
         \assert($data instanceof SubmitGuestReviewInput);
 
-        if ('' === $data->authorUserId) {
-            throw new UnauthorizedHttpException('Bearer', 'Authentication is required to submit a review.');
-        }
-
-        $authorUserId = Uuid::fromString($data->authorUserId);
+        $authorUserId = $this->currentUser->id();
         $accommodationId = Uuid::fromString($data->accommodationId);
 
         $teamId = $this->teamOwningAccommodation($accommodationId);

@@ -8,12 +8,12 @@ use Symfony\Component\Uid\Uuid;
 
 final class RefuseReservationTest extends ReservationApiTestCase
 {
-    public function test_should_refuse_pending_reservation(): void
+    public function test_should_refuse_pending_reservation_as_host(): void
     {
         $id = $this->insertReservation(status: 'pending');
 
         self::createClient()->request('PATCH', '/api/reservations/'.$id.'/refuse', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/merge-patch+json'],
             'json' => new \ArrayObject(),
         ]);
 
@@ -24,12 +24,50 @@ final class RefuseReservationTest extends ReservationApiTestCase
         ]);
     }
 
+    public function test_should_return401_when_not_authenticated(): void
+    {
+        $id = $this->insertReservation(status: 'pending');
+
+        self::createClient()->request('PATCH', '/api/reservations/'.$id.'/refuse', [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => new \ArrayObject(),
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function test_should_return403_when_not_host_team(): void
+    {
+        $id = $this->insertReservation(status: 'pending');
+        $this->createAuthUser(email: 'other@example.com', teamId: Uuid::v7()->toRfc4122());
+
+        self::createClient()->request('PATCH', '/api/reservations/'.$id.'/refuse', [
+            'headers' => $this->authHeaders('other@example.com') + ['Content-Type' => 'application/merge-patch+json'],
+            'json' => new \ArrayObject(),
+        ]);
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    public function test_should_return403_when_guest_tries_to_refuse(): void
+    {
+        $guestUserId = $this->createAuthUser(email: 'guest@example.com', teamId: Uuid::v7()->toRfc4122());
+        $id = $this->insertReservation(teamId: Uuid::v7()->toRfc4122(), status: 'pending', guestUserId: $guestUserId);
+
+        self::createClient()->request('PATCH', '/api/reservations/'.$id.'/refuse', [
+            'headers' => $this->authHeaders('guest@example.com') + ['Content-Type' => 'application/merge-patch+json'],
+            'json' => new \ArrayObject(),
+        ]);
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function test_should_return422_when_already_confirmed(): void
     {
         $id = $this->insertReservation(status: 'confirmed');
 
         self::createClient()->request('PATCH', '/api/reservations/'.$id.'/refuse', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/merge-patch+json'],
             'json' => new \ArrayObject(),
         ]);
 
@@ -41,7 +79,7 @@ final class RefuseReservationTest extends ReservationApiTestCase
         $id = $this->insertReservation(status: 'cancelled');
 
         self::createClient()->request('PATCH', '/api/reservations/'.$id.'/refuse', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/merge-patch+json'],
             'json' => new \ArrayObject(),
         ]);
 
@@ -53,7 +91,7 @@ final class RefuseReservationTest extends ReservationApiTestCase
         $id = $this->insertReservation(status: 'refused');
 
         self::createClient()->request('PATCH', '/api/reservations/'.$id.'/refuse', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/merge-patch+json'],
             'json' => new \ArrayObject(),
         ]);
 
@@ -65,7 +103,7 @@ final class RefuseReservationTest extends ReservationApiTestCase
         $missing = Uuid::v7()->toRfc4122();
 
         self::createClient()->request('PATCH', '/api/reservations/'.$missing.'/refuse', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/merge-patch+json'],
             'json' => new \ArrayObject(),
         ]);
 

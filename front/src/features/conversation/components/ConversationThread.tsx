@@ -110,7 +110,6 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
     const result = await dispatch(
       sendMessage({
         conversationId: conversation.id,
-        authorUserId: currentUserId,
         body: trimmed,
       })
     );

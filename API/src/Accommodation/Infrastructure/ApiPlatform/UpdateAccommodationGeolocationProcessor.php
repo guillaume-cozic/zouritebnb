@@ -19,13 +19,17 @@ final readonly class UpdateAccommodationGeolocationProcessor implements Processo
     public function __construct(
         private UpdateAccommodationGeolocation $updateAccommodationGeolocation,
         private TransactionalUseCaseHandler $handler,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        $id = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($id);
+
         $this->handler->execute(fn () => $this->updateAccommodationGeolocation->handle(new UpdateAccommodationGeolocationCommand(
-            id: Uuid::fromString($uriVariables['id']),
+            id: $id,
             latitude: $data->latitude,
             longitude: $data->longitude,
         )));

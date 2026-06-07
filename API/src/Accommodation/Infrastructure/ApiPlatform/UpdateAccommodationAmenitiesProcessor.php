@@ -19,13 +19,17 @@ final readonly class UpdateAccommodationAmenitiesProcessor implements ProcessorI
     public function __construct(
         private UpdateAccommodationAmenities $updateAccommodationAmenities,
         private TransactionalUseCaseHandler $handler,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        $id = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($id);
+
         $this->handler->execute(fn () => $this->updateAccommodationAmenities->handle(new UpdateAccommodationAmenitiesCommand(
-            id: Uuid::fromString($uriVariables['id']),
+            id: $id,
             codes: $data->codes ?? [],
         )));
     }

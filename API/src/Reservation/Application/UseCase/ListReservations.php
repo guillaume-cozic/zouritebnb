@@ -19,10 +19,11 @@ final readonly class ListReservations
      */
     public function handle(
         Uuid $teamId,
+        Uuid $guestUserId,
         ?Uuid $accommodationId = null,
         ?\DateTimeImmutable $from = null,
         ?\DateTimeImmutable $to = null,
     ): array {
-        return $this->repository->list($teamId, $accommodationId, $from, $to);
+        return $this->repository->list($teamId, $guestUserId, $accommodationId, $from, $to);
     }
 }

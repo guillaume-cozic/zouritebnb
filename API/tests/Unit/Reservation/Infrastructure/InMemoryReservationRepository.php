@@ -26,13 +26,16 @@ final class InMemoryReservationRepository implements ReservationRepository
 
     public function list(
         Uuid $teamId,
+        Uuid $guestUserId,
         ?Uuid $accommodationId,
         ?\DateTimeImmutable $from,
         ?\DateTimeImmutable $to,
     ): array {
         $result = [];
         foreach ($this->reservations as $reservation) {
-            if (!$reservation->getTeamId()->equals($teamId)) {
+            $isTeamHost = $reservation->getTeamId()->equals($teamId);
+            $isGuest = null !== $reservation->getGuestUserId() && $reservation->getGuestUserId()->equals($guestUserId);
+            if (!$isTeamHost && !$isGuest) {
                 continue;
             }
             if (null !== $accommodationId && !$reservation->getAccommodationId()->equals($accommodationId)) {

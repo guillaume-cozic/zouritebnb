@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\E2e\User;
 
-use Symfony\Component\Uid\Uuid;
-
 final class UpdateUserProfileTest extends UserApiTestCase
 {
     public function test_should_update_user_profile(): void
     {
         $id = $this->insertUser(email: 'host@example.com', plainPassword: 'supersecret');
 
-        self::createClient()->request('PATCH', '/api/users/'.$id.'/profile', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+        self::createClient()->request('PATCH', '/api/users/profile', [
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
                 'firstName' => 'Marie',
                 'lastName' => 'Dupont',
@@ -40,9 +38,11 @@ final class UpdateUserProfileTest extends UserApiTestCase
         ]);
     }
 
-    public function test_should_return422_when_user_does_not_exist(): void
+    public function test_should_return401_when_not_authenticated(): void
     {
-        self::createClient()->request('PATCH', '/api/users/'.Uuid::v7()->toRfc4122().'/profile', [
+        $this->insertUser(email: 'host@example.com');
+
+        self::createClient()->request('PATCH', '/api/users/profile', [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
                 'firstName' => 'Marie',
@@ -51,16 +51,16 @@ final class UpdateUserProfileTest extends UserApiTestCase
             ],
         ]);
 
-        self::assertResponseStatusCodeSame(422);
+        self::assertResponseStatusCodeSame(401);
     }
 
     public function test_should_return422_when_email_is_already_taken_by_another_user(): void
     {
         $this->insertUser(email: 'taken@example.com');
-        $id = $this->insertUser(email: 'host@example.com');
+        $this->insertUser(email: 'host@example.com');
 
-        self::createClient()->request('PATCH', '/api/users/'.$id.'/profile', [
-            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+        self::createClient()->request('PATCH', '/api/users/profile', [
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
                 'firstName' => 'Marie',
                 'lastName' => 'Dupont',

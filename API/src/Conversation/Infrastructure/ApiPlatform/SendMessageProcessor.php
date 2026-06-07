@@ -11,6 +11,7 @@ use App\Conversation\Domain\Command\SendMessageCommand;
 use App\Conversation\Domain\Entity\Conversation;
 use App\Conversation\Domain\Entity\ConversationId;
 use App\Conversation\Domain\Port\ConversationRepository;
+use App\Shared\Infrastructure\Security\CurrentUser;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use Symfony\Component\Uid\Uuid;
 
@@ -23,6 +24,7 @@ final readonly class SendMessageProcessor implements ProcessorInterface
         private SendMessage $sendMessage,
         private ConversationRepository $repository,
         private TransactionalUseCaseHandler $handler,
+        private CurrentUser $currentUser,
     ) {
     }
 
@@ -31,11 +33,12 @@ final readonly class SendMessageProcessor implements ProcessorInterface
         \assert($data instanceof SendMessageInput);
 
         $conversationId = (string) $uriVariables['id'];
+        $authorUserId = $this->currentUser->id()->toRfc4122();
 
         /** @var string $messageId */
         $messageId = $this->handler->execute(fn () => $this->sendMessage->handle(new SendMessageCommand(
             conversationId: $conversationId,
-            authorUserId: $data->authorUserId,
+            authorUserId: $authorUserId,
             body: $data->body,
         )));
 

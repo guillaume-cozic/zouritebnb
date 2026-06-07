@@ -15,10 +15,6 @@ final readonly class RequestReservationInput
         public string $accommodationId = '',
 
         #[Groups(['reservation:write'])]
-        #[ApiProperty(description: 'Identifiant UUID de l\'utilisateur (loueur) qui effectue la demande', example: '01961e2f-dead-7000-beef-0000000000c1')]
-        public string $guestUserId = '',
-
-        #[Groups(['reservation:write'])]
         #[ApiProperty(description: 'Date et heure d\'arrivée au format ISO 8601', example: '2026-05-01T15:00:00+00:00')]
         public string $checkIn = '',
 

@@ -10,7 +10,7 @@ import {
 } from '../ReservationSelectors';
 import { fetchConversationsForTeam } from '../../conversation/ConversationSlice';
 import { selectConversations } from '../../conversation/ConversationSelectors';
-import { selectAuthTeamId } from '../../auth/AuthSelectors';
+import { selectIsAuthenticated } from '../../auth/AuthSelectors';
 import { Reservation, ReservationStatus } from '../ReservationTypes';
 import { isStayCompleted } from '../../review/reviewEligibility';
 import { selectSubmittedReviews } from '../../review/ReviewSelectors';
@@ -43,7 +43,7 @@ const formatDate = (iso: string, locale: string): string =>
 const AdminReservationsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
-  const teamId = useAppSelector(selectAuthTeamId);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const reservations = useAppSelector(selectReservations);
   const status = useAppSelector(selectReservationsStatus);
   const error = useAppSelector(selectReservationsError);
@@ -65,10 +65,10 @@ const AdminReservationsPage: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchReservations({}));
-    if (teamId) {
-      dispatch(fetchConversationsForTeam(teamId));
+    if (isAuthenticated) {
+      dispatch(fetchConversationsForTeam());
     }
-  }, [dispatch, teamId]);
+  }, [dispatch, isAuthenticated]);
 
   const conversationByReservation = useMemo(() => {
     const map = new Map<string, string>();

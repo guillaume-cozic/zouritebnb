@@ -22,11 +22,15 @@ final readonly class UploadAccommodationPhotoProcessor implements ProcessorInter
         private UploadAccommodationPhoto $uploadAccommodationPhoto,
         private TransactionalUseCaseHandler $handler,
         private RequestStack $requestStack,
+        private AccommodationOwnershipGuard $ownershipGuard,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
+        $accommodationId = Uuid::fromString($uriVariables['id']);
+        $this->ownershipGuard->assertOwnedByCurrentUser($accommodationId);
+
         $request = $this->requestStack->getCurrentRequest();
         $file = $request->files->get('file');
 
@@ -35,7 +39,7 @@ final readonly class UploadAccommodationPhotoProcessor implements ProcessorInter
         }
 
         $this->handler->execute(fn () => $this->uploadAccommodationPhoto->handle(new UploadAccommodationPhotoCommand(
-            accommodationId: Uuid::fromString($uriVariables['id']),
+            accommodationId: $accommodationId,
             content: $file->getContent(),
             originalName: $file->getClientOriginalName(),
             mimeType: $file->getClientMimeType() ?? '',

@@ -21,18 +21,20 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/conversations/{id}',
             openapi: new OpenApiOperation(
                 summary: 'Récupérer une conversation et ses messages',
-                description: 'Retourne la conversation, ses participants et l\'ensemble de ses messages (système et utilisateurs), triés par date d\'envoi. 404 si introuvable.',
+                description: 'Retourne la conversation, ses participants et l\'ensemble de ses messages (système et utilisateurs), triés par date d\'envoi. Authentification requise (401 sinon). Réservé aux participants : le loueur concerné ou un membre de l\'équipe hôte (403 sinon). 404 si introuvable.',
             ),
             normalizationContext: ['groups' => ['conversation:read']],
+            security: 'is_authenticated()',
             provider: ConversationItemProvider::class,
         ),
         new GetCollection(
             uriTemplate: '/conversations',
             openapi: new OpenApiOperation(
-                summary: 'Lister les conversations accessibles à un utilisateur',
-                description: 'Retourne les conversations où l\'utilisateur est soit le loueur, soit membre de l\'équipe hôte. Filtre obligatoire : `userId` (UUID).',
+                summary: 'Lister mes conversations',
+                description: 'Retourne les conversations de l\'utilisateur authentifié : celles où il est le loueur ou membre de l\'équipe hôte. L\'identité est déduite du token JWT (aucun filtre `userId`/`teamId` n\'est accepté). Authentification requise (401 sinon).',
             ),
             normalizationContext: ['groups' => ['conversation:read']],
+            security: 'is_authenticated()',
             provider: ConversationCollectionProvider::class,
         ),
         new Post(
@@ -40,10 +42,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
             status: 201,
             openapi: new OpenApiOperation(
                 summary: 'Envoyer un message dans une conversation',
-                description: 'Ajoute un nouveau message à une conversation existante. L\'auteur doit être soit le loueur, soit un membre de l\'équipe hôte. Retourne 404 si la conversation est introuvable, 422 si l\'auteur n\'est pas participant.',
+                description: 'Ajoute un nouveau message à une conversation existante. L\'auteur est l\'utilisateur authentifié, qui doit être soit le loueur, soit un membre de l\'équipe hôte. Authentification requise (401 sinon). Retourne 422 si la conversation est introuvable ou si l\'auteur n\'est pas participant.',
             ),
             denormalizationContext: ['groups' => ['conversation:write']],
             normalizationContext: ['groups' => ['conversation:read']],
+            security: 'is_authenticated()',
             input: SendMessageInput::class,
             output: MessageOutput::class,
             processor: SendMessageProcessor::class,

@@ -15,10 +15,14 @@ interface ReservationRepository
     public function ofId(ReservationId $id): ?Reservation;
 
     /**
+     * Lists the reservations visible to a user: those belonging to the user's team
+     * (as host) or those where the user is the guest.
+     *
      * @return Reservation[]
      */
     public function list(
         Uuid $teamId,
+        Uuid $guestUserId,
         ?Uuid $accommodationId,
         ?\DateTimeImmutable $from,
         ?\DateTimeImmutable $to,

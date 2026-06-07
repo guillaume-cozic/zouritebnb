@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
                 description: 'Retourne la liste des invitations de co-hôtes en statut "pending" pour l\'équipe.',
             ),
             normalizationContext: ['groups' => ['team_invitation:read']],
+            security: 'is_authenticated()',
             provider: TeamInvitationCollectionProvider::class,
         ),
         new Post(
@@ -54,6 +55,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             ),
             denormalizationContext: ['groups' => ['team:write']],
             normalizationContext: ['groups' => ['team_invitation:read']],
+            security: 'is_authenticated()',
             input: InviteCoHostInput::class,
             processor: InviteCoHostProcessor::class,
         ),
@@ -63,8 +65,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
             read: false,
             openapi: new OpenApiOperation(
                 summary: 'Annuler une invitation de co-hôte',
-                description: 'Annule une invitation en attente. Retourne une erreur 422 si l\'invitation est introuvable ou déjà finalisée (acceptée ou annulée).',
+                description: 'Annule une invitation en attente. Retourne une erreur 422 si l\'invitation est introuvable ou déjà finalisée (acceptée ou annulée). Réservé aux membres de l\'équipe propriétaire de l\'invitation.',
             ),
+            security: 'is_authenticated()',
             output: false,
             processor: CancelTeamInvitationProcessor::class,
         ),

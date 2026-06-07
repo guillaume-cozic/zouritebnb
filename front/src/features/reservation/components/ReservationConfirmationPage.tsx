@@ -131,7 +131,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
     const reservationResult = await dispatch(
       requestReservation({
         accommodationId,
-        guestUserId: user.id,
         checkIn: toApiDateTime(checkInDate, checkInTime),
         checkOut: toApiDateTime(checkOutDate, checkOutTime),
         guestName: guestName.trim(),

@@ -7,8 +7,7 @@ namespace App\Conversation\Infrastructure\ApiPlatform;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Conversation\Application\UseCase\ListConversations;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Uid\Uuid;
+use App\Shared\Infrastructure\Security\CurrentUser;
 
 /**
  * @implements ProviderInterface<ConversationOutput>
@@ -17,23 +16,16 @@ final readonly class ConversationCollectionProvider implements ProviderInterface
 {
     public function __construct(
         private ListConversations $listConversations,
-        private RequestStack $requestStack,
+        private CurrentUser $currentUser,
     ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $userIdParam = $request?->query->get('userId');
-        $teamIdParam = $request?->query->get('teamId');
-
-        if (\is_string($teamIdParam) && '' !== $teamIdParam) {
-            $conversations = $this->listConversations->forTeam(Uuid::fromString($teamIdParam));
-        } elseif (\is_string($userIdParam) && '' !== $userIdParam) {
-            $conversations = $this->listConversations->forUser(Uuid::fromString($userIdParam));
-        } else {
-            return [];
-        }
+        // The identity is always derived from the authenticated user, never from a
+        // client-supplied userId/teamId. The use case returns every conversation where
+        // the user is either the guest or a member of the host team.
+        $conversations = $this->listConversations->forUser($this->currentUser->id());
 
         return array_map(static fn ($c) => ConversationOutput::fromEntity($c), $conversations);
     }
