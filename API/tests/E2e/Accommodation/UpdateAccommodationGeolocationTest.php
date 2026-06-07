@@ -6,7 +6,7 @@ namespace App\Tests\E2e\Accommodation;
 
 final class UpdateAccommodationGeolocationTest extends AccommodationApiTestCase
 {
-    public function testShouldUpdateAccommodationGeolocation(): void
+    public function test_should_update_accommodation_geolocation(): void
     {
         $id = $this->insertAccommodation('Cozy Chalet', 'A warm mountain chalet', 150.0);
 
@@ -29,7 +29,7 @@ final class UpdateAccommodationGeolocationTest extends AccommodationApiTestCase
         ]);
     }
 
-    public function testShouldNotUpdateGeolocationWithUnknownAccommodation(): void
+    public function test_should_not_update_geolocation_with_unknown_accommodation(): void
     {
         self::createClient()->request('PUT', '/api/accommodations/01961e2f-dead-7000-beef-000000000099/geolocation', [
             'headers' => ['Content-Type' => 'application/ld+json'],

@@ -6,7 +6,7 @@ namespace App\Tests\E2e\SolidarityProject;
 
 final class GetSolidarityProjectItemTest extends SolidarityProjectApiTestCase
 {
-    public function testShouldGetSolidarityProject(): void
+    public function test_should_get_solidarity_project(): void
     {
         $id = $this->insertSolidarityProject(
             'Reforestation',
@@ -27,7 +27,7 @@ final class GetSolidarityProjectItemTest extends SolidarityProjectApiTestCase
         ]);
     }
 
-    public function testShouldGetClosedProjectById(): void
+    public function test_should_get_closed_project_by_id(): void
     {
         $id = $this->insertSolidarityProject('Old', 'desc', null, 'closed');
 
@@ -40,7 +40,7 @@ final class GetSolidarityProjectItemTest extends SolidarityProjectApiTestCase
         ]);
     }
 
-    public function testShouldReturn404WhenNotFound(): void
+    public function test_should_return404_when_not_found(): void
     {
         self::createClient()->request('GET', '/api/solidarity_projects/00000000-0000-0000-0000-000000000000');
 

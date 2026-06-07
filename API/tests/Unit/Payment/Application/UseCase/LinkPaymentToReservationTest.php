@@ -30,7 +30,7 @@ final class LinkPaymentToReservationTest extends TestCase
         $this->useCase = new LinkPaymentToReservation($this->repository, $this->eventBus);
     }
 
-    public function testShouldLinkReservationIdToExistingPayment(): void
+    public function test_should_link_reservation_id_to_existing_payment(): void
     {
         $payment = new Payment(
             id: Uuid::v7(),
@@ -55,7 +55,7 @@ final class LinkPaymentToReservationTest extends TestCase
         self::assertInstanceOf(PaymentLinkedToReservation::class, $events[0]);
     }
 
-    public function testShouldThrowWhenPaymentIntentIdUnknown(): void
+    public function test_should_throw_when_payment_intent_id_unknown(): void
     {
         $this->expectException(PaymentNotFoundException::class);
         $this->useCase->handle(new LinkPaymentToReservationCommand('pi_test_missing', Uuid::v7()));

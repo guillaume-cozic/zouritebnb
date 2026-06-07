@@ -11,7 +11,7 @@ use Symfony\Component\Uid\Uuid;
 
 final class GalleryTest extends TestCase
 {
-    public function testShouldAddPhoto(): void
+    public function test_should_add_photo(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $photoId = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
@@ -23,7 +23,7 @@ final class GalleryTest extends TestCase
         self::assertTrue($photoId->equals($gallery->photoIds()[0]));
     }
 
-    public function testShouldRemovePhoto(): void
+    public function test_should_remove_photo(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $photoId1 = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
@@ -38,7 +38,7 @@ final class GalleryTest extends TestCase
         self::assertTrue($photoId2->equals($gallery->photoIds()[0]));
     }
 
-    public function testShouldReorderPhotos(): void
+    public function test_should_reorder_photos(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $photoId1 = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
@@ -53,7 +53,7 @@ final class GalleryTest extends TestCase
         self::assertTrue($photoId1->equals($gallery->photoIds()[1]));
     }
 
-    public function testShouldNotExceedMaxPhotos(): void
+    public function test_should_not_exceed_max_photos(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $gallery = new Gallery(accommodationId: $accommodationId);
@@ -68,7 +68,7 @@ final class GalleryTest extends TestCase
         $gallery->addPhoto(Uuid::fromString('01961e2f-dead-7000-beef-000000000199'));
     }
 
-    public function testShouldCountPhotos(): void
+    public function test_should_count_photos(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $gallery = new Gallery(accommodationId: $accommodationId);

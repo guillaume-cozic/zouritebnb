@@ -32,7 +32,7 @@ final class CancelPaymentForReservationTest extends TestCase
         $this->useCase = new CancelPaymentForReservation($this->repository, $this->gateway, $this->eventBus);
     }
 
-    public function testShouldCancelPendingPaymentViaGateway(): void
+    public function test_should_cancel_pending_payment_via_gateway(): void
     {
         $reservationId = Uuid::v7();
         $payment = new Payment(
@@ -55,7 +55,7 @@ final class CancelPaymentForReservationTest extends TestCase
         self::assertInstanceOf(PaymentCancelled::class, $events[0]);
     }
 
-    public function testShouldNoopWhenNoPaymentForReservation(): void
+    public function test_should_noop_when_no_payment_for_reservation(): void
     {
         $this->useCase->handle(new CancelPaymentForReservationCommand(Uuid::v7()));
 
@@ -63,7 +63,7 @@ final class CancelPaymentForReservationTest extends TestCase
         self::assertSame([], $this->eventBus->getDispatchedEvents());
     }
 
-    public function testShouldNoopWhenPaymentAlreadyCaptured(): void
+    public function test_should_noop_when_payment_already_captured(): void
     {
         $reservationId = Uuid::v7();
         $payment = new Payment(

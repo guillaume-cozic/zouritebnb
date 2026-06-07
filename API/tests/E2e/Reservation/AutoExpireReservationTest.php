@@ -51,7 +51,7 @@ final class AutoExpireReservationTest extends ReservationApiTestCase
         return $id->toRfc4122();
     }
 
-    public function testShouldKeepReservationPendingImmediatelyAfterRequest(): void
+    public function test_should_keep_reservation_pending_immediately_after_request(): void
     {
         $accommodationId = $this->insertAccommodation();
         $guestUserId = $this->insertUser(teamId: Uuid::v7());
@@ -71,7 +71,7 @@ final class AutoExpireReservationTest extends ReservationApiTestCase
         self::assertJsonContains(['status' => 'pending']);
     }
 
-    public function testShouldAutoRefuseAndPostSystemMessageWhenTimeoutElapsed(): void
+    public function test_should_auto_refuse_and_post_system_message_when_timeout_elapsed(): void
     {
         $accommodationId = $this->insertAccommodation();
         $guestUserId = $this->insertUser(teamId: Uuid::v7());
@@ -111,7 +111,7 @@ final class AutoExpireReservationTest extends ReservationApiTestCase
         self::assertStringContainsString('24h', $messages[1]['body']);
     }
 
-    public function testShouldNotAutoRefuseWhenHostAlreadyConfirmed(): void
+    public function test_should_not_auto_refuse_when_host_already_confirmed(): void
     {
         $accommodationId = $this->insertAccommodation();
         $guestUserId = $this->insertUser(teamId: Uuid::v7());
@@ -145,7 +145,7 @@ final class AutoExpireReservationTest extends ReservationApiTestCase
         self::assertJsonContains(['status' => 'confirmed']);
     }
 
-    public function testManualRefusePostsSystemMessageInConversation(): void
+    public function test_manual_refuse_posts_system_message_in_conversation(): void
     {
         $accommodationId = $this->insertAccommodation();
         $guestUserId = $this->insertUser(teamId: Uuid::v7());

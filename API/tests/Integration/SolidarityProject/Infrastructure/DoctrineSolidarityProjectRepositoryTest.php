@@ -20,7 +20,7 @@ final class DoctrineSolidarityProjectRepositoryTest extends RepositoryTestCase
         $this->repository = self::getContainer()->get(SolidarityProjectRepository::class);
     }
 
-    public function testShouldSaveAndFindById(): void
+    public function test_should_save_and_find_by_id(): void
     {
         $id = Uuid::v7();
         $createdAt = new \DateTimeImmutable('2026-04-01T10:00:00+00:00');
@@ -45,14 +45,14 @@ final class DoctrineSolidarityProjectRepositoryTest extends RepositoryTestCase
         self::assertEquals($createdAt, $found->getCreatedAt());
     }
 
-    public function testShouldReturnNullWhenNotFound(): void
+    public function test_should_return_null_when_not_found(): void
     {
         $result = $this->repository->findById(Uuid::v4());
 
         self::assertNull($result);
     }
 
-    public function testShouldUpdateExistingEntity(): void
+    public function test_should_update_existing_entity(): void
     {
         $id = Uuid::v7();
         $this->repository->save(new SolidarityProject(
@@ -79,7 +79,7 @@ final class DoctrineSolidarityProjectRepositoryTest extends RepositoryTestCase
         self::assertSame('closed', $found->getStatus());
     }
 
-    public function testShouldFindAllActiveProjectsOrderedByCreatedAtDesc(): void
+    public function test_should_find_all_active_projects_ordered_by_created_at_desc(): void
     {
         $older = new SolidarityProject(
             id: Uuid::v7(),

@@ -14,7 +14,7 @@ use Symfony\Component\Uid\Uuid;
 
 final class StorePhotoOnPhotoUploadedTest extends TestCase
 {
-    public function testShouldTransformStoreAndPersistPhoto(): void
+    public function test_should_transform_store_and_persist_photo(): void
     {
         $photoRepository = new InMemoryPhotoRepository();
         $photoStorage = new InMemoryPhotoStorage();

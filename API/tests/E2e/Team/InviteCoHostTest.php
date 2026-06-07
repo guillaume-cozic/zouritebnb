@@ -13,7 +13,7 @@ final class InviteCoHostTest extends ApiTestCase
 {
     protected static ?bool $alwaysBootKernel = true;
 
-    public function testShouldCreateInvitationAndReturn201(): void
+    public function test_should_create_invitation_and_return201(): void
     {
         $teamId = Uuid::v7()->toRfc4122();
 
@@ -29,7 +29,7 @@ final class InviteCoHostTest extends ApiTestCase
         ]);
     }
 
-    public function testShouldReturn422WhenEmailIsInvalid(): void
+    public function test_should_return422_when_email_is_invalid(): void
     {
         $teamId = Uuid::v7()->toRfc4122();
 
@@ -41,7 +41,7 @@ final class InviteCoHostTest extends ApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn422WhenEmailIsEmpty(): void
+    public function test_should_return422_when_email_is_empty(): void
     {
         $teamId = Uuid::v7()->toRfc4122();
 
@@ -53,7 +53,7 @@ final class InviteCoHostTest extends ApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldListPendingInvitations(): void
+    public function test_should_list_pending_invitations(): void
     {
         $teamId = Uuid::v7();
 

@@ -13,7 +13,7 @@ final class CancelTeamInvitationTest extends ApiTestCase
 {
     protected static ?bool $alwaysBootKernel = true;
 
-    public function testShouldCancelPendingInvitationAndReturn204(): void
+    public function test_should_cancel_pending_invitation_and_return204(): void
     {
         $invitationId = Uuid::v7();
         $teamId = Uuid::v7();
@@ -36,7 +36,7 @@ final class CancelTeamInvitationTest extends ApiTestCase
         self::assertResponseStatusCodeSame(204);
     }
 
-    public function testShouldReturn422WhenInvitationAlreadyCancelled(): void
+    public function test_should_return422_when_invitation_already_cancelled(): void
     {
         $invitationId = Uuid::v7();
         $teamId = Uuid::v7();
@@ -59,7 +59,7 @@ final class CancelTeamInvitationTest extends ApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn422WhenInvitationDoesNotExist(): void
+    public function test_should_return422_when_invitation_does_not_exist(): void
     {
         $invitationId = Uuid::v7();
 

@@ -30,7 +30,7 @@ final class CreateReservationTest extends ReservationApiTestCase
         return $id->toRfc4122();
     }
 
-    public function testShouldCreateReservation(): void
+    public function test_should_create_reservation(): void
     {
         $accommodationId = $this->insertAccommodation(100.0);
 
@@ -53,7 +53,7 @@ final class CreateReservationTest extends ReservationApiTestCase
         ]);
     }
 
-    public function testShouldApplyWeeklyPromotionForStayOfSevenNightsOrMore(): void
+    public function test_should_apply_weekly_promotion_for_stay_of_seven_nights_or_more(): void
     {
         $accommodationId = $this->insertAccommodation(100.0, 20.0);
 
@@ -75,7 +75,7 @@ final class CreateReservationTest extends ReservationApiTestCase
         ]);
     }
 
-    public function testShouldReturn422WhenCheckOutIsBeforeCheckIn(): void
+    public function test_should_return422_when_check_out_is_before_check_in(): void
     {
         $accommodationId = $this->insertAccommodation();
 
@@ -92,7 +92,7 @@ final class CreateReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn422WhenGuestNameIsEmpty(): void
+    public function test_should_return422_when_guest_name_is_empty(): void
     {
         $accommodationId = $this->insertAccommodation();
 
@@ -109,7 +109,7 @@ final class CreateReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn422WhenAccommodationDoesNotExist(): void
+    public function test_should_return422_when_accommodation_does_not_exist(): void
     {
         self::createClient()->request('POST', '/api/reservations', [
             'headers' => ['Content-Type' => 'application/ld+json'],

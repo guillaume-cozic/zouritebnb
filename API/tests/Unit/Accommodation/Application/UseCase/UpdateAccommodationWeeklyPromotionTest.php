@@ -30,7 +30,7 @@ final class UpdateAccommodationWeeklyPromotionTest extends TestCase
         $this->useCase = new UpdateAccommodationWeeklyPromotion($this->repository, $this->eventBus);
     }
 
-    public function testShouldUpdateWeeklyPromotion(): void
+    public function test_should_update_weekly_promotion(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -41,7 +41,7 @@ final class UpdateAccommodationWeeklyPromotionTest extends TestCase
         self::assertSame(15.0, $accommodation->getWeeklyPromotionPercentage());
     }
 
-    public function testShouldDisablePromotionWithNull(): void
+    public function test_should_disable_promotion_with_null(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -53,7 +53,7 @@ final class UpdateAccommodationWeeklyPromotionTest extends TestCase
         self::assertNull($accommodation->getWeeklyPromotionPercentage());
     }
 
-    public function testShouldDispatchWeeklyPromotionUpdatedEvent(): void
+    public function test_should_dispatch_weekly_promotion_updated_event(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -67,7 +67,7 @@ final class UpdateAccommodationWeeklyPromotionTest extends TestCase
         self::assertSame(10.0, $events[0]->weeklyPromotionPercentage);
     }
 
-    public function testShouldNotUpdatePromotionWithUnknownAccommodation(): void
+    public function test_should_not_update_promotion_with_unknown_accommodation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');
 
@@ -76,7 +76,7 @@ final class UpdateAccommodationWeeklyPromotionTest extends TestCase
         $this->useCase->handle(new UpdateAccommodationWeeklyPromotionCommand(accommodationId: $id, weeklyPromotionPercentage: 10.0));
     }
 
-    public function testShouldRejectZeroOrNegative(): void
+    public function test_should_reject_zero_or_negative(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -86,7 +86,7 @@ final class UpdateAccommodationWeeklyPromotionTest extends TestCase
         $this->useCase->handle(new UpdateAccommodationWeeklyPromotionCommand(accommodationId: $id, weeklyPromotionPercentage: 0.0));
     }
 
-    public function testShouldRejectAboveHundred(): void
+    public function test_should_reject_above_hundred(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));

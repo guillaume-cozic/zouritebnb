@@ -30,7 +30,7 @@ final class RequestReservationTest extends ReservationApiTestCase
         return $id->toRfc4122();
     }
 
-    public function testShouldRequestReservationAsPending(): void
+    public function test_should_request_reservation_as_pending(): void
     {
         $teamId = Uuid::fromString(self::DEFAULT_TEAM_UUID);
         $accommodationId = $this->insertAccommodation($teamId, 100.0);
@@ -58,7 +58,7 @@ final class RequestReservationTest extends ReservationApiTestCase
         ]);
     }
 
-    public function testShouldReturn422WhenAccommodationDoesNotExist(): void
+    public function test_should_return422_when_accommodation_does_not_exist(): void
     {
         self::createClient()->request('POST', '/api/reservations/request', [
             'headers' => ['Content-Type' => 'application/ld+json'],
@@ -74,7 +74,7 @@ final class RequestReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn422WhenCheckOutBeforeCheckIn(): void
+    public function test_should_return422_when_check_out_before_check_in(): void
     {
         $accommodationId = $this->insertAccommodation();
 
@@ -92,7 +92,7 @@ final class RequestReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn422WhenGuestNameIsEmpty(): void
+    public function test_should_return422_when_guest_name_is_empty(): void
     {
         $accommodationId = $this->insertAccommodation();
 

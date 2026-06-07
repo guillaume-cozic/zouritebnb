@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class UploadAccommodationPhotoTest extends AccommodationApiTestCase
 {
-    public function testShouldUploadPhoto(): void
+    public function test_should_upload_photo(): void
     {
         $id = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
 
@@ -25,7 +25,7 @@ final class UploadAccommodationPhotoTest extends AccommodationApiTestCase
         self::assertResponseStatusCodeSame(201);
     }
 
-    public function testShouldNotUploadWhenAccommodationNotFound(): void
+    public function test_should_not_upload_when_accommodation_not_found(): void
     {
         $tmpFile = $this->createTempImage();
         $uploadedFile = new UploadedFile($tmpFile, 'test.jpg', 'image/jpeg', test: true);
@@ -40,7 +40,7 @@ final class UploadAccommodationPhotoTest extends AccommodationApiTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
-    public function testShouldNotUploadWithInvalidMimeType(): void
+    public function test_should_not_upload_with_invalid_mime_type(): void
     {
         $id = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
 
@@ -58,7 +58,7 @@ final class UploadAccommodationPhotoTest extends AccommodationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldNotUploadWithoutFile(): void
+    public function test_should_not_upload_without_file(): void
     {
         $id = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
 

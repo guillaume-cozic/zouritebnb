@@ -17,6 +17,9 @@ RUN docker-php-ext-install zip
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install gd
 
+# Code coverage driver (dev/test only)
+RUN pecl install pcov && docker-php-ext-enable pcov
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 RUN useradd -ms /bin/bash app

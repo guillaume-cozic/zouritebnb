@@ -11,7 +11,7 @@ use Symfony\Component\Uid\Uuid;
 
 final class SolidarityProjectTest extends TestCase
 {
-    public function testShouldCreateAValidSolidarityProject(): void
+    public function test_should_create_a_valid_solidarity_project(): void
     {
         $id = Uuid::v7();
         $createdAt = new \DateTimeImmutable('2026-04-13T10:00:00+00:00');
@@ -33,7 +33,7 @@ final class SolidarityProjectTest extends TestCase
         self::assertSame($createdAt, $project->getCreatedAt());
     }
 
-    public function testShouldAcceptNullImageUrl(): void
+    public function test_should_accept_null_image_url(): void
     {
         $project = new SolidarityProject(
             id: Uuid::v7(),
@@ -47,7 +47,7 @@ final class SolidarityProjectTest extends TestCase
         self::assertSame('closed', $project->getStatus());
     }
 
-    public function testShouldAutoSetCreatedAtOnConstruction(): void
+    public function test_should_auto_set_created_at_on_construction(): void
     {
         $before = new \DateTimeImmutable();
         $project = new SolidarityProject(
@@ -63,7 +63,7 @@ final class SolidarityProjectTest extends TestCase
         self::assertLessThanOrEqual($after, $project->getCreatedAt());
     }
 
-    public function testShouldTrimTitleAndDescription(): void
+    public function test_should_trim_title_and_description(): void
     {
         $project = new SolidarityProject(
             id: Uuid::v7(),
@@ -78,7 +78,7 @@ final class SolidarityProjectTest extends TestCase
         self::assertSame('https://example.com/img.jpg', $project->getImageUrl());
     }
 
-    public function testShouldThrowWhenTitleIsBlank(): void
+    public function test_should_throw_when_title_is_blank(): void
     {
         $this->expectException(InvalidSolidarityProjectException::class);
 
@@ -91,7 +91,7 @@ final class SolidarityProjectTest extends TestCase
         );
     }
 
-    public function testShouldThrowWhenDescriptionIsBlank(): void
+    public function test_should_throw_when_description_is_blank(): void
     {
         $this->expectException(InvalidSolidarityProjectException::class);
 
@@ -104,7 +104,7 @@ final class SolidarityProjectTest extends TestCase
         );
     }
 
-    public function testShouldThrowWhenStatusIsInvalid(): void
+    public function test_should_throw_when_status_is_invalid(): void
     {
         $this->expectException(InvalidSolidarityProjectException::class);
 
@@ -117,7 +117,7 @@ final class SolidarityProjectTest extends TestCase
         );
     }
 
-    public function testShouldThrowWhenImageUrlIsBlank(): void
+    public function test_should_throw_when_image_url_is_blank(): void
     {
         $this->expectException(InvalidSolidarityProjectException::class);
 

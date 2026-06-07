@@ -10,6 +10,7 @@ use App\Reservation\Domain\Entity\DateRange;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
+use App\Reservation\Domain\Entity\ReservationPrice;
 use App\Reservation\Domain\Entity\ReservationStatus;
 use App\Reservation\Domain\Exception\InvalidReservationStateException;
 use App\Reservation\Domain\Exception\ReservationNotFoundException;
@@ -43,13 +44,13 @@ final class CancelReservationTest extends TestCase
             dateRange: new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-05')),
             guestName: new GuestName('John'),
             status: $status,
-            price: new \App\Reservation\Domain\Entity\ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
+            price: new ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
         );
 
         $this->repository->save($reservation);
     }
 
-    public function testShouldCancelPendingReservation(): void
+    public function test_should_cancel_pending_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->givenReservation($id, ReservationStatus::Pending);
@@ -64,7 +65,7 @@ final class CancelReservationTest extends TestCase
         self::assertInstanceOf(ReservationCancelled::class, $events[0]);
     }
 
-    public function testShouldCancelConfirmedReservation(): void
+    public function test_should_cancel_confirmed_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000002');
         $this->givenReservation($id, ReservationStatus::Confirmed);
@@ -75,7 +76,7 @@ final class CancelReservationTest extends TestCase
         self::assertSame(ReservationStatus::Cancelled, $reservation->getStatus());
     }
 
-    public function testShouldNotCancelAlreadyCancelledReservation(): void
+    public function test_should_not_cancel_already_cancelled_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000003');
         $this->givenReservation($id, ReservationStatus::Cancelled);
@@ -86,7 +87,7 @@ final class CancelReservationTest extends TestCase
         $this->useCase->handle(new CancelReservationCommand($id->toRfc4122()));
     }
 
-    public function testShouldThrowNotFoundWhenReservationDoesNotExist(): void
+    public function test_should_throw_not_found_when_reservation_does_not_exist(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');
 

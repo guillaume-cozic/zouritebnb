@@ -25,7 +25,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         $this->repository = self::getContainer()->get(ReservationRepository::class);
     }
 
-    public function testShouldSaveAndFindById(): void
+    public function test_should_save_and_find_by_id(): void
     {
         $id = new ReservationId(Uuid::v4());
         $accommodationId = Uuid::v4();
@@ -58,14 +58,14 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         self::assertEquals(new \DateTimeImmutable('2026-05-05'), $found->getDateRange()->checkOut());
     }
 
-    public function testShouldReturnNullWhenNotFound(): void
+    public function test_should_return_null_when_not_found(): void
     {
         $result = $this->repository->ofId(new ReservationId(Uuid::v4()));
 
         self::assertNull($result);
     }
 
-    public function testShouldUpdateExistingReservation(): void
+    public function test_should_update_existing_reservation(): void
     {
         $id = new ReservationId(Uuid::v4());
         $reservation = Reservation::create(
@@ -89,7 +89,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         self::assertSame(ReservationStatus::Cancelled, $found->getStatus());
     }
 
-    public function testShouldListFiltersByTeamId(): void
+    public function test_should_list_filters_by_team_id(): void
     {
         $teamA = Uuid::v4();
         $teamB = Uuid::v4();
@@ -102,7 +102,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         self::assertSame('A', $result[0]->getGuestName()->toString());
     }
 
-    public function testShouldListFiltersByAccommodationId(): void
+    public function test_should_list_filters_by_accommodation_id(): void
     {
         $teamId = Uuid::v4();
         $accommodation1 = Uuid::v4();
@@ -116,7 +116,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         self::assertSame('One', $result[0]->getGuestName()->toString());
     }
 
-    public function testShouldListFiltersByDateOverlap(): void
+    public function test_should_list_filters_by_date_overlap(): void
     {
         $teamId = Uuid::v4();
         $accommodationId = Uuid::v4();
@@ -140,7 +140,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         self::assertSame(['Inside', 'OverlapEnd', 'OverlapStart'], $names);
     }
 
-    public function testShouldListWithNoFiltersReturnsAllTeamReservations(): void
+    public function test_should_list_with_no_filters_returns_all_team_reservations(): void
     {
         $teamId = Uuid::v4();
         $this->saveReservation($teamId, Uuid::v4(), '2026-01-01', '2026-01-05', 'R1');

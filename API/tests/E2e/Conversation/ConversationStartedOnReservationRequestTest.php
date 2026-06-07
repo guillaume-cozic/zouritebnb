@@ -8,7 +8,7 @@ use Symfony\Component\Uid\Uuid;
 
 final class ConversationStartedOnReservationRequestTest extends ConversationApiTestCase
 {
-    public function testShouldCreateConversationAndOpeningMessageWhenReservationIsRequested(): void
+    public function test_should_create_conversation_and_opening_message_when_reservation_is_requested(): void
     {
         $teamId = Uuid::fromString(self::DEFAULT_TEAM_UUID);
         $accommodationId = $this->insertAccommodation($teamId);
@@ -37,7 +37,7 @@ final class ConversationStartedOnReservationRequestTest extends ConversationApiT
         self::assertStringContainsString('Jean Dupont', $message['body']);
     }
 
-    public function testShouldExposeConversationDetailById(): void
+    public function test_should_expose_conversation_detail_by_id(): void
     {
         $accommodationId = $this->insertAccommodation();
         $guestUserId = $this->insertUser(teamId: Uuid::v7());

@@ -6,7 +6,7 @@ namespace App\Tests\E2e\Reservation;
 
 final class ConfirmReservationTest extends ReservationApiTestCase
 {
-    public function testShouldConfirmPendingReservation(): void
+    public function test_should_confirm_pending_reservation(): void
     {
         $id = $this->insertReservation();
 
@@ -22,7 +22,7 @@ final class ConfirmReservationTest extends ReservationApiTestCase
         ]);
     }
 
-    public function testShouldReturn404WhenNotFound(): void
+    public function test_should_return404_when_not_found(): void
     {
         self::createClient()->request('PATCH', '/api/reservations/01961e2f-dead-7000-beef-000000000099/confirm', [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
@@ -32,7 +32,7 @@ final class ConfirmReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
-    public function testShouldReturn422WhenAlreadyConfirmed(): void
+    public function test_should_return422_when_already_confirmed(): void
     {
         $id = $this->insertReservation(status: 'confirmed');
 
@@ -44,7 +44,7 @@ final class ConfirmReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn422WhenCancelled(): void
+    public function test_should_return422_when_cancelled(): void
     {
         $id = $this->insertReservation(status: 'cancelled');
 

@@ -10,7 +10,7 @@ final class GetAccommodationTest extends AccommodationApiTestCase
 {
     use AssertsOpenApiContract;
 
-    public function testShouldGetAccommodation(): void
+    public function test_should_get_accommodation(): void
     {
         $id = $this->insertAccommodation('Beach Villa', 'Luxury beach villa', 320.0);
 
@@ -26,7 +26,7 @@ final class GetAccommodationTest extends AccommodationApiTestCase
         $this->assertResponseMatchesOpenApiContract($response, 'GET', '/api/accommodations/{id}');
     }
 
-    public function testShouldNotGetUnknownAccommodation(): void
+    public function test_should_not_get_unknown_accommodation(): void
     {
         static::createClient()->request('GET', '/api/accommodations/00000000-0000-0000-0000-000000000000');
 

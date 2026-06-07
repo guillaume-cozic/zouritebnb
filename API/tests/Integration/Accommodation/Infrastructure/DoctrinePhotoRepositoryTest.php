@@ -20,7 +20,7 @@ final class DoctrinePhotoRepositoryTest extends RepositoryTestCase
         $this->repository = self::getContainer()->get(PhotoRepository::class);
     }
 
-    public function testShouldSaveAndFindById(): void
+    public function test_should_save_and_find_by_id(): void
     {
         $id = Uuid::v7();
         $accommodationId = Uuid::v7();
@@ -46,14 +46,14 @@ final class DoctrinePhotoRepositoryTest extends RepositoryTestCase
         self::assertSame(204800, $found->getSize());
     }
 
-    public function testShouldReturnNullWhenNotFound(): void
+    public function test_should_return_null_when_not_found(): void
     {
         $result = $this->repository->findById(Uuid::v7());
 
         self::assertNull($result);
     }
 
-    public function testShouldDeletePhoto(): void
+    public function test_should_delete_photo(): void
     {
         $id = Uuid::v7();
 
@@ -73,7 +73,7 @@ final class DoctrinePhotoRepositoryTest extends RepositoryTestCase
         self::assertNull($this->repository->findById($id));
     }
 
-    public function testShouldCountByAccommodationId(): void
+    public function test_should_count_by_accommodation_id(): void
     {
         $accommodationId = Uuid::v7();
 

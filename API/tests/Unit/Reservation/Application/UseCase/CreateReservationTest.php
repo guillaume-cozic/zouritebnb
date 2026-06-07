@@ -43,7 +43,7 @@ final class CreateReservationTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function testShouldCreateConfirmedReservationAndDispatchEvent(): void
+    public function test_should_create_confirmed_reservation_and_dispatch_event(): void
     {
         $reservationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000a1');
@@ -71,7 +71,7 @@ final class CreateReservationTest extends TestCase
         self::assertTrue($reservationId->equals($events[0]->reservationId));
     }
 
-    public function testShouldComputeTotalPriceForFiveNightsWithoutPromotion(): void
+    public function test_should_compute_total_price_for_five_nights_without_promotion(): void
     {
         $accommodationId = Uuid::v7();
         $this->pricingProvider->set($accommodationId, 100.0);
@@ -91,7 +91,7 @@ final class CreateReservationTest extends TestCase
         self::assertNull($reservation->getPrice()->appliedDiscountPercentage);
     }
 
-    public function testShouldApplyWeeklyPromotionForSevenNightsOrMore(): void
+    public function test_should_apply_weekly_promotion_for_seven_nights_or_more(): void
     {
         $accommodationId = Uuid::v7();
         $this->pricingProvider->set($accommodationId, 100.0, 20.0);
@@ -111,7 +111,7 @@ final class CreateReservationTest extends TestCase
         self::assertSame(20.0, $reservation->getPrice()->appliedDiscountPercentage);
     }
 
-    public function testShouldNotApplyWeeklyPromotionForSixNights(): void
+    public function test_should_not_apply_weekly_promotion_for_six_nights(): void
     {
         $accommodationId = Uuid::v7();
         $this->pricingProvider->set($accommodationId, 100.0, 20.0);
@@ -130,7 +130,7 @@ final class CreateReservationTest extends TestCase
         self::assertNull($reservation->getPrice()->appliedDiscountPercentage);
     }
 
-    public function testShouldThrowWhenAccommodationNotFound(): void
+    public function test_should_throw_when_accommodation_not_found(): void
     {
         $this->expectException(InvalidReservationException::class);
         $this->expectExceptionMessage('Accommodation not found.');
@@ -144,7 +144,7 @@ final class CreateReservationTest extends TestCase
         ));
     }
 
-    public function testShouldNotCreateReservationWithInvalidDateRange(): void
+    public function test_should_not_create_reservation_with_invalid_date_range(): void
     {
         $this->expectException(InvalidDateRangeException::class);
         $this->expectExceptionMessage('Check-out date must be strictly after check-in date.');
@@ -158,7 +158,7 @@ final class CreateReservationTest extends TestCase
         ));
     }
 
-    public function testShouldNotCreateReservationWithEmptyGuestName(): void
+    public function test_should_not_create_reservation_with_empty_guest_name(): void
     {
         $accommodationId = Uuid::v7();
         $this->pricingProvider->set($accommodationId, 100.0);

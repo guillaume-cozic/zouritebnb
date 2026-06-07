@@ -42,7 +42,7 @@ final class CreatePaymentIntentTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function testShouldRequestAuthorizationAndPersistPendingPayment(): void
+    public function test_should_request_authorization_and_persist_pending_payment(): void
     {
         $paymentId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         UuidGenerator::queue([$paymentId]);
@@ -73,7 +73,7 @@ final class CreatePaymentIntentTest extends TestCase
         self::assertSame('2026-05-17T10:00:00+00:00', $stored->getCreatedAt()->format(\DateTimeInterface::ATOM));
     }
 
-    public function testShouldRejectZeroAmount(): void
+    public function test_should_reject_zero_amount(): void
     {
         $this->expectException(InvalidPaymentException::class);
 
@@ -84,7 +84,7 @@ final class CreatePaymentIntentTest extends TestCase
         ));
     }
 
-    public function testShouldRejectInvalidCurrency(): void
+    public function test_should_reject_invalid_currency(): void
     {
         $this->expectException(InvalidPaymentException::class);
 

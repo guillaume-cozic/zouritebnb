@@ -28,7 +28,7 @@ final class RecordStripeEventTest extends TestCase
         $this->useCase = new RecordStripeEvent($this->repository, $this->eventBus);
     }
 
-    public function testShouldMarkPaymentCapturedOnSucceededEvent(): void
+    public function test_should_mark_payment_captured_on_succeeded_event(): void
     {
         $this->repository->save($this->makePayment('pi_test_1', PaymentStatus::Authorized));
 
@@ -37,7 +37,7 @@ final class RecordStripeEventTest extends TestCase
         self::assertSame(PaymentStatus::Captured, $this->repository->findByPaymentIntentId('pi_test_1')->getStatus());
     }
 
-    public function testShouldMarkPaymentCancelledOnCanceledEvent(): void
+    public function test_should_mark_payment_cancelled_on_canceled_event(): void
     {
         $this->repository->save($this->makePayment('pi_test_2', PaymentStatus::Pending));
 
@@ -46,7 +46,7 @@ final class RecordStripeEventTest extends TestCase
         self::assertSame(PaymentStatus::Cancelled, $this->repository->findByPaymentIntentId('pi_test_2')->getStatus());
     }
 
-    public function testShouldMarkPaymentFailedOnPaymentFailedEvent(): void
+    public function test_should_mark_payment_failed_on_payment_failed_event(): void
     {
         $this->repository->save($this->makePayment('pi_test_3', PaymentStatus::Pending));
 
@@ -55,14 +55,24 @@ final class RecordStripeEventTest extends TestCase
         self::assertSame(PaymentStatus::Failed, $this->repository->findByPaymentIntentId('pi_test_3')->getStatus());
     }
 
-    public function testShouldNoopWhenPaymentIntentIdUnknown(): void
+    public function test_should_mark_payment_authorized_on_amount_capturable_updated_event(): void
+    {
+        $this->repository->save($this->makePayment('pi_test_auth', PaymentStatus::Pending));
+
+        $this->useCase->handle(new RecordStripeEventCommand(RecordStripeEvent::EVENT_AUTHORIZED, 'pi_test_auth'));
+
+        self::assertSame(PaymentStatus::Authorized, $this->repository->findByPaymentIntentId('pi_test_auth')->getStatus());
+        self::assertNotSame([], $this->eventBus->getDispatchedEvents());
+    }
+
+    public function test_should_noop_when_payment_intent_id_unknown(): void
     {
         $this->useCase->handle(new RecordStripeEventCommand(RecordStripeEvent::EVENT_SUCCEEDED, 'pi_unknown'));
 
         self::assertSame([], $this->eventBus->getDispatchedEvents());
     }
 
-    public function testShouldIgnoreUnknownEventTypes(): void
+    public function test_should_ignore_unknown_event_types(): void
     {
         $payment = $this->makePayment('pi_test_x', PaymentStatus::Pending);
         $this->repository->save($payment);

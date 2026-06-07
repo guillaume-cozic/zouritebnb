@@ -10,7 +10,7 @@ final class GetAccommodationCollectionTest extends AccommodationApiTestCase
 {
     use AssertsOpenApiContract;
 
-    public function testShouldListAccommodations(): void
+    public function test_should_list_accommodations(): void
     {
         $first = $this->insertAccommodation('Beach Villa', 'Luxury beach villa', 320.0, 'published');
         $this->insertPhoto($first);
@@ -23,7 +23,7 @@ final class GetAccommodationCollectionTest extends AccommodationApiTestCase
         $this->assertResponseMatchesOpenApiContract($response, 'GET', '/api/accommodations');
     }
 
-    public function testShouldNotListDraftAccommodations(): void
+    public function test_should_not_list_draft_accommodations(): void
     {
         $this->insertAccommodation('Draft Villa', 'A draft', 100.0, 'draft');
         $this->insertAccommodation('Published Cabin', 'A cabin', 150.0, 'published');
@@ -35,7 +35,7 @@ final class GetAccommodationCollectionTest extends AccommodationApiTestCase
         self::assertSame('Published Cabin', $response->toArray()['member'][0]['title']);
     }
 
-    public function testShouldReturnEmptyCollection(): void
+    public function test_should_return_empty_collection(): void
     {
         $response = self::createClient()->request('GET', '/api/accommodations');
 

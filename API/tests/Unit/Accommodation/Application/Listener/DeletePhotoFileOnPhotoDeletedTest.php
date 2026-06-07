@@ -14,7 +14,7 @@ use Symfony\Component\Uid\Uuid;
 
 final class DeletePhotoFileOnPhotoDeletedTest extends TestCase
 {
-    public function testShouldDeletePhotoFromRepositoryAndStorage(): void
+    public function test_should_delete_photo_from_repository_and_storage(): void
     {
         $photoId = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');

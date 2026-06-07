@@ -53,7 +53,7 @@ final class RefuseReservationTest extends TestCase
         return $reservation;
     }
 
-    public function testShouldRefusePendingReservation(): void
+    public function test_should_refuse_pending_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->givenReservation($id, ReservationStatus::Pending);
@@ -68,7 +68,7 @@ final class RefuseReservationTest extends TestCase
         self::assertInstanceOf(ReservationRefused::class, $events[0]);
     }
 
-    public function testShouldNotRefuseConfirmedReservation(): void
+    public function test_should_not_refuse_confirmed_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000002');
         $this->givenReservation($id, ReservationStatus::Confirmed);
@@ -79,7 +79,7 @@ final class RefuseReservationTest extends TestCase
         $this->useCase->handle(new RefuseReservationCommand($id->toRfc4122()));
     }
 
-    public function testShouldNotRefuseCancelledReservation(): void
+    public function test_should_not_refuse_cancelled_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000003');
         $this->givenReservation($id, ReservationStatus::Cancelled);
@@ -90,7 +90,7 @@ final class RefuseReservationTest extends TestCase
         $this->useCase->handle(new RefuseReservationCommand($id->toRfc4122()));
     }
 
-    public function testShouldNotRefuseAlreadyRefusedReservation(): void
+    public function test_should_not_refuse_already_refused_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000004');
         $this->givenReservation($id, ReservationStatus::Refused);
@@ -101,7 +101,7 @@ final class RefuseReservationTest extends TestCase
         $this->useCase->handle(new RefuseReservationCommand($id->toRfc4122()));
     }
 
-    public function testShouldThrowNotFoundWhenReservationDoesNotExist(): void
+    public function test_should_throw_not_found_when_reservation_does_not_exist(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');
 

@@ -33,7 +33,7 @@ final class CapturePaymentForReservationTest extends TestCase
         $this->useCase = new CapturePaymentForReservation($this->repository, $this->gateway, $this->eventBus);
     }
 
-    public function testShouldCapturePaymentLinkedToReservation(): void
+    public function test_should_capture_payment_linked_to_reservation(): void
     {
         $reservationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
         $payment = new Payment(
@@ -59,7 +59,7 @@ final class CapturePaymentForReservationTest extends TestCase
         self::assertInstanceOf(PaymentCaptured::class, $events[0]);
     }
 
-    public function testShouldThrowWhenNoPaymentForReservation(): void
+    public function test_should_throw_when_no_payment_for_reservation(): void
     {
         $this->expectException(PaymentNotFoundException::class);
 

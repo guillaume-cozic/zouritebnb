@@ -32,7 +32,7 @@ final class DeleteAccommodationPhotoTest extends TestCase
         );
     }
 
-    public function testShouldRemovePhotoFromGallery(): void
+    public function test_should_remove_photo_from_gallery(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $photoId = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
@@ -50,7 +50,7 @@ final class DeleteAccommodationPhotoTest extends TestCase
         self::assertCount(0, $gallery->photoIds());
     }
 
-    public function testShouldDispatchEventWithFilenameAndPhotoId(): void
+    public function test_should_dispatch_event_with_filename_and_photo_id(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $photoId = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
@@ -72,7 +72,7 @@ final class DeleteAccommodationPhotoTest extends TestCase
         self::assertTrue($photoId->equals($events[0]->photoId));
     }
 
-    public function testShouldNotDeleteWhenPhotoNotInGallery(): void
+    public function test_should_not_delete_when_photo_not_in_gallery(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $photoId = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');

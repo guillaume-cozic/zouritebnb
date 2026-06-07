@@ -8,7 +8,7 @@ use Symfony\Component\Uid\Uuid;
 
 final class RefuseReservationTest extends ReservationApiTestCase
 {
-    public function testShouldRefusePendingReservation(): void
+    public function test_should_refuse_pending_reservation(): void
     {
         $id = $this->insertReservation(status: 'pending');
 
@@ -24,7 +24,7 @@ final class RefuseReservationTest extends ReservationApiTestCase
         ]);
     }
 
-    public function testShouldReturn422WhenAlreadyConfirmed(): void
+    public function test_should_return422_when_already_confirmed(): void
     {
         $id = $this->insertReservation(status: 'confirmed');
 
@@ -36,7 +36,7 @@ final class RefuseReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn422WhenAlreadyCancelled(): void
+    public function test_should_return422_when_already_cancelled(): void
     {
         $id = $this->insertReservation(status: 'cancelled');
 
@@ -48,7 +48,7 @@ final class RefuseReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn422WhenAlreadyRefused(): void
+    public function test_should_return422_when_already_refused(): void
     {
         $id = $this->insertReservation(status: 'refused');
 
@@ -60,7 +60,7 @@ final class RefuseReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testShouldReturn404WhenNotFound(): void
+    public function test_should_return404_when_not_found(): void
     {
         $missing = Uuid::v7()->toRfc4122();
 

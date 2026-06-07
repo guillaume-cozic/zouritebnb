@@ -55,7 +55,7 @@ final class ListReservationsTest extends TestCase
         $this->repository->save($reservation);
     }
 
-    public function testShouldScopeResultsByTeamId(): void
+    public function test_should_scope_results_by_team_id(): void
     {
         $results = $this->useCase->handle($this->teamA);
         self::assertCount(3, $results);
@@ -64,13 +64,13 @@ final class ListReservationsTest extends TestCase
         self::assertCount(1, $resultsB);
     }
 
-    public function testShouldFilterByAccommodationId(): void
+    public function test_should_filter_by_accommodation_id(): void
     {
         $results = $this->useCase->handle($this->teamA, $this->accommodation1);
         self::assertCount(2, $results);
     }
 
-    public function testShouldFilterByDateRange(): void
+    public function test_should_filter_by_date_range(): void
     {
         $results = $this->useCase->handle(
             $this->teamA,

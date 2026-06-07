@@ -74,7 +74,7 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
         }
 
         // amenities[] (or comma-separated) — accommodation must contain ALL of them
-        $amenitiesRaw = $query?->all('amenities') ?? [];
+        $amenitiesRaw = $query?->all()['amenities'] ?? [];
         if (\is_string($amenitiesRaw)) {
             $amenitiesRaw = explode(',', $amenitiesRaw);
         }

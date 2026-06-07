@@ -44,7 +44,7 @@ final class StartConversationTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function testShouldStartConversationWithSystemMessageContainingTemplate(): void
+    public function test_should_start_conversation_with_system_message_containing_template(): void
     {
         $reservationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000a1');
@@ -87,7 +87,7 @@ final class StartConversationTest extends TestCase
         self::assertTrue($messageId->equals($events[0]->openingMessageId));
     }
 
-    public function testShouldAppendGuestNoteToOpeningMessage(): void
+    public function test_should_append_guest_note_to_opening_message(): void
     {
         $reservationId = Uuid::v7();
         UuidGenerator::queue([Uuid::v7(), Uuid::v7()]);
@@ -113,7 +113,7 @@ final class StartConversationTest extends TestCase
         self::assertStringContainsString('Nous voyageons avec un bébé.', $body);
     }
 
-    public function testShouldBeIdempotentWhenReservationAlreadyHasConversation(): void
+    public function test_should_be_idempotent_when_reservation_already_has_conversation(): void
     {
         $reservationId = Uuid::v7();
         UuidGenerator::queue([Uuid::v7(), Uuid::v7()]);
@@ -135,14 +135,14 @@ final class StartConversationTest extends TestCase
         self::assertCount(1, $this->repository->listForGuestUser($this->repository->ofReservationId($reservationId)->getGuestUserId()));
     }
 
-    public function testShouldThrowWhenReservationNotFound(): void
+    public function test_should_throw_when_reservation_not_found(): void
     {
         $this->expectException(CannotStartConversationException::class);
 
         $this->useCase->handle(new StartConversationCommand(reservationId: Uuid::v7()));
     }
 
-    public function testShouldThrowWhenReservationHasNoGuestUser(): void
+    public function test_should_throw_when_reservation_has_no_guest_user(): void
     {
         $reservationId = Uuid::v7();
         $this->reservationProvider->add(new ReservationSummary(

@@ -61,7 +61,7 @@ final class SendMessageTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function testShouldLetGuestPostMessage(): void
+    public function test_should_let_guest_post_message(): void
     {
         $this->useCase->handle(new SendMessageCommand(
             conversationId: $this->conversationId->toRfc4122(),
@@ -77,7 +77,7 @@ final class SendMessageTest extends TestCase
         self::assertTrue($this->guestUserId->equals($message->getAuthorUserId()));
     }
 
-    public function testShouldLetTeamMemberPostMessage(): void
+    public function test_should_let_team_member_post_message(): void
     {
         $teamMember = Uuid::fromString('01961e2f-dead-7000-beef-0000000000d1');
         $this->teamMembershipChecker->add($teamMember, $this->teamId);
@@ -94,7 +94,7 @@ final class SendMessageTest extends TestCase
         self::assertTrue($teamMember->equals($message->getAuthorUserId()));
     }
 
-    public function testShouldRejectOutsider(): void
+    public function test_should_reject_outsider(): void
     {
         $outsider = Uuid::v7();
 
@@ -107,7 +107,7 @@ final class SendMessageTest extends TestCase
         ));
     }
 
-    public function testShouldThrowNotFoundForUnknownConversation(): void
+    public function test_should_throw_not_found_for_unknown_conversation(): void
     {
         $this->expectException(ConversationNotFoundException::class);
 
@@ -118,7 +118,7 @@ final class SendMessageTest extends TestCase
         ));
     }
 
-    public function testShouldRejectEmptyBody(): void
+    public function test_should_reject_empty_body(): void
     {
         $this->expectException(InvalidMessageException::class);
 

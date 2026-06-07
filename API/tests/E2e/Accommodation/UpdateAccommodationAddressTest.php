@@ -6,7 +6,7 @@ namespace App\Tests\E2e\Accommodation;
 
 final class UpdateAccommodationAddressTest extends AccommodationApiTestCase
 {
-    public function testShouldUpdateAccommodationAddress(): void
+    public function test_should_update_accommodation_address(): void
     {
         $id = $this->insertAccommodation('Cozy Chalet', 'A warm mountain chalet', 150.0);
 
@@ -33,7 +33,7 @@ final class UpdateAccommodationAddressTest extends AccommodationApiTestCase
         ]);
     }
 
-    public function testShouldNotUpdateAddressWithUnknownAccommodation(): void
+    public function test_should_not_update_address_with_unknown_accommodation(): void
     {
         self::createClient()->request('PUT', '/api/accommodations/01961e2f-dead-7000-beef-000000000099/address', [
             'headers' => ['Content-Type' => 'application/ld+json'],
@@ -48,7 +48,7 @@ final class UpdateAccommodationAddressTest extends AccommodationApiTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
-    public function testShouldNotUpdateAddressWithEmptyStreet(): void
+    public function test_should_not_update_address_with_empty_street(): void
     {
         $id = $this->insertAccommodation('Cozy Chalet', 'A warm mountain chalet', 150.0);
 

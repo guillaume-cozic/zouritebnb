@@ -43,7 +43,7 @@ final class RequestReservationTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function testShouldCreatePendingReservationAndDispatchRequestedEvent(): void
+    public function test_should_create_pending_reservation_and_dispatch_requested_event(): void
     {
         $reservationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000a1');
@@ -75,7 +75,7 @@ final class RequestReservationTest extends TestCase
         self::assertTrue($guestUserId->equals($events[0]->guestUserId));
     }
 
-    public function testShouldComputeTotalPriceAndApplyWeeklyPromotion(): void
+    public function test_should_compute_total_price_and_apply_weekly_promotion(): void
     {
         $accommodationId = Uuid::v7();
         $teamId = Uuid::v7();
@@ -95,7 +95,7 @@ final class RequestReservationTest extends TestCase
         self::assertSame(20.0, $reservation->getPrice()->appliedDiscountPercentage);
     }
 
-    public function testShouldThrowWhenAccommodationNotFound(): void
+    public function test_should_throw_when_accommodation_not_found(): void
     {
         $this->expectException(InvalidReservationException::class);
         $this->expectExceptionMessage('Accommodation not found.');
@@ -109,7 +109,7 @@ final class RequestReservationTest extends TestCase
         ));
     }
 
-    public function testShouldThrowWhenAccommodationHasNoTeam(): void
+    public function test_should_throw_when_accommodation_has_no_team(): void
     {
         $accommodationId = Uuid::v7();
         $this->pricingProvider->set($accommodationId, 100.0);
@@ -126,7 +126,7 @@ final class RequestReservationTest extends TestCase
         ));
     }
 
-    public function testShouldRejectInvalidDateRange(): void
+    public function test_should_reject_invalid_date_range(): void
     {
         $accommodationId = Uuid::v7();
         $this->pricingProvider->set($accommodationId, 100.0, null, Uuid::v7());
@@ -142,7 +142,7 @@ final class RequestReservationTest extends TestCase
         ));
     }
 
-    public function testShouldRejectEmptyGuestName(): void
+    public function test_should_reject_empty_guest_name(): void
     {
         $accommodationId = Uuid::v7();
         $this->pricingProvider->set($accommodationId, 100.0, null, Uuid::v7());

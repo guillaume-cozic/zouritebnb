@@ -47,7 +47,7 @@ final class UploadAccommodationPhotoTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function testShouldAddPhotoToGallery(): void
+    public function test_should_add_photo_to_gallery(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $photoUuid = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
@@ -67,7 +67,7 @@ final class UploadAccommodationPhotoTest extends TestCase
         self::assertTrue($photoUuid->equals($gallery->photoIds()[0]));
     }
 
-    public function testShouldDispatchEventWithPhotoData(): void
+    public function test_should_dispatch_event_with_photo_data(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $photoUuid = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
@@ -93,7 +93,7 @@ final class UploadAccommodationPhotoTest extends TestCase
         self::assertSame(12345, $events[0]->size);
     }
 
-    public function testShouldNotUploadWhenAccommodationNotFound(): void
+    public function test_should_not_upload_when_accommodation_not_found(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');
 
@@ -109,7 +109,7 @@ final class UploadAccommodationPhotoTest extends TestCase
         ));
     }
 
-    public function testShouldNotUploadWhenGalleryIsFull(): void
+    public function test_should_not_upload_when_gallery_is_full(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->accommodationRepository->save(new Accommodation($accommodationId, 'Chalet', 'Description', 150.0));
@@ -132,7 +132,7 @@ final class UploadAccommodationPhotoTest extends TestCase
         ));
     }
 
-    public function testShouldNotUploadWithInvalidMimeType(): void
+    public function test_should_not_upload_with_invalid_mime_type(): void
     {
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->accommodationRepository->save(new Accommodation($accommodationId, 'Chalet', 'Description', 150.0));

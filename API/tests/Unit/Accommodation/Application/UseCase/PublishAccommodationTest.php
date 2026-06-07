@@ -30,7 +30,7 @@ final class PublishAccommodationTest extends TestCase
         $this->useCase = new PublishAccommodation($this->repository, $this->eventBus);
     }
 
-    public function testShouldPublishAccommodation(): void
+    public function test_should_publish_accommodation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -41,7 +41,7 @@ final class PublishAccommodationTest extends TestCase
         self::assertSame(AccommodationStatus::Published, $accommodation->getStatus());
     }
 
-    public function testShouldDispatchAccommodationPublishedEvent(): void
+    public function test_should_dispatch_accommodation_published_event(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -54,7 +54,7 @@ final class PublishAccommodationTest extends TestCase
         self::assertTrue($id->equals($events[0]->accommodationId));
     }
 
-    public function testShouldNotPublishWithUnknownAccommodation(): void
+    public function test_should_not_publish_with_unknown_accommodation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');
 

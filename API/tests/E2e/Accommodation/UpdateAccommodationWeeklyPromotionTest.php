@@ -6,7 +6,7 @@ namespace App\Tests\E2e\Accommodation;
 
 final class UpdateAccommodationWeeklyPromotionTest extends AccommodationApiTestCase
 {
-    public function testShouldUpdateWeeklyPromotion(): void
+    public function test_should_update_weekly_promotion(): void
     {
         $id = $this->insertAccommodation('Cozy Chalet', 'A warm mountain chalet', 150.0);
 
@@ -23,7 +23,7 @@ final class UpdateAccommodationWeeklyPromotionTest extends AccommodationApiTestC
         self::assertJsonContains(['weeklyPromotionPercentage' => 10]);
     }
 
-    public function testShouldRejectOutOfBoundsPromotion(): void
+    public function test_should_reject_out_of_bounds_promotion(): void
     {
         $id = $this->insertAccommodation('Cozy Chalet', 'A warm mountain chalet', 150.0);
 

@@ -6,7 +6,7 @@ namespace App\Tests\E2e\SolidarityProject;
 
 final class GetSolidarityProjectCollectionTest extends SolidarityProjectApiTestCase
 {
-    public function testShouldListActiveSolidarityProjects(): void
+    public function test_should_list_active_solidarity_projects(): void
     {
         $this->insertSolidarityProject('Project A', 'Description A', null, 'active', new \DateTimeImmutable('2026-01-01'));
         $this->insertSolidarityProject('Project B', 'Description B', null, 'active', new \DateTimeImmutable('2026-03-01'));
@@ -17,7 +17,7 @@ final class GetSolidarityProjectCollectionTest extends SolidarityProjectApiTestC
         self::assertCount(2, $response->toArray()['member']);
     }
 
-    public function testShouldNotListClosedProjects(): void
+    public function test_should_not_list_closed_projects(): void
     {
         $this->insertSolidarityProject('Active project', 'desc', null, 'active');
         $this->insertSolidarityProject('Closed project', 'desc', null, 'closed');
@@ -30,7 +30,7 @@ final class GetSolidarityProjectCollectionTest extends SolidarityProjectApiTestC
         self::assertSame('Active project', $members[0]['title']);
     }
 
-    public function testShouldReturnProjectsOrderedByCreatedAtDesc(): void
+    public function test_should_return_projects_ordered_by_created_at_desc(): void
     {
         $this->insertSolidarityProject('Older', 'desc', null, 'active', new \DateTimeImmutable('2026-01-01'));
         $this->insertSolidarityProject('Newer', 'desc', null, 'active', new \DateTimeImmutable('2026-03-01'));
@@ -43,7 +43,7 @@ final class GetSolidarityProjectCollectionTest extends SolidarityProjectApiTestC
         self::assertSame('Older', $members[1]['title']);
     }
 
-    public function testShouldReturnEmptyCollection(): void
+    public function test_should_return_empty_collection(): void
     {
         $response = self::createClient()->request('GET', '/api/solidarity_projects');
 

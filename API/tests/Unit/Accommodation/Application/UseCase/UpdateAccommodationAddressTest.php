@@ -31,7 +31,7 @@ final class UpdateAccommodationAddressTest extends TestCase
         $this->useCase = new UpdateAccommodationAddress($this->repository, $this->eventBus);
     }
 
-    public function testShouldUpdateAddress(): void
+    public function test_should_update_address(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -52,7 +52,7 @@ final class UpdateAccommodationAddressTest extends TestCase
         self::assertSame('France', $accommodation->getAddress()->country());
     }
 
-    public function testShouldDispatchAddressUpdatedEvent(): void
+    public function test_should_dispatch_address_updated_event(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -71,7 +71,7 @@ final class UpdateAccommodationAddressTest extends TestCase
         self::assertTrue($id->equals($events[0]->accommodationId));
     }
 
-    public function testShouldNotUpdateAddressWithUnknownAccommodation(): void
+    public function test_should_not_update_address_with_unknown_accommodation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');
 
@@ -95,7 +95,7 @@ final class UpdateAccommodationAddressTest extends TestCase
     }
 
     #[DataProvider('invalidAddressProvider')]
-    public function testShouldNotUpdateAddressWithInvalidField(
+    public function test_should_not_update_address_with_invalid_field(
         ?string $street,
         ?string $city,
         ?string $zipCode,

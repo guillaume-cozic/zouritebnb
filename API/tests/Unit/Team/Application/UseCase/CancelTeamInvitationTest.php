@@ -30,7 +30,7 @@ final class CancelTeamInvitationTest extends TestCase
         $this->useCase = new CancelTeamInvitation($this->repository, $this->eventBus);
     }
 
-    public function testShouldCancelPendingInvitationAndDispatchEvent(): void
+    public function test_should_cancel_pending_invitation_and_dispatch_event(): void
     {
         $invitationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $teamId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000b1');
@@ -56,7 +56,7 @@ final class CancelTeamInvitationTest extends TestCase
         self::assertTrue($invitationId->equals($events[0]->invitationId));
     }
 
-    public function testShouldThrowWhenInvitationNotFound(): void
+    public function test_should_throw_when_invitation_not_found(): void
     {
         $this->expectException(InvalidInvitationException::class);
         $this->expectExceptionMessage('was not found');
@@ -66,7 +66,7 @@ final class CancelTeamInvitationTest extends TestCase
         ));
     }
 
-    public function testShouldThrowWhenInvitationAlreadyFinalized(): void
+    public function test_should_throw_when_invitation_already_finalized(): void
     {
         $invitationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000002');
         $teamId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000b1');

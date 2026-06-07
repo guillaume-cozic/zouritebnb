@@ -30,7 +30,7 @@ final class UpdateAccommodationPriceTest extends TestCase
         $this->useCase = new UpdateAccommodationPrice($this->repository, $this->eventBus);
     }
 
-    public function testShouldUpdatePrice(): void
+    public function test_should_update_price(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -41,7 +41,7 @@ final class UpdateAccommodationPriceTest extends TestCase
         self::assertSame(200.0, $accommodation->getPrice());
     }
 
-    public function testShouldDispatchPriceUpdatedEvent(): void
+    public function test_should_dispatch_price_updated_event(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -54,7 +54,7 @@ final class UpdateAccommodationPriceTest extends TestCase
         self::assertTrue($id->equals($events[0]->accommodationId));
     }
 
-    public function testShouldNotUpdatePriceWithUnknownAccommodation(): void
+    public function test_should_not_update_price_with_unknown_accommodation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');
 
@@ -64,7 +64,7 @@ final class UpdateAccommodationPriceTest extends TestCase
         $this->useCase->handle(new UpdateAccommodationPriceCommand(id: $id, price: 200.0));
     }
 
-    public function testShouldNotUpdatePriceWhenInvalidPriceGiven(): void
+    public function test_should_not_update_price_when_invalid_price_given(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));

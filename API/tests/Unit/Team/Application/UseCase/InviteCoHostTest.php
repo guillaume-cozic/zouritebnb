@@ -37,7 +37,7 @@ final class InviteCoHostTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function testShouldCreateInvitationAndDispatchEvent(): void
+    public function test_should_create_invitation_and_dispatch_event(): void
     {
         $invitationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $teamId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000b1');
@@ -62,7 +62,7 @@ final class InviteCoHostTest extends TestCase
         self::assertSame('alice@example.com', $events[0]->email);
     }
 
-    public function testShouldRejectEmptyEmail(): void
+    public function test_should_reject_empty_email(): void
     {
         $this->expectException(InvalidInvitationException::class);
         $this->expectExceptionMessage('Invitation email must not be empty.');
@@ -73,7 +73,7 @@ final class InviteCoHostTest extends TestCase
         ));
     }
 
-    public function testShouldRejectInvalidEmailFormat(): void
+    public function test_should_reject_invalid_email_format(): void
     {
         $this->expectException(InvalidInvitationException::class);
         $this->expectExceptionMessage('is not a valid email address');
@@ -84,7 +84,7 @@ final class InviteCoHostTest extends TestCase
         ));
     }
 
-    public function testShouldRejectDuplicatePendingInvitation(): void
+    public function test_should_reject_duplicate_pending_invitation(): void
     {
         $teamId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000b1');
 

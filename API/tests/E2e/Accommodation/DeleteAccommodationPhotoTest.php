@@ -6,7 +6,7 @@ namespace App\Tests\E2e\Accommodation;
 
 final class DeleteAccommodationPhotoTest extends AccommodationApiTestCase
 {
-    public function testShouldDeletePhoto(): void
+    public function test_should_delete_photo(): void
     {
         $accommodationId = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
         $photoId = $this->insertPhoto($accommodationId);
@@ -16,7 +16,7 @@ final class DeleteAccommodationPhotoTest extends AccommodationApiTestCase
         self::assertResponseStatusCodeSame(204);
     }
 
-    public function testShouldNotDeleteWhenPhotoNotFound(): void
+    public function test_should_not_delete_when_photo_not_found(): void
     {
         $accommodationId = $this->insertAccommodation('Chalet', 'A cozy chalet', 150.0);
 
@@ -25,7 +25,7 @@ final class DeleteAccommodationPhotoTest extends AccommodationApiTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
-    public function testShouldNotDeletePhotoFromWrongAccommodation(): void
+    public function test_should_not_delete_photo_from_wrong_accommodation(): void
     {
         $accommodationId1 = $this->insertAccommodation('Chalet 1', 'First chalet', 150.0);
         $accommodationId2 = $this->insertAccommodation('Chalet 2', 'Second chalet', 200.0);

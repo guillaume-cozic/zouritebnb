@@ -8,7 +8,7 @@ use Symfony\Component\Uid\Uuid;
 
 final class SendMessageTest extends ConversationApiTestCase
 {
-    public function testGuestCanPostMessage(): void
+    public function test_guest_can_post_message(): void
     {
         $teamId = Uuid::fromString(self::DEFAULT_TEAM_UUID);
         $accommodationId = $this->insertAccommodation($teamId);
@@ -35,7 +35,7 @@ final class SendMessageTest extends ConversationApiTestCase
         ]);
     }
 
-    public function testHostTeamMemberCanPostMessage(): void
+    public function test_host_team_member_can_post_message(): void
     {
         $teamId = Uuid::fromString(self::DEFAULT_TEAM_UUID);
         $accommodationId = $this->insertAccommodation($teamId);
@@ -58,7 +58,7 @@ final class SendMessageTest extends ConversationApiTestCase
         self::assertResponseStatusCodeSame(201);
     }
 
-    public function testOutsiderCannotPostMessage(): void
+    public function test_outsider_cannot_post_message(): void
     {
         $accommodationId = $this->insertAccommodation();
         $guestUserId = $this->insertUser(teamId: Uuid::v7());
@@ -80,7 +80,25 @@ final class SendMessageTest extends ConversationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
-    public function testEmptyBodyIsRejected(): void
+    public function test_rejects_message_when_conversation_does_not_exist(): void
+    {
+        $userId = $this->insertUser(teamId: Uuid::v7());
+        $unknownConversationId = Uuid::v7()->toRfc4122();
+
+        self::createClient()->request('POST', '/api/conversations/'.$unknownConversationId.'/messages', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'authorUserId' => $userId,
+                'body' => 'Hello',
+            ],
+        ]);
+
+        // ConversationNotFoundException is a plain \DomainException with no explicit
+        // ApiPlatform status mapping, so it surfaces as 422 (not 404 as the OpenAPI doc states).
+        self::assertResponseStatusCodeSame(422);
+    }
+
+    public function test_empty_body_is_rejected(): void
     {
         $accommodationId = $this->insertAccommodation();
         $guestUserId = $this->insertUser(teamId: Uuid::v7());

@@ -10,6 +10,7 @@ use App\Reservation\Domain\Entity\DateRange;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
+use App\Reservation\Domain\Entity\ReservationPrice;
 use App\Reservation\Domain\Entity\ReservationStatus;
 use App\Reservation\Domain\Exception\InvalidReservationStateException;
 use App\Reservation\Domain\Exception\ReservationNotFoundException;
@@ -34,7 +35,7 @@ final class ConfirmReservationTest extends TestCase
         $this->useCase = new ConfirmReservation($this->repository, $this->eventBus);
     }
 
-    private function givenReservation(Uuid $id, ReservationStatus $status): Reservation
+    private function givenReservation(Uuid $id, ReservationStatus $status): void
     {
         $reservation = new Reservation(
             id: new ReservationId($id),
@@ -43,15 +44,14 @@ final class ConfirmReservationTest extends TestCase
             dateRange: new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-05')),
             guestName: new GuestName('John'),
             status: $status,
-            price: new \App\Reservation\Domain\Entity\ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
+            price: new ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
         );
 
         $this->repository->save($reservation);
 
-        return $reservation;
     }
 
-    public function testShouldConfirmPendingReservation(): void
+    public function test_should_confirm_pending_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->givenReservation($id, ReservationStatus::Pending);
@@ -66,7 +66,7 @@ final class ConfirmReservationTest extends TestCase
         self::assertInstanceOf(ReservationConfirmed::class, $events[0]);
     }
 
-    public function testShouldNotConfirmAlreadyConfirmedReservation(): void
+    public function test_should_not_confirm_already_confirmed_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000002');
         $this->givenReservation($id, ReservationStatus::Confirmed);
@@ -77,7 +77,7 @@ final class ConfirmReservationTest extends TestCase
         $this->useCase->handle(new ConfirmReservationCommand($id->toRfc4122()));
     }
 
-    public function testShouldNotConfirmCancelledReservation(): void
+    public function test_should_not_confirm_cancelled_reservation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000003');
         $this->givenReservation($id, ReservationStatus::Cancelled);
@@ -88,7 +88,7 @@ final class ConfirmReservationTest extends TestCase
         $this->useCase->handle(new ConfirmReservationCommand($id->toRfc4122()));
     }
 
-    public function testShouldThrowNotFoundWhenReservationDoesNotExist(): void
+    public function test_should_throw_not_found_when_reservation_does_not_exist(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');
 

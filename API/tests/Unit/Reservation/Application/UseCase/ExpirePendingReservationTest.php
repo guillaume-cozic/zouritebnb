@@ -50,7 +50,7 @@ final class ExpirePendingReservationTest extends TestCase
         ));
     }
 
-    public function testShouldRefusePendingReservationWhenTimeoutElapsed(): void
+    public function test_should_refuse_pending_reservation_when_timeout_elapsed(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->givenReservation($id, ReservationStatus::Pending);
@@ -71,7 +71,7 @@ final class ExpirePendingReservationTest extends TestCase
         self::assertTrue($events[0]->isAutomatic);
     }
 
-    public function testShouldDoNothingWhenTimeoutNotYetElapsed(): void
+    public function test_should_do_nothing_when_timeout_not_yet_elapsed(): void
     {
         $id = Uuid::v7();
         $this->givenReservation($id, ReservationStatus::Pending);
@@ -89,7 +89,7 @@ final class ExpirePendingReservationTest extends TestCase
         self::assertCount(0, $this->eventBus->getDispatchedEvents());
     }
 
-    public function testShouldDoNothingWhenReservationIsAlreadyConfirmed(): void
+    public function test_should_do_nothing_when_reservation_is_already_confirmed(): void
     {
         $id = Uuid::v7();
         $this->givenReservation($id, ReservationStatus::Confirmed);
@@ -104,7 +104,7 @@ final class ExpirePendingReservationTest extends TestCase
         self::assertCount(0, $this->eventBus->getDispatchedEvents());
     }
 
-    public function testShouldDoNothingWhenReservationIsAlreadyRefused(): void
+    public function test_should_do_nothing_when_reservation_is_already_refused(): void
     {
         $id = Uuid::v7();
         $this->givenReservation($id, ReservationStatus::Refused);
@@ -119,7 +119,7 @@ final class ExpirePendingReservationTest extends TestCase
         self::assertCount(0, $this->eventBus->getDispatchedEvents());
     }
 
-    public function testShouldDoNothingWhenReservationDoesNotExist(): void
+    public function test_should_do_nothing_when_reservation_does_not_exist(): void
     {
         $this->useCase->handle(new ExpirePendingReservationCommand(
             reservationId: Uuid::v7()->toRfc4122(),

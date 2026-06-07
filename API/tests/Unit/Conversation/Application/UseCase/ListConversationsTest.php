@@ -42,7 +42,7 @@ final class ListConversationsTest extends TestCase
         return $conversation;
     }
 
-    public function testShouldReturnGuestConversationsForUserWithoutTeam(): void
+    public function test_should_return_guest_conversations_for_user_without_team(): void
     {
         $guestUserId = Uuid::v7();
         $teamId = Uuid::v7();
@@ -54,7 +54,7 @@ final class ListConversationsTest extends TestCase
         self::assertSame($expected->getId()->toString(), $result[0]->getId()->toString());
     }
 
-    public function testShouldReturnTeamConversationsForTeamMember(): void
+    public function test_should_return_team_conversations_for_team_member(): void
     {
         $userId = Uuid::v7();
         $teamId = Uuid::v7();
@@ -69,7 +69,7 @@ final class ListConversationsTest extends TestCase
         self::assertSame($expected->getId()->toString(), $result[0]->getId()->toString());
     }
 
-    public function testShouldMergeAndDeduplicateGuestAndTeamConversations(): void
+    public function test_should_merge_and_deduplicate_guest_and_team_conversations(): void
     {
         $userId = Uuid::v7();
         $teamId = Uuid::v7();
@@ -89,7 +89,38 @@ final class ListConversationsTest extends TestCase
         self::assertContains($guestOnly->getId()->toString(), $ids);
     }
 
-    public function testShouldSortByCreatedAtDescending(): void
+    public function test_should_return_team_conversations_for_team(): void
+    {
+        $teamId = Uuid::v7();
+        $expected = $this->givenConversation($teamId, Uuid::v7());
+        $this->givenConversation(Uuid::v7(), Uuid::v7()); // unrelated team
+
+        $result = $this->useCase->forTeam($teamId);
+
+        self::assertCount(1, $result);
+        self::assertSame($expected->getId()->toString(), $result[0]->getId()->toString());
+    }
+
+    public function test_should_return_empty_array_when_team_has_no_conversations(): void
+    {
+        $result = $this->useCase->forTeam(Uuid::v7());
+
+        self::assertSame([], $result);
+    }
+
+    public function test_should_return_only_guest_conversations_when_user_has_no_team(): void
+    {
+        $userId = Uuid::v7();
+        // No team set for this user -> userTeamProvider returns null -> teamConversations branch is [].
+        $expected = $this->givenConversation(Uuid::v7(), $userId);
+
+        $result = $this->useCase->forUser($userId);
+
+        self::assertCount(1, $result);
+        self::assertSame($expected->getId()->toString(), $result[0]->getId()->toString());
+    }
+
+    public function test_should_sort_by_created_at_descending(): void
     {
         $userId = Uuid::v7();
         $oldest = $this->givenConversation(Uuid::v7(), $userId, '2026-05-10T00:00:00+00:00');

@@ -33,7 +33,7 @@ final class CreateAccommodationTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function testShouldSaveAccommodation(): void
+    public function test_should_save_accommodation(): void
     {
         $expectedId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         UuidGenerator::freeze($expectedId);
@@ -50,7 +50,7 @@ final class CreateAccommodationTest extends TestCase
     }
 
     #[DataProvider('invalidPriceProvider')]
-    public function testShouldNotSaveAccommodationWithInvalidPrice(?float $price, string $expectedMessage): void
+    public function test_should_not_save_accommodation_with_invalid_price(?float $price, string $expectedMessage): void
     {
         $this->expectException(InvalidPriceException::class);
         $this->expectExceptionMessage($expectedMessage);

@@ -6,7 +6,7 @@ namespace App\Tests\E2e\Accommodation;
 
 final class CreateAccommodationTest extends AccommodationApiTestCase
 {
-    public function testShouldCreateAccommodation(): void
+    public function test_should_create_accommodation(): void
     {
         self::createClient()->request('POST', '/api/accommodations', [
             'headers' => ['Content-Type' => 'application/ld+json'],
@@ -20,7 +20,7 @@ final class CreateAccommodationTest extends AccommodationApiTestCase
         self::assertResponseStatusCodeSame(201);
     }
 
-    public function testShouldNotCreateAccommodationWithMissingPrice(): void
+    public function test_should_not_create_accommodation_with_missing_price(): void
     {
         self::createClient()->request('POST', '/api/accommodations', [
             'headers' => ['Content-Type' => 'application/ld+json'],
@@ -34,7 +34,7 @@ final class CreateAccommodationTest extends AccommodationApiTestCase
         self::assertJsonContains(['detail' => 'Price is required.']);
     }
 
-    public function testShouldNotCreateAccommodationWithNegativePrice(): void
+    public function test_should_not_create_accommodation_with_negative_price(): void
     {
         self::createClient()->request('POST', '/api/accommodations', [
             'headers' => ['Content-Type' => 'application/ld+json'],

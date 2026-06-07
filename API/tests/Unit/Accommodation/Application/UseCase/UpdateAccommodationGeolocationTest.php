@@ -29,7 +29,7 @@ final class UpdateAccommodationGeolocationTest extends TestCase
         $this->useCase = new UpdateAccommodationGeolocation($this->repository, $this->eventBus);
     }
 
-    public function testShouldUpdateGeolocation(): void
+    public function test_should_update_geolocation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -46,7 +46,7 @@ final class UpdateAccommodationGeolocationTest extends TestCase
         self::assertSame(2.3522, $accommodation->getGeolocation()->longitude());
     }
 
-    public function testShouldDispatchGeolocationUpdatedEvent(): void
+    public function test_should_dispatch_geolocation_updated_event(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         $this->repository->save(new Accommodation($id, 'Chalet', 'Description', 150.0));
@@ -63,7 +63,7 @@ final class UpdateAccommodationGeolocationTest extends TestCase
         self::assertTrue($id->equals($events[0]->accommodationId));
     }
 
-    public function testShouldNotUpdateGeolocationWithUnknownAccommodation(): void
+    public function test_should_not_update_geolocation_with_unknown_accommodation(): void
     {
         $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000099');
 
