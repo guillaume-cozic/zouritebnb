@@ -105,7 +105,7 @@ const AccommodationsMap: React.FC<AccommodationsMapProps> = ({
       <MapContainer
         center={points[0] ?? DEFAULT_CENTER}
         zoom={12}
-        scrollWheelZoom={false}
+        scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
