@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { fetchOwnsAccommodation } from '../AccommodationManagementSlice';
+import { selectHasAccommodation } from '../AccommodationManagementSelectors';
 
 interface MenuItem {
   to: string;
   labelKey: string;
   icon: React.ReactNode;
 }
+
+// Host menu entries that are pointless without a listing — hidden until the host owns one.
+const LISTING_GATED_ROUTES = ['/admin/accommodations', '/admin/calendar', '/admin/reservations'];
 
 const HOST_MENU: MenuItem[] = [
   {
@@ -98,10 +104,25 @@ const TRAVELER_MENU: MenuItem[] = [
 const BackofficeLayout: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const hasAccommodation = useAppSelector(selectHasAccommodation);
   const isTraveler = location.pathname.startsWith('/account');
-  const menu = isTraveler ? TRAVELER_MENU : HOST_MENU;
   const titleKey = isTraveler ? 'backoffice.menu.travelerTitle' : 'backoffice.menu.title';
   const footerKey = isTraveler ? 'backoffice.travelerSidebarFooter' : 'backoffice.sidebarFooter';
+
+  useEffect(() => {
+    if (!isTraveler) {
+      dispatch(fetchOwnsAccommodation());
+    }
+  }, [dispatch, isTraveler]);
+
+  // Hide listing-gated entries only once we know the host owns nothing — avoids a flicker
+  // for hosts who do have listings (and the route guard catches clicks made meanwhile).
+  const hostMenu =
+    hasAccommodation === false
+      ? HOST_MENU.filter((item) => !LISTING_GATED_ROUTES.includes(item.to))
+      : HOST_MENU;
+  const menu = isTraveler ? TRAVELER_MENU : hostMenu;
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">

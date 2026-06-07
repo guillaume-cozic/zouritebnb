@@ -10,6 +10,7 @@ import AccommodationPhotosPage from './features/accommodation/components/Accommo
 import ManageAccommodationsPage from './features/accommodationManagement/components/ManageAccommodationsPage';
 import BackofficeLayout from './features/accommodationManagement/components/BackofficeLayout';
 import HostHomePage from './features/accommodationManagement/components/HostHomePage';
+import RequireAccommodation from './features/accommodationManagement/components/RequireAccommodation';
 import TeamSettingsPage from './features/team/components/TeamSettingsPage';
 import LoginPage from './features/auth/components/LoginPage';
 import RegisterPage from './features/auth/components/RegisterPage';
@@ -46,11 +47,14 @@ function App() {
             <Route path="/create" element={<CreateAccommodationWizard />} />
             <Route element={<BackofficeLayout />}>
               <Route path="/admin" element={<HostHomePage />} />
-              <Route path="/admin/accommodations" element={<ManageAccommodationsPage />} />
+              {/* Pages useless without a listing: gated behind owning ≥1 accommodation */}
+              <Route element={<RequireAccommodation />}>
+                <Route path="/admin/accommodations" element={<ManageAccommodationsPage />} />
+                <Route path="/admin/calendar" element={<AllAccommodationsCalendarPage />} />
+                <Route path="/admin/accommodations/:id/calendar" element={<AccommodationCalendarPage />} />
+                <Route path="/admin/reservations" element={<AdminReservationsPage />} />
+              </Route>
               <Route path="/admin/team" element={<TeamSettingsPage />} />
-              <Route path="/admin/calendar" element={<AllAccommodationsCalendarPage />} />
-              <Route path="/admin/accommodations/:id/calendar" element={<AccommodationCalendarPage />} />
-              <Route path="/admin/reservations" element={<AdminReservationsPage />} />
               <Route path="/admin/conversations" element={<AdminConversationsPage />} />
               <Route path="/admin/conversations/:id" element={<AdminConversationsPage />} />
               <Route path="/accommodations/:id/edit" element={<EditAccommodationPage />} />

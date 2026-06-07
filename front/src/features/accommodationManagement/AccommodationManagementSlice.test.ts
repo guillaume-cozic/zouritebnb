@@ -7,6 +7,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import accommodationManagementReducer, {
   setStatusFilter,
   fetchAllAccommodations,
+  fetchOwnsAccommodation,
   publishAccommodation,
   unpublishAccommodation,
 } from './AccommodationManagementSlice';
@@ -58,6 +59,64 @@ describe('fetchAllAccommodations', () => {
     const state = store.getState().accommodationManagement;
     expect(state.status).toBe('failed');
     expect(state.error).toBe('nope');
+  });
+});
+
+describe('fetchOwnsAccommodation (gate du back-office)', () => {
+  test('hasAccommodation = true quand le total est > 0', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:totalItems': 3, 'hydra:member': [{ id: 'a-1' }] } });
+    const store = buildStore();
+
+    await store.dispatch(fetchOwnsAccommodation());
+
+    const state = store.getState().accommodationManagement;
+    expect(state.hasAccommodation).toBe(true);
+    expect(state.ownershipStatus).toBe('succeeded');
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/my-accommodations', {
+      params: { status: 'all', itemsPerPage: 1 },
+    });
+  });
+
+  test('hasAccommodation = false quand le total est 0', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:totalItems': 0, 'hydra:member': [] } });
+    const store = buildStore();
+
+    await store.dispatch(fetchOwnsAccommodation());
+
+    expect(store.getState().accommodationManagement.hasAccommodation).toBe(false);
+  });
+
+  test('fail open : hasAccommodation = true si la requête échoue', async () => {
+    mockedApi.get.mockRejectedValue({ response: { data: { detail: 'boom' } } });
+    const store = buildStore();
+
+    await store.dispatch(fetchOwnsAccommodation());
+
+    const state = store.getState().accommodationManagement;
+    expect(state.hasAccommodation).toBe(true);
+    expect(state.ownershipStatus).toBe('failed');
+  });
+
+  test('créer un hébergement ouvre le gate immédiatement (pas de refetch requis)', () => {
+    const store = buildStore();
+    expect(store.getState().accommodationManagement.hasAccommodation).toBeNull();
+
+    store.dispatch({ type: 'accommodation/create/fulfilled', payload: { id: 'new-1' } });
+
+    expect(store.getState().accommodationManagement.hasAccommodation).toBe(true);
+  });
+
+  test("un fetch 'all' synchronise aussi le gate, mais pas un fetch filtré", async () => {
+    const store = buildStore();
+
+    await seedItems(store); // status 'all' → 2 items
+    expect(store.getState().accommodationManagement.hasAccommodation).toBe(true);
+
+    // Un filtre 'draft' qui ne renvoie rien ne doit PAS repasser le gate à false.
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [] } });
+    await store.dispatch(fetchAllAccommodations('draft'));
+
+    expect(store.getState().accommodationManagement.hasAccommodation).toBe(true);
   });
 });
 

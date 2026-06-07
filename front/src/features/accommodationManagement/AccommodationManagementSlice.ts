@@ -1,12 +1,17 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import { ManagedAccommodation, StatusFilter } from './AccommodationManagementTypes';
+import { createAccommodation } from '../accommodation/AccommodationSlice';
 
 interface AccommodationManagementState {
   items: ManagedAccommodation[];
   statusFilter: StatusFilter;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+  // Whether the host owns at least one accommodation (any status). `null` = not resolved yet.
+  // Tracked separately from `items` so an active status filter can never make it a false negative.
+  hasAccommodation: boolean | null;
+  ownershipStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 const initialState: AccommodationManagementState = {
@@ -14,6 +19,8 @@ const initialState: AccommodationManagementState = {
   statusFilter: 'all',
   status: 'idle',
   error: null,
+  hasAccommodation: null,
+  ownershipStatus: 'idle',
 };
 
 export const fetchAllAccommodations = createAsyncThunk(
@@ -29,6 +36,29 @@ export const fetchAllAccommodations = createAsyncThunk(
       return rejectWithValue(
         err.response?.data?.detail || 'Erreur lors du chargement des hébergements'
       );
+    }
+  }
+);
+
+/**
+ * Lightweight check used to gate the host back-office: does the current team own at
+ * least one accommodation? Kept independent from `fetchAllAccommodations` so the status
+ * filter on the management page never interferes with the gate.
+ */
+export const fetchOwnsAccommodation = createAsyncThunk(
+  'accommodationManagement/fetchOwnsAccommodation',
+  async (_: void, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/api/my-accommodations', {
+        params: { status: 'all', itemsPerPage: 1 },
+      });
+      const data = response.data;
+      const total = data['hydra:totalItems'] ?? data['totalItems'];
+      if (typeof total === 'number') return total > 0;
+      const members = (data['hydra:member'] ?? data['member'] ?? []) as unknown[];
+      return members.length > 0;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.detail || 'ownership check failed');
     }
   }
 );
@@ -86,6 +116,23 @@ const accommodationManagementSlice = createSlice({
       .addCase(fetchAllAccommodations.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.items = action.payload;
+        // Keep the ownership gate fresh, but only from an unfiltered ('all') fetch.
+        if (action.meta.arg === 'all') {
+          state.hasAccommodation = action.payload.length > 0;
+          state.ownershipStatus = 'succeeded';
+        }
+      })
+      .addCase(fetchOwnsAccommodation.pending, (state) => {
+        state.ownershipStatus = 'loading';
+      })
+      .addCase(fetchOwnsAccommodation.fulfilled, (state, action) => {
+        state.ownershipStatus = 'succeeded';
+        state.hasAccommodation = action.payload;
+      })
+      .addCase(fetchOwnsAccommodation.rejected, (state) => {
+        // Fail open: a transient error must not lock a host out of their back-office.
+        state.ownershipStatus = 'failed';
+        state.hasAccommodation = true;
       })
       .addCase(fetchAllAccommodations.rejected, (state, action) => {
         state.status = 'failed';
@@ -98,6 +145,11 @@ const accommodationManagementSlice = createSlice({
       .addCase(unpublishAccommodation.fulfilled, (state, action) => {
         const item = state.items.find((a) => a.id === action.payload);
         if (item) item.status = 'draft';
+      })
+      // Creating a listing immediately opens the back-office gate, without waiting for a refetch.
+      .addCase(createAccommodation.fulfilled, (state) => {
+        state.hasAccommodation = true;
+        state.ownershipStatus = 'succeeded';
       });
   },
 });
