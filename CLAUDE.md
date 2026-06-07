@@ -33,6 +33,7 @@ Skills are split across both projects. **Always consult the relevant skills befo
 | `react-redux-architecture` | Any component, slice, or business logic in the front app |
 | `api-discovery` | Before coding any feature that interacts with the backend API |
 | `event-driven-components` | Any handler/`useEffect` that would dispatch more than one action — components dispatch a single intent event, slices/listeners react |
+| `redux-store-test` | Testing a slice/listener — dispatch an action, assert the store state |
 
 ## Orchestration
 
