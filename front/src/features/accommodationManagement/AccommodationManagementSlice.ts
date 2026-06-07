@@ -20,7 +20,7 @@ export const fetchAllAccommodations = createAsyncThunk(
   'accommodationManagement/fetchAll',
   async (statusFilter: StatusFilter, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/accommodations', {
+      const response = await api.get('/api/my-accommodations', {
         params: { status: statusFilter },
       });
       const data = response.data;

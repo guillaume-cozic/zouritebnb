@@ -43,6 +43,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
             normalizationContext: ['groups' => ['accommodation:list']],
             provider: PublishedAccommodationProvider::class,
         ),
+        new GetCollection(
+            uriTemplate: '/my-accommodations',
+            openapi: new OpenApiOperation(
+                summary: 'Lister mes hébergements (back-office)',
+                description: "Retourne la liste paginée des hébergements appartenant à l'équipe de l'utilisateur authentifié, quel que soit leur statut. Filtre optionnel via ?status=all|published|draft.",
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            normalizationContext: ['groups' => ['accommodation:list']],
+            provider: MyAccommodationsProvider::class,
+        ),
         new Patch(
             uriTemplate: '/accommodations/{id}/publish',
             status: 204,

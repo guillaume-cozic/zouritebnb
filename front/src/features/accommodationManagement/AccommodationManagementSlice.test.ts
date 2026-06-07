@@ -46,7 +46,7 @@ describe('fetchAllAccommodations', () => {
     const state = store.getState().accommodationManagement;
     expect(state.status).toBe('succeeded');
     expect(state.items).toHaveLength(2);
-    expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations', { params: { status: 'all' } });
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/my-accommodations', { params: { status: 'all' } });
   });
 
   test('le store passe à failed avec le message d\'erreur après rejected', async () => {
