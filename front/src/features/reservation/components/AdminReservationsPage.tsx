@@ -15,6 +15,7 @@ import { Reservation, ReservationStatus } from '../ReservationTypes';
 import { isStayCompleted } from '../../review/reviewEligibility';
 import { selectSubmittedReviews } from '../../review/ReviewSelectors';
 import ReviewModal from '../../review/components/ReviewModal';
+import EmptyState, { CalendarIcon } from '../../../components/EmptyState';
 
 const STATUS_FILTERS: Array<{ key: 'all' | ReservationStatus; labelKey: string }> = [
   { key: 'all', labelKey: 'admin.reservations.filter.all' },
@@ -132,7 +133,26 @@ const AdminReservationsPage: React.FC = () => {
           <div className="px-6 py-10 text-center text-red-600 text-sm">{error}</div>
         )}
         {status === 'succeeded' && filtered.length === 0 && (
-          <div className="px-6 py-16 text-center text-gray-400 text-sm">{t('admin.reservations.empty')}</div>
+          <EmptyState
+            variant="plain"
+            icon={<CalendarIcon />}
+            title={t('admin.reservations.empty.title')}
+            description={
+              statusFilter === 'all'
+                ? t('admin.reservations.empty.description')
+                : t('admin.reservations.empty.filteredDescription')
+            }
+            action={
+              statusFilter !== 'all' ? (
+                <button
+                  onClick={() => setStatusFilter('all')}
+                  className="inline-flex items-center gap-2 rounded-xl text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 h-10 px-5 transition-colors"
+                >
+                  {t('admin.reservations.empty.showAll')}
+                </button>
+              ) : undefined
+            }
+          />
         )}
         {filtered.length > 0 && (
           <ul className="divide-y divide-gray-100">

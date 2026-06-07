@@ -34,7 +34,12 @@
       "title": "Reservations",
       "subtitle": "All reservations of your team, newest first.",
       "loading": "Loading…",
-      "empty": "No reservation for this filter.",
+      "empty": {
+        "title": "No reservations",
+        "description": "Your guests' bookings will show up here as soon as the first request comes in.",
+        "filteredDescription": "No reservation matches this filter.",
+        "showAll": "View all reservations"
+      },
       "openConversation": "Open conversation",
       "pendingBadge_one": "{{count}} pending request",
       "pendingBadge_other": "{{count}} pending requests",
@@ -179,7 +184,13 @@
     },
     "sidebarFooter": "Your gîte, your world. Take care of every guest.",
     "travelerSidebarFooter": "Your messages and personal info, all in one quiet place.",
-    "empty": "No accommodation.",
+    "empty": {
+      "title": "No accommodation yet",
+      "description": "Create your first listing to start receiving bookings.",
+      "filteredTitle": "No accommodation in this filter",
+      "filteredDescription": "Try another filter to find your listings.",
+      "showAll": "View all accommodations"
+    },
     "filter": {
       "all": "All",
       "published": "Published",
@@ -607,7 +618,10 @@
     "submit": "Create",
     "cancel": "Cancel",
     "loading": "Loading...",
-    "empty": "No reservations",
+    "empty": {
+      "title": "No accommodation",
+      "description": "Add an accommodation to view and plan its reservations in the calendar."
+    },
     "error": "Error",
     "status": {
       "pending": "Pending",

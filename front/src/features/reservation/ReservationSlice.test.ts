@@ -54,7 +54,7 @@ describe('reservationModalOpened', () => {
     await flush();
     await flush();
 
-    expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations', expect.anything());
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/my-accommodations', expect.anything());
     expect(store.getState().accommodationManagement.items).toHaveLength(1);
   });
 

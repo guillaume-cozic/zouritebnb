@@ -15,6 +15,7 @@ import {
   selectManagementStatusFilter,
 } from '../AccommodationManagementSelectors';
 import { StatusFilter } from '../AccommodationManagementTypes';
+import EmptyState, { HomeIcon } from '../../../components/EmptyState';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
@@ -86,7 +87,34 @@ const BackofficeAccommodationsPage: React.FC = () => {
         <div className="text-center py-12 text-red-500">{error}</div>
       )}
       {status === 'succeeded' && items.length === 0 && (
-        <div className="text-center py-12 text-gray-500">{t('backoffice.empty')}</div>
+        statusFilter === 'all' ? (
+          <EmptyState
+            icon={<HomeIcon />}
+            title={t('backoffice.empty.title')}
+            description={t('backoffice.empty.description')}
+            action={
+              <Link to="/create">
+                <button className="inline-flex items-center gap-2 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-10 px-5 shadow-sm shadow-blue-200 transition-all">
+                  {t('navbar.createAccommodation')}
+                </button>
+              </Link>
+            }
+          />
+        ) : (
+          <EmptyState
+            icon={<HomeIcon />}
+            title={t('backoffice.empty.filteredTitle')}
+            description={t('backoffice.empty.filteredDescription')}
+            action={
+              <button
+                onClick={() => dispatch(setStatusFilter('all'))}
+                className="inline-flex items-center gap-2 rounded-xl text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 h-10 px-5 transition-colors"
+              >
+                {t('backoffice.empty.showAll')}
+              </button>
+            }
+          />
+        )
       )}
       {items.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">

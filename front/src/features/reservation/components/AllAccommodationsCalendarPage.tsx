@@ -25,6 +25,8 @@ import { selectManagedAccommodations } from '../../accommodationManagement/Accom
 import CreateReservationModal from './CreateReservationModal';
 import ReservationEventPopover from './ReservationEventPopover';
 import { Reservation } from '../ReservationTypes';
+import { Link } from 'react-router-dom';
+import EmptyState, { HomeIcon } from '../../../components/EmptyState';
 import { colorForStatus } from './CalendarEventColor';
 
 moment.locale('fr');
@@ -293,6 +295,21 @@ const AllAccommodationsCalendarPage: React.FC = () => {
               </TimelineHeaders>
             </Timeline>
           </div>
+        )}
+        {status === 'succeeded' && groups.length === 0 && (
+          <EmptyState
+            variant="plain"
+            icon={<HomeIcon />}
+            title={t('calendar.empty.title')}
+            description={t('calendar.empty.description')}
+            action={
+              <Link to="/create">
+                <button className="inline-flex items-center gap-2 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-10 px-5 shadow-sm shadow-blue-200 transition-all">
+                  {t('navbar.createAccommodation')}
+                </button>
+              </Link>
+            }
+          />
         )}
       </div>
       <CreateReservationModal

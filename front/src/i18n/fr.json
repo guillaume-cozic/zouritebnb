@@ -34,7 +34,12 @@
       "title": "Réservations",
       "subtitle": "Toutes les réservations de votre équipe, du plus récent au plus ancien.",
       "loading": "Chargement…",
-      "empty": "Aucune réservation pour ce filtre.",
+      "empty": {
+        "title": "Aucune réservation",
+        "description": "Les réservations de vos voyageurs apparaîtront ici dès la première demande.",
+        "filteredDescription": "Aucune réservation ne correspond à ce filtre.",
+        "showAll": "Voir toutes les réservations"
+      },
       "openConversation": "Ouvrir la conversation",
       "pendingBadge_one": "{{count}} demande en attente",
       "pendingBadge_other": "{{count}} demandes en attente",
@@ -179,7 +184,13 @@
     },
     "sidebarFooter": "Votre gîte, votre univers. Prenez soin de chaque voyageur.",
     "travelerSidebarFooter": "Vos messages et vos infos personnelles, au calme.",
-    "empty": "Aucun hébergement.",
+    "empty": {
+      "title": "Aucun hébergement pour le moment",
+      "description": "Créez votre premier hébergement pour commencer à recevoir des réservations.",
+      "filteredTitle": "Aucun hébergement dans ce filtre",
+      "filteredDescription": "Essayez un autre filtre pour retrouver vos hébergements.",
+      "showAll": "Voir tous les hébergements"
+    },
     "filter": {
       "all": "Tous",
       "published": "Publiés",
@@ -607,7 +618,10 @@
     "submit": "Créer",
     "cancel": "Annuler",
     "loading": "Chargement...",
-    "empty": "Aucune réservation",
+    "empty": {
+      "title": "Aucun hébergement",
+      "description": "Ajoutez un hébergement pour visualiser et planifier ses réservations dans le calendrier."
+    },
     "error": "Erreur",
     "status": {
       "pending": "En attente",
