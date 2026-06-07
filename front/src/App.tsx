@@ -38,23 +38,23 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/accommodations/:id/book" element={<ReservationConfirmationPage />} />
           </Route>
-          <Route path="/create" element={<CreateAccommodationWizard />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/conversations" element={<Navigate to="/account/conversations" replace />} />
           <Route path="/conversations/:id" element={<Navigate to="/account/conversations" replace />} />
-          <Route element={<BackofficeLayout />}>
-            <Route path="/admin" element={<HostHomePage />} />
-            <Route path="/admin/accommodations" element={<ManageAccommodationsPage />} />
-            <Route path="/admin/team" element={<TeamSettingsPage />} />
-            <Route path="/admin/calendar" element={<AllAccommodationsCalendarPage />} />
-            <Route path="/admin/accommodations/:id/calendar" element={<AccommodationCalendarPage />} />
-            <Route path="/admin/reservations" element={<AdminReservationsPage />} />
-            <Route path="/admin/conversations" element={<AdminConversationsPage />} />
-            <Route path="/admin/conversations/:id" element={<AdminConversationsPage />} />
-            <Route path="/accommodations/:id/edit" element={<EditAccommodationPage />} />
-            <Route path="/accommodations/:id/photos" element={<AccommodationPhotosPage />} />
-            <Route element={<ProtectedRoute />}>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/create" element={<CreateAccommodationWizard />} />
+            <Route element={<BackofficeLayout />}>
+              <Route path="/admin" element={<HostHomePage />} />
+              <Route path="/admin/accommodations" element={<ManageAccommodationsPage />} />
+              <Route path="/admin/team" element={<TeamSettingsPage />} />
+              <Route path="/admin/calendar" element={<AllAccommodationsCalendarPage />} />
+              <Route path="/admin/accommodations/:id/calendar" element={<AccommodationCalendarPage />} />
+              <Route path="/admin/reservations" element={<AdminReservationsPage />} />
+              <Route path="/admin/conversations" element={<AdminConversationsPage />} />
+              <Route path="/admin/conversations/:id" element={<AdminConversationsPage />} />
+              <Route path="/accommodations/:id/edit" element={<EditAccommodationPage />} />
+              <Route path="/accommodations/:id/photos" element={<AccommodationPhotosPage />} />
               <Route path="/account" element={<Navigate to="/account/conversations" replace />} />
               <Route path="/account/conversations" element={<ConversationsListPage />} />
               <Route path="/account/conversations/:id" element={<ConversationDetailPage />} />
