@@ -12,6 +12,15 @@ export const selectHomepageStatus = (state: RootState) =>
 export const selectHomepageError = (state: RootState) =>
   state.homepage?.error ?? null;
 
+export const selectHomepageLoadingMore = (state: RootState) =>
+  state.homepage?.loadingMore ?? false;
+
+export const selectHomepageTotalItems = (state: RootState) =>
+  state.homepage?.totalItems ?? 0;
+
+export const selectHomepageHasMore = (state: RootState) =>
+  (state.homepage?.accommodations.length ?? 0) < (state.homepage?.totalItems ?? 0);
+
 // Filters are now applied server-side by the API; the selector is a pass-through
 // kept as a named export so callers don't need to switch imports.
 export const selectFilteredAccommodations = selectAccommodations;

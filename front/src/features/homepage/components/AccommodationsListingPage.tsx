@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchPublishedAccommodations, setFilters } from '../HomepageSlice';
+import { fetchPublishedAccommodations, nextPageRequested, setFilters } from '../HomepageSlice';
 import {
   selectFilteredAccommodations,
   selectHomepageStatus,
   selectHomepageError,
   selectHomepageFilters,
+  selectHomepageHasMore,
+  selectHomepageLoadingMore,
 } from '../HomepageSelectors';
 import AccommodationCard from './AccommodationCard';
 import AccommodationsMap from './AccommodationsMap';
@@ -44,11 +46,14 @@ const AccommodationsListingPage: React.FC = () => {
   const status = useAppSelector(selectHomepageStatus);
   const error = useAppSelector(selectHomepageError);
   const filters = useAppSelector(selectHomepageFilters);
+  const hasMore = useAppSelector(selectHomepageHasMore);
+  const loadingMore = useAppSelector(selectHomepageLoadingMore);
 
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const amenitiesKey = filters.amenities.join(',');
   useEffect(() => {
@@ -60,8 +65,26 @@ const AccommodationsListingPage: React.FC = () => {
       priceMin: filters.priceMin,
       priceMax: filters.priceMax,
       amenities: filters.amenities,
+      page: 1,
     }));
   }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, amenitiesKey]);
+
+  // Infinite scroll: ask for the next page when the sentinel enters the viewport.
+  // The component only declares the intent; the listener decides what to fetch.
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          dispatch(nextPageRequested());
+        }
+      },
+      { rootMargin: '400px' }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [dispatch, hasMore, accommodations.length]);
 
   const toggleAmenity = (code: string) => {
     const next = filters.amenities.includes(code)
@@ -380,6 +403,28 @@ const AccommodationsListingPage: React.FC = () => {
                 <AccommodationCard key={item.id} accommodation={item} />
               ))}
             </div>
+          )}
+
+          {/* Sentinel observed by the IntersectionObserver to trigger the next page. */}
+          {hasMore && <div ref={sentinelRef} aria-hidden="true" className="h-px w-full" />}
+
+          {loadingMore && (
+            <div className="flex items-center justify-center py-10 text-gray-500">
+              <svg
+                className="animate-spin h-5 w-5 text-blue-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" />
+              </svg>
+              <span className="ml-3 text-sm">{t('listing.loadingMore')}</span>
+            </div>
+          )}
+
+          {!hasMore && !loadingMore && accommodations.length > 0 && (
+            <p className="text-center py-10 text-sm text-gray-400">{t('listing.endOfResults')}</p>
           )}
         </>
       )}
