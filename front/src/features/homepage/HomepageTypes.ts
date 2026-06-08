@@ -12,6 +12,8 @@ export interface AccommodationListItem {
   thumbnailUrl: string | null;
   photoUrls: string[];
   amenities: string[] | null;
+  averageRating: number | null;
+  reviewCount: number;
 }
 
 export interface SearchFilters {

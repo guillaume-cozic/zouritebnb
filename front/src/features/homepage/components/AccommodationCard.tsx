@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AccommodationListItem } from '../HomepageTypes';
+import RatingBadge from '../../review/components/RatingBadge';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 const PHOTO_CYCLE_MS = 1200;
@@ -112,9 +113,19 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
 
       {/* Content */}
       <div className="p-5">
-        <h3 className="font-semibold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
-          {accommodation.title}
-        </h3>
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+            {accommodation.title}
+          </h3>
+          {accommodation.averageRating != null && accommodation.reviewCount > 0 && (
+            <RatingBadge
+              rating={accommodation.averageRating}
+              count={accommodation.reviewCount}
+              showCount={false}
+              className="flex-shrink-0 mt-0.5"
+            />
+          )}
+        </div>
 
         <div className="flex items-center text-sm text-gray-500 mb-3">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 text-gray-400 flex-shrink-0">

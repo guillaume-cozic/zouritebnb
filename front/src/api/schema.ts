@@ -120,24 +120,38 @@ export interface paths {
      */
     patch: operations["api_accommodations_idweekly-promotion_patch"];
   };
+  "/api/my-accommodations": {
+    /**
+     * Lister mes hébergements (back-office)
+     * @description Retourne la liste paginée des hébergements appartenant à l'équipe de l'utilisateur authentifié, quel que soit leur statut. Filtre optionnel via ?status=all|published|draft.
+     */
+    get: operations["api_my-accommodations_get_collection"];
+  };
+  "/api/accommodations/{accommodationId}/reviews": {
+    /**
+     * Lister les avis d'un hébergement
+     * @description Retourne les avis laissés par les voyageurs sur un hébergement, du plus récent au plus ancien. Endpoint public.
+     */
+    get: operations["api_accommodations_accommodationIdreviews_get_collection"];
+  };
   "/api/conversations": {
     /**
-     * Lister les conversations accessibles à un utilisateur
-     * @description Retourne les conversations où l'utilisateur est soit le loueur, soit membre de l'équipe hôte. Filtre obligatoire : `userId` (UUID).
+     * Lister mes conversations
+     * @description Retourne les conversations de l'utilisateur authentifié : celles où il est le loueur ou membre de l'équipe hôte. L'identité est déduite du token JWT (aucun filtre `userId`/`teamId` n'est accepté). Authentification requise (401 sinon).
      */
     get: operations["api_conversations_get_collection"];
   };
   "/api/conversations/{id}": {
     /**
      * Récupérer une conversation et ses messages
-     * @description Retourne la conversation, ses participants et l'ensemble de ses messages (système et utilisateurs), triés par date d'envoi. 404 si introuvable.
+     * @description Retourne la conversation, ses participants et l'ensemble de ses messages (système et utilisateurs), triés par date d'envoi. Authentification requise (401 sinon). Réservé aux participants : le loueur concerné ou un membre de l'équipe hôte (403 sinon). 404 si introuvable.
      */
     get: operations["api_conversations_id_get"];
   };
   "/api/conversations/{id}/messages": {
     /**
      * Envoyer un message dans une conversation
-     * @description Ajoute un nouveau message à une conversation existante. L'auteur doit être soit le loueur, soit un membre de l'équipe hôte. Retourne 404 si la conversation est introuvable, 422 si l'auteur n'est pas participant.
+     * @description Ajoute un nouveau message à une conversation existante. L'auteur est l'utilisateur authentifié, qui doit être soit le loueur, soit un membre de l'équipe hôte. Authentification requise (401 sinon). Retourne 422 si la conversation est introuvable ou si l'auteur n'est pas participant.
      */
     post: operations["api_conversations_idmessages_post"];
   };
@@ -165,49 +179,63 @@ export interface paths {
   "/api/reservations": {
     /**
      * Lister les réservations
-     * @description Retourne la liste des réservations de l'équipe courante. Filtres optionnels : accommodationId (UUID de l'hébergement), from et to (intervalle de dates ISO 8601 — les réservations qui chevauchent cet intervalle sont retournées).
+     * @description Retourne les réservations visibles par l'utilisateur courant : celles de son équipe (en tant que loueur) et celles où il est le voyageur. Filtres optionnels : accommodationId (UUID de l'hébergement), from et to (intervalle de dates ISO 8601 — les réservations qui chevauchent cet intervalle sont retournées).
      */
     get: operations["api_reservations_get_collection"];
     /**
      * Créer une réservation (back-office)
-     * @description Crée une réservation directement en statut "confirmed" depuis le back-office hôte, sans étape d'approbation (aucun loueur associé : guestUserId reste null). Pour le parcours public où un loueur soumet une demande à valider par l'hôte, utiliser POST /reservations/request. La date de départ doit être strictement postérieure à la date d'arrivée et le nom du voyageur ne peut pas être vide.
+     * @description Crée une réservation directement en statut "confirmed" depuis le back-office hôte, sans étape d'approbation (aucun loueur associé : guestUserId reste null). La réservation est rattachée à l'équipe de l'utilisateur authentifié. Pour le parcours public où un loueur soumet une demande à valider par l'hôte, utiliser POST /reservations/request. La date de départ doit être strictement postérieure à la date d'arrivée et le nom du voyageur ne peut pas être vide.
      */
     post: operations["api_reservations_post"];
   };
   "/api/reservations/request": {
     /**
      * Demander une réservation (parcours B2C)
-     * @description Crée une demande de réservation en statut "pending" depuis le parcours public. Une conversation entre l'hôte et le loueur est ouverte automatiquement. L'hôte dispose de 24h pour accepter ou refuser. La date de départ doit être strictement postérieure à la date d'arrivée.
+     * @description Crée une demande de réservation en statut "pending" depuis le parcours public. Le voyageur est l'utilisateur authentifié (déduit du JWT). Une conversation entre l'hôte et le loueur est ouverte automatiquement. L'hôte dispose de 24h pour accepter ou refuser. La date de départ doit être strictement postérieure à la date d'arrivée.
      */
     post: operations["api_reservationsrequest_post"];
   };
   "/api/reservations/{id}": {
     /**
      * Récupérer une réservation
-     * @description Retourne le détail complet d'une réservation par son identifiant UUID. Retourne 404 si la réservation est introuvable.
+     * @description Retourne le détail complet d'une réservation par son identifiant UUID. Accessible uniquement au voyageur de la réservation ou à un membre de l'équipe loueur (403 sinon). Retourne 404 si la réservation est introuvable.
      */
     get: operations["api_reservations_id_get"];
   };
   "/api/reservations/{id}/cancel": {
     /**
      * Annuler une réservation
-     * @description Passe une réservation au statut "cancelled". Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée.
+     * @description Passe une réservation au statut "cancelled". Accessible au voyageur de la réservation ou à un membre de l'équipe loueur (403 sinon). Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée.
      */
     patch: operations["api_reservations_idcancel_patch"];
   };
   "/api/reservations/{id}/confirm": {
     /**
      * Confirmer une réservation
-     * @description Passe une réservation du statut "pending" au statut "confirmed". Retourne 404 si la réservation est introuvable, 422 si elle est déjà confirmée ou annulée.
+     * @description L'équipe loueur passe une réservation du statut "pending" au statut "confirmed". Réservé aux membres de l'équipe propriétaire (403 sinon). Retourne 404 si la réservation est introuvable, 422 si elle est déjà confirmée ou annulée.
      */
     patch: operations["api_reservations_idconfirm_patch"];
   };
   "/api/reservations/{id}/refuse": {
     /**
      * Refuser une réservation (hôte)
-     * @description L'hôte refuse une réservation en statut "pending". Passe au statut "refused". Retourne 404 si introuvable, 422 si la réservation n'est pas en "pending".
+     * @description L'hôte refuse une réservation en statut "pending". Réservé aux membres de l'équipe propriétaire (403 sinon). Passe au statut "refused". Retourne 404 si introuvable, 422 si la réservation n'est pas en "pending".
      */
     patch: operations["api_reservations_idrefuse_patch"];
+  };
+  "/api/reviews/accommodation": {
+    /**
+     * Noter un hébergement (voyageur)
+     * @description Permet à un voyageur connecté de noter l'hébergement où il a séjourné. L'auteur de l'avis est l'utilisateur courant authentifié (dérivé du jeton JWT, jamais fourni dans le corps) et doit avoir un séjour confirmé dont la date de départ est passée. La note doit être un entier entre 1 et 5, et le commentaire doit contenir au moins 50 caractères. Retourne 401 si aucun utilisateur authentifié n'est fourni, 422 si les règles métier sont violées (note hors bornes, commentaire trop court, séjour non terminé, avis déjà déposé).
+     */
+    post: operations["api_reviewsaccommodation_post"];
+  };
+  "/api/reviews/guest": {
+    /**
+     * Noter un voyageur (loueur)
+     * @description Permet à un loueur connecté, membre de l'équipe hôte de l'hébergement, de noter un voyageur ayant effectué un séjour terminé. L'auteur de l'avis est l'utilisateur courant authentifié (dérivé du jeton JWT, jamais fourni dans le corps). La note doit être un entier entre 1 et 5, et le commentaire doit contenir au moins 50 caractères. Retourne 401 si aucun utilisateur authentifié n'est fourni, 403 si l'auteur n'est pas membre de l'équipe hôte de l'hébergement, 422 si les règles métier sont violées (note hors bornes, commentaire trop court, séjour non terminé, avis déjà déposé).
+     */
+    post: operations["api_reviewsguest_post"];
   };
   "/api/solidarity_projects": {
     /**
@@ -226,14 +254,14 @@ export interface paths {
   "/api/solidarity_projects/{id}/mark-default": {
     /**
      * Définir le projet solidaire par défaut de la plateforme
-     * @description Marque ce projet comme le projet par défaut affiché sur les hébergements quand l'équipe hôte n'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut.
+     * @description Marque ce projet comme le projet par défaut affiché sur les hébergements quand l'équipe hôte n'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut. Réservé aux utilisateurs authentifiés.
      */
     patch: operations["api_solidarity_projects_idmark-default_patch"];
   };
   "/api/teams/{id}": {
     /**
      * Récupérer une équipe
-     * @description Retourne une équipe et son projet solidaire coup de cœur.
+     * @description Retourne une équipe et son projet solidaire coup de cœur. Réservé aux membres de l'équipe.
      */
     get: operations["api_teams_id_get"];
   };
@@ -254,7 +282,7 @@ export interface paths {
   "/api/team-invitations/{id}": {
     /**
      * Annuler une invitation de co-hôte
-     * @description Annule une invitation en attente. Retourne une erreur 422 si l'invitation est introuvable ou déjà finalisée (acceptée ou annulée).
+     * @description Annule une invitation en attente. Retourne une erreur 422 si l'invitation est introuvable ou déjà finalisée (acceptée ou annulée). Réservé aux membres de l'équipe propriétaire de l'invitation.
      */
     delete: operations["api_team-invitations_id_delete"];
   };
@@ -273,7 +301,7 @@ export interface paths {
   "/api/login": {
     /**
      * Authentification d'un utilisateur
-     * @description Vérifie email + mot de passe et retourne l'utilisateur (pas de token pour l'instant).
+     * @description Vérifie email + mot de passe et retourne l'utilisateur ainsi qu'un JWT (champ `token`) à utiliser comme Bearer.
      */
     post: operations["api_login_post"];
   };
@@ -284,12 +312,24 @@ export interface paths {
      */
     post: operations["api_register_post"];
   };
-  "/api/users/{id}/profile": {
+  "/api/users/profile": {
     /**
-     * Mettre à jour le profil d'un utilisateur
-     * @description Met à jour le prénom, le nom et l'email d'un utilisateur.
+     * Mettre à jour le profil de l'utilisateur courant
+     * @description Met à jour le prénom, le nom et l'email de l'utilisateur authentifié (identifié via le JWT).
      */
-    patch: operations["api_users_idprofile_patch"];
+    patch: operations["api_usersprofile_patch"];
+  };
+  "/api/users/{id}/identity-verification": {
+    /**
+     * Statut de vérification d'identité d'un utilisateur
+     * @description Retourne le statut de vérification courant de l'utilisateur.
+     */
+    get: operations["api_users_ididentity-verification_get"];
+    /**
+     * Soumettre une vérification d'identité
+     * @description Envoie la pièce d'identité et le selfie (multipart). La vérification automatique est simulée : l'utilisateur passe immédiatement au statut "verified". Champs : document (fichier), selfie (fichier), documentType (passport|id_card|driving_license).
+     */
+    post: operations["api_users_ididentity-verification_post"];
   };
 }
 
@@ -318,6 +358,17 @@ export interface components {
        * @example 150
        */
       price?: number | null;
+      /**
+       * @description Note moyenne sur 5 calculée à partir des avis voyageurs, null si aucun avis
+       * @example 4.5
+       */
+      averageRating?: number | null;
+      /**
+       * @description Nombre d'avis voyageurs reçus
+       * @default 0
+       * @example 12
+       */
+      reviewCount?: number;
       /**
        * @description Pourcentage de réduction appliqué aux séjours d'au moins 7 nuits
        * @example 10
@@ -447,6 +498,17 @@ export interface components {
        */
       price?: number | null;
       /**
+       * @description Note moyenne sur 5 calculée à partir des avis voyageurs, null si aucun avis
+       * @example 4.5
+       */
+      averageRating?: number | null;
+      /**
+       * @description Nombre d'avis voyageurs reçus
+       * @default 0
+       * @example 12
+       */
+      reviewCount?: number;
+      /**
        * @description Statut de publication
        * @example draft
        */
@@ -525,6 +587,17 @@ export interface components {
        * @example 150
        */
       price?: number | null;
+      /**
+       * @description Note moyenne sur 5 calculée à partir des avis voyageurs, null si aucun avis
+       * @example 4.5
+       */
+      averageRating?: number | null;
+      /**
+       * @description Nombre d'avis voyageurs reçus
+       * @default 0
+       * @example 12
+       */
+      reviewCount?: number;
       /**
        * @description Pourcentage de réduction appliqué aux séjours d'au moins 7 nuits
        * @example 10
@@ -619,6 +692,33 @@ export interface components {
           [key: string]: string;
         }[] | null;
     });
+    "AccommodationReview.jsonld-accommodation_review.read": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant UUID de l'avis
+       * @example 01961e2f-dead-7000-beef-000000000001
+       */
+      id?: string | null;
+      /**
+       * @description Note attribuée sur 5
+       * @example 5
+       */
+      rating?: number | null;
+      /**
+       * @description Commentaire du voyageur
+       * @example Séjour parfait, logement propre et bien situé.
+       */
+      comment?: string | null;
+      /**
+       * @description Nom affiché de l'auteur (prénom + initiale du nom)
+       * @example Marie D.
+       */
+      authorName?: string | null;
+      /**
+       * @description Date de publication de l'avis (ISO 8601)
+       * @example 2026-05-12T14:30:00+00:00
+       */
+      createdAt?: string | null;
+    });
     /** @description Unprocessable entity */
     ConstraintViolation: {
       /** @default 422 */
@@ -682,11 +782,6 @@ export interface components {
       isSystem?: boolean;
     });
     "Conversation.SendMessageInput-conversation.write": {
-      /**
-       * @description Identifiant UUID de l'auteur (loueur ou membre de l'équipe hôte)
-       * @example 01961e2f-dead-7000-beef-0000000000c1
-       */
-      authorUserId?: string;
       /**
        * @description Corps du message. Doit contenir au moins un caractère non blanc et pas plus de 5000 caractères.
        * @example Bonjour, est-il possible d'avoir un lit bébé ?
@@ -1113,6 +1208,73 @@ export interface components {
        * @example Dupont
        */
       lastName?: string | null;
+      /**
+       * @description Statut de vérification d'identité
+       * @default not_started
+       * @example verified
+       */
+      verificationStatus?: string;
+    });
+    "User.jsonld-user.read_user.token": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant UUID de l'utilisateur
+       * @example 019cf27a-96ba-7957-8622-eeccb7350e79
+       */
+      id?: string | null;
+      /**
+       * @description Adresse email
+       * @example host@example.com
+       */
+      email?: string | null;
+      /**
+       * @description Identifiant UUID de l'équipe de l'utilisateur
+       * @example 019cf27a-96ba-7957-8622-eeccb7350e99
+       */
+      teamId?: string | null;
+      /**
+       * @description Prénom
+       * @example Marie
+       */
+      firstName?: string | null;
+      /**
+       * @description Nom
+       * @example Dupont
+       */
+      lastName?: string | null;
+      /**
+       * @description Statut de vérification d'identité
+       * @default not_started
+       * @example verified
+       */
+      verificationStatus?: string;
+      /**
+       * @description JWT Bearer à placer dans l'en-tête Authorization pour les requêtes authentifiées
+       * @example eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...
+       */
+      token?: string | null;
+    });
+    "UserVerification.jsonld-user_verification.read": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant UUID de l'utilisateur
+       * @example 019cf27a-96ba-7957-8622-eeccb7350e79
+       */
+      userId?: string | null;
+      /**
+       * @description Statut de vérification
+       * @default not_started
+       * @example verified
+       */
+      status?: string;
+      /**
+       * @description Type de pièce d'identité soumise
+       * @example passport
+       */
+      documentType?: string | null;
+      /**
+       * @description Date de vérification (ISO 8601)
+       * @example 2026-06-07T12:00:00+00:00
+       */
+      verifiedAt?: string | null;
     });
   };
   responses: {
@@ -1174,6 +1336,14 @@ export interface operations {
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -1248,6 +1418,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -1290,6 +1468,14 @@ export interface operations {
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -1344,6 +1530,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -1386,6 +1580,14 @@ export interface operations {
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -1440,6 +1642,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -1488,6 +1698,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -1524,6 +1742,14 @@ export interface operations {
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -1570,6 +1796,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -1606,6 +1840,14 @@ export interface operations {
       204: {
         content: never;
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -1640,6 +1882,14 @@ export interface operations {
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -1688,6 +1938,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -1724,6 +1982,14 @@ export interface operations {
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -1778,6 +2044,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -1797,8 +2071,64 @@ export interface operations {
     };
   };
   /**
-   * Lister les conversations accessibles à un utilisateur
-   * @description Retourne les conversations où l'utilisateur est soit le loueur, soit membre de l'équipe hôte. Filtre obligatoire : `userId` (UUID).
+   * Lister mes hébergements (back-office)
+   * @description Retourne la liste paginée des hébergements appartenant à l'équipe de l'utilisateur authentifié, quel que soit leur statut. Filtre optionnel via ?status=all|published|draft.
+   */
+  "api_my-accommodations_get_collection": {
+    parameters: {
+      query?: {
+        /** @description The collection page number */
+        page?: number;
+      };
+    };
+    responses: {
+      /** @description AccommodationEntity collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
+            member: components["schemas"]["AccommodationEntity.jsonld-accommodation.list"][];
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Lister les avis d'un hébergement
+   * @description Retourne les avis laissés par les voyageurs sur un hébergement, du plus récent au plus ancien. Endpoint public.
+   */
+  api_accommodations_accommodationIdreviews_get_collection: {
+    parameters: {
+      query?: {
+        /** @description The collection page number */
+        page?: number;
+      };
+      path: {
+        /** @description AccommodationReview identifier */
+        accommodationId: string;
+      };
+    };
+    responses: {
+      /** @description AccommodationReview collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
+            member: components["schemas"]["AccommodationReview.jsonld-accommodation_review.read"][];
+          };
+        };
+      };
+    };
+  };
+  /**
+   * Lister mes conversations
+   * @description Retourne les conversations de l'utilisateur authentifié : celles où il est le loueur ou membre de l'équipe hôte. L'identité est déduite du token JWT (aucun filtre `userId`/`teamId` n'est accepté). Authentification requise (401 sinon).
    */
   api_conversations_get_collection: {
     parameters: {
@@ -1816,11 +2146,19 @@ export interface operations {
           };
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
   };
   /**
    * Récupérer une conversation et ses messages
-   * @description Retourne la conversation, ses participants et l'ensemble de ses messages (système et utilisateurs), triés par date d'envoi. 404 si introuvable.
+   * @description Retourne la conversation, ses participants et l'ensemble de ses messages (système et utilisateurs), triés par date d'envoi. Authentification requise (401 sinon). Réservé aux participants : le loueur concerné ou un membre de l'équipe hôte (403 sinon). 404 si introuvable.
    */
   api_conversations_id_get: {
     parameters: {
@@ -1836,6 +2174,14 @@ export interface operations {
           "application/ld+json": components["schemas"]["Conversation.jsonld-conversation.read"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -1848,7 +2194,7 @@ export interface operations {
   };
   /**
    * Envoyer un message dans une conversation
-   * @description Ajoute un nouveau message à une conversation existante. L'auteur doit être soit le loueur, soit un membre de l'équipe hôte. Retourne 404 si la conversation est introuvable, 422 si l'auteur n'est pas participant.
+   * @description Ajoute un nouveau message à une conversation existante. L'auteur est l'utilisateur authentifié, qui doit être soit le loueur, soit un membre de l'équipe hôte. Authentification requise (401 sinon). Retourne 422 si la conversation est introuvable ou si l'auteur n'est pas participant.
    */
   api_conversations_idmessages_post: {
     parameters: {
@@ -1872,6 +2218,14 @@ export interface operations {
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -1930,6 +2284,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description An error occurred */
       422: {
         content: {
@@ -1958,7 +2320,7 @@ export interface operations {
   };
   /**
    * Lister les réservations
-   * @description Retourne la liste des réservations de l'équipe courante. Filtres optionnels : accommodationId (UUID de l'hébergement), from et to (intervalle de dates ISO 8601 — les réservations qui chevauchent cet intervalle sont retournées).
+   * @description Retourne les réservations visibles par l'utilisateur courant : celles de son équipe (en tant que loueur) et celles où il est le voyageur. Filtres optionnels : accommodationId (UUID de l'hébergement), from et to (intervalle de dates ISO 8601 — les réservations qui chevauchent cet intervalle sont retournées).
    */
   api_reservations_get_collection: {
     parameters: {
@@ -1976,11 +2338,19 @@ export interface operations {
           };
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
   };
   /**
    * Créer une réservation (back-office)
-   * @description Crée une réservation directement en statut "confirmed" depuis le back-office hôte, sans étape d'approbation (aucun loueur associé : guestUserId reste null). Pour le parcours public où un loueur soumet une demande à valider par l'hôte, utiliser POST /reservations/request. La date de départ doit être strictement postérieure à la date d'arrivée et le nom du voyageur ne peut pas être vide.
+   * @description Crée une réservation directement en statut "confirmed" depuis le back-office hôte, sans étape d'approbation (aucun loueur associé : guestUserId reste null). La réservation est rattachée à l'équipe de l'utilisateur authentifié. Pour le parcours public où un loueur soumet une demande à valider par l'hôte, utiliser POST /reservations/request. La date de départ doit être strictement postérieure à la date d'arrivée et le nom du voyageur ne peut pas être vide.
    */
   api_reservations_post: {
     /** @description The new Reservation resource */
@@ -2004,6 +2374,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description An error occurred */
       422: {
         content: {
@@ -2016,7 +2394,7 @@ export interface operations {
   };
   /**
    * Demander une réservation (parcours B2C)
-   * @description Crée une demande de réservation en statut "pending" depuis le parcours public. Une conversation entre l'hôte et le loueur est ouverte automatiquement. L'hôte dispose de 24h pour accepter ou refuser. La date de départ doit être strictement postérieure à la date d'arrivée.
+   * @description Crée une demande de réservation en statut "pending" depuis le parcours public. Le voyageur est l'utilisateur authentifié (déduit du JWT). Une conversation entre l'hôte et le loueur est ouverte automatiquement. L'hôte dispose de 24h pour accepter ou refuser. La date de départ doit être strictement postérieure à la date d'arrivée.
    */
   api_reservationsrequest_post: {
     /** @description The new Reservation resource */
@@ -2040,6 +2418,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description An error occurred */
       422: {
         content: {
@@ -2052,7 +2438,7 @@ export interface operations {
   };
   /**
    * Récupérer une réservation
-   * @description Retourne le détail complet d'une réservation par son identifiant UUID. Retourne 404 si la réservation est introuvable.
+   * @description Retourne le détail complet d'une réservation par son identifiant UUID. Accessible uniquement au voyageur de la réservation ou à un membre de l'équipe loueur (403 sinon). Retourne 404 si la réservation est introuvable.
    */
   api_reservations_id_get: {
     parameters: {
@@ -2068,6 +2454,14 @@ export interface operations {
           "application/ld+json": components["schemas"]["Reservation.jsonld-reservation.read"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -2080,7 +2474,7 @@ export interface operations {
   };
   /**
    * Annuler une réservation
-   * @description Passe une réservation au statut "cancelled". Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée.
+   * @description Passe une réservation au statut "cancelled". Accessible au voyageur de la réservation ou à un membre de l'équipe loueur (403 sinon). Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée.
    */
   api_reservations_idcancel_patch: {
     parameters: {
@@ -2109,6 +2503,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -2129,7 +2531,7 @@ export interface operations {
   };
   /**
    * Confirmer une réservation
-   * @description Passe une réservation du statut "pending" au statut "confirmed". Retourne 404 si la réservation est introuvable, 422 si elle est déjà confirmée ou annulée.
+   * @description L'équipe loueur passe une réservation du statut "pending" au statut "confirmed". Réservé aux membres de l'équipe propriétaire (403 sinon). Retourne 404 si la réservation est introuvable, 422 si elle est déjà confirmée ou annulée.
    */
   api_reservations_idconfirm_patch: {
     parameters: {
@@ -2158,6 +2560,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -2178,7 +2588,7 @@ export interface operations {
   };
   /**
    * Refuser une réservation (hôte)
-   * @description L'hôte refuse une réservation en statut "pending". Passe au statut "refused". Retourne 404 si introuvable, 422 si la réservation n'est pas en "pending".
+   * @description L'hôte refuse une réservation en statut "pending". Réservé aux membres de l'équipe propriétaire (403 sinon). Passe au statut "refused". Retourne 404 si introuvable, 422 si la réservation n'est pas en "pending".
    */
   api_reservations_idrefuse_patch: {
     parameters: {
@@ -2207,8 +2617,100 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Noter un hébergement (voyageur)
+   * @description Permet à un voyageur connecté de noter l'hébergement où il a séjourné. L'auteur de l'avis est l'utilisateur courant authentifié (dérivé du jeton JWT, jamais fourni dans le corps) et doit avoir un séjour confirmé dont la date de départ est passée. La note doit être un entier entre 1 et 5, et le commentaire doit contenir au moins 50 caractères. Retourne 401 si aucun utilisateur authentifié n'est fourni, 422 si les règles métier sont violées (note hors bornes, commentaire trop court, séjour non terminé, avis déjà déposé).
+   */
+  api_reviewsaccommodation_post: {
+    /** @description The new Review resource */
+    requestBody?: {
+      content: {
+        "application/ld+json": unknown;
+      };
+    };
+    responses: {
+      /** @description Review resource created */
+      201: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Noter un voyageur (loueur)
+   * @description Permet à un loueur connecté, membre de l'équipe hôte de l'hébergement, de noter un voyageur ayant effectué un séjour terminé. L'auteur de l'avis est l'utilisateur courant authentifié (dérivé du jeton JWT, jamais fourni dans le corps). La note doit être un entier entre 1 et 5, et le commentaire doit contenir au moins 50 caractères. Retourne 401 si aucun utilisateur authentifié n'est fourni, 403 si l'auteur n'est pas membre de l'équipe hôte de l'hébergement, 422 si les règles métier sont violées (note hors bornes, commentaire trop court, séjour non terminé, avis déjà déposé).
+   */
+  api_reviewsguest_post: {
+    /** @description The new Review resource */
+    requestBody?: {
+      content: {
+        "application/ld+json": unknown;
+      };
+    };
+    responses: {
+      /** @description Review resource created */
+      201: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -2271,7 +2773,7 @@ export interface operations {
   };
   /**
    * Définir le projet solidaire par défaut de la plateforme
-   * @description Marque ce projet comme le projet par défaut affiché sur les hébergements quand l'équipe hôte n'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut.
+   * @description Marque ce projet comme le projet par défaut affiché sur les hébergements quand l'équipe hôte n'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut. Réservé aux utilisateurs authentifiés.
    */
   "api_solidarity_projects_idmark-default_patch": {
     parameters: {
@@ -2287,6 +2789,14 @@ export interface operations {
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -2313,7 +2823,7 @@ export interface operations {
   };
   /**
    * Récupérer une équipe
-   * @description Retourne une équipe et son projet solidaire coup de cœur.
+   * @description Retourne une équipe et son projet solidaire coup de cœur. Réservé aux membres de l'équipe.
    */
   api_teams_id_get: {
     parameters: {
@@ -2327,6 +2837,14 @@ export interface operations {
       200: {
         content: {
           "application/ld+json": components["schemas"]["TeamEntity.jsonld-team.read"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Not found */
@@ -2363,6 +2881,14 @@ export interface operations {
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
@@ -2417,6 +2943,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Not found */
       404: {
         content: {
@@ -2437,7 +2971,7 @@ export interface operations {
   };
   /**
    * Annuler une invitation de co-hôte
-   * @description Annule une invitation en attente. Retourne une erreur 422 si l'invitation est introuvable ou déjà finalisée (acceptée ou annulée).
+   * @description Annule une invitation en attente. Retourne une erreur 422 si l'invitation est introuvable ou déjà finalisée (acceptée ou annulée). Réservé aux membres de l'équipe propriétaire de l'invitation.
    */
   "api_team-invitations_id_delete": {
     parameters: {
@@ -2450,6 +2984,14 @@ export interface operations {
       /** @description TeamInvitation resource deleted */
       204: {
         content: never;
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
       };
       /** @description Not found */
       404: {
@@ -2483,6 +3025,14 @@ export interface operations {
           "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
             member: components["schemas"]["TeamInvitation.jsonld-team_invitation.read"][];
           };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
         };
       };
     };
@@ -2519,6 +3069,14 @@ export interface operations {
           "application/json": components["schemas"]["Error"];
         };
       };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description An error occurred */
       422: {
         content: {
@@ -2531,7 +3089,7 @@ export interface operations {
   };
   /**
    * Authentification d'un utilisateur
-   * @description Vérifie email + mot de passe et retourne l'utilisateur (pas de token pour l'instant).
+   * @description Vérifie email + mot de passe et retourne l'utilisateur ainsi qu'un JWT (champ `token`) à utiliser comme Bearer.
    */
   api_login_post: {
     /** @description The new User resource */
@@ -2544,7 +3102,7 @@ export interface operations {
       /** @description User resource created */
       201: {
         content: {
-          "application/ld+json": components["schemas"]["User.jsonld-user.read"];
+          "application/ld+json": components["schemas"]["User.jsonld-user.read_user.token"];
         };
       };
       /** @description Invalid input */
@@ -2602,16 +3160,10 @@ export interface operations {
     };
   };
   /**
-   * Mettre à jour le profil d'un utilisateur
-   * @description Met à jour le prénom, le nom et l'email d'un utilisateur.
+   * Mettre à jour le profil de l'utilisateur courant
+   * @description Met à jour le prénom, le nom et l'email de l'utilisateur authentifié (identifié via le JWT).
    */
-  api_users_idprofile_patch: {
-    parameters: {
-      path: {
-        /** @description User identifier */
-        id: string;
-      };
-    };
+  api_usersprofile_patch: {
     /** @description The updated User resource */
     requestBody: {
       content: {
@@ -2633,6 +3185,70 @@ export interface operations {
       };
       /** @description Not found */
       404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Statut de vérification d'identité d'un utilisateur
+   * @description Retourne le statut de vérification courant de l'utilisateur.
+   */
+  "api_users_ididentity-verification_get": {
+    parameters: {
+      path: {
+        /** @description UserVerification identifier */
+        id: string;
+      };
+    };
+    responses: {
+      /** @description UserVerification resource */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["UserVerification.jsonld-user_verification.read"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Soumettre une vérification d'identité
+   * @description Envoie la pièce d'identité et le selfie (multipart). La vérification automatique est simulée : l'utilisateur passe immédiatement au statut "verified". Champs : document (fichier), selfie (fichier), documentType (passport|id_card|driving_license).
+   */
+  "api_users_ididentity-verification_post": {
+    parameters: {
+      path: {
+        /** @description UserVerification identifier */
+        id: string;
+      };
+    };
+    responses: {
+      /** @description UserVerification resource created */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["UserVerification.jsonld-user_verification.read"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];

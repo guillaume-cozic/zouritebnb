@@ -409,6 +409,14 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Prix par nuit en euros', example: 150.0)]
     public ?float $price = null;
 
+    #[Groups(['accommodation:read', 'accommodation:list'])]
+    #[ApiProperty(description: 'Note moyenne sur 5 calculée à partir des avis voyageurs, null si aucun avis', example: 4.5)]
+    public ?float $averageRating = null;
+
+    #[Groups(['accommodation:read', 'accommodation:list'])]
+    #[ApiProperty(description: 'Nombre d\'avis voyageurs reçus', example: 12)]
+    public int $reviewCount = 0;
+
     #[Groups(['accommodation:read'])]
     #[ApiProperty(description: 'Pourcentage de réduction appliqué aux séjours d\'au moins 7 nuits', example: 10.0)]
     public ?float $weeklyPromotionPercentage = null;

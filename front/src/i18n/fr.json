@@ -111,7 +111,8 @@
       "myAccommodations": "Mes hébergements",
       "calendar": "Calendrier",
       "conversations": "Conversations",
-      "settings": "Mes paramètres"
+      "settings": "Mes paramètres",
+      "verification": "Vérification d'identité"
     }
   },
   "auth": {
@@ -229,7 +230,7 @@
     "current": {
       "title": "Chez nous aujourd'hui",
       "subtitle": "Les voyageurs qui séjournent en ce moment.",
-      "empty": "Personne ne séjourne chez vous aujourd'hui.",
+      "empty": "Pas de voyages prochainement.",
       "dayCount": "Jour {{day}} / {{total}}",
       "leavingTomorrow": "Part demain"
     },
@@ -673,11 +674,41 @@
     "rateGuest": "Noter le voyageur",
     "alreadyReviewedAccommodation": "Avis publié",
     "alreadyReviewedGuest": "Voyageur noté",
+    "noRatingYet": "Pas encore d'avis",
+    "reviewCount_one": "{{count}} avis",
+    "reviewCount_other": "{{count}} avis",
     "error": {
       "validation": "Vérifiez votre note (1 à 5) et votre commentaire (50 caractères minimum).",
       "forbidden": "Vous n'êtes pas autorisé à laisser cet avis.",
       "unauthenticated": "Vous devez être connecté pour laisser un avis.",
       "generic": "Une erreur est survenue lors de l'envoi de votre avis."
+    }
+  },
+  "userProfile": {
+    "verification": {
+      "title": "Vérification d'identité",
+      "subtitle": "Confirmez votre identité pour renforcer la confiance auprès des hôtes et des voyageurs.",
+      "documentTypeLabel": "Type de pièce d'identité",
+      "documentTypes": {
+        "passport": "Passeport",
+        "id_card": "Carte d'identité",
+        "driving_license": "Permis de conduire"
+      },
+      "documentLabel": "Pièce d'identité",
+      "documentHint": "Cliquez pour téléverser une photo de votre pièce (JPEG, PNG ou WebP).",
+      "selfieLabel": "Selfie",
+      "selfieHint": "Cliquez pour téléverser un selfie récent (JPEG, PNG ou WebP).",
+      "submit": "Soumettre pour vérification",
+      "uploading": "Téléversement… {{progress}}%",
+      "analyzing": "Analyse de vos documents en cours…",
+      "verifiedTitle": "Votre identité est vérifiée",
+      "verifiedOn": "Vérifiée le {{date}}",
+      "status": {
+        "not_started": "Non vérifié",
+        "pending": "En attente",
+        "verified": "Vérifié",
+        "rejected": "Refusé"
+      }
     }
   }
 }

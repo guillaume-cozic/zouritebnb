@@ -15,6 +15,15 @@ export interface SubmitGuestReviewPayload {
   comment: string;
 }
 
+/** A review displayed on the accommodation detail page (GET /accommodations/{id}/reviews). */
+export interface AccommodationReview {
+  id: string;
+  rating: number;
+  comment: string;
+  authorName: string;
+  createdAt: string;
+}
+
 /** A submitted review, tracked locally so the UI can hide the "rate" button. */
 export interface SubmittedReview {
   target: ReviewTarget;

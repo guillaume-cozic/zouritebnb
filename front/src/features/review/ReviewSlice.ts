@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import {
+  AccommodationReview,
   ReviewTarget,
   SubmitAccommodationReviewPayload,
   SubmitGuestReviewPayload,
@@ -29,6 +30,9 @@ interface ReviewState {
   errorCode: number | null;
   /** Reviews already submitted in this session, keyed by reservation + target. */
   submitted: SubmittedReview[];
+  /** Reviews of the accommodation currently displayed on the detail page. */
+  list: AccommodationReview[];
+  listStatus: Status;
 }
 
 const initialState: ReviewState = {
@@ -36,6 +40,8 @@ const initialState: ReviewState = {
   error: null,
   errorCode: null,
   submitted: [],
+  list: [],
+  listStatus: 'idle',
 };
 
 interface RejectMeta {
@@ -80,6 +86,19 @@ export const submitGuestReview = createAsyncThunk<
     return rejectWithValue(extractError(err));
   }
 });
+
+export const fetchAccommodationReviews = createAsyncThunk<AccommodationReview[], string>(
+  'review/fetchAccommodationReviews',
+  async (accommodationId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/api/accommodations/${accommodationId}/reviews`);
+      const data = response.data;
+      return (data['hydra:member'] ?? data['member'] ?? []) as AccommodationReview[];
+    } catch (err: any) {
+      return rejectWithValue(extractError(err));
+    }
+  }
+);
 
 const markSubmitted = (state: ReviewState, target: ReviewTarget, reservationId: string) => {
   state.status = 'succeeded';
@@ -129,6 +148,17 @@ const reviewSlice = createSlice({
       })
       .addCase(submitGuestReview.rejected, (state, action) => {
         markFailed(state, action.payload);
+      })
+      .addCase(fetchAccommodationReviews.pending, (state) => {
+        state.listStatus = 'loading';
+      })
+      .addCase(fetchAccommodationReviews.fulfilled, (state, action) => {
+        state.listStatus = 'succeeded';
+        state.list = action.payload;
+      })
+      .addCase(fetchAccommodationReviews.rejected, (state) => {
+        state.listStatus = 'failed';
+        state.list = [];
       });
   },
 });

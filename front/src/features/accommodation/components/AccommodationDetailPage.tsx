@@ -18,6 +18,10 @@ import { selectAuthUser } from '../../auth/AuthSelectors';
 import LocationMap from '../../../components/LocationMap';
 import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
+import RatingBadge from '../../review/components/RatingBadge';
+import AccommodationReviews from '../../review/components/AccommodationReviews';
+import { fetchAccommodationReviews } from '../../review/ReviewSlice';
+import { selectAccommodationReviews } from '../../review/ReviewSelectors';
 import { selectCurrentAccommodation, selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
 
 registerLocale('fr', fr);
@@ -48,6 +52,7 @@ const AccommodationDetailPage: React.FC = () => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const user = useAppSelector(selectAuthUser);
+  const reviews = useAppSelector(selectAccommodationReviews);
   const navigate = useNavigate();
 
   const startDate = toDate(filters.checkIn);
@@ -78,6 +83,7 @@ const AccommodationDetailPage: React.FC = () => {
   useEffect(() => {
     if (id) {
       dispatch(fetchAccommodation(id));
+      dispatch(fetchAccommodationReviews(id));
     }
   }, [dispatch, id]);
 
@@ -85,11 +91,14 @@ const AccommodationDetailPage: React.FC = () => {
     dispatch(fetchSolidarityProjects());
   }, [dispatch]);
 
+  // The team endpoint is authenticated (it carries the host's bank details), so
+  // only fetch it for logged-in users. The page itself stays public; anonymous
+  // visitors simply fall back to the platform's default solidarity project.
   useEffect(() => {
-    if (accommodation?.teamId) {
+    if (accommodation?.teamId && user) {
       dispatch(fetchTeam(accommodation.teamId));
     }
-  }, [dispatch, accommodation?.teamId]);
+  }, [dispatch, accommodation?.teamId, user]);
 
   const activeProjects = solidarityProjects.filter((p) => p.status === 'active');
   const favoriteProject = team?.favoriteSolidarityProjectId
@@ -164,6 +173,9 @@ const AccommodationDetailPage: React.FC = () => {
               )}
             </div>
             <div className="flex items-center gap-4 text-gray-500">
+              {accommodation.averageRating != null && (accommodation.reviewCount ?? 0) > 0 && (
+                <RatingBadge rating={accommodation.averageRating} count={accommodation.reviewCount} />
+              )}
               <div className="flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
                   <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
@@ -551,6 +563,7 @@ const AccommodationDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
+        <AccommodationReviews reviews={reviews} />
       </div>
 
     </main>

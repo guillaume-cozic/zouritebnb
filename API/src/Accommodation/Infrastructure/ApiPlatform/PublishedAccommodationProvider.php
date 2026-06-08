@@ -108,7 +108,17 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
                     FROM accommodation_photo p
                     WHERE p.accommodation_id = a.id
                     LIMIT 1
-                ) AS thumbnail_filename
+                ) AS thumbnail_filename,
+                (
+                    SELECT AVG(r.rating)
+                    FROM review r
+                    WHERE r.type = 'accommodation' AND r.subject_accommodation_id = a.id
+                ) AS average_rating,
+                (
+                    SELECT COUNT(*)
+                    FROM review r
+                    WHERE r.type = 'accommodation' AND r.subject_accommodation_id = a.id
+                ) AS review_count
             FROM accommodation a
             WHERE {$whereSql}
             ORDER BY a.title ASC
@@ -150,6 +160,10 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $output->thumbnailUrl = null !== $row['thumbnail_filename']
                 ? '/uploads/photos/'.$row['thumbnail_filename']
                 : null;
+            $output->averageRating = null !== $row['average_rating']
+                ? round((float) $row['average_rating'], 1)
+                : null;
+            $output->reviewCount = (int) $row['review_count'];
             $output->photoUrls = $photoUrlsByAccommodation[$row['id']] ?? [];
             $outputs[] = $output;
         }

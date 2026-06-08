@@ -77,6 +77,23 @@ final readonly class AccommodationItemProvider implements ProviderInterface
             $output->photos = array_values($photosById);
         }
 
+        // Average rating computed from guest reviews of this accommodation
+        $ratingSql = <<<'SQL'
+            SELECT AVG(r.rating) AS avg_rating, COUNT(*) AS review_count
+            FROM review r
+            WHERE r.type = 'accommodation'
+              AND r.subject_accommodation_id = UUID_TO_BIN(:accommodationId)
+            SQL;
+
+        $ratingRow = $this->connection->executeQuery($ratingSql, [
+            'accommodationId' => $output->id,
+        ])->fetchAssociative();
+
+        $output->reviewCount = (int) ($ratingRow['review_count'] ?? 0);
+        $output->averageRating = null !== ($ratingRow['avg_rating'] ?? null)
+            ? round((float) $ratingRow['avg_rating'], 1)
+            : null;
+
         return $output;
     }
 }

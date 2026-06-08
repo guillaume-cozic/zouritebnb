@@ -23,6 +23,8 @@ export interface Accommodation {
   teamId?: string | null;
   thumbnailUrl?: string | null;
   photos?: { id: string; url: string }[];
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 export interface AddressDraft {

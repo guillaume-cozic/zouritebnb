@@ -111,7 +111,8 @@
       "myAccommodations": "My accommodations",
       "calendar": "Calendar",
       "conversations": "Conversations",
-      "settings": "My settings"
+      "settings": "My settings",
+      "verification": "Identity verification"
     }
   },
   "auth": {
@@ -229,7 +230,7 @@
     "current": {
       "title": "Staying with us today",
       "subtitle": "Guests currently in your accommodations.",
-      "empty": "No one is staying with you today.",
+      "empty": "No upcoming trips.",
       "dayCount": "Day {{day}} / {{total}}",
       "leavingTomorrow": "Leaving tomorrow"
     },
@@ -673,11 +674,41 @@
     "rateGuest": "Rate the guest",
     "alreadyReviewedAccommodation": "Review posted",
     "alreadyReviewedGuest": "Guest rated",
+    "noRatingYet": "No reviews yet",
+    "reviewCount_one": "{{count}} review",
+    "reviewCount_other": "{{count}} reviews",
     "error": {
       "validation": "Check your rating (1 to 5) and your comment (50 characters minimum).",
       "forbidden": "You are not allowed to leave this review.",
       "unauthenticated": "You must be logged in to leave a review.",
       "generic": "Something went wrong while submitting your review."
+    }
+  },
+  "userProfile": {
+    "verification": {
+      "title": "Identity verification",
+      "subtitle": "Confirm your identity to build trust with hosts and travelers.",
+      "documentTypeLabel": "Identity document type",
+      "documentTypes": {
+        "passport": "Passport",
+        "id_card": "ID card",
+        "driving_license": "Driving licence"
+      },
+      "documentLabel": "Identity document",
+      "documentHint": "Click to upload a photo of your document (JPEG, PNG or WebP).",
+      "selfieLabel": "Selfie",
+      "selfieHint": "Click to upload a recent selfie (JPEG, PNG or WebP).",
+      "submit": "Submit for verification",
+      "uploading": "Uploading… {{progress}}%",
+      "analyzing": "Analyzing your documents…",
+      "verifiedTitle": "Your identity is verified",
+      "verifiedOn": "Verified on {{date}}",
+      "status": {
+        "not_started": "Not verified",
+        "pending": "Pending",
+        "verified": "Verified",
+        "rejected": "Rejected"
+      }
     }
   }
 }
