@@ -63,7 +63,7 @@
       }
     },
     "conversations": {
-      "title": "Conversations",
+      "title": "Messages",
       "subtitle": "Exchanges with guests",
       "empty": "No conversation yet.",
       "noMatch": "No conversation matches your search.",
@@ -185,7 +185,7 @@
       "accommodations": "Accommodations",
       "calendar": "Calendar",
       "reservations": "Reservations",
-      "conversations": "Conversations",
+      "conversations": "Messages",
       "team": "My settings"
     },
     "sidebarFooter": "Your gîte, your world. Take care of every guest.",

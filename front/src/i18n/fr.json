@@ -63,7 +63,7 @@
       }
     },
     "conversations": {
-      "title": "Conversations",
+      "title": "Messagerie",
       "subtitle": "Échanges avec les loueurs",
       "empty": "Aucune conversation pour le moment.",
       "noMatch": "Aucune conversation ne correspond à votre recherche.",
@@ -185,7 +185,7 @@
       "accommodations": "Hébergements",
       "calendar": "Calendrier",
       "reservations": "Réservations",
-      "conversations": "Conversations",
+      "conversations": "Messagerie",
       "team": "Mes paramètres"
     },
     "sidebarFooter": "Votre gîte, votre univers. Prenez soin de chaque voyageur.",
