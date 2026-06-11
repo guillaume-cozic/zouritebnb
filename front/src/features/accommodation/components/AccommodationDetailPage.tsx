@@ -12,6 +12,7 @@ import Footer from '../../../components/Footer';
 import { selectHomepageFilters } from '../../homepage/HomepageSelectors';
 import { fetchSolidarityProjects } from '../../solidarityProject/SolidarityProjectSlice';
 import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
+import { projectExcerpt } from '../../solidarityProject/SolidarityProjectText';
 import { fetchTeam } from '../../team/TeamSlice';
 import { selectCurrentTeam } from '../../team/TeamSelectors';
 import { selectAuthUser } from '../../auth/AuthSelectors';
@@ -370,7 +371,7 @@ const AccommodationDetailPage: React.FC = () => {
                   )}
                   <div className="flex-1 min-w-0">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{highlightedProject.title}</h3>
-                    <p className="text-gray-600 text-sm line-clamp-3 mb-3">{highlightedProject.description}</p>
+                    <p className="text-gray-600 text-sm line-clamp-3 mb-3">{projectExcerpt(highlightedProject.description)}</p>
                     <Link
                       to={`/solidarity-projects/${highlightedProject.id}`}
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-800"

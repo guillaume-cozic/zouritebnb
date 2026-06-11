@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SolidarityProject } from '../SolidarityProjectTypes';
+import { projectExcerpt } from '../SolidarityProjectText';
 
 interface Props {
   project: SolidarityProject;
@@ -34,8 +35,8 @@ const SolidarityProjectCard: React.FC<Props> = ({ project }) => {
         >
           {project.title}
         </Link>
-        <p className="text-gray-500 text-sm leading-relaxed whitespace-pre-line">
-          {project.description}
+        <p className="text-gray-500 text-sm leading-relaxed line-clamp-3">
+          {projectExcerpt(project.description)}
         </p>
       </div>
     </div>

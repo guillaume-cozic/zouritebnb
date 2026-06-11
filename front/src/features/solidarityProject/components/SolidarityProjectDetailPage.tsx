@@ -14,6 +14,7 @@ import {
   selectSolidarityProjectsStatus,
 } from '../SolidarityProjectSelectors';
 import { KeyFigure, SolidarityProject } from '../SolidarityProjectTypes';
+import { stripHtml } from '../SolidarityProjectText';
 import SolidarityProjectCard from './SolidarityProjectCard';
 import Footer from '../../../components/Footer';
 
@@ -30,7 +31,7 @@ const formatDate = (iso: string, locale: string): string => {
 };
 
 const readingMinutes = (text: string): number => {
-  const words = text.trim().split(/\s+/).length;
+  const words = stripHtml(text).split(/\s+/).length;
   return Math.max(1, Math.ceil(words / 200));
 };
 
