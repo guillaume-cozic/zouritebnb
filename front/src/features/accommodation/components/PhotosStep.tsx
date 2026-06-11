@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { goToStep } from '../AccommodationSlice';
 import { selectCurrentAccommodation } from '../AccommodationSelectors';
 import api from '../../../services/api';
+import { extractErrorMessage } from '../../../services/errors';
 
 type PhotoStatus = 'pending' | 'uploading' | 'success' | 'error';
 
@@ -47,10 +48,10 @@ function PhotosStep() {
         },
       });
       updatePhoto(photo.id, { status: 'success', progress: 100 });
-    } catch (err: any) {
+    } catch (err) {
       updatePhoto(photo.id, {
         status: 'error',
-        error: err.response?.data?.detail || t('photosStep.uploadError'),
+        error: extractErrorMessage(err, t('photosStep.uploadError')),
       });
     }
   };

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage, extractErrorStatus } from '../../services/errors';
 import {
   AccommodationReview,
   ReviewTarget,
@@ -49,12 +50,9 @@ interface RejectMeta {
   detail?: string;
 }
 
-const extractError = (err: any): RejectMeta => ({
-  status: err?.response?.status,
-  detail:
-    err?.response?.data?.detail ||
-    err?.response?.data?.['hydra:description'] ||
-    err?.message,
+const extractError = (err: unknown): RejectMeta => ({
+  status: extractErrorStatus(err),
+  detail: extractErrorMessage(err, 'Une erreur est survenue'),
 });
 
 export const submitAccommodationReview = createAsyncThunk<
@@ -67,7 +65,7 @@ export const submitAccommodationReview = createAsyncThunk<
       headers: { 'Content-Type': 'application/ld+json' },
     });
     return { reservationId };
-  } catch (err: any) {
+  } catch (err) {
     return rejectWithValue(extractError(err));
   }
 });
@@ -82,7 +80,7 @@ export const submitGuestReview = createAsyncThunk<
       headers: { 'Content-Type': 'application/ld+json' },
     });
     return { reservationId };
-  } catch (err: any) {
+  } catch (err) {
     return rejectWithValue(extractError(err));
   }
 });
@@ -94,7 +92,7 @@ export const fetchAccommodationReviews = createAsyncThunk<AccommodationReview[],
       const response = await api.get(`/api/accommodations/${accommodationId}/reviews`);
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as AccommodationReview[];
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(extractError(err));
     }
   }

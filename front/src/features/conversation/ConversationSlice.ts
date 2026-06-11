@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import { Conversation, ConversationMessage, SendMessagePayload } from './ConversationTypes';
 
 type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -34,9 +35,9 @@ export const fetchConversationsForUser = createAsyncThunk(
       const response = await api.get('/api/conversations');
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as Conversation[];
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement des conversations'
+        extractErrorMessage(err, 'Erreur lors du chargement des conversations')
       );
     }
   }
@@ -50,9 +51,9 @@ export const fetchConversationsForTeam = createAsyncThunk(
       const response = await api.get('/api/conversations');
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as Conversation[];
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement des conversations'
+        extractErrorMessage(err, 'Erreur lors du chargement des conversations')
       );
     }
   }
@@ -64,9 +65,9 @@ export const fetchConversationById = createAsyncThunk(
     try {
       const response = await api.get(`/api/conversations/${id}`);
       return response.data as Conversation;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Conversation introuvable'
+        extractErrorMessage(err, 'Conversation introuvable')
       );
     }
   }
@@ -85,9 +86,9 @@ export const sendMessage = createAsyncThunk(
         conversationId: payload.conversationId,
         message: response.data as ConversationMessage,
       };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || "Impossible d'envoyer le message"
+        extractErrorMessage(err, "Impossible d'envoyer le message")
       );
     }
   }

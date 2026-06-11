@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, createAction, PayloadAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import { AccommodationListItem, SearchFilters } from './HomepageTypes';
 
 export const ITEMS_PER_PAGE = 12;
@@ -77,9 +78,9 @@ export const fetchPublishedAccommodations = createAsyncThunk<
       const items = (data['hydra:member'] ?? data['member'] ?? []) as AccommodationListItem[];
       const totalItems = (data['hydra:totalItems'] ?? data['totalItems'] ?? items.length) as number;
       return { items, totalItems, page };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement des hébergements'
+        extractErrorMessage(err, 'Erreur lors du chargement des hébergements')
       );
     }
   }
@@ -92,9 +93,9 @@ export const fetchHomepageFeatured = createAsyncThunk<AccommodationListItem[]>(
       const response = await api.get('/api/accommodations', { params: { itemsPerPage: '9' } });
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as AccommodationListItem[];
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement des hébergements'
+        extractErrorMessage(err, 'Erreur lors du chargement des hébergements')
       );
     }
   }

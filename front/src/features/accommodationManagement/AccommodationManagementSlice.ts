@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import { ManagedAccommodation, StatusFilter } from './AccommodationManagementTypes';
 import { createAccommodation } from '../accommodation/AccommodationSlice';
 
@@ -32,9 +33,9 @@ export const fetchAllAccommodations = createAsyncThunk(
       });
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as ManagedAccommodation[];
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement des hébergements'
+        extractErrorMessage(err, 'Erreur lors du chargement des hébergements')
       );
     }
   }
@@ -57,8 +58,8 @@ export const fetchOwnsAccommodation = createAsyncThunk(
       if (typeof total === 'number') return total > 0;
       const members = (data['hydra:member'] ?? data['member'] ?? []) as unknown[];
       return members.length > 0;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || 'ownership check failed');
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'ownership check failed'));
     }
   }
 );
@@ -73,9 +74,9 @@ export const publishAccommodation = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return id;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la publication'
+        extractErrorMessage(err, 'Erreur lors de la publication')
       );
     }
   }
@@ -91,9 +92,9 @@ export const unpublishAccommodation = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return id;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la dépublication'
+        extractErrorMessage(err, 'Erreur lors de la dépublication')
       );
     }
   }

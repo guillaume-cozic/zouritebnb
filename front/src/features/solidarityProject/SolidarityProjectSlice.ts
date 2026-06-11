@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import { SolidarityProject } from './SolidarityProjectTypes';
 
 interface SolidarityProjectState {
@@ -27,9 +28,9 @@ export const fetchSolidarityProjects = createAsyncThunk(
       const response = await api.get('/api/solidarity_projects');
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as SolidarityProject[];
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement des projets solidaires'
+        extractErrorMessage(err, 'Erreur lors du chargement des projets solidaires')
       );
     }
   }
@@ -41,9 +42,9 @@ export const fetchSolidarityProjectById = createAsyncThunk(
     try {
       const response = await api.get(`/api/solidarity_projects/${id}`);
       return response.data as SolidarityProject;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement du projet'
+        extractErrorMessage(err, 'Erreur lors du chargement du projet')
       );
     }
   }

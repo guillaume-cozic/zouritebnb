@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import {
   IdentityDocumentType,
   UserProfileState,
@@ -43,9 +44,9 @@ export const submitIdentityVerification = createAsyncThunk(
         }
       );
       return response.data as VerificationResult;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la vérification d\'identité'
+        extractErrorMessage(err, 'Erreur lors de la vérification d\'identité')
       );
     }
   }
@@ -57,9 +58,9 @@ export const fetchVerificationStatus = createAsyncThunk(
     try {
       const response = await api.get(`/api/users/${userId}/identity-verification`);
       return response.data as VerificationResult;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement du statut'
+        extractErrorMessage(err, 'Erreur lors du chargement du statut')
       );
     }
   }

@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchAccommodation, uploadPhotos, reorderPhotos, deletePhoto } from '../AccommodationSlice';
 import { selectCurrentAccommodation, selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
 import EditLayout, { SECTIONS } from './EditLayout';
+import { extractErrorMessage } from '../../../services/errors';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
@@ -47,8 +48,8 @@ const AccommodationPhotosPage: React.FC = () => {
       await dispatch(uploadPhotos({ id: accommodation.id, files: Array.from(files) })).unwrap();
       setUploadSuccess(true);
       setTimeout(() => setUploadSuccess(false), 3000);
-    } catch (err: any) {
-      setUploadError(typeof err === 'string' ? err : err?.message || t('photos.uploadError'));
+    } catch (err) {
+      setUploadError(typeof err === 'string' ? err : extractErrorMessage(err, t('photos.uploadError')));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import { Locality, Region } from './GeographyTypes';
 
 interface GeographyState {
@@ -25,9 +26,9 @@ export const fetchLocalities = createAsyncThunk<Locality[], string | undefined>(
       const response = await api.get('/api/localities', { params: queryParams });
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as Locality[];
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement des localités'
+        extractErrorMessage(err, 'Erreur lors du chargement des localités')
       );
     }
   }
@@ -40,9 +41,9 @@ export const fetchRegions = createAsyncThunk<Region[], void>(
       const response = await api.get('/api/regions');
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as Region[];
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement des régions'
+        extractErrorMessage(err, 'Erreur lors du chargement des régions')
       );
     }
   }

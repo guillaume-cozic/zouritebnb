@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import {
   CreateReservationPayload,
   FetchReservationsParams,
@@ -40,9 +41,9 @@ export const fetchReservations = createAsyncThunk(
       const response = await api.get('/api/reservations', { params: query });
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as Reservation[];
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement des réservations'
+        extractErrorMessage(err, 'Erreur lors du chargement des réservations')
       );
     }
   }
@@ -56,9 +57,9 @@ export const createReservation = createAsyncThunk(
         headers: { 'Content-Type': 'application/ld+json' },
       });
       return response.data as Reservation;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la création de la réservation'
+        extractErrorMessage(err, 'Erreur lors de la création de la réservation')
       );
     }
   }
@@ -72,9 +73,9 @@ export const requestReservation = createAsyncThunk(
         headers: { 'Content-Type': 'application/ld+json' },
       });
       return response.data as Reservation;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la demande de réservation'
+        extractErrorMessage(err, 'Erreur lors de la demande de réservation')
       );
     }
   }
@@ -90,9 +91,9 @@ export const refuseReservation = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return response.data as Reservation;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du refus'
+        extractErrorMessage(err, 'Erreur lors du refus')
       );
     }
   }
@@ -108,9 +109,9 @@ export const confirmReservation = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return response.data as Reservation;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la confirmation'
+        extractErrorMessage(err, 'Erreur lors de la confirmation')
       );
     }
   }
@@ -122,9 +123,9 @@ export const fetchReservationById = createAsyncThunk(
     try {
       const response = await api.get(`/api/reservations/${id}`);
       return response.data as Reservation;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Réservation introuvable'
+        extractErrorMessage(err, 'Réservation introuvable')
       );
     }
   }
@@ -140,9 +141,9 @@ export const cancelReservation = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return response.data as Reservation;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de l\'annulation'
+        extractErrorMessage(err, 'Erreur lors de l\'annulation')
       );
     }
   }

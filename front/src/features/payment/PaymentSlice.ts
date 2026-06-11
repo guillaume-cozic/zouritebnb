@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import { CreatePaymentIntentPayload, PaymentIntentResponse } from './PaymentTypes';
 
 type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -27,9 +28,9 @@ export const createPaymentIntent = createAsyncThunk<
       paymentIntentId: response.data.paymentIntentId,
       clientSecret: response.data.clientSecret,
     };
-  } catch (err: any) {
+  } catch (err) {
     return rejectWithValue(
-      err.response?.data?.detail || 'Erreur lors de la création du paiement'
+      extractErrorMessage(err, 'Erreur lors de la création du paiement')
     );
   }
 });
