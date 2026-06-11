@@ -49,6 +49,8 @@ trait AuthenticatedClientTrait
 {
     /**
      * Persists a security user and returns its UUID (RFC4122).
+     *
+     * @param list<string> $roles additional roles (e.g. ['ROLE_ADMIN']); ROLE_USER is always granted
      */
     protected function createAuthUser(
         string $email = 'host@example.com',
@@ -56,6 +58,7 @@ trait AuthenticatedClientTrait
         ?string $teamId = null,
         ?string $firstName = null,
         ?string $lastName = null,
+        array $roles = [],
     ): string {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine.orm.entity_manager');
@@ -68,7 +71,8 @@ trait AuthenticatedClientTrait
             ->setHashedPassword(password_hash($plainPassword, \PASSWORD_BCRYPT))
             ->setTeamId(Uuid::fromString($teamId ?? Uuid::v7()->toRfc4122()))
             ->setFirstName($firstName)
-            ->setLastName($lastName);
+            ->setLastName($lastName)
+            ->setRoles($roles);
 
         $em->persist($entity);
         $em->flush();

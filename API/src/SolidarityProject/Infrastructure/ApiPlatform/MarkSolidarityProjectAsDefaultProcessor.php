@@ -26,9 +26,9 @@ final readonly class MarkSolidarityProjectAsDefaultProcessor implements Processo
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        // Platform-level action reserved for authenticated users. Resolving the
-        // current user enforces authentication at the processor level (401 when
-        // anonymous) and guarantees the identity is never taken from the client.
+        // Platform curation action reserved for ROLE_ADMIN (enforced by the
+        // operation's security expression). Resolving the current user adds a
+        // defense-in-depth 401 if the endpoint is ever reached anonymously.
         $this->currentUser->id();
 
         $this->handler->execute(fn () => $this->useCase->handle(new MarkSolidarityProjectAsDefaultCommand(

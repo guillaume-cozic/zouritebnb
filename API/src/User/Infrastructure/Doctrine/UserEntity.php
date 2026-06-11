@@ -33,6 +33,10 @@ class UserEntity implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $lastName = null;
 
+    /** @var list<string> */
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
+
     #[ORM\Column(length: 20, options: ['default' => 'not_started'])]
     private string $verificationStatus = 'not_started';
 
@@ -193,7 +197,18 @@ class UserEntity implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        // ROLE_USER is always granted; stored roles (e.g. ROLE_ADMIN) are additive.
+        return array_values(array_unique(['ROLE_USER', ...$this->roles]));
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
     }
 
     public function getPassword(): ?string

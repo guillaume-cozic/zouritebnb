@@ -12,11 +12,11 @@ final class MarkSolidarityProjectAsDefaultTest extends SolidarityProjectApiTestC
 
     public function test_should_mark_solidarity_project_as_default(): void
     {
-        $this->createAuthUser(email: 'host@example.com');
+        $this->createAuthUser(email: 'admin@example.com', roles: ['ROLE_ADMIN']);
         $id = $this->insertSolidarityProject('Reforestation', 'Plant 10 000 trees', null, 'active');
 
         self::createClient()->request('PATCH', '/api/solidarity_projects/'.$id.'/mark-default', [
-            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $this->authHeaders('admin@example.com') + ['Content-Type' => 'application/merge-patch+json'],
             'json' => [],
         ]);
 
@@ -31,10 +31,27 @@ final class MarkSolidarityProjectAsDefaultTest extends SolidarityProjectApiTestC
         ]);
     }
 
-    public function test_should_unmark_the_previous_default_project(): void
+    public function test_should_return_403_when_not_admin(): void
     {
         $this->createAuthUser(email: 'host@example.com');
-        $headers = $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'];
+        $id = $this->insertSolidarityProject('Reforestation', 'Plant 10 000 trees', null, 'active');
+
+        self::createClient()->request('PATCH', '/api/solidarity_projects/'.$id.'/mark-default', [
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [],
+        ]);
+
+        self::assertResponseStatusCodeSame(403);
+
+        self::createClient()->request('GET', '/api/solidarity_projects/'.$id);
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains(['id' => $id, 'isDefault' => false]);
+    }
+
+    public function test_should_unmark_the_previous_default_project(): void
+    {
+        $this->createAuthUser(email: 'admin@example.com', roles: ['ROLE_ADMIN']);
+        $headers = $this->authHeaders('admin@example.com') + ['Content-Type' => 'application/merge-patch+json'];
 
         $previousDefaultId = $this->insertSolidarityProject(
             'Ancien projet',
@@ -81,10 +98,10 @@ final class MarkSolidarityProjectAsDefaultTest extends SolidarityProjectApiTestC
 
     public function test_should_return422_when_project_does_not_exist(): void
     {
-        $this->createAuthUser(email: 'host@example.com');
+        $this->createAuthUser(email: 'admin@example.com', roles: ['ROLE_ADMIN']);
 
         self::createClient()->request('PATCH', '/api/solidarity_projects/00000000-0000-0000-0000-000000000000/mark-default', [
-            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'],
+            'headers' => $this->authHeaders('admin@example.com') + ['Content-Type' => 'application/merge-patch+json'],
             'json' => [],
         ]);
 
