@@ -1088,6 +1088,23 @@ export interface components {
        * @example false
        */
       isDefault?: boolean | null;
+      /**
+       * @description Chiffres clés du projet (valeur + libellé), affichés en tête de la page projet
+       * @example [
+       *   {
+       *     "value": "10 000",
+       *     "label": "arbres plantés"
+       *   },
+       *   {
+       *     "value": "3 ans",
+       *     "label": "de programme"
+       *   }
+       * ]
+       */
+      keyFigures?: {
+          value: string;
+          label: string;
+        }[];
     });
     "TeamEntity.jsonld-team.read": components["schemas"]["HydraItemBaseSchema"] & ({
       /**

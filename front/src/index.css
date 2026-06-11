@@ -6,6 +6,12 @@
   .prose-blog {
     @apply text-gray-700 leading-relaxed;
   }
+  /* Keep text at a comfortable reading measure inside a wide card;
+     figures (images) break out to the full content width. A fixed rem
+     measure (not ch) so headings and paragraphs share the same edges. */
+  .prose-blog > *:not(figure) {
+    @apply max-w-[44rem] mx-auto;
+  }
   .prose-blog > * + * {
     @apply mt-5;
   }
@@ -31,10 +37,10 @@
     @apply list-decimal list-outside pl-6 space-y-2;
   }
   .prose-blog blockquote {
-    @apply border-l-4 border-blue-500 pl-5 italic text-gray-600 my-6;
+    @apply border-l-4 border-primary-500 pl-5 italic text-gray-600 my-6;
   }
   .prose-blog a {
-    @apply text-blue-600 underline underline-offset-2 hover:text-blue-700;
+    @apply text-primary-600 underline underline-offset-2 hover:text-primary-700;
   }
   .prose-blog strong {
     @apply font-semibold text-gray-900;
@@ -42,11 +48,20 @@
   .prose-blog img {
     @apply rounded-xl my-6 w-full;
   }
+  .prose-blog figure {
+    @apply my-8;
+  }
+  .prose-blog figure img {
+    @apply my-0;
+  }
+  .prose-blog figcaption {
+    @apply mt-3 text-center text-sm text-gray-500;
+  }
   .prose-blog code {
     @apply bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm;
   }
   .prose-blog--editorial p:first-of-type::first-letter {
-    @apply float-left text-6xl sm:text-7xl font-bold text-blue-600 mr-3 mt-1;
+    @apply float-left text-6xl sm:text-7xl font-bold text-primary-600 mr-3 mt-1;
     line-height: 0.85;
   }
 }

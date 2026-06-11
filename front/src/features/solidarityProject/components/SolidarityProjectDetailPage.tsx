@@ -13,7 +13,7 @@ import {
   selectSolidarityProjects,
   selectSolidarityProjectsStatus,
 } from '../SolidarityProjectSelectors';
-import { SolidarityProject } from '../SolidarityProjectTypes';
+import { KeyFigure, SolidarityProject } from '../SolidarityProjectTypes';
 import SolidarityProjectCard from './SolidarityProjectCard';
 import Footer from '../../../components/Footer';
 
@@ -35,7 +35,11 @@ const readingMinutes = (text: string): number => {
 };
 
 const renderBody = (description: string): React.ReactNode => {
-  const classes = 'prose-blog prose-blog--editorial';
+  const paragraphs = description.split(/\n{2,}/);
+  // The drop cap only flatters long-form content; on a one-liner it
+  // towers over the text and looks broken.
+  const editorial = paragraphs.length > 1 || description.length > 280;
+  const classes = editorial ? 'prose-blog prose-blog--editorial' : 'prose-blog';
   if (/<[a-z][\s\S]*>/i.test(description)) {
     return (
       <div
@@ -46,7 +50,7 @@ const renderBody = (description: string): React.ReactNode => {
   }
   return (
     <div className={classes}>
-      {description.split(/\n{2,}/).map((para, i) => (
+      {paragraphs.map((para, i) => (
         <p key={i}>{para}</p>
       ))}
     </div>
@@ -81,7 +85,7 @@ const ReadingProgressBar: React.FC<{ value: number }> = ({ value }) => (
     aria-hidden="true"
   >
     <div
-      className="h-full bg-gradient-to-r from-primary-500 via-primary-600 to-indigo-600 transition-[width] duration-150 ease-out shadow-sm shadow-primary-500/30"
+      className="h-full bg-gradient-to-r from-primary-400 via-primary-500 to-primary-600 transition-[width] duration-150 ease-out shadow-sm shadow-primary-500/30"
       style={{ width: `${value * 100}%` }}
     />
   </div>
@@ -170,7 +174,7 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-green-600"
+            className="text-success-600"
           >
             <path d="M20 6 9 17l-5-5" />
           </svg>
@@ -192,7 +196,7 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({
         )}
       </button>
       {copied && isVertical && (
-        <span className="text-[10px] text-green-600 font-medium mt-1">
+        <span className="text-[10px] text-success-600 font-medium mt-1">
           {t('projects.share.copied')}
         </span>
       )}
@@ -200,10 +204,25 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({
   );
 };
 
+const KeyFiguresStrip: React.FC<{ figures: KeyFigure[] }> = ({ figures }) => (
+  <dl className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-gray-100 rounded-t-2xl overflow-hidden border-b border-gray-100">
+    {figures.map((figure) => (
+      <div key={figure.label} className="bg-white px-4 py-6 text-center">
+        <dd className="text-2xl sm:text-3xl font-bold text-primary-600 tracking-tight">
+          {figure.value}
+        </dd>
+        <dt className="mt-1.5 text-[11px] uppercase tracking-widest text-gray-500 font-semibold">
+          {figure.label}
+        </dt>
+      </div>
+    ))}
+  </dl>
+);
+
 const ArticleSkeleton: React.FC = () => (
   <div className="animate-pulse">
     <div className="h-[420px] bg-gray-200" />
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative">
       <div className="bg-white rounded-2xl shadow-xl p-10 space-y-4">
         <div className="h-4 bg-gray-200 rounded w-32" />
         <div className="h-10 bg-gray-200 rounded w-3/4" />
@@ -256,7 +275,7 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
 
         {/* Back link overlay */}
         <div className="absolute top-6 left-0 right-0">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link
               to="/solidarity-projects"
               className="inline-flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white bg-black/30 backdrop-blur-sm rounded-full px-4 py-2 transition-all"
@@ -282,7 +301,7 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
 
         {/* Title overlay */}
         <div className="absolute bottom-0 left-0 right-0 pb-14 sm:pb-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3 mb-5">
               <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-white/80">
                 {t('projects.category')}
@@ -291,7 +310,7 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
               <span
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
                   project.status === 'active'
-                    ? 'bg-green-500/90 text-white'
+                    ? 'bg-success-500/90 text-white'
                     : 'bg-gray-700/80 text-white'
                 }`}
               >
@@ -366,14 +385,20 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
       </header>
 
       {/* Body */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative">
-        <div className="relative bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-          {/* Floating share — desktop only */}
-          <div className="hidden xl:block absolute -left-20 top-12">
-            <div className="sticky top-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative">
+        <div className="relative bg-white rounded-2xl shadow-xl border border-gray-100">
+          {/* Floating share — desktop only. Lives outside the clipped CTA
+              footer: an overflow-hidden ancestor would swallow the -left
+              offset entirely. */}
+          <div className="hidden xl:block absolute -left-20 top-12 bottom-12">
+            <div className="sticky top-28">
               <ShareButtons title={project.title} orientation="vertical" />
             </div>
           </div>
+
+          {(project.keyFigures?.length ?? 0) > 0 && (
+            <KeyFiguresStrip figures={project.keyFigures!} />
+          )}
 
           <div className="px-6 sm:px-12 lg:px-16 py-12 sm:py-16">
             {renderBody(project.description)}
@@ -388,7 +413,7 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
           </div>
 
           {/* CTA footer */}
-          <div className="relative px-6 sm:px-12 lg:px-16 py-10 bg-gradient-to-br from-primary-50 via-white to-indigo-50 border-t border-gray-100 overflow-hidden">
+          <div className="relative px-6 sm:px-12 lg:px-16 py-10 bg-gradient-to-br from-primary-50 via-white to-primary-100/60 border-t border-gray-100 rounded-b-2xl overflow-hidden">
             <div
               className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-primary-100/60 blur-3xl"
               aria-hidden="true"
@@ -517,7 +542,7 @@ const SolidarityProjectDetailPage: React.FC = () => {
       <ReadingProgressBar value={progress} />
       {status === 'loading' && <ArticleSkeleton />}
       {status === 'failed' && (
-        <p className="text-center text-red-500 py-20">{error}</p>
+        <p className="text-center text-danger-500 py-20">{error}</p>
       )}
       {status === 'succeeded' && project && (
         <Article project={project} related={related} />

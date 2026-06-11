@@ -16,6 +16,7 @@
  */
 import type { components } from './schema';
 import type { AccommodationListItem } from '../features/homepage/HomepageTypes';
+import type { SolidarityProject } from '../features/solidarityProject/SolidarityProjectTypes';
 
 /** Fails to compile unless `T` is exactly `true`. */
 type Expect<T extends true> = T;
@@ -45,4 +46,19 @@ type _ListItemKeysExistInContract = Expect<
 // 2. Each shared field's type must be compatible with the contract.
 type _ListItemTypesMatchContract = Expect<
   FieldsCompatible<AccommodationListItem, AccommodationListContract>
+>;
+
+// --- Solidarity project (detail page) ----------------------------------------
+
+type SolidarityProjectContract =
+  components['schemas']['SolidarityProject.jsonld-solidarity_project.read'];
+
+// 1. Every field the front relies on must still exist in the published contract.
+type _SolidarityProjectKeysExistInContract = Expect<
+  IsNever<Exclude<keyof SolidarityProject, keyof SolidarityProjectContract>>
+>;
+
+// 2. Each shared field's type must be compatible with the contract.
+type _SolidarityProjectTypesMatchContract = Expect<
+  FieldsCompatible<SolidarityProject, SolidarityProjectContract>
 >;
