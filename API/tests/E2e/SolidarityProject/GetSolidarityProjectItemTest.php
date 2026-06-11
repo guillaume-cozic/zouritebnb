@@ -13,6 +13,10 @@ final class GetSolidarityProjectItemTest extends SolidarityProjectApiTestCase
             'Plant 10 000 trees',
             'https://example.com/image.jpg',
             'active',
+            keyFigures: [
+                ['value' => '10 000', 'label' => 'arbres plantés'],
+                ['value' => '3 ans', 'label' => 'de programme'],
+            ],
         );
 
         self::createClient()->request('GET', '/api/solidarity_projects/'.$id);
@@ -24,7 +28,21 @@ final class GetSolidarityProjectItemTest extends SolidarityProjectApiTestCase
             'description' => 'Plant 10 000 trees',
             'imageUrl' => 'https://example.com/image.jpg',
             'status' => 'active',
+            'keyFigures' => [
+                ['value' => '10 000', 'label' => 'arbres plantés'],
+                ['value' => '3 ans', 'label' => 'de programme'],
+            ],
         ]);
+    }
+
+    public function test_should_return_empty_key_figures_when_none_defined(): void
+    {
+        $id = $this->insertSolidarityProject('Reforestation', 'Plant trees');
+
+        self::createClient()->request('GET', '/api/solidarity_projects/'.$id);
+
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains(['keyFigures' => []]);
     }
 
     public function test_should_get_closed_project_by_id(): void

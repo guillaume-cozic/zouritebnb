@@ -35,6 +35,12 @@ class SolidarityProjectEntity
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
     private bool $isDefault = false;
 
+    /**
+     * @var array<array{value: string, label: string}>
+     */
+    #[ORM\Column(type: Types::JSON)]
+    private array $keyFigures = [];
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -115,6 +121,24 @@ class SolidarityProjectEntity
     public function setIsDefault(bool $isDefault): static
     {
         $this->isDefault = $isDefault;
+
+        return $this;
+    }
+
+    /**
+     * @return array<array{value: string, label: string}>
+     */
+    public function getKeyFigures(): array
+    {
+        return $this->keyFigures;
+    }
+
+    /**
+     * @param array<array{value: string, label: string}> $keyFigures
+     */
+    public function setKeyFigures(array $keyFigures): static
+    {
+        $this->keyFigures = $keyFigures;
 
         return $this;
     }

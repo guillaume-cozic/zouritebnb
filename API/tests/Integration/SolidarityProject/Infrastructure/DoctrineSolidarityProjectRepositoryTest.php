@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\SolidarityProject\Infrastructure;
 
+use App\SolidarityProject\Domain\Entity\KeyFigure;
 use App\SolidarityProject\Domain\Entity\SolidarityProject;
 use App\SolidarityProject\Domain\Port\SolidarityProjectRepository;
 use App\Tests\Integration\RepositoryTestCase;
@@ -31,6 +32,10 @@ final class DoctrineSolidarityProjectRepositoryTest extends RepositoryTestCase
             imageUrl: 'https://example.com/img.jpg',
             status: 'active',
             createdAt: $createdAt,
+            keyFigures: [
+                new KeyFigure('10 000', 'arbres plantés'),
+                new KeyFigure('3 ans', 'de programme'),
+            ],
         );
 
         $this->repository->save($project);
@@ -43,6 +48,11 @@ final class DoctrineSolidarityProjectRepositoryTest extends RepositoryTestCase
         self::assertSame('https://example.com/img.jpg', $found->getImageUrl());
         self::assertSame('active', $found->getStatus());
         self::assertEquals($createdAt, $found->getCreatedAt());
+        self::assertCount(2, $found->getKeyFigures());
+        self::assertSame('10 000', $found->getKeyFigures()[0]->value());
+        self::assertSame('arbres plantés', $found->getKeyFigures()[0]->label());
+        self::assertSame('3 ans', $found->getKeyFigures()[1]->value());
+        self::assertSame('de programme', $found->getKeyFigures()[1]->label());
     }
 
     public function test_should_return_null_when_not_found(): void

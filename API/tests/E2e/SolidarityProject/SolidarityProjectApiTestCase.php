@@ -13,12 +13,16 @@ abstract class SolidarityProjectApiTestCase extends ApiTestCase
 {
     protected static ?bool $alwaysBootKernel = true;
 
+    /**
+     * @param array<array{value: string, label: string}> $keyFigures
+     */
     protected function insertSolidarityProject(
         string $title,
         string $description,
         ?string $imageUrl = null,
         string $status = 'active',
         ?\DateTimeImmutable $createdAt = null,
+        array $keyFigures = [],
     ): string {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine.orm.entity_manager');
@@ -29,7 +33,8 @@ abstract class SolidarityProjectApiTestCase extends ApiTestCase
             ->setDescription($description)
             ->setImageUrl($imageUrl)
             ->setStatus($status)
-            ->setCreatedAt($createdAt ?? new \DateTimeImmutable());
+            ->setCreatedAt($createdAt ?? new \DateTimeImmutable())
+            ->setKeyFigures($keyFigures);
 
         $em->persist($entity);
         $em->flush();

@@ -85,6 +85,27 @@ class SolidarityProjectOutput implements FromEntityInterface
     #[ApiProperty(description: 'Vrai si ce projet est marqué comme défaut de la plateforme', example: false)]
     public ?bool $isDefault = null;
 
+    /**
+     * @var array<array{value: string, label: string}>
+     */
+    #[Groups(['solidarity_project:read'])]
+    #[ApiProperty(
+        description: 'Chiffres clés du projet (valeur + libellé), affichés en tête de la page projet',
+        example: [['value' => '10 000', 'label' => 'arbres plantés'], ['value' => '3 ans', 'label' => 'de programme']],
+        openapiContext: [
+            'type' => 'array',
+            'items' => [
+                'type' => 'object',
+                'properties' => [
+                    'value' => ['type' => 'string'],
+                    'label' => ['type' => 'string'],
+                ],
+                'required' => ['value', 'label'],
+            ],
+        ],
+    )]
+    public array $keyFigures = [];
+
     public static function fromEntity(object $entity): static
     {
         /** @var SolidarityProjectEntity $entity */
@@ -96,6 +117,7 @@ class SolidarityProjectOutput implements FromEntityInterface
         $output->status = $entity->getStatus();
         $output->createdAt = $entity->getCreatedAt()?->format(\DateTimeInterface::ATOM);
         $output->isDefault = $entity->isDefault();
+        $output->keyFigures = $entity->getKeyFigures();
 
         return $output;
     }

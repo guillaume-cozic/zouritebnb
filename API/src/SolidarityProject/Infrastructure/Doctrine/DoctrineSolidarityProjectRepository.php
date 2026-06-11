@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\SolidarityProject\Infrastructure\Doctrine;
 
+use App\SolidarityProject\Domain\Entity\KeyFigure;
 use App\SolidarityProject\Domain\Entity\SolidarityProject;
 use App\SolidarityProject\Domain\Port\SolidarityProjectRepository as SolidarityProjectRepositoryPort;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -30,7 +31,11 @@ class DoctrineSolidarityProjectRepository extends ServiceEntityRepository implem
             ->setImageUrl($project->getImageUrl())
             ->setStatus($project->getStatus())
             ->setCreatedAt($project->getCreatedAt())
-            ->setIsDefault($project->isDefault());
+            ->setIsDefault($project->isDefault())
+            ->setKeyFigures(array_map(
+                static fn (KeyFigure $keyFigure): array => ['value' => $keyFigure->value(), 'label' => $keyFigure->label()],
+                $project->getKeyFigures(),
+            ));
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -80,6 +85,10 @@ class DoctrineSolidarityProjectRepository extends ServiceEntityRepository implem
             status: $entity->getStatus(),
             createdAt: $entity->getCreatedAt(),
             isDefault: $entity->isDefault(),
+            keyFigures: array_map(
+                static fn (array $keyFigure): KeyFigure => new KeyFigure($keyFigure['value'] ?? null, $keyFigure['label'] ?? null),
+                $entity->getKeyFigures(),
+            ),
         );
     }
 }

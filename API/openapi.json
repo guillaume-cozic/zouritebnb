@@ -6301,6 +6301,35 @@
                                     "boolean",
                                     "null"
                                 ]
+                            },
+                            "keyFigures": {
+                                "description": "Chiffres cl\u00e9s du projet (valeur + libell\u00e9), affich\u00e9s en t\u00eate de la page projet",
+                                "example": [
+                                    {
+                                        "value": "10 000",
+                                        "label": "arbres plant\u00e9s"
+                                    },
+                                    {
+                                        "value": "3 ans",
+                                        "label": "de programme"
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "value": {
+                                            "type": "string"
+                                        },
+                                        "label": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "value",
+                                        "label"
+                                    ]
+                                }
                             }
                         }
                     }

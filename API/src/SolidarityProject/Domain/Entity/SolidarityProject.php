@@ -18,6 +18,9 @@ final readonly class SolidarityProject
     private string $description;
     private ?string $imageUrl;
 
+    /**
+     * @param KeyFigure[] $keyFigures
+     */
     public function __construct(
         private Uuid $id,
         string $title,
@@ -26,6 +29,7 @@ final readonly class SolidarityProject
         private string $status,
         private \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
         private bool $isDefault = false,
+        private array $keyFigures = [],
     ) {
         $title = trim($title);
         if ('' === $title) {
@@ -86,5 +90,13 @@ final readonly class SolidarityProject
     public function isDefault(): bool
     {
         return $this->isDefault;
+    }
+
+    /**
+     * @return KeyFigure[]
+     */
+    public function getKeyFigures(): array
+    {
+        return $this->keyFigures;
     }
 }
