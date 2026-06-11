@@ -1,10 +1,24 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import { BankAccountPayload, Team, TeamInvitation } from './TeamTypes';
 
 export const teamSettingsPageOpened = createAction<{ teamId: string | null }>(
   'team/settingsPageOpened'
 );
+
+/**
+ * Single business intent dispatched when the user edits the bank account form.
+ * A listener debounces, normalises the values and runs the update thunk.
+ */
+export const bankAccountEdited = createAction<{
+  teamId: string;
+  iban: string;
+  bic: string;
+  holderName: string;
+}>('team/bankAccountEdited');
+
+export type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 interface TeamState {
   current: Team | null;
@@ -14,6 +28,9 @@ interface TeamState {
   invitationsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   inviteStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   inviteError: string | null;
+  bankSaveState: SaveState;
+  bankSaveError: string | null;
+  favoriteSaveState: SaveState;
 }
 
 const initialState: TeamState = {
@@ -24,6 +41,9 @@ const initialState: TeamState = {
   invitationsStatus: 'idle',
   inviteStatus: 'idle',
   inviteError: null,
+  bankSaveState: 'idle',
+  bankSaveError: null,
+  favoriteSaveState: 'idle',
 };
 
 export const fetchTeam = createAsyncThunk(
@@ -32,8 +52,8 @@ export const fetchTeam = createAsyncThunk(
     try {
       const response = await api.get(`/api/teams/${id}`);
       return response.data as Team;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || 'Erreur lors du chargement de l\'équipe');
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors du chargement de l\'équipe'));
     }
   }
 );
@@ -48,8 +68,8 @@ export const updateTeamFavoriteProject = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return { favoriteSolidarityProjectId };
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || 'Erreur lors de la mise à jour');
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors de la mise à jour'));
     }
   }
 );
@@ -64,8 +84,8 @@ export const updateTeamBankAccount = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return payload;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || 'Erreur lors de la mise à jour du compte bancaire');
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors de la mise à jour du compte bancaire'));
     }
   }
 );
@@ -78,8 +98,8 @@ export const fetchTeamInvitations = createAsyncThunk(
       const data = response.data;
       const items: TeamInvitation[] = data['hydra:member'] ?? data.member ?? data ?? [];
       return items;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || 'Erreur lors du chargement des invitations');
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors du chargement des invitations'));
     }
   }
 );
@@ -90,8 +110,8 @@ export const cancelTeamInvitation = createAsyncThunk(
     try {
       await api.delete(`/api/team-invitations/${invitationId}`);
       return invitationId;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || "Erreur lors de l'annulation");
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, "Erreur lors de l'annulation"));
     }
   }
 );
@@ -106,8 +126,8 @@ export const inviteCoHost = createAsyncThunk(
         { headers: { 'Content-Type': 'application/ld+json' } }
       );
       return response.data as TeamInvitation;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || "Erreur lors de l'invitation");
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, "Erreur lors de l'invitation"));
     }
   }
 );
@@ -119,6 +139,12 @@ const teamSlice = createSlice({
     clearInviteStatus(state) {
       state.inviteStatus = 'idle';
       state.inviteError = null;
+    },
+    bankSaveStateCleared(state) {
+      state.bankSaveState = 'idle';
+    },
+    favoriteSaveStateCleared(state) {
+      state.favoriteSaveState = 'idle';
     },
   },
   extraReducers: (builder) => {
@@ -135,18 +161,34 @@ const teamSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload as string;
       })
+      .addCase(updateTeamFavoriteProject.pending, (state) => {
+        state.favoriteSaveState = 'saving';
+      })
       .addCase(updateTeamFavoriteProject.fulfilled, (state, action) => {
+        state.favoriteSaveState = 'saved';
         if (state.current) {
           state.current.favoriteSolidarityProjectId = action.payload.favoriteSolidarityProjectId;
         }
       })
+      .addCase(updateTeamFavoriteProject.rejected, (state) => {
+        state.favoriteSaveState = 'error';
+      })
+      .addCase(updateTeamBankAccount.pending, (state) => {
+        state.bankSaveState = 'saving';
+        state.bankSaveError = null;
+      })
       .addCase(updateTeamBankAccount.fulfilled, (state, action) => {
+        state.bankSaveState = 'saved';
         if (state.current) {
           const { iban, bic, holderName } = action.payload;
           state.current.iban = iban;
           state.current.bic = bic;
           state.current.bankAccountHolderName = holderName;
         }
+      })
+      .addCase(updateTeamBankAccount.rejected, (state, action) => {
+        state.bankSaveState = 'error';
+        state.bankSaveError = (action.payload as string) ?? null;
       })
       .addCase(fetchTeamInvitations.pending, (state) => {
         state.invitationsStatus = 'loading';
@@ -176,5 +218,5 @@ const teamSlice = createSlice({
   },
 });
 
-export const { clearInviteStatus } = teamSlice.actions;
+export const { clearInviteStatus, bankSaveStateCleared, favoriteSaveStateCleared } = teamSlice.actions;
 export default teamSlice.reducer;

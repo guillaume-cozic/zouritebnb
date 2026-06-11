@@ -6,3 +6,4 @@ export const selectAuthError = (state: RootState) => state.auth?.error ?? null;
 export const selectAuthTeamId = (state: RootState) => state.auth?.user?.teamId ?? null;
 export const selectAuthToken = (state: RootState) => state.auth?.user?.token ?? null;
 export const selectIsAuthenticated = (state: RootState) => !!state.auth?.user;
+export const selectProfileSaveState = (state: RootState) => state.auth?.profileSaveState ?? 'idle';

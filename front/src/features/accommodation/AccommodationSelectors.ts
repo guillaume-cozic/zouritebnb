@@ -17,3 +17,6 @@ export const selectPhotoUploadStatus = (state: RootState) =>
 
 export const selectFormDrafts = (state: RootState) =>
   state.accommodation.formDrafts;
+
+export const selectEditSaveStatus = (state: RootState) =>
+  state.accommodation.editSaveStatus;

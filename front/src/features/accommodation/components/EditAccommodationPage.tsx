@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -7,25 +7,22 @@ import { z } from 'zod';
 import { TFunction } from 'i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import {
-  fetchAccommodation,
-  updatePrice,
-  updateWeeklyPromotion,
-  updateDescription,
-  setLocation,
-  setCapacity,
-  setAmenities,
-  setCheckInOut,
+  accommodationFieldEdited,
+  editPageOpened,
+  AutoSaveStatus,
 } from '../AccommodationSlice';
-import { selectCurrentAccommodation, selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
+import {
+  selectCurrentAccommodation,
+  selectAccommodationStatus,
+  selectAccommodationError,
+  selectEditSaveStatus,
+} from '../AccommodationSelectors';
+import { Accommodation } from '../AccommodationTypes';
 import { AMENITY_CATEGORIES } from '../AmenityData';
 import MapSelector from '../../../components/MapSelector';
 import EditLayout, { SECTIONS, EditSection } from './EditLayout';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
-type AutoSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
-
-const AUTOSAVE_DELAY = 1200;
 
 // --- Sub-form schemas ---
 const getLocationSchema = (t: TFunction) => z.object({
@@ -73,279 +70,97 @@ const SaveStatusBadge: React.FC<{ status: AutoSaveStatus; t: (key: string) => st
   );
 };
 
-// --- Hook: useDebounce ---
-function useDebounce<T extends (...args: any[]) => any>(fn: T, delay: number): T {
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const fnRef = useRef(fn);
-  fnRef.current = fn;
-
-  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
-
-  return useCallback((...args: any[]) => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => fnRef.current(...args), delay);
-  }, [delay]) as unknown as T;
-}
-
-const EditAccommodationPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+/**
+ * Inner form, mounted once the accommodation is loaded (keyed by its id), so
+ * the local input states hydrate from props in their initializers. Each change
+ * handler updates its controlled input and dispatches a single
+ * `accommodationFieldEdited` intent — the listener debounces and saves.
+ */
+const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ accommodation }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const accommodation = useAppSelector(selectCurrentAccommodation);
-  const status = useAppSelector(selectAccommodationStatus);
   const error = useAppSelector(selectAccommodationError);
+  const sectionStatus = useAppSelector(selectEditSaveStatus);
+  const id = accommodation.id!;
 
   const [activeSection, setActiveSection] = useState<EditSection>('description');
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
-  // Per-section auto-save status
-  const [sectionStatus, setSectionStatus] = useState<Record<string, AutoSaveStatus>>({});
-  const statusTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-
-  // Track whether initial data has loaded (to avoid auto-saving on mount)
-  const initialLoadDone = useRef(false);
-  const amenitiesInitialized = useRef(false);
-
-  // Amenities local state
-  const [selectedAmenities, setSelectedAmenities] = useState<Set<string>>(new Set());
-
-  // Price local state
-  const [price, setPrice] = useState<number>(0);
-  const priceInitialized = useRef(false);
-
-  // Weekly promotion local state ('' = disabled / null)
-  const [weeklyPromotion, setWeeklyPromotion] = useState<string>('');
-  const weeklyPromotionInitialized = useRef(false);
-
-  // Capacity local state
+  // Controlled inputs, hydrated once from the loaded accommodation.
+  const [title, setTitle] = useState(accommodation.title ?? '');
+  const [description, setDescription] = useState(accommodation.description ?? '');
+  const [price, setPrice] = useState<number>(accommodation.price ?? 0);
+  const [weeklyPromotion, setWeeklyPromotion] = useState<string>(
+    accommodation.weeklyPromotionPercentage != null
+      ? String(accommodation.weeklyPromotionPercentage)
+      : ''
+  );
   const [capacityValues, setCapacityValues] = useState({
-    bedrooms: 0, bathrooms: 0, maxGuests: 0, singleBeds: 0, doubleBeds: 0,
+    bedrooms: accommodation.bedrooms ?? 0,
+    bathrooms: accommodation.bathrooms ?? 0,
+    maxGuests: accommodation.maxGuests ?? 0,
+    singleBeds: accommodation.singleBeds ?? 0,
+    doubleBeds: accommodation.doubleBeds ?? 0,
   });
-  const capacityInitialized = useRef(false);
+  const [selectedAmenities, setSelectedAmenities] = useState<Set<string>>(
+    () => new Set(accommodation.amenities ?? [])
+  );
+  const [checkInOut, setCheckInOutState] = useState({
+    checkIn: accommodation.checkIn ?? '16:00',
+    checkOut: accommodation.checkOut ?? '12:00',
+  });
 
-  // Title & description local state
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const titleInitialized = useRef(false);
-  const descriptionInitialized = useRef(false);
-
-  // CheckInOut local state
-  const [checkInOut, setCheckInOutState] = useState({ checkIn: '16:00', checkOut: '12:00' });
-  const checkInOutInitialized = useRef(false);
-
-  // Location form
   const locationForm = useForm({
     resolver: zodResolver(getLocationSchema(t)),
+    mode: 'onChange',
+    defaultValues: {
+      street: accommodation.street ?? '',
+      city: accommodation.city ?? '',
+      zipCode: accommodation.zipCode ?? '',
+      country: accommodation.country ?? '',
+      latitude: accommodation.latitude,
+      longitude: accommodation.longitude,
+    },
   });
-  const locationInitialized = useRef(false);
-
-  const setSectionSaveStatus = useCallback((section: string, s: AutoSaveStatus) => {
-    setSectionStatus((prev) => ({ ...prev, [section]: s }));
-    if (statusTimers.current[section]) clearTimeout(statusTimers.current[section]);
-    if (s === 'saved') {
-      statusTimers.current[section] = setTimeout(() => {
-        setSectionStatus((prev) => ({ ...prev, [section]: 'idle' }));
-      }, 2500);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (id) dispatch(fetchAccommodation(id));
-  }, [dispatch, id]);
-
-  // Populate all local state from accommodation
-  useEffect(() => {
-    if (!accommodation) return;
-    if (!titleInitialized.current) {
-      setTitle(accommodation.title ?? '');
-      titleInitialized.current = true;
-    }
-    if (!descriptionInitialized.current) {
-      setDescription(accommodation.description ?? '');
-      descriptionInitialized.current = true;
-    }
-    if (!priceInitialized.current) {
-      setPrice(accommodation.price ?? 0);
-      priceInitialized.current = true;
-    }
-    if (!weeklyPromotionInitialized.current) {
-      setWeeklyPromotion(
-        accommodation.weeklyPromotionPercentage != null
-          ? String(accommodation.weeklyPromotionPercentage)
-          : ''
-      );
-      weeklyPromotionInitialized.current = true;
-    }
-    if (!capacityInitialized.current) {
-      setCapacityValues({
-        bedrooms: accommodation.bedrooms ?? 0,
-        bathrooms: accommodation.bathrooms ?? 0,
-        maxGuests: accommodation.maxGuests ?? 0,
-        singleBeds: accommodation.singleBeds ?? 0,
-        doubleBeds: accommodation.doubleBeds ?? 0,
-      });
-      capacityInitialized.current = true;
-    }
-    if (!checkInOutInitialized.current) {
-      setCheckInOutState({
-        checkIn: accommodation.checkIn ?? '16:00',
-        checkOut: accommodation.checkOut ?? '12:00',
-      });
-      checkInOutInitialized.current = true;
-    }
-    if (!amenitiesInitialized.current && accommodation.amenities) {
-      setSelectedAmenities(new Set(accommodation.amenities));
-      amenitiesInitialized.current = true;
-    }
-    if (!locationInitialized.current) {
-      locationForm.reset({
-        street: accommodation.street ?? '',
-        city: accommodation.city ?? '',
-        zipCode: accommodation.zipCode ?? '',
-        country: accommodation.country ?? '',
-        latitude: accommodation.latitude,
-        longitude: accommodation.longitude,
-      });
-      locationInitialized.current = true;
-    }
-    // Mark initial load as done after a tick
-    if (!initialLoadDone.current) {
-      setTimeout(() => { initialLoadDone.current = true; }, 100);
-    }
-  }, [accommodation]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const scrollTo = (key: EditSection) => {
     setActiveSection(key);
     sectionRefs.current[key]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // --- Auto-save handlers ---
-  const autoSaveDescription = useDebounce(async (t: string, d: string) => {
-    if (!accommodation?.id || !initialLoadDone.current) return;
-    if (!t.trim() || !d.trim()) return;
-    setSectionSaveStatus('description', 'saving');
-    try {
-      await dispatch(updateDescription({ id: accommodation.id, title: t, description: d })).unwrap();
-      setSectionSaveStatus('description', 'saved');
-    } catch {
-      setSectionSaveStatus('description', 'error');
-    }
-  }, AUTOSAVE_DELAY);
-
-  const autoSavePrice = useDebounce(async (value: number) => {
-    if (!accommodation?.id || !initialLoadDone.current || value <= 0) return;
-    setSectionSaveStatus('price', 'saving');
-    try {
-      await dispatch(updatePrice({ id: accommodation.id, price: value })).unwrap();
-      setSectionSaveStatus('price', 'saved');
-    } catch {
-      setSectionSaveStatus('price', 'error');
-    }
-  }, AUTOSAVE_DELAY);
-
-  const autoSaveWeeklyPromotion = useDebounce(async (raw: string) => {
-    if (!accommodation?.id || !initialLoadDone.current) return;
-    let value: number | null;
-    if (raw === '') {
-      value = null;
-    } else {
-      const n = Number(raw);
-      if (!Number.isFinite(n) || n <= 0 || n > 100) return;
-      value = n;
-    }
-    setSectionSaveStatus('price', 'saving');
-    try {
-      await dispatch(updateWeeklyPromotion({ id: accommodation.id, weeklyPromotionPercentage: value })).unwrap();
-      setSectionSaveStatus('price', 'saved');
-    } catch {
-      setSectionSaveStatus('price', 'error');
-    }
-  }, AUTOSAVE_DELAY);
-
-  const autoSaveCapacity = useDebounce(async (vals: typeof capacityValues) => {
-    if (!accommodation?.id || !initialLoadDone.current) return;
-    setSectionSaveStatus('capacity', 'saving');
-    try {
-      await dispatch(setCapacity({ id: accommodation.id, ...vals })).unwrap();
-      setSectionSaveStatus('capacity', 'saved');
-    } catch {
-      setSectionSaveStatus('capacity', 'error');
-    }
-  }, AUTOSAVE_DELAY);
-
-  const autoSaveAmenities = useDebounce(async (codes: string[]) => {
-    if (!accommodation?.id || !initialLoadDone.current) return;
-    setSectionSaveStatus('amenities', 'saving');
-    try {
-      await dispatch(setAmenities({ id: accommodation.id, codes })).unwrap();
-      setSectionSaveStatus('amenities', 'saved');
-    } catch {
-      setSectionSaveStatus('amenities', 'error');
-    }
-  }, AUTOSAVE_DELAY);
-
-  const autoSaveCheckInOut = useDebounce(async (vals: { checkIn: string; checkOut: string }) => {
-    if (!accommodation?.id || !initialLoadDone.current) return;
-    setSectionSaveStatus('checkinout', 'saving');
-    try {
-      await dispatch(setCheckInOut({ id: accommodation.id, ...vals })).unwrap();
-      setSectionSaveStatus('checkinout', 'saved');
-    } catch {
-      setSectionSaveStatus('checkinout', 'error');
-    }
-  }, AUTOSAVE_DELAY);
-
-  const autoSaveLocation = useDebounce(async () => {
-    if (!accommodation?.id || !initialLoadDone.current) return;
-    const valid = await locationForm.trigger();
-    if (!valid) return;
-    const data = locationForm.getValues();
-    setSectionSaveStatus('location', 'saving');
-    try {
-      await dispatch(setLocation({
-        id: accommodation.id,
-        street: data.street,
-        city: data.city,
-        zipCode: data.zipCode ?? '',
-        country: data.country,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      })).unwrap();
-      setSectionSaveStatus('location', 'saved');
-    } catch {
-      setSectionSaveStatus('location', 'error');
-    }
-  }, AUTOSAVE_DELAY);
-
-  // --- Change handlers that trigger auto-save ---
+  // --- Change handlers: update the controlled input, declare the intent ---
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setTitle(v);
-    autoSaveDescription(v, description);
+    dispatch(accommodationFieldEdited({ field: 'description', id, title: v, description }));
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const v = e.target.value;
     setDescription(v);
-    autoSaveDescription(title, v);
+    dispatch(accommodationFieldEdited({ field: 'description', id, title, description: v }));
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = Number(e.target.value);
     setPrice(v);
-    autoSavePrice(v);
+    dispatch(accommodationFieldEdited({ field: 'price', id, price: v }));
   };
 
   const handleWeeklyPromotionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setWeeklyPromotion(v);
-    autoSaveWeeklyPromotion(v);
+    dispatch(accommodationFieldEdited({
+      field: 'weeklyPromotion',
+      id,
+      weeklyPromotionPercentage: v === '' ? null : Number(v),
+    }));
   };
 
   const handleCapacityChange = (field: string, value: number) => {
     setCapacityValues((prev) => {
       const next = { ...prev, [field]: value };
-      autoSaveCapacity(next);
+      dispatch(accommodationFieldEdited({ field: 'capacity', id, ...next }));
       return next;
     });
   };
@@ -354,7 +169,7 @@ const EditAccommodationPage: React.FC = () => {
     setSelectedAmenities((prev) => {
       const next = new Set(prev);
       next.has(code) ? next.delete(code) : next.add(code);
-      autoSaveAmenities(Array.from(next));
+      dispatch(accommodationFieldEdited({ field: 'amenities', id, codes: Array.from(next) }));
       return next;
     });
   };
@@ -362,51 +177,38 @@ const EditAccommodationPage: React.FC = () => {
   const handleCheckInOutChange = (field: 'checkIn' | 'checkOut', value: string) => {
     setCheckInOutState((prev) => {
       const next = { ...prev, [field]: value };
-      autoSaveCheckInOut(next);
+      dispatch(accommodationFieldEdited({ field: 'checkInOut', id, ...next }));
       return next;
     });
   };
 
-  const handleLocationFieldChange = () => {
-    autoSaveLocation();
+  const dispatchLocationEdited = () => {
+    const v = locationForm.getValues();
+    const num = (x: unknown): number | undefined =>
+      x === '' || x === undefined || x === null ? undefined : Number(x);
+    dispatch(accommodationFieldEdited({
+      field: 'location',
+      id,
+      street: v.street ?? '',
+      city: v.city ?? '',
+      zipCode: v.zipCode ?? '',
+      country: v.country ?? '',
+      latitude: num(v.latitude),
+      longitude: num(v.longitude),
+    }));
   };
 
   const handleMapSelect = (lat: number, lng: number) => {
     locationForm.setValue('latitude', lat, { shouldValidate: true });
     locationForm.setValue('longitude', lng, { shouldValidate: true });
-    autoSaveLocation();
+    dispatchLocationEdited();
   };
-
-  // Loading
-  if (status === 'loading' && !accommodation) {
-    return (
-      <main className="min-h-screen py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded-lg w-1/3" />
-            <div className="h-64 bg-gray-100 rounded-lg" />
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (!accommodation) {
-    return (
-      <main className="min-h-screen py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center py-20">
-          <p className="text-red-500 mb-4">{error || t('edit.notFound')}</p>
-          <Link to="/" className="text-blue-600 hover:underline">{t('detail.backToHome')}</Link>
-        </div>
-      </main>
-    );
-  }
 
   const inputClass = 'w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all';
 
   return (
     <EditLayout
-      accommodationId={accommodation.id!}
+      accommodationId={id}
       accommodationTitle={accommodation.title ?? ''}
       activeSection={activeSection}
       error={error}
@@ -612,23 +414,23 @@ const EditAccommodationPage: React.FC = () => {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('addressStep.street')}</label>
-              <input type="text" {...locationForm.register('street', { onChange: handleLocationFieldChange })} className={inputClass} />
+              <input type="text" {...locationForm.register('street', { onChange: dispatchLocationEdited })} className={inputClass} />
               {locationForm.formState.errors.street && <p className="mt-1 text-sm text-red-600">{String(locationForm.formState.errors.street.message)}</p>}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('addressStep.city')}</label>
-                <input type="text" {...locationForm.register('city', { onChange: handleLocationFieldChange })} className={inputClass} />
+                <input type="text" {...locationForm.register('city', { onChange: dispatchLocationEdited })} className={inputClass} />
                 {locationForm.formState.errors.city && <p className="mt-1 text-sm text-red-600">{String(locationForm.formState.errors.city.message)}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('addressStep.zipCode')}</label>
-                <input type="text" {...locationForm.register('zipCode', { onChange: handleLocationFieldChange })} className={inputClass} />
+                <input type="text" {...locationForm.register('zipCode', { onChange: dispatchLocationEdited })} className={inputClass} />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('addressStep.country')}</label>
-              <input type="text" {...locationForm.register('country', { onChange: handleLocationFieldChange })} className={inputClass} />
+              <input type="text" {...locationForm.register('country', { onChange: dispatchLocationEdited })} className={inputClass} />
               {locationForm.formState.errors.country && <p className="mt-1 text-sm text-red-600">{String(locationForm.formState.errors.country.message)}</p>}
             </div>
             <div className="rounded-xl overflow-hidden border border-gray-100">
@@ -642,11 +444,11 @@ const EditAccommodationPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('addressStep.latitude')}</label>
-                <input type="number" step="any" {...locationForm.register('latitude', { onChange: handleLocationFieldChange })} className={inputClass} />
+                <input type="number" step="any" {...locationForm.register('latitude', { onChange: dispatchLocationEdited })} className={inputClass} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('addressStep.longitude')}</label>
-                <input type="number" step="any" {...locationForm.register('longitude', { onChange: handleLocationFieldChange })} className={inputClass} />
+                <input type="number" step="any" {...locationForm.register('longitude', { onChange: dispatchLocationEdited })} className={inputClass} />
               </div>
             </div>
           </div>
@@ -687,7 +489,7 @@ const EditAccommodationPage: React.FC = () => {
 
         {/* Photos — clickable card linking to dedicated page */}
         <Link
-          to={`/accommodations/${accommodation.id}/photos`}
+          to={`/accommodations/${id}/photos`}
           ref={(el) => { sectionRefs.current.photos = el; }}
           className="block bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all p-6 sm:p-8 group cursor-pointer"
         >
@@ -722,6 +524,44 @@ const EditAccommodationPage: React.FC = () => {
       </div>
     </EditLayout>
   );
+};
+
+const EditAccommodationPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const accommodation = useAppSelector(selectCurrentAccommodation);
+  const status = useAppSelector(selectAccommodationStatus);
+  const error = useAppSelector(selectAccommodationError);
+
+  useEffect(() => {
+    if (id) dispatch(editPageOpened({ id }));
+  }, [dispatch, id]);
+
+  if (!accommodation || accommodation.id !== id) {
+    if (status === 'loading' || status === 'idle') {
+      return (
+        <main className="min-h-screen py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="animate-pulse space-y-6">
+              <div className="h-8 bg-gray-200 rounded-lg w-1/3" />
+              <div className="h-64 bg-gray-100 rounded-lg" />
+            </div>
+          </div>
+        </main>
+      );
+    }
+    return (
+      <main className="min-h-screen py-8">
+        <div className="max-w-7xl mx-auto px-4 text-center py-20">
+          <p className="text-red-500 mb-4">{error || t('edit.notFound')}</p>
+          <Link to="/" className="text-blue-600 hover:underline">{t('detail.backToHome')}</Link>
+        </div>
+      </main>
+    );
+  }
+
+  return <EditAccommodationForm key={accommodation.id} accommodation={accommodation} />;
 };
 
 export default EditAccommodationPage;

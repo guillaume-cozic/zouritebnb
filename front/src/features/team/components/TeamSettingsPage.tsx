@@ -1,8 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { updateTeamFavoriteProject, inviteCoHost, cancelTeamInvitation, teamSettingsPageOpened, updateTeamBankAccount } from '../TeamSlice';
+import {
+  updateTeamFavoriteProject,
+  inviteCoHost,
+  cancelTeamInvitation,
+  teamSettingsPageOpened,
+  bankAccountEdited,
+  SaveState,
+} from '../TeamSlice';
 import {
   selectCurrentTeam,
   selectTeamError,
@@ -10,13 +17,174 @@ import {
   selectTeamInvitations,
   selectInviteStatus,
   selectInviteError,
+  selectBankSaveState,
+  selectBankSaveError,
+  selectFavoriteSaveState,
 } from '../TeamSelectors';
 import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
-import { selectAuthTeamId, selectAuthUser } from '../../auth/AuthSelectors';
-import { updateUserProfile } from '../../auth/AuthSlice';
-import { DEFAULT_TEAM_ID } from '../TeamTypes';
+import { selectAuthTeamId, selectAuthUser, selectProfileSaveState } from '../../auth/AuthSelectors';
+import { profileEdited } from '../../auth/AuthSlice';
+import { AuthUser } from '../../auth/AuthTypes';
+import { DEFAULT_TEAM_ID, Team } from '../TeamTypes';
 
-type SaveState = 'idle' | 'saving' | 'saved' | 'error';
+const inputClass = 'w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white';
+
+const SaveIndicator: React.FC<{ state: SaveState }> = ({ state }) => {
+  const { t } = useTranslation();
+  if (state === 'idle') return null;
+  if (state === 'saving') return <span className="text-sm text-gray-500">{t('team.autoSaving')}</span>;
+  if (state === 'saved') return <span className="text-sm text-green-600">{t('team.saved')}</span>;
+  return <span className="text-sm text-red-600">{t('team.saveError')}</span>;
+};
+
+/**
+ * Profile form, keyed by user id so the controlled inputs hydrate from props.
+ * Every change dispatches a single `profileEdited` intent; the listener
+ * debounces and saves.
+ */
+const ProfileSection: React.FC<{ user: AuthUser }> = ({ user }) => {
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const profileSaveState = useAppSelector(selectProfileSaveState);
+
+  const [firstName, setFirstName] = useState(user.firstName ?? '');
+  const [lastName, setLastName] = useState(user.lastName ?? '');
+  const [email, setEmail] = useState(user.email);
+
+  const handleChange = (next: { firstName?: string; lastName?: string; email?: string }) => {
+    const values = { firstName, lastName, email, ...next };
+    if (next.firstName !== undefined) setFirstName(next.firstName);
+    if (next.lastName !== undefined) setLastName(next.lastName);
+    if (next.email !== undefined) setEmail(next.email);
+    dispatch(profileEdited({ userId: user.id, ...values }));
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">{t('team.profileTitle')}</h2>
+          <p className="text-xs text-gray-500">{t('team.profileHelp')}</p>
+        </div>
+        <SaveIndicator state={profileSaveState} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">{t('team.firstName')}</label>
+          <input
+            type="text"
+            value={firstName}
+            onChange={(e) => handleChange({ firstName: e.target.value })}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">{t('team.lastName')}</label>
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => handleChange({ lastName: e.target.value })}
+            className={inputClass}
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium mb-2">{t('team.email')}</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => handleChange({ email: e.target.value })}
+            className={inputClass}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Bank account form, keyed by team id. Every change dispatches a single
+ * `bankAccountEdited` intent; the listener debounces, normalises and saves.
+ */
+const BankAccountSection: React.FC<{ team: Team }> = ({ team }) => {
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const bankSaveState = useAppSelector(selectBankSaveState);
+  const bankSaveError = useAppSelector(selectBankSaveError);
+
+  const [iban, setIban] = useState(team.iban ?? '');
+  const [bic, setBic] = useState(team.bic ?? '');
+  const [holderName, setHolderName] = useState(team.bankAccountHolderName ?? '');
+
+  const handleChange = (next: { iban?: string; bic?: string; holderName?: string }) => {
+    const values = { iban, bic, holderName, ...next };
+    if (next.iban !== undefined) setIban(next.iban);
+    if (next.bic !== undefined) setBic(next.bic);
+    if (next.holderName !== undefined) setHolderName(next.holderName);
+    dispatch(bankAccountEdited({ teamId: team.id, ...values }));
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+      <div className="flex items-start justify-between mb-1">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">{t('team.bankAccount.title')}</h2>
+          <p className="text-xs text-gray-500">{t('team.bankAccount.help')}</p>
+        </div>
+        <SaveIndicator state={bankSaveState} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium mb-2">{t('team.bankAccount.iban')}</label>
+          <input
+            type="text"
+            value={iban}
+            onChange={(e) => handleChange({ iban: e.target.value })}
+            placeholder="FR76 3000 1007 9412 3456 7890 185"
+            spellCheck={false}
+            autoComplete="off"
+            className={`${inputClass} font-mono tracking-wider`}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">{t('team.bankAccount.holderName')}</label>
+          <input
+            type="text"
+            value={holderName}
+            onChange={(e) => handleChange({ holderName: e.target.value })}
+            placeholder={t('team.bankAccount.holderNamePlaceholder') as string}
+            autoComplete="off"
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            {t('team.bankAccount.bic')}{' '}
+            <span className="text-xs font-normal text-gray-400">({t('team.bankAccount.optional')})</span>
+          </label>
+          <input
+            type="text"
+            value={bic}
+            onChange={(e) => handleChange({ bic: e.target.value })}
+            placeholder="BDFEFRPPCCT"
+            spellCheck={false}
+            autoComplete="off"
+            className={`${inputClass} font-mono tracking-wider`}
+          />
+        </div>
+      </div>
+      {iban.trim() !== '' && holderName.trim() === '' && (
+        <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          {t('team.bankAccount.holderRequired')}
+        </p>
+      )}
+      {bankSaveState === 'error' && bankSaveError && (
+        <p className="mt-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          {bankSaveError}
+        </p>
+      )}
+    </div>
+  );
+};
 
 const TeamSettingsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -32,86 +200,14 @@ const TeamSettingsPage: React.FC = () => {
   const invitations = useAppSelector(selectTeamInvitations);
   const inviteStatus = useAppSelector(selectInviteStatus);
   const inviteError = useAppSelector(selectInviteError);
+  const favoriteSaveState = useAppSelector(selectFavoriteSaveState);
 
   const [inviteEmail, setInviteEmail] = useState('');
   const [invitationToCancel, setInvitationToCancel] = useState<{ id: string; email: string } | null>(null);
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [profileState, setProfileState] = useState<SaveState>('idle');
-  const [favoriteState, setFavoriteState] = useState<SaveState>('idle');
-  const profileTimer = useRef<number | null>(null);
-  const isHydrating = useRef(true);
-
-  const [iban, setIban] = useState('');
-  const [bic, setBic] = useState('');
-  const [holderName, setHolderName] = useState('');
-  const [bankState, setBankState] = useState<SaveState>('idle');
-  const [bankError, setBankError] = useState<string | null>(null);
-  const bankTimer = useRef<number | null>(null);
-  const isBankHydrating = useRef(true);
-
-  useEffect(() => {
-    if (user) {
-      isHydrating.current = true;
-      setFirstName(user.firstName ?? '');
-      setLastName(user.lastName ?? '');
-      setEmail(user.email);
-      const handle = window.setTimeout(() => { isHydrating.current = false; }, 0);
-      return () => window.clearTimeout(handle);
-    }
-  }, [user]);
-
   useEffect(() => {
     dispatch(teamSettingsPageOpened({ teamId }));
   }, [dispatch, teamId]);
-
-  useEffect(() => {
-    if (team) {
-      isBankHydrating.current = true;
-      setIban(team.iban ?? '');
-      setBic(team.bic ?? '');
-      setHolderName(team.bankAccountHolderName ?? '');
-      const handle = window.setTimeout(() => { isBankHydrating.current = false; }, 0);
-      return () => window.clearTimeout(handle);
-    }
-  }, [team]);
-
-  useEffect(() => {
-    if (!team || isBankHydrating.current) return;
-    if (bankTimer.current) window.clearTimeout(bankTimer.current);
-    bankTimer.current = window.setTimeout(async () => {
-      const ibanTrimmed = iban.trim();
-      const holderTrimmed = holderName.trim();
-
-      if ('' !== ibanTrimmed && '' === holderTrimmed) {
-        setBankState('idle');
-        return;
-      }
-
-      setBankState('saving');
-      setBankError(null);
-      const result = await dispatch(updateTeamBankAccount({
-        id: team.id,
-        payload: {
-          iban: '' === ibanTrimmed ? null : ibanTrimmed,
-          bic: '' === bic.trim() ? null : bic.trim(),
-          holderName: '' === holderTrimmed ? null : holderTrimmed,
-        },
-      }));
-      if (updateTeamBankAccount.fulfilled.match(result)) {
-        setBankState('saved');
-        window.setTimeout(() => setBankState('idle'), 1500);
-      } else {
-        setBankState('error');
-        setBankError((result.payload as string) ?? null);
-      }
-    }, 800);
-    return () => {
-      if (bankTimer.current) window.clearTimeout(bankTimer.current);
-    };
-  }, [iban, bic, holderName, team, dispatch]);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,54 +218,7 @@ const TeamSettingsPage: React.FC = () => {
     }
   };
 
-  // Autosave profil (debounce 800ms)
-  useEffect(() => {
-    if (!user || isHydrating.current) return;
-    if (profileTimer.current) window.clearTimeout(profileTimer.current);
-    profileTimer.current = window.setTimeout(async () => {
-      if (!email) return;
-      setProfileState('saving');
-      const result = await dispatch(updateUserProfile({
-        id: user.id,
-        firstName: firstName || null,
-        lastName: lastName || null,
-        email,
-      }));
-      if (updateUserProfile.fulfilled.match(result)) {
-        setProfileState('saved');
-        window.setTimeout(() => setProfileState('idle'), 1500);
-      } else {
-        setProfileState('error');
-      }
-    }, 800);
-    return () => {
-      if (profileTimer.current) window.clearTimeout(profileTimer.current);
-    };
-  }, [firstName, lastName, email, user, dispatch]);
-
   const activeProjects = projects.filter((p) => p.status === 'active');
-
-  const handleFavoriteChange = async (projectId: string) => {
-    if (!team) return;
-    setFavoriteState('saving');
-    const result = await dispatch(updateTeamFavoriteProject({
-      id: team.id,
-      favoriteSolidarityProjectId: projectId || null,
-    }));
-    if (updateTeamFavoriteProject.fulfilled.match(result)) {
-      setFavoriteState('saved');
-      window.setTimeout(() => setFavoriteState('idle'), 1500);
-    } else {
-      setFavoriteState('error');
-    }
-  };
-
-  const SaveIndicator: React.FC<{ state: SaveState }> = ({ state }) => {
-    if (state === 'idle') return null;
-    if (state === 'saving') return <span className="text-sm text-gray-500">{t('team.autoSaving')}</span>;
-    if (state === 'saved') return <span className="text-sm text-green-600">{t('team.saved')}</span>;
-    return <span className="text-sm text-red-600">{t('team.saveError')}</span>;
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -189,46 +238,7 @@ const TeamSettingsPage: React.FC = () => {
         </div>
       )}
 
-      {user && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">{t('team.profileTitle')}</h2>
-              <p className="text-xs text-gray-500">{t('team.profileHelp')}</p>
-            </div>
-            <SaveIndicator state={profileState} />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">{t('team.firstName')}</label>
-              <input
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">{t('team.lastName')}</label>
-              <input
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-2">{t('team.email')}</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {user && <ProfileSection key={user.id} user={user} />}
 
       {teamId && teamStatus === 'loading' && !team && (
         <div className="text-center py-12 text-gray-500">{t('homepage.loading')}</div>
@@ -244,12 +254,15 @@ const TeamSettingsPage: React.FC = () => {
               <label className="block text-sm font-medium">{t('team.favoriteProjectLabel')}</label>
               <p className="text-xs text-gray-500">{t('team.favoriteProjectHelp')}</p>
             </div>
-            <SaveIndicator state={favoriteState} />
+            <SaveIndicator state={favoriteSaveState} />
           </div>
           <select
             value={team.favoriteSolidarityProjectId ?? ''}
-            onChange={(e) => handleFavoriteChange(e.target.value)}
-            className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+            onChange={(e) => dispatch(updateTeamFavoriteProject({
+              id: team.id,
+              favoriteSolidarityProjectId: e.target.value || null,
+            }))}
+            className={`${inputClass} transition-all`}
           >
             <option value="">{t('team.favoriteProjectNone')}</option>
             {activeProjects.map((p) => (
@@ -259,67 +272,7 @@ const TeamSettingsPage: React.FC = () => {
         </div>
       )}
 
-      {team && !isTravelerMode && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
-          <div className="flex items-start justify-between mb-1">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">{t('team.bankAccount.title')}</h2>
-              <p className="text-xs text-gray-500">{t('team.bankAccount.help')}</p>
-            </div>
-            <SaveIndicator state={bankState} />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-2">{t('team.bankAccount.iban')}</label>
-              <input
-                type="text"
-                value={iban}
-                onChange={(e) => setIban(e.target.value)}
-                placeholder="FR76 3000 1007 9412 3456 7890 185"
-                spellCheck={false}
-                autoComplete="off"
-                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">{t('team.bankAccount.holderName')}</label>
-              <input
-                type="text"
-                value={holderName}
-                onChange={(e) => setHolderName(e.target.value)}
-                placeholder={t('team.bankAccount.holderNamePlaceholder') as string}
-                autoComplete="off"
-                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {t('team.bankAccount.bic')}{' '}
-                <span className="text-xs font-normal text-gray-400">({t('team.bankAccount.optional')})</span>
-              </label>
-              <input
-                type="text"
-                value={bic}
-                onChange={(e) => setBic(e.target.value)}
-                placeholder="BDFEFRPPCCT"
-                spellCheck={false}
-                autoComplete="off"
-                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
-              />
-            </div>
-          </div>
-          {iban.trim() !== '' && holderName.trim() === '' && (
-            <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              {t('team.bankAccount.holderRequired')}
-            </p>
-          )}
-          {bankState === 'error' && bankError && (
-            <p className="mt-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              {bankError}
-            </p>
-          )}
-        </div>
-      )}
+      {team && !isTravelerMode && <BankAccountSection key={team.id} team={team} />}
 
       {team && !isTravelerMode && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
@@ -335,7 +288,7 @@ const TeamSettingsPage: React.FC = () => {
               placeholder={t('team.inviteEmailPlaceholder')}
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              className="flex-1 h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white"
+              className={`flex-1 ${inputClass}`}
             />
             <button
               type="submit"

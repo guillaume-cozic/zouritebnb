@@ -1,5 +1,6 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createAction, isAnyOf, PayloadAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
+import { extractErrorMessage } from '../../services/errors';
 import {
   Accommodation,
   CreateAccommodationPayload,
@@ -18,6 +19,46 @@ import {
   AddressDraft,
 } from './AccommodationTypes';
 
+export type AutoSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+/** Sections of the edit page, used to display a per-section auto-save badge. */
+export type EditSection = 'description' | 'price' | 'capacity' | 'amenities' | 'location' | 'checkinout';
+
+/**
+ * Single business intent dispatched by the edit page when the user modifies a
+ * field. A listener debounces and runs the matching update thunk — the
+ * component never orchestrates the save.
+ */
+export type AccommodationFieldEditedPayload =
+  | { field: 'description'; id: string; title: string; description: string }
+  | { field: 'price'; id: string; price: number }
+  | { field: 'weeklyPromotion'; id: string; weeklyPromotionPercentage: number | null }
+  | { field: 'capacity'; id: string; bedrooms: number; bathrooms: number; maxGuests: number; singleBeds: number; doubleBeds: number }
+  | { field: 'amenities'; id: string; codes: string[] }
+  | { field: 'checkInOut'; id: string; checkIn: string; checkOut: string }
+  | { field: 'location'; id: string; street: string; city: string; zipCode: string; country: string; latitude?: number; longitude?: number };
+
+export type AccommodationEditField = AccommodationFieldEditedPayload['field'];
+
+export const accommodationFieldEdited = createAction<AccommodationFieldEditedPayload>(
+  'accommodation/fieldEdited'
+);
+
+/** Intent: the edit page was opened, the listener loads the accommodation. */
+export const editPageOpened = createAction<{ id: string }>('accommodation/editPageOpened');
+
+/** Badge section displaying the save status of a given edited field. */
+export const editSectionForField = (field: AccommodationEditField): EditSection => {
+  switch (field) {
+    case 'weeklyPromotion':
+      return 'price';
+    case 'checkInOut':
+      return 'checkinout';
+    default:
+      return field;
+  }
+};
+
 interface AccommodationState {
   current: Accommodation | null;
   wizardStep: WizardStep;
@@ -25,6 +66,8 @@ interface AccommodationState {
   error: string | null;
   photoUploadStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   formDrafts: FormDrafts;
+  /** Per-section auto-save badge status on the edit page. */
+  editSaveStatus: Partial<Record<EditSection, AutoSaveStatus>>;
 }
 
 const initialState: AccommodationState = {
@@ -34,6 +77,7 @@ const initialState: AccommodationState = {
   error: null,
   photoUploadStatus: 'idle',
   formDrafts: {},
+  editSaveStatus: {},
 };
 
 export const createAccommodation = createAsyncThunk(
@@ -44,9 +88,9 @@ export const createAccommodation = createAsyncThunk(
         headers: { 'Content-Type': 'application/ld+json' },
       });
       return { ...payload, id: response.data.id } as Accommodation;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la création'
+        extractErrorMessage(err, 'Erreur lors de la création')
       );
     }
   }
@@ -74,9 +118,9 @@ export const setLocation = createAsyncThunk(
       }
 
       return { street, city, zipCode, country, latitude, longitude };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || "Erreur lors de la mise à jour de la localisation"
+        extractErrorMessage(err, "Erreur lors de la mise à jour de la localisation")
       );
     }
   }
@@ -95,9 +139,9 @@ export const setCapacity = createAsyncThunk(
         { headers: { 'Content-Type': 'application/ld+json' } }
       );
       return { bedrooms, bathrooms, maxGuests, singleBeds, doubleBeds };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la mise à jour de la capacité'
+        extractErrorMessage(err, 'Erreur lors de la mise à jour de la capacité')
       );
     }
   }
@@ -113,9 +157,9 @@ export const setAmenities = createAsyncThunk(
         { headers: { 'Content-Type': 'application/ld+json' } }
       );
       return { codes };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la mise à jour des équipements'
+        extractErrorMessage(err, 'Erreur lors de la mise à jour des équipements')
       );
     }
   }
@@ -137,8 +181,8 @@ export const addPhoto = createAsyncThunk(
         throw new Error(data.detail || `Upload failed (${response.status})`);
       }
       return file.name;
-    } catch (err: any) {
-      return rejectWithValue(err.message || "Erreur lors de l'upload de la photo");
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, "Erreur lors de l'upload de la photo"));
     }
   }
 );
@@ -149,9 +193,9 @@ export const deletePhoto = createAsyncThunk(
     try {
       await api.delete(`/api/accommodations/${id}/photos/${photoId}`);
       return { photoId };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la suppression de la photo'
+        extractErrorMessage(err, 'Erreur lors de la suppression de la photo')
       );
     }
   }
@@ -167,9 +211,9 @@ export const reorderPhotos = createAsyncThunk(
         { headers: { 'Content-Type': 'application/ld+json' } }
       );
       return { photoIds };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du réordonnancement des photos'
+        extractErrorMessage(err, 'Erreur lors du réordonnancement des photos')
       );
     }
   }
@@ -185,9 +229,9 @@ export const updatePrice = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return { price };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la mise à jour du prix'
+        extractErrorMessage(err, 'Erreur lors de la mise à jour du prix')
       );
     }
   }
@@ -203,9 +247,9 @@ export const updateWeeklyPromotion = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return { weeklyPromotionPercentage };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la mise à jour de la promotion'
+        extractErrorMessage(err, 'Erreur lors de la mise à jour de la promotion')
       );
     }
   }
@@ -221,9 +265,9 @@ export const setCheckInOut = createAsyncThunk(
         { headers: { 'Content-Type': 'application/ld+json' } }
       );
       return { checkIn, checkOut };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la mise à jour des horaires'
+        extractErrorMessage(err, 'Erreur lors de la mise à jour des horaires')
       );
     }
   }
@@ -239,9 +283,9 @@ export const updateDescription = createAsyncThunk(
         { headers: { 'Content-Type': 'application/ld+json' } }
       );
       return { title, description };
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors de la mise à jour de la description'
+        extractErrorMessage(err, 'Erreur lors de la mise à jour de la description')
       );
     }
   }
@@ -253,9 +297,9 @@ export const fetchAccommodation = createAsyncThunk(
     try {
       const response = await api.get(`/api/accommodations/${id}`);
       return response.data as Accommodation;
-    } catch (err: any) {
+    } catch (err) {
       return rejectWithValue(
-        err.response?.data?.detail || 'Erreur lors du chargement'
+        extractErrorMessage(err, 'Erreur lors du chargement')
       );
     }
   }
@@ -270,11 +314,35 @@ export const uploadPhotos = createAsyncThunk(
       }
       await dispatch(fetchAccommodation(id));
       return { count: files.length };
-    } catch (err: any) {
-      return rejectWithValue(typeof err === 'string' ? err : err?.message || "Erreur lors de l'upload");
+    } catch (err) {
+      return rejectWithValue(typeof err === 'string' ? err : extractErrorMessage(err, "Erreur lors de l'upload"));
     }
   }
 );
+
+/** Update thunks dispatched by the edit page auto-save, with their badge section. */
+const EDIT_SECTION_BY_THUNK_PREFIX: Record<string, EditSection> = {
+  [updateDescription.typePrefix]: 'description',
+  [updatePrice.typePrefix]: 'price',
+  [updateWeeklyPromotion.typePrefix]: 'price',
+  [setCapacity.typePrefix]: 'capacity',
+  [setAmenities.typePrefix]: 'amenities',
+  [setCheckInOut.typePrefix]: 'checkinout',
+  [setLocation.typePrefix]: 'location',
+};
+
+const EDIT_THUNKS = [
+  updateDescription,
+  updatePrice,
+  updateWeeklyPromotion,
+  setCapacity,
+  setAmenities,
+  setCheckInOut,
+  setLocation,
+];
+
+const editSectionForThunkAction = (actionType: string): EditSection | undefined =>
+  EDIT_SECTION_BY_THUNK_PREFIX[actionType.replace(/\/(pending|fulfilled|rejected)$/, '')];
 
 const accommodationSlice = createSlice({
   name: 'accommodation',
@@ -305,6 +373,9 @@ const accommodationSlice = createSlice({
       action: PayloadAction<{ id: string; address: AddressDraft }>
     ) {
       state.formDrafts.address = action.payload.address;
+    },
+    editSaveStatusCleared(state, action: PayloadAction<{ section: EditSection }>) {
+      state.editSaveStatus[action.payload.section] = 'idle';
     },
   },
   extraReducers: (builder) => {
@@ -480,6 +551,23 @@ const accommodationSlice = createSlice({
       .addCase(fetchAccommodation.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
+      })
+      // Edit page auto-save badges: every update thunk reports its lifecycle
+      // on the section it belongs to.
+      .addCase(editPageOpened, (state) => {
+        state.editSaveStatus = {};
+      })
+      .addMatcher(isAnyOf(...EDIT_THUNKS.map((t) => t.pending)), (state, action) => {
+        const section = editSectionForThunkAction(action.type);
+        if (section) state.editSaveStatus[section] = 'saving';
+      })
+      .addMatcher(isAnyOf(...EDIT_THUNKS.map((t) => t.fulfilled)), (state, action) => {
+        const section = editSectionForThunkAction(action.type);
+        if (section) state.editSaveStatus[section] = 'saved';
+      })
+      .addMatcher(isAnyOf(...EDIT_THUNKS.map((t) => t.rejected)), (state, action) => {
+        const section = editSectionForThunkAction(action.type);
+        if (section) state.editSaveStatus[section] = 'error';
       });
   },
 });
@@ -490,5 +578,6 @@ export const {
   resetWizard,
   wizardStepLeft,
   addressSubmitted,
+  editSaveStatusCleared,
 } = accommodationSlice.actions;
 export default accommodationSlice.reducer;

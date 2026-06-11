@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createAction, PayloadAction } from '@reduxjs/toolkit';
 import api, {
   AUTH_USER_KEY,
   clearStoredAuth,
@@ -10,6 +10,7 @@ import {
   fetchVerificationStatus,
 } from '../userProfile/UserProfileSlice';
 import { VerificationResult } from '../userProfile/UserProfileTypes';
+import { extractErrorMessage } from '../../services/errors';
 
 const STORAGE_KEY = AUTH_USER_KEY;
 
@@ -22,16 +23,31 @@ const loadUser = (): AuthUser | null => {
   }
 };
 
+export type ProfileSaveState = 'idle' | 'saving' | 'saved' | 'error';
+
+/**
+ * Single business intent dispatched when the user edits their profile form.
+ * A listener debounces and runs the update thunk.
+ */
+export const profileEdited = createAction<{
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}>('auth/profileEdited');
+
 interface AuthState {
   user: AuthUser | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+  profileSaveState: ProfileSaveState;
 }
 
 const initialState: AuthState = {
   user: loadUser(),
   status: 'idle',
   error: null,
+  profileSaveState: 'idle',
 };
 
 export const registerUser = createAsyncThunk(
@@ -42,8 +58,8 @@ export const registerUser = createAsyncThunk(
         headers: { 'Content-Type': 'application/ld+json' },
       });
       return response.data as AuthUser;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || 'Erreur lors de l\'inscription');
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors de l\'inscription'));
     }
   }
 );
@@ -58,8 +74,8 @@ export const updateUserProfile = createAsyncThunk(
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return { firstName: payload.firstName, lastName: payload.lastName, email: payload.email };
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || 'Erreur lors de la mise à jour du profil');
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors de la mise à jour du profil'));
     }
   }
 );
@@ -72,8 +88,8 @@ export const loginUser = createAsyncThunk(
         headers: { 'Content-Type': 'application/ld+json' },
       });
       return response.data as AuthUser;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.detail || 'Identifiants invalides');
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Identifiants invalides'));
     }
   }
 );
@@ -87,6 +103,9 @@ const authSlice = createSlice({
       state.status = 'idle';
       state.error = null;
       clearStoredAuth();
+    },
+    profileSaveStateCleared(state) {
+      state.profileSaveState = 'idle';
     },
   },
   extraReducers: (builder) => {
@@ -114,12 +133,19 @@ const authSlice = createSlice({
       .addCase(loginUser.pending, handlePending)
       .addCase(loginUser.fulfilled, handleFulfilled)
       .addCase(loginUser.rejected, handleRejected)
+      .addCase(updateUserProfile.pending, (state) => {
+        state.profileSaveState = 'saving';
+      })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.profileSaveState = 'saved';
         if (!state.user) return;
         state.user.firstName = action.payload.firstName;
         state.user.lastName = action.payload.lastName;
         state.user.email = action.payload.email;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
+      })
+      .addCase(updateUserProfile.rejected, (state) => {
+        state.profileSaveState = 'error';
       });
 
     const syncVerificationStatus = (
@@ -137,5 +163,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, profileSaveStateCleared } = authSlice.actions;
 export default authSlice.reducer;
