@@ -8,7 +8,6 @@ import {
   cancelTeamInvitation,
   teamSettingsPageOpened,
   bankAccountEdited,
-  SaveState,
 } from '../TeamSlice';
 import {
   selectCurrentTeam,
@@ -26,16 +25,7 @@ import { selectAuthTeamId, selectAuthUser, selectProfileSaveState } from '../../
 import { profileEdited } from '../../auth/AuthSlice';
 import { AuthUser } from '../../auth/AuthTypes';
 import { DEFAULT_TEAM_ID, Team } from '../TeamTypes';
-
-const inputClass = 'w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white';
-
-const SaveIndicator: React.FC<{ state: SaveState }> = ({ state }) => {
-  const { t } = useTranslation();
-  if (state === 'idle') return null;
-  if (state === 'saving') return <span className="text-sm text-gray-500">{t('team.autoSaving')}</span>;
-  if (state === 'saved') return <span className="text-sm text-green-600">{t('team.saved')}</span>;
-  return <span className="text-sm text-red-600">{t('team.saveError')}</span>;
-};
+import { Button, Card, Field, Input, Modal, SaveIndicator, Select } from '../../../components/ui';
 
 /**
  * Profile form, keyed by user id so the controlled inputs hydrate from props.
@@ -60,44 +50,36 @@ const ProfileSection: React.FC<{ user: AuthUser }> = ({ user }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">{t('team.profileTitle')}</h2>
-          <p className="text-xs text-gray-500">{t('team.profileHelp')}</p>
-        </div>
-        <SaveIndicator state={profileSaveState} />
-      </div>
+    <Card
+      title={t('team.profileTitle')}
+      subtitle={t('team.profileHelp')}
+      action={<SaveIndicator status={profileSaveState} />}
+      className="mb-6"
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">{t('team.firstName')}</label>
-          <input
+        <Field label={t('team.firstName')}>
+          <Input
             type="text"
             value={firstName}
             onChange={(e) => handleChange({ firstName: e.target.value })}
-            className={inputClass}
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">{t('team.lastName')}</label>
-          <input
+        </Field>
+        <Field label={t('team.lastName')}>
+          <Input
             type="text"
             value={lastName}
             onChange={(e) => handleChange({ lastName: e.target.value })}
-            className={inputClass}
           />
-        </div>
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">{t('team.email')}</label>
-          <input
+        </Field>
+        <Field label={t('team.email')} className="md:col-span-2">
+          <Input
             type="email"
             value={email}
             onChange={(e) => handleChange({ email: e.target.value })}
-            className={inputClass}
           />
-        </div>
+        </Field>
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -124,65 +106,63 @@ const BankAccountSection: React.FC<{ team: Team }> = ({ team }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
-      <div className="flex items-start justify-between mb-1">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">{t('team.bankAccount.title')}</h2>
-          <p className="text-xs text-gray-500">{t('team.bankAccount.help')}</p>
-        </div>
-        <SaveIndicator state={bankSaveState} />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">{t('team.bankAccount.iban')}</label>
-          <input
+    <Card
+      title={t('team.bankAccount.title')}
+      subtitle={t('team.bankAccount.help')}
+      action={<SaveIndicator status={bankSaveState} />}
+      className="mt-6"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label={t('team.bankAccount.iban')} className="md:col-span-2">
+          <Input
             type="text"
             value={iban}
             onChange={(e) => handleChange({ iban: e.target.value })}
             placeholder="FR76 3000 1007 9412 3456 7890 185"
             spellCheck={false}
             autoComplete="off"
-            className={`${inputClass} font-mono tracking-wider`}
+            className="font-mono tracking-wider"
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">{t('team.bankAccount.holderName')}</label>
-          <input
+        </Field>
+        <Field label={t('team.bankAccount.holderName')}>
+          <Input
             type="text"
             value={holderName}
             onChange={(e) => handleChange({ holderName: e.target.value })}
             placeholder={t('team.bankAccount.holderNamePlaceholder') as string}
             autoComplete="off"
-            className={inputClass}
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            {t('team.bankAccount.bic')}{' '}
-            <span className="text-xs font-normal text-gray-400">({t('team.bankAccount.optional')})</span>
-          </label>
-          <input
+        </Field>
+        <Field
+          label={
+            <>
+              {t('team.bankAccount.bic')}{' '}
+              <span className="text-xs font-normal text-surface-400">({t('team.bankAccount.optional')})</span>
+            </>
+          }
+        >
+          <Input
             type="text"
             value={bic}
             onChange={(e) => handleChange({ bic: e.target.value })}
             placeholder="BDFEFRPPCCT"
             spellCheck={false}
             autoComplete="off"
-            className={`${inputClass} font-mono tracking-wider`}
+            className="font-mono tracking-wider"
           />
-        </div>
+        </Field>
       </div>
       {iban.trim() !== '' && holderName.trim() === '' && (
-        <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+        <p className="mt-3 text-xs text-warning-700 bg-warning-50 border border-warning-200 rounded-lg px-3 py-2">
           {t('team.bankAccount.holderRequired')}
         </p>
       )}
       {bankSaveState === 'error' && bankSaveError && (
-        <p className="mt-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+        <p className="mt-3 text-xs text-danger-700 bg-danger-50 border border-danger-200 rounded-lg px-3 py-2">
           {bankSaveError}
         </p>
       )}
-    </div>
+    </Card>
   );
 };
 
@@ -223,17 +203,17 @@ const TeamSettingsPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <header className="mb-8 relative">
-        <div className="absolute -left-4 top-0 bottom-2 w-1 bg-gradient-to-b from-blue-500 via-blue-400 to-transparent rounded-full" aria-hidden="true" />
-        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-700">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+        <div className="absolute -left-4 top-0 bottom-2 w-1 bg-gradient-to-b from-primary-500 via-primary-400 to-transparent rounded-full" aria-hidden="true" />
+        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary-700">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary-500" />
           {t('backoffice.menu.title')}
         </div>
-        <h1 className="mt-2 text-3xl font-bold text-gray-900 tracking-tight">{t('team.title')}</h1>
-        <p className="text-gray-500 mt-1">{t('team.subtitle')}</p>
+        <h1 className="mt-2 text-3xl font-bold text-surface-900 tracking-tight">{t('team.title')}</h1>
+        <p className="text-surface-500 mt-1">{t('team.subtitle')}</p>
       </header>
 
       {!teamId && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+        <div className="bg-warning-50 border border-warning-200 rounded-xl p-4 text-sm text-warning-800">
           {t('team.loginRequired')}
         </div>
       )}
@@ -241,92 +221,83 @@ const TeamSettingsPage: React.FC = () => {
       {user && <ProfileSection key={user.id} user={user} />}
 
       {teamId && teamStatus === 'loading' && !team && (
-        <div className="text-center py-12 text-gray-500">{t('homepage.loading')}</div>
+        <div className="text-center py-12 text-surface-500">{t('homepage.loading')}</div>
       )}
       {teamStatus === 'failed' && (
-        <div className="text-center py-12 text-red-500">{teamError}</div>
+        <div className="text-center py-12 text-danger-500">{teamError}</div>
       )}
 
       {team && !isTravelerMode && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <label className="block text-sm font-medium">{t('team.favoriteProjectLabel')}</label>
-              <p className="text-xs text-gray-500">{t('team.favoriteProjectHelp')}</p>
-            </div>
-            <SaveIndicator state={favoriteSaveState} />
-          </div>
-          <select
+        <Card
+          title={t('team.favoriteProjectLabel')}
+          subtitle={t('team.favoriteProjectHelp')}
+          action={<SaveIndicator status={favoriteSaveState} />}
+        >
+          <Select
             value={team.favoriteSolidarityProjectId ?? ''}
             onChange={(e) => dispatch(updateTeamFavoriteProject({
               id: team.id,
               favoriteSolidarityProjectId: e.target.value || null,
             }))}
-            className={`${inputClass} transition-all`}
           >
             <option value="">{t('team.favoriteProjectNone')}</option>
             {activeProjects.map((p) => (
               <option key={p.id} value={p.id}>{p.title}</option>
             ))}
-          </select>
-        </div>
+          </Select>
+        </Card>
       )}
 
       {team && !isTravelerMode && <BankAccountSection key={team.id} team={team} />}
 
       {team && !isTravelerMode && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">{t('team.coHostsTitle')}</h2>
-            <p className="text-xs text-gray-500">{t('team.coHostsHelp')}</p>
-          </div>
-
+        <Card title={t('team.coHostsTitle')} subtitle={t('team.coHostsHelp')} className="mt-6">
           <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2 mb-4">
-            <input
+            <Input
               type="email"
               required
               placeholder={t('team.inviteEmailPlaceholder')}
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              className={`flex-1 ${inputClass}`}
+              className="flex-1"
             />
-            <button
+            <Button
               type="submit"
-              disabled={inviteStatus === 'loading' || !inviteEmail.trim()}
-              className="h-11 px-5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
+              loading={inviteStatus === 'loading'}
+              disabled={!inviteEmail.trim()}
             >
               {inviteStatus === 'loading' ? t('team.inviting') : t('team.inviteButton')}
-            </button>
+            </Button>
           </form>
 
           {inviteStatus === 'succeeded' && (
-            <div className="mb-4 text-sm text-green-600">{t('team.invitationSent')}</div>
+            <div className="mb-4 text-sm text-success-600">{t('team.invitationSent')}</div>
           )}
           {inviteStatus === 'failed' && inviteError && (
-            <div className="mb-4 text-sm text-red-600">{inviteError}</div>
+            <div className="mb-4 text-sm text-danger-600">{inviteError}</div>
           )}
 
-          <h3 className="text-sm font-medium text-gray-700 mb-2">{t('team.pendingInvitations')}</h3>
+          <h3 className="text-sm font-medium text-surface-700 mb-2">{t('team.pendingInvitations')}</h3>
           {invitations.length === 0 ? (
-            <p className="text-sm text-gray-400">{t('team.noPendingInvitations')}</p>
+            <p className="text-sm text-surface-400">{t('team.noPendingInvitations')}</p>
           ) : (
-            <ul className="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
+            <ul className="divide-y divide-surface-100 border border-surface-100 rounded-xl overflow-hidden">
               {invitations.map((inv) => (
-                <li key={inv.id} className="flex items-center justify-between px-4 py-3 bg-gray-50/50">
+                <li key={inv.id} className="flex items-center justify-between px-4 py-3 bg-surface-50/50">
                   <div className="flex flex-col">
-                    <span className="text-sm text-gray-900">{inv.email}</span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-sm text-surface-900">{inv.email}</span>
+                    <span className="text-xs text-surface-400">
                       {new Date(inv.createdAt).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning-100 text-warning-800">
                       {t('team.invitationPending')}
                     </span>
                     <button
                       type="button"
                       onClick={() => setInvitationToCancel({ id: inv.id, email: inv.email })}
-                      className="text-sm text-red-600 hover:text-red-700 hover:underline"
+                      className="text-sm text-danger-600 hover:text-danger-700 hover:underline"
                     >
                       {t('team.cancelInvitation')}
                     </button>
@@ -335,46 +306,37 @@ const TeamSettingsPage: React.FC = () => {
               ))}
             </ul>
           )}
-        </div>
+        </Card>
       )}
 
       {invitationToCancel && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4"
-          onClick={() => setInvitationToCancel(null)}
-        >
-          <div
-            className="bg-white rounded-xl shadow-xl w-full max-w-md"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-900">{t('team.cancelInvitation')}</h2>
-            </div>
-            <div className="px-6 py-5 space-y-2">
-              <p className="text-sm text-gray-700">{t('team.confirmCancelInvitation')}</p>
-              <p className="text-sm font-medium text-gray-900">{invitationToCancel.email}</p>
-            </div>
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setInvitationToCancel(null)}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
+        <Modal
+          open
+          onClose={() => setInvitationToCancel(null)}
+          title={t('team.cancelInvitation')}
+          footer={
+            <>
+              <Button variant="secondary" size="sm" onClick={() => setInvitationToCancel(null)}>
                 {t('team.keep')}
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
                 onClick={() => {
                   dispatch(cancelTeamInvitation(invitationToCancel.id));
                   setInvitationToCancel(null);
                 }}
-                className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700"
               >
                 {t('team.cancelInvitation')}
-              </button>
-            </div>
+              </Button>
+            </>
+          }
+        >
+          <div className="space-y-2">
+            <p className="text-sm text-surface-700">{t('team.confirmCancelInvitation')}</p>
+            <p className="text-sm font-medium text-surface-900">{invitationToCancel.email}</p>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

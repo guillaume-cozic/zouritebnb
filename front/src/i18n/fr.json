@@ -1,4 +1,9 @@
 {
+  "autosave": {
+    "saving": "Enregistrement...",
+    "saved": "Enregistré",
+    "error": "Erreur d'enregistrement"
+  },
   "request": {
     "title": "Demander une réservation",
     "subtitle": "L'hôte sera notifié et dispose de 24h pour accepter ou refuser.",

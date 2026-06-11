@@ -1,4 +1,9 @@
 {
+  "autosave": {
+    "saving": "Saving...",
+    "saved": "Saved",
+    "error": "Save error"
+  },
   "request": {
     "title": "Request a reservation",
     "subtitle": "The host will be notified and has 24h to accept or decline.",
