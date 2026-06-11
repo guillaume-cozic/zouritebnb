@@ -45,6 +45,9 @@ security:
         - { path: ^/api/regions, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api/localities, methods: [GET], roles: PUBLIC_ACCESS }
 
+        # Admin back-office endpoints are restricted to platform administrators
+        - { path: ^/api/admin, roles: ROLE_ADMIN }
+
         # Everything else under /api requires a valid JWT
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 

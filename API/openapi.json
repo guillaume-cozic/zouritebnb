@@ -2025,6 +2025,262 @@
                 ]
             }
         },
+        "/api/admin/accommodations": {
+            "get": {
+                "operationId": "api_adminaccommodations_get_collection",
+                "tags": [
+                    "AdminAccommodation"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AdminAccommodation collection",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "AdminAccommodation.jsonld-admin_accommodation.list collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AdminAccommodation.jsonld-admin_accommodation.list"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Lister tous les h\u00e9bergements (administration)",
+                "description": "Retourne la liste compl\u00e8te des h\u00e9bergements de la plateforme (brouillons inclus), tri\u00e9s par titre, avec l'email d'un membre de l'\u00e9quipe h\u00f4te. Endpoint en lecture seule r\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": []
+            }
+        },
+        "/api/admin/reservations": {
+            "get": {
+                "operationId": "api_adminreservations_get_collection",
+                "tags": [
+                    "AdminReservation"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AdminReservation collection",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "AdminReservation.jsonld-admin_reservation.list collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AdminReservation.jsonld-admin_reservation.list"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Lister toutes les r\u00e9servations (administration)",
+                "description": "Retourne la liste compl\u00e8te des r\u00e9servations de la plateforme, tri\u00e9es par date d'arriv\u00e9e d\u00e9croissante, avec le titre de l'h\u00e9bergement associ\u00e9. Endpoint en lecture seule r\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": []
+            }
+        },
+        "/api/admin/reviews": {
+            "get": {
+                "operationId": "api_adminreviews_get_collection",
+                "tags": [
+                    "AdminReview"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AdminReview collection",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "AdminReview.jsonld-admin_review.list collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AdminReview.jsonld-admin_review.list"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Lister tous les avis (administration)",
+                "description": "Retourne la liste compl\u00e8te des avis de la plateforme (avis sur h\u00e9bergements et avis sur voyageurs), du plus r\u00e9cent au plus ancien, avec les noms de l'auteur et du sujet de l'avis. Endpoint en lecture seule r\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": []
+            }
+        },
+        "/api/admin/users": {
+            "get": {
+                "operationId": "api_adminusers_get_collection",
+                "tags": [
+                    "AdminUser"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AdminUser collection",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "AdminUser.jsonld-admin_user.list collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AdminUser.jsonld-admin_user.list"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Lister tous les utilisateurs (administration)",
+                "description": "Retourne la liste compl\u00e8te des utilisateurs de la plateforme, tri\u00e9s par email, avec leurs r\u00f4les, leur statut de v\u00e9rification d'identit\u00e9 et leurs compteurs d'activit\u00e9 (h\u00e9bergements de leur \u00e9quipe, r\u00e9servations effectu\u00e9es). Le mot de passe hach\u00e9 n'est jamais expos\u00e9. Endpoint en lecture seule r\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": []
+            }
+        },
         "/api/conversations": {
             "get": {
                 "operationId": "api_conversations_get_collection",
@@ -5404,6 +5660,392 @@
                     }
                 ]
             },
+            "AdminAccommodation.jsonld-admin_accommodation.list": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Identifiant unique de l'h\u00e9bergement (UUID)",
+                                "example": "01961e2f-dead-7000-beef-0000000000a1",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "title": {
+                                "description": "Titre de l'h\u00e9bergement",
+                                "example": "Villa avec vue sur le lagon",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "status": {
+                                "description": "Statut de publication (draft ou published)",
+                                "example": "published",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "price": {
+                                "description": "Prix par nuit en euros",
+                                "example": 120,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "city": {
+                                "description": "Ville de l'h\u00e9bergement",
+                                "example": "Papeete",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "bedrooms": {
+                                "description": "Nombre de chambres",
+                                "example": 3,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "maxGuests": {
+                                "description": "Capacit\u00e9 maximale en voyageurs",
+                                "example": 6,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "weeklyPromotionPercentage": {
+                                "description": "Pourcentage de remise \u00e0 la semaine (null si aucune promotion)",
+                                "example": 15,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "teamId": {
+                                "description": "Identifiant UUID de l'\u00e9quipe h\u00f4te propri\u00e9taire",
+                                "example": "01961e2f-dead-7000-beef-0000000000b1",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "hostEmail": {
+                                "description": "Email d'un membre de l'\u00e9quipe h\u00f4te (null si aucune \u00e9quipe ou aucun membre)",
+                                "example": "host@example.com",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "AdminReservation.jsonld-admin_reservation.list": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Identifiant unique de la r\u00e9servation (UUID)",
+                                "example": "01961e2f-dead-7000-beef-000000000001",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "guestName": {
+                                "description": "Nom du voyageur",
+                                "example": "Jean Dupont",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "guestUserId": {
+                                "description": "Identifiant UUID du compte voyageur (null si r\u00e9servation hors compte)",
+                                "example": "01961e2f-dead-7000-beef-0000000000c1",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "accommodationId": {
+                                "description": "Identifiant UUID de l'h\u00e9bergement r\u00e9serv\u00e9",
+                                "example": "01961e2f-dead-7000-beef-0000000000a1",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "accommodationTitle": {
+                                "description": "Titre de l'h\u00e9bergement r\u00e9serv\u00e9 (null si l'h\u00e9bergement a \u00e9t\u00e9 supprim\u00e9)",
+                                "example": "Villa avec vue sur le lagon",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "teamId": {
+                                "description": "Identifiant UUID de l'\u00e9quipe h\u00f4te",
+                                "example": "01961e2f-dead-7000-beef-0000000000b1",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "checkIn": {
+                                "description": "Date d'arriv\u00e9e (ISO 8601)",
+                                "example": "2026-05-01T15:00:00+00:00",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "checkOut": {
+                                "description": "Date de d\u00e9part (ISO 8601)",
+                                "example": "2026-05-05T11:00:00+00:00",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "status": {
+                                "description": "Statut de la r\u00e9servation (pending, confirmed, refused, cancelled, expired)",
+                                "example": "confirmed",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "totalPrice": {
+                                "description": "Prix total du s\u00e9jour en euros",
+                                "example": 400,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "pricePerNight": {
+                                "description": "Prix par nuit en euros",
+                                "example": 100,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "appliedDiscountPercentage": {
+                                "description": "Pourcentage de remise appliqu\u00e9 (null si aucune remise)",
+                                "example": 10,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "AdminReview.jsonld-admin_review.list": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Identifiant unique de l'avis (UUID)",
+                                "example": "01961e2f-dead-7000-beef-000000000001",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "type": {
+                                "description": "Type d'avis (accommodation ou guest)",
+                                "example": "accommodation",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "rating": {
+                                "description": "Note attribu\u00e9e sur 5",
+                                "example": 5,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "comment": {
+                                "description": "Commentaire de l'avis",
+                                "example": "S\u00e9jour parfait, logement propre et bien situ\u00e9, h\u00f4te tr\u00e8s r\u00e9actif.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "createdAt": {
+                                "description": "Date de publication de l'avis (ISO 8601)",
+                                "example": "2026-05-12T14:30:00+00:00",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "authorUserId": {
+                                "description": "Identifiant UUID de l'auteur de l'avis",
+                                "example": "01961e2f-dead-7000-beef-0000000000c1",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "authorName": {
+                                "description": "Nom complet de l'auteur, ou son email \u00e0 d\u00e9faut (null si le compte a \u00e9t\u00e9 supprim\u00e9)",
+                                "example": "Marie Dupont",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "subjectAccommodationId": {
+                                "description": "Identifiant UUID de l'h\u00e9bergement not\u00e9 (null pour un avis sur voyageur)",
+                                "example": "01961e2f-dead-7000-beef-0000000000a1",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "subjectAccommodationTitle": {
+                                "description": "Titre de l'h\u00e9bergement not\u00e9 (null pour un avis sur voyageur)",
+                                "example": "Villa avec vue sur le lagon",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "subjectUserId": {
+                                "description": "Identifiant UUID du voyageur not\u00e9 (null pour un avis sur h\u00e9bergement)",
+                                "example": "01961e2f-dead-7000-beef-0000000000c2",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "subjectUserName": {
+                                "description": "Nom complet du voyageur not\u00e9, ou son email \u00e0 d\u00e9faut (null pour un avis sur h\u00e9bergement)",
+                                "example": "Paul Martin",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "AdminUser.jsonld-admin_user.list": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Identifiant unique de l'utilisateur (UUID)",
+                                "example": "01961e2f-dead-7000-beef-0000000000c1",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "email": {
+                                "description": "Adresse email de l'utilisateur",
+                                "example": "marie.dupont@example.com",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "firstName": {
+                                "description": "Pr\u00e9nom de l'utilisateur",
+                                "example": "Marie",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "lastName": {
+                                "description": "Nom de famille de l'utilisateur",
+                                "example": "Dupont",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "roles": {
+                                "description": "R\u00f4les attribu\u00e9s \u00e0 l'utilisateur (ROLE_USER est implicite)",
+                                "example": [
+                                    "ROLE_ADMIN"
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "verificationStatus": {
+                                "description": "Statut de la v\u00e9rification d'identit\u00e9 (not_started, pending, verified, rejected)",
+                                "example": "verified",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "teamId": {
+                                "description": "Identifiant UUID de l'\u00e9quipe h\u00f4te de l'utilisateur",
+                                "example": "01961e2f-dead-7000-beef-0000000000b1",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "accommodationCount": {
+                                "description": "Nombre d'h\u00e9bergements appartenant \u00e0 l'\u00e9quipe de l'utilisateur",
+                                "example": 3,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "reservationCount": {
+                                "description": "Nombre de r\u00e9servations effectu\u00e9es par l'utilisateur en tant que voyageur",
+                                "example": 5,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
             "ConstraintViolation": {
                 "type": "object",
                 "description": "Unprocessable entity",
@@ -6689,6 +7331,10 @@
             "description": "Resource 'AccommodationEntity' operations."
         },
         {
+            "name": "AdminAccommodation",
+            "description": "Resource 'AdminAccommodation' operations."
+        },
+        {
             "name": "Conversation",
             "description": "Resource 'Conversation' operations."
         },
@@ -6705,12 +7351,20 @@
             "description": "Resource 'PaymentIntent' operations."
         },
         {
+            "name": "AdminReservation",
+            "description": "Resource 'AdminReservation' operations."
+        },
+        {
             "name": "Reservation",
             "description": "Resource 'Reservation' operations."
         },
         {
             "name": "AccommodationReview",
             "description": "Resource 'AccommodationReview' operations."
+        },
+        {
+            "name": "AdminReview",
+            "description": "Resource 'AdminReview' operations."
         },
         {
             "name": "Review",
@@ -6727,6 +7381,10 @@
         {
             "name": "TeamEntity",
             "description": "Resource 'TeamEntity' operations."
+        },
+        {
+            "name": "AdminUser",
+            "description": "Resource 'AdminUser' operations."
         },
         {
             "name": "User",

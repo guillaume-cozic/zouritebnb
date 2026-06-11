@@ -134,6 +134,34 @@ export interface paths {
      */
     get: operations["api_accommodations_accommodationIdreviews_get_collection"];
   };
+  "/api/admin/accommodations": {
+    /**
+     * Lister tous les hébergements (administration)
+     * @description Retourne la liste complète des hébergements de la plateforme (brouillons inclus), triés par titre, avec l'email d'un membre de l'équipe hôte. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
+     */
+    get: operations["api_adminaccommodations_get_collection"];
+  };
+  "/api/admin/reservations": {
+    /**
+     * Lister toutes les réservations (administration)
+     * @description Retourne la liste complète des réservations de la plateforme, triées par date d'arrivée décroissante, avec le titre de l'hébergement associé. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
+     */
+    get: operations["api_adminreservations_get_collection"];
+  };
+  "/api/admin/reviews": {
+    /**
+     * Lister tous les avis (administration)
+     * @description Retourne la liste complète des avis de la plateforme (avis sur hébergements et avis sur voyageurs), du plus récent au plus ancien, avec les noms de l'auteur et du sujet de l'avis. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
+     */
+    get: operations["api_adminreviews_get_collection"];
+  };
+  "/api/admin/users": {
+    /**
+     * Lister tous les utilisateurs (administration)
+     * @description Retourne la liste complète des utilisateurs de la plateforme, triés par email, avec leurs rôles, leur statut de vérification d'identité et leurs compteurs d'activité (hébergements de leur équipe, réservations effectuées). Le mot de passe haché n'est jamais exposé. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
+     */
+    get: operations["api_adminusers_get_collection"];
+  };
   "/api/conversations": {
     /**
      * Lister mes conversations
@@ -718,6 +746,226 @@ export interface components {
        * @example 2026-05-12T14:30:00+00:00
        */
       createdAt?: string | null;
+    });
+    "AdminAccommodation.jsonld-admin_accommodation.list": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant unique de l'hébergement (UUID)
+       * @example 01961e2f-dead-7000-beef-0000000000a1
+       */
+      id?: string | null;
+      /**
+       * @description Titre de l'hébergement
+       * @example Villa avec vue sur le lagon
+       */
+      title?: string | null;
+      /**
+       * @description Statut de publication (draft ou published)
+       * @example published
+       */
+      status?: string | null;
+      /**
+       * @description Prix par nuit en euros
+       * @example 120
+       */
+      price?: number | null;
+      /**
+       * @description Ville de l'hébergement
+       * @example Papeete
+       */
+      city?: string | null;
+      /**
+       * @description Nombre de chambres
+       * @example 3
+       */
+      bedrooms?: number | null;
+      /**
+       * @description Capacité maximale en voyageurs
+       * @example 6
+       */
+      maxGuests?: number | null;
+      /**
+       * @description Pourcentage de remise à la semaine (null si aucune promotion)
+       * @example 15
+       */
+      weeklyPromotionPercentage?: number | null;
+      /**
+       * @description Identifiant UUID de l'équipe hôte propriétaire
+       * @example 01961e2f-dead-7000-beef-0000000000b1
+       */
+      teamId?: string | null;
+      /**
+       * @description Email d'un membre de l'équipe hôte (null si aucune équipe ou aucun membre)
+       * @example host@example.com
+       */
+      hostEmail?: string | null;
+    });
+    "AdminReservation.jsonld-admin_reservation.list": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant unique de la réservation (UUID)
+       * @example 01961e2f-dead-7000-beef-000000000001
+       */
+      id?: string | null;
+      /**
+       * @description Nom du voyageur
+       * @example Jean Dupont
+       */
+      guestName?: string | null;
+      /**
+       * @description Identifiant UUID du compte voyageur (null si réservation hors compte)
+       * @example 01961e2f-dead-7000-beef-0000000000c1
+       */
+      guestUserId?: string | null;
+      /**
+       * @description Identifiant UUID de l'hébergement réservé
+       * @example 01961e2f-dead-7000-beef-0000000000a1
+       */
+      accommodationId?: string | null;
+      /**
+       * @description Titre de l'hébergement réservé (null si l'hébergement a été supprimé)
+       * @example Villa avec vue sur le lagon
+       */
+      accommodationTitle?: string | null;
+      /**
+       * @description Identifiant UUID de l'équipe hôte
+       * @example 01961e2f-dead-7000-beef-0000000000b1
+       */
+      teamId?: string | null;
+      /**
+       * @description Date d'arrivée (ISO 8601)
+       * @example 2026-05-01T15:00:00+00:00
+       */
+      checkIn?: string | null;
+      /**
+       * @description Date de départ (ISO 8601)
+       * @example 2026-05-05T11:00:00+00:00
+       */
+      checkOut?: string | null;
+      /**
+       * @description Statut de la réservation (pending, confirmed, refused, cancelled, expired)
+       * @example confirmed
+       */
+      status?: string | null;
+      /**
+       * @description Prix total du séjour en euros
+       * @example 400
+       */
+      totalPrice?: number | null;
+      /**
+       * @description Prix par nuit en euros
+       * @example 100
+       */
+      pricePerNight?: number | null;
+      /**
+       * @description Pourcentage de remise appliqué (null si aucune remise)
+       * @example 10
+       */
+      appliedDiscountPercentage?: number | null;
+    });
+    "AdminReview.jsonld-admin_review.list": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant unique de l'avis (UUID)
+       * @example 01961e2f-dead-7000-beef-000000000001
+       */
+      id?: string | null;
+      /**
+       * @description Type d'avis (accommodation ou guest)
+       * @example accommodation
+       */
+      type?: string | null;
+      /**
+       * @description Note attribuée sur 5
+       * @example 5
+       */
+      rating?: number | null;
+      /**
+       * @description Commentaire de l'avis
+       * @example Séjour parfait, logement propre et bien situé, hôte très réactif.
+       */
+      comment?: string | null;
+      /**
+       * @description Date de publication de l'avis (ISO 8601)
+       * @example 2026-05-12T14:30:00+00:00
+       */
+      createdAt?: string | null;
+      /**
+       * @description Identifiant UUID de l'auteur de l'avis
+       * @example 01961e2f-dead-7000-beef-0000000000c1
+       */
+      authorUserId?: string | null;
+      /**
+       * @description Nom complet de l'auteur, ou son email à défaut (null si le compte a été supprimé)
+       * @example Marie Dupont
+       */
+      authorName?: string | null;
+      /**
+       * @description Identifiant UUID de l'hébergement noté (null pour un avis sur voyageur)
+       * @example 01961e2f-dead-7000-beef-0000000000a1
+       */
+      subjectAccommodationId?: string | null;
+      /**
+       * @description Titre de l'hébergement noté (null pour un avis sur voyageur)
+       * @example Villa avec vue sur le lagon
+       */
+      subjectAccommodationTitle?: string | null;
+      /**
+       * @description Identifiant UUID du voyageur noté (null pour un avis sur hébergement)
+       * @example 01961e2f-dead-7000-beef-0000000000c2
+       */
+      subjectUserId?: string | null;
+      /**
+       * @description Nom complet du voyageur noté, ou son email à défaut (null pour un avis sur hébergement)
+       * @example Paul Martin
+       */
+      subjectUserName?: string | null;
+    });
+    "AdminUser.jsonld-admin_user.list": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant unique de l'utilisateur (UUID)
+       * @example 01961e2f-dead-7000-beef-0000000000c1
+       */
+      id?: string | null;
+      /**
+       * @description Adresse email de l'utilisateur
+       * @example marie.dupont@example.com
+       */
+      email?: string | null;
+      /**
+       * @description Prénom de l'utilisateur
+       * @example Marie
+       */
+      firstName?: string | null;
+      /**
+       * @description Nom de famille de l'utilisateur
+       * @example Dupont
+       */
+      lastName?: string | null;
+      /**
+       * @description Rôles attribués à l'utilisateur (ROLE_USER est implicite)
+       * @example [
+       *   "ROLE_ADMIN"
+       * ]
+       */
+      roles?: string[];
+      /**
+       * @description Statut de la vérification d'identité (not_started, pending, verified, rejected)
+       * @example verified
+       */
+      verificationStatus?: string | null;
+      /**
+       * @description Identifiant UUID de l'équipe hôte de l'utilisateur
+       * @example 01961e2f-dead-7000-beef-0000000000b1
+       */
+      teamId?: string | null;
+      /**
+       * @description Nombre d'hébergements appartenant à l'équipe de l'utilisateur
+       * @example 3
+       */
+      accommodationCount?: number | null;
+      /**
+       * @description Nombre de réservations effectuées par l'utilisateur en tant que voyageur
+       * @example 5
+       */
+      reservationCount?: number | null;
     });
     /** @description Unprocessable entity */
     ConstraintViolation: {
@@ -2138,6 +2386,102 @@ export interface operations {
           "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
             member: components["schemas"]["AccommodationReview.jsonld-accommodation_review.read"][];
           };
+        };
+      };
+    };
+  };
+  /**
+   * Lister tous les hébergements (administration)
+   * @description Retourne la liste complète des hébergements de la plateforme (brouillons inclus), triés par titre, avec l'email d'un membre de l'équipe hôte. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
+   */
+  api_adminaccommodations_get_collection: {
+    responses: {
+      /** @description AdminAccommodation collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
+            member: components["schemas"]["AdminAccommodation.jsonld-admin_accommodation.list"][];
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Lister toutes les réservations (administration)
+   * @description Retourne la liste complète des réservations de la plateforme, triées par date d'arrivée décroissante, avec le titre de l'hébergement associé. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
+   */
+  api_adminreservations_get_collection: {
+    responses: {
+      /** @description AdminReservation collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
+            member: components["schemas"]["AdminReservation.jsonld-admin_reservation.list"][];
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Lister tous les avis (administration)
+   * @description Retourne la liste complète des avis de la plateforme (avis sur hébergements et avis sur voyageurs), du plus récent au plus ancien, avec les noms de l'auteur et du sujet de l'avis. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
+   */
+  api_adminreviews_get_collection: {
+    responses: {
+      /** @description AdminReview collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
+            member: components["schemas"]["AdminReview.jsonld-admin_review.list"][];
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Lister tous les utilisateurs (administration)
+   * @description Retourne la liste complète des utilisateurs de la plateforme, triés par email, avec leurs rôles, leur statut de vérification d'identité et leurs compteurs d'activité (hébergements de leur équipe, réservations effectuées). Le mot de passe haché n'est jamais exposé. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
+   */
+  api_adminusers_get_collection: {
+    responses: {
+      /** @description AdminUser collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
+            member: components["schemas"]["AdminUser.jsonld-admin_user.list"][];
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
         };
       };
     };
