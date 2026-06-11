@@ -249,7 +249,7 @@ const RodriguesMap: React.FC = () => {
         </div>
 
         <div
-          className="rounded-2xl overflow-hidden border border-gray-100 shadow-lg"
+          className="relative z-0 rounded-2xl overflow-hidden border border-gray-100 shadow-lg"
           style={{ height: 520 }}
         >
           <MapContainer

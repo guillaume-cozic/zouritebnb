@@ -19,7 +19,7 @@ interface LocationMapProps {
 }
 
 const LocationMap: React.FC<LocationMapProps> = ({ latitude, longitude, label, zoom = 14, height = 320 }) => (
-  <div className="rounded-2xl overflow-hidden border border-gray-100" style={{ height }}>
+  <div className="relative z-0 rounded-2xl overflow-hidden border border-gray-100" style={{ height }}>
     <MapContainer center={[latitude, longitude]} zoom={zoom} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

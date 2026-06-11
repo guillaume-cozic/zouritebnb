@@ -99,7 +99,7 @@ const AccommodationsMap: React.FC<AccommodationsMapProps> = ({
 
   return (
     <div
-      className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
+      className="relative z-0 rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
       style={{ height }}
     >
       <MapContainer
