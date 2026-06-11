@@ -62,6 +62,39 @@ final class SubmitIdentityVerificationTest extends UserApiTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function test_should_return_403_when_submitting_for_another_user(): void
+    {
+        $victimId = $this->insertUser(email: 'victim@example.com');
+        $this->insertUser(email: 'attacker@example.com');
+        $attackerHeaders = $this->authHeaders('attacker@example.com');
+
+        self::createClient()->request('POST', '/api/users/'.$victimId.'/identity-verification', [
+            'headers' => $attackerHeaders + ['Content-Type' => 'multipart/form-data'],
+            'extra' => [
+                'parameters' => ['documentType' => 'passport'],
+                'files' => [
+                    'document' => $this->image(),
+                    'selfie' => $this->image(),
+                ],
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    public function test_should_return_403_when_reading_another_users_status(): void
+    {
+        $victimId = $this->insertUser(email: 'victim@example.com');
+        $this->insertUser(email: 'attacker@example.com');
+        $attackerHeaders = $this->authHeaders('attacker@example.com');
+
+        self::createClient()->request('GET', '/api/users/'.$victimId.'/identity-verification', [
+            'headers' => $attackerHeaders,
+        ]);
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function test_should_return_422_with_invalid_document_type(): void
     {
         $id = $this->insertUser(email: 'host@example.com');
