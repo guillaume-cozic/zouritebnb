@@ -42,7 +42,9 @@ final readonly class UploadAccommodationPhotoProcessor implements ProcessorInter
             accommodationId: $accommodationId,
             content: $file->getContent(),
             originalName: $file->getClientOriginalName(),
-            mimeType: $file->getClientMimeType() ?? '',
+            // Real MIME sniffed from the bytes (finfo), not the client-supplied
+            // Content-Type header which an attacker fully controls.
+            mimeType: $file->getMimeType() ?? '',
             size: $file->getSize(),
         )));
     }

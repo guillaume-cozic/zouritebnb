@@ -148,4 +148,20 @@ final class UploadAccommodationPhotoTest extends TestCase
             size: 5000,
         ));
     }
+
+    public function test_should_not_upload_a_photo_larger_than_the_max_size(): void
+    {
+        $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
+        $this->accommodationRepository->save(new Accommodation($accommodationId, 'Chalet', 'Description', 150.0));
+
+        $this->expectException(InvalidPhotoException::class);
+
+        $this->useCase->handle(new UploadAccommodationPhotoCommand(
+            accommodationId: $accommodationId,
+            content: 'huge',
+            originalName: 'photo.jpg',
+            mimeType: 'image/jpeg',
+            size: 10 * 1024 * 1024 + 1,
+        ));
+    }
 }

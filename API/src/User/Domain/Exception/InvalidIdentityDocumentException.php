@@ -20,4 +20,9 @@ final class InvalidIdentityDocumentException extends \DomainException
     {
         return new self(\sprintf('The "%s" file is required.', $field));
     }
+
+    public static function becauseTooLarge(int $size, int $maxSize): self
+    {
+        return new self(\sprintf('The identity document is too large (%d bytes), the maximum allowed size is %d bytes.', $size, $maxSize));
+    }
 }

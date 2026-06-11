@@ -16,6 +16,9 @@ final readonly class IdentityDocument
 {
     private const array ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+    /** Hard cap on the uploaded document size (10 MB) to prevent memory-exhaustion DoS. */
+    private const int MAX_SIZE_BYTES = 10 * 1024 * 1024;
+
     public function __construct(
         private string $content,
         private string $originalName,
@@ -24,6 +27,10 @@ final readonly class IdentityDocument
     ) {
         if (!\in_array($mimeType, self::ALLOWED_MIME_TYPES, true)) {
             throw InvalidIdentityDocumentException::becauseInvalidMimeType($mimeType);
+        }
+
+        if ($size > self::MAX_SIZE_BYTES) {
+            throw InvalidIdentityDocumentException::becauseTooLarge($size, self::MAX_SIZE_BYTES);
         }
     }
 

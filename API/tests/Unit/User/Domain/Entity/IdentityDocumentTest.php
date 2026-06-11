@@ -60,4 +60,28 @@ final class IdentityDocumentTest extends TestCase
             size: 1,
         );
     }
+
+    public function test_should_reject_a_document_larger_than_the_max_size(): void
+    {
+        $this->expectException(InvalidIdentityDocumentException::class);
+
+        new IdentityDocument(
+            content: 'x',
+            originalName: 'doc.jpg',
+            mimeType: 'image/jpeg',
+            size: 10 * 1024 * 1024 + 1,
+        );
+    }
+
+    public function test_should_accept_a_document_at_the_max_size(): void
+    {
+        $document = new IdentityDocument(
+            content: 'x',
+            originalName: 'doc.jpg',
+            mimeType: 'image/jpeg',
+            size: 10 * 1024 * 1024,
+        );
+
+        self::assertSame(10 * 1024 * 1024, $document->getSize());
+    }
 }

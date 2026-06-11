@@ -17,6 +17,9 @@ final readonly class UploadAccommodationPhoto
 {
     private const array ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+    /** Hard cap on the uploaded photo size (10 MB) to prevent memory-exhaustion DoS. */
+    private const int MAX_SIZE_BYTES = 10 * 1024 * 1024;
+
     public function __construct(
         private AccommodationRepository $accommodationRepository,
         private GalleryRepository $galleryRepository,
@@ -34,6 +37,10 @@ final readonly class UploadAccommodationPhoto
 
         if (!\in_array($command->mimeType, self::ALLOWED_MIME_TYPES, true)) {
             throw InvalidPhotoException::becauseInvalidMimeType($command->mimeType);
+        }
+
+        if ($command->size > self::MAX_SIZE_BYTES) {
+            throw InvalidPhotoException::becauseTooLarge($command->size, self::MAX_SIZE_BYTES);
         }
 
         $gallery = $this->galleryRepository->findByAccommodationId($command->accommodationId);
