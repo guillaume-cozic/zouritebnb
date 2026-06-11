@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Accommodation\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use App\Accommodation\Infrastructure\ApiPlatform\AccommodationListingQuery;
 use App\Accommodation\Infrastructure\ApiPlatform\PublishedAccommodationProvider;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
@@ -263,6 +264,6 @@ final class PublishedAccommodationProviderTest extends TestCase
             }
         );
 
-        return new PublishedAccommodationProvider($connection, $requestStack);
+        return new PublishedAccommodationProvider(new AccommodationListingQuery($connection), $requestStack);
     }
 }
