@@ -15,15 +15,15 @@ use App\Reservation\Domain\Port\ReservationRepository;
 use App\Shared\Domain\Port\AccommodationPricingProvider;
 use App\Shared\Domain\Port\EventBus;
 use App\Shared\Domain\Port\UuidGenerator;
+use App\Shared\Domain\Service\StayPriceCalculator;
 
 final readonly class CreateReservation
 {
-    private const int WEEKLY_PROMOTION_MIN_NIGHTS = 7;
-
     public function __construct(
         private ReservationRepository $repository,
         private EventBus $eventBus,
         private AccommodationPricingProvider $pricingProvider,
+        private StayPriceCalculator $priceCalculator,
     ) {
     }
 
@@ -36,22 +36,12 @@ final readonly class CreateReservation
             throw InvalidReservationException::becauseAccommodationNotFound();
         }
 
-        $checkInDay = $dateRange->checkIn()->setTime(0, 0);
-        $checkOutDay = $dateRange->checkOut()->setTime(0, 0);
-        $nights = (int) $checkInDay->diff($checkOutDay)->days;
-
-        if ($nights >= self::WEEKLY_PROMOTION_MIN_NIGHTS && null !== $pricing->weeklyPromotionPercentage) {
-            $discountedPricePerNight = $pricing->pricePerNight * (1 - $pricing->weeklyPromotionPercentage / 100);
-            $appliedDiscount = $pricing->weeklyPromotionPercentage;
-        } else {
-            $discountedPricePerNight = $pricing->pricePerNight;
-            $appliedDiscount = null;
-        }
+        $stayPrice = $this->priceCalculator->calculate($pricing, $dateRange->checkIn(), $dateRange->checkOut());
 
         $price = new ReservationPrice(
-            totalPrice: $discountedPricePerNight * $nights,
-            pricePerNight: $pricing->pricePerNight,
-            appliedDiscountPercentage: $appliedDiscount,
+            totalPrice: $stayPrice->totalPrice,
+            pricePerNight: $stayPrice->pricePerNight,
+            appliedDiscountPercentage: $stayPrice->appliedDiscountPercentage,
         );
 
         $reservation = Reservation::create(
