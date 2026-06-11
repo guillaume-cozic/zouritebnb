@@ -5,7 +5,8 @@
 ```
 bnb/
 ├── API/    # Backend Symfony / API Platform
-└── front/  # Frontend React / Redux / TypeScript
+├── front/  # Frontend React / Redux / TypeScript (voyageurs + backoffice hôtes)
+└── admin/  # Frontend React / Vite / Redux / TypeScript — back-office administrateur plateforme (lecture seule, ROLE_ADMIN)
 ```
 
 ## Skills
@@ -61,3 +62,12 @@ cd front && npm start   # Dev server (localhost:3000)
 cd front && npm run build
 cd front && npm test
 ```
+
+### Admin
+
+```bash
+cd admin && npm run dev    # Dev server (localhost:3001)
+cd admin && npm run build  # tsc --noEmit && vite build
+```
+
+L'app admin suit les mêmes conventions que `front/` (slices Redux, selectors, composants déclaratifs, tokens Tailwind sémantiques). Elle consomme les endpoints `/api/admin/*` (GET, sécurisés `ROLE_ADMIN`).
