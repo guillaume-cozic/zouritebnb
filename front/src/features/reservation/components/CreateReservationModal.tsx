@@ -12,6 +12,7 @@ import {
   selectReservationMutationStatus,
 } from '../ReservationSelectors';
 import { selectManagedAccommodations } from '../../accommodationManagement/AccommodationManagementSelectors';
+import { Button, Field, Input, Modal, Select } from '../../../components/ui';
 
 registerLocale('fr', fr);
 registerLocale('en', enGB);
@@ -76,8 +77,6 @@ const CreateReservationModal: React.FC<Props> = ({
     }
   }, [isOpen, initialCheckIn, initialCheckOut, accommodationId, dispatch]);
 
-  if (!isOpen) return null;
-
   const handleRangeChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
     setStartDate(start);
@@ -109,126 +108,109 @@ const CreateReservationModal: React.FC<Props> = ({
       ? Math.max(0, Math.round((endDate.getTime() - startDate.getTime()) / 86400000))
       : 0;
 
-
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl my-8">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">{t('calendar.createTitle')}</h2>
-          {nights > 0 && (
-            <span className="text-sm text-gray-500">
-              {nights} {nights > 1 ? 'nuits' : 'nuit'}
-            </span>
-          )}
-        </div>
-        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
-          {!accommodationId && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('calendar.accommodation')}
-              </label>
-              <select
-                value={chosenAccommodation}
-                onChange={(e) => setChosenAccommodation(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                required
-              >
-                <option value="">—</option>
-                {accommodations.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.title}
-                  </option>
-                ))}
-              </select>
+    <Modal
+      open={isOpen}
+      onClose={onClose}
+      size="lg"
+      className="my-8"
+      title={t('calendar.createTitle')}
+      action={
+        nights > 0 ? (
+          <span className="text-sm text-surface-500">
+            {nights} {nights > 1 ? 'nuits' : 'nuit'}
+          </span>
+        ) : undefined
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {!accommodationId && (
+          <Field label={t('calendar.accommodation')}>
+            <Select
+              value={chosenAccommodation}
+              onChange={(e) => setChosenAccommodation(e.target.value)}
+              required
+            >
+              <option value="">—</option>
+              {accommodations.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.title}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        )}
+        <Field label={t('calendar.guestName')}>
+          <Input
+            type="text"
+            value={guestName}
+            onChange={(e) => setGuestName(e.target.value)}
+            required
+          />
+        </Field>
+        <div>
+          <label className="block text-sm font-medium text-surface-700 mb-2">
+            {t('calendar.checkIn')} → {t('calendar.checkOut')}
+          </label>
+          {(startDate || endDate) && (
+            <div className="mb-2 text-sm text-surface-700">
+              {startDate ? startDate.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB') : '—'}
+              {' → '}
+              {endDate ? endDate.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB') : '—'}
             </div>
           )}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('calendar.guestName')}
-            </label>
-            <input
-              type="text"
-              value={guestName}
-              onChange={(e) => setGuestName(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              required
+          <div className="flex justify-center">
+            <DatePicker
+              selected={startDate}
+              onChange={handleRangeChange}
+              startDate={startDate ?? undefined}
+              endDate={endDate ?? undefined}
+              selectsRange
+              inline
+              monthsShown={2}
+              locale={locale}
+              minDate={new Date()}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('calendar.checkIn')} → {t('calendar.checkOut')}
-            </label>
-            {(startDate || endDate) && (
-              <div className="mb-2 text-sm text-gray-700">
-                {startDate ? startDate.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB') : '—'}
-                {' → '}
-                {endDate ? endDate.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB') : '—'}
-              </div>
-            )}
-            <div className="flex justify-center">
-              <DatePicker
-                selected={startDate}
-                onChange={handleRangeChange}
-                startDate={startDate ?? undefined}
-                endDate={endDate ?? undefined}
-                selectsRange
-                inline
-                monthsShown={2}
-                locale={locale}
-                minDate={new Date()}
-              />
-            </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={t('calendar.checkIn')}>
+            <Input
+              type="time"
+              value={checkInTime}
+              onChange={(e) => setCheckInTime(e.target.value)}
+              required
+            />
+          </Field>
+          <Field label={t('calendar.checkOut')}>
+            <Input
+              type="time"
+              value={checkOutTime}
+              onChange={(e) => setCheckOutTime(e.target.value)}
+              required
+            />
+          </Field>
+        </div>
+        {mutationError && (
+          <div className="text-sm text-danger-600 bg-danger-50 border border-danger-200 rounded-lg px-3 py-2">
+            {mutationError}
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('calendar.checkIn')}
-              </label>
-              <input
-                type="time"
-                value={checkInTime}
-                onChange={(e) => setCheckInTime(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('calendar.checkOut')}
-              </label>
-              <input
-                type="time"
-                value={checkOutTime}
-                onChange={(e) => setCheckOutTime(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                required
-              />
-            </div>
-          </div>
-          {mutationError && (
-            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              {mutationError}
-            </div>
-          )}
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              {t('calendar.cancel')}
-            </button>
-            <button
-              type="submit"
-              disabled={submitting || mutationStatus === 'loading' || !startDate || !endDate}
-              className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
-            >
-              {t('calendar.submit')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        )}
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="secondary" size="sm" onClick={onClose}>
+            {t('calendar.cancel')}
+          </Button>
+          <Button
+            type="submit"
+            size="sm"
+            loading={submitting || mutationStatus === 'loading'}
+            disabled={!startDate || !endDate}
+          >
+            {t('calendar.submit')}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 };
 

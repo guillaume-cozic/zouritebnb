@@ -4,6 +4,7 @@ import { useAppDispatch } from '../../../store/hooks';
 import { Reservation } from '../ReservationTypes';
 import { cancelReservation, confirmReservation } from '../ReservationSlice';
 import { colorForStatus } from './CalendarEventColor';
+import { Button, Modal } from '../../../components/ui';
 
 interface Props {
   reservation: Reservation;
@@ -32,47 +33,48 @@ const ReservationEventPopover: React.FC<Props> = ({ reservation, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between">
-          <div>
-            <h3 className="text-base font-semibold text-gray-900">{reservation.guestName}</h3>
-            <span className={`mt-1 inline-block text-xs px-2 py-0.5 rounded-full ${colors.badgeClass}`}>
-              {t(`calendar.status.${reservation.status}`)}
-            </span>
-          </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">
-            ×
-          </button>
-        </div>
-        <div className="px-5 py-4 text-sm text-gray-700 space-y-1">
-          <div>
-            <span className="font-medium">{t('calendar.checkIn')}: </span>
-            {fmt(reservation.checkIn)}
-          </div>
-          <div>
-            <span className="font-medium">{t('calendar.checkOut')}: </span>
-            {fmt(reservation.checkOut)}
-          </div>
-        </div>
-        <div className="px-5 py-3 border-t border-gray-100 flex justify-end gap-2">
-          <button
-            onClick={handleConfirm}
-            disabled={!canConfirm}
-            className="px-3 py-1.5 text-sm rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
+    <Modal
+      open
+      onClose={onClose}
+      size="sm"
+      title={reservation.guestName}
+      subtitle={
+        <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${colors.badgeClass}`}>
+          {t(`calendar.status.${reservation.status}`)}
+        </span>
+      }
+      action={
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('calendar.cancel')}
+          className="text-surface-400 hover:text-surface-600 text-xl leading-none"
+        >
+          ×
+        </button>
+      }
+      footer={
+        <>
+          <Button variant="success" size="sm" onClick={handleConfirm} disabled={!canConfirm}>
             {t('calendar.action.confirm')}
-          </button>
-          <button
-            onClick={handleCancel}
-            disabled={!canCancel}
-            className="px-3 py-1.5 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
+          </Button>
+          <Button variant="danger" size="sm" onClick={handleCancel} disabled={!canCancel}>
             {t('calendar.action.cancel')}
-          </button>
+          </Button>
+        </>
+      }
+    >
+      <div className="text-sm text-surface-700 space-y-1">
+        <div>
+          <span className="font-medium">{t('calendar.checkIn')}: </span>
+          {fmt(reservation.checkIn)}
+        </div>
+        <div>
+          <span className="font-medium">{t('calendar.checkOut')}: </span>
+          {fmt(reservation.checkOut)}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
 

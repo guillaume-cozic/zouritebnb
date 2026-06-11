@@ -2,12 +2,13 @@ import React from 'react';
 import { cn } from './cn';
 import { Spinner } from './Spinner';
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost';
 type Size = 'sm' | 'md';
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'bg-primary-600 text-white hover:bg-primary-700',
   secondary: 'border border-surface-300 text-surface-700 bg-white hover:bg-surface-50',
+  success: 'bg-success-600 text-white hover:bg-success-700',
   danger: 'bg-danger-600 text-white hover:bg-danger-700',
   ghost: 'text-surface-600 hover:bg-surface-100',
 };
