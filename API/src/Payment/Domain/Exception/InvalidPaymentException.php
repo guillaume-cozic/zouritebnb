@@ -13,6 +13,11 @@ final class InvalidPaymentException extends \DomainException
         return new self(\sprintf('Payment amount must be greater than zero, got %d cents.', $amountCents));
     }
 
+    public static function becauseAccommodationNotFound(string $accommodationId): self
+    {
+        return new self(\sprintf('Accommodation "%s" not found.', $accommodationId));
+    }
+
     public static function becauseCurrencyIsInvalid(string $currency): self
     {
         return new self(\sprintf('Payment currency must be a 3-letter ISO code, got "%s".', $currency));

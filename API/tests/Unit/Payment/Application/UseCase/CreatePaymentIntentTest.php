@@ -9,9 +9,11 @@ use App\Payment\Domain\Command\CreatePaymentIntentCommand;
 use App\Payment\Domain\Entity\PaymentStatus;
 use App\Payment\Domain\Exception\InvalidPaymentException;
 use App\Shared\Domain\Port\UuidGenerator;
+use App\Shared\Domain\Service\StayPriceCalculator;
 use App\Tests\Unit\Payment\Infrastructure\FakePaymentGateway;
 use App\Tests\Unit\Payment\Infrastructure\FixedClock;
 use App\Tests\Unit\Payment\Infrastructure\InMemoryPaymentRepository;
+use App\Tests\Unit\Reservation\Infrastructure\InMemoryAccommodationPricingProvider;
 use App\Tests\Unit\Shared\Infrastructure\InMemoryEventBus;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
@@ -24,6 +26,7 @@ final class CreatePaymentIntentTest extends TestCase
     private FakePaymentGateway $gateway;
     private InMemoryEventBus $eventBus;
     private FixedClock $clock;
+    private InMemoryAccommodationPricingProvider $pricingProvider;
     private CreatePaymentIntent $useCase;
 
     #[Before]
@@ -33,7 +36,15 @@ final class CreatePaymentIntentTest extends TestCase
         $this->gateway = new FakePaymentGateway();
         $this->eventBus = new InMemoryEventBus();
         $this->clock = new FixedClock(new \DateTimeImmutable('2026-05-17T10:00:00+00:00'));
-        $this->useCase = new CreatePaymentIntent($this->repository, $this->gateway, $this->eventBus, $this->clock);
+        $this->pricingProvider = new InMemoryAccommodationPricingProvider();
+        $this->useCase = new CreatePaymentIntent(
+            $this->repository,
+            $this->gateway,
+            $this->eventBus,
+            $this->clock,
+            $this->pricingProvider,
+            new StayPriceCalculator(),
+        );
     }
 
     #[After]
@@ -42,56 +53,89 @@ final class CreatePaymentIntentTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function test_should_request_authorization_and_persist_pending_payment(): void
+    public function test_should_derive_amount_from_pricing_and_persist_pending_payment(): void
     {
+        $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000a1');
+        $userId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000b1');
         $paymentId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
         UuidGenerator::queue([$paymentId]);
 
+        // 100€/night, 4 nights, no promotion => 400€ = 40000 cents.
+        $this->pricingProvider->set($accommodationId, 100.0);
+
         $result = $this->useCase->handle(new CreatePaymentIntentCommand(
-            amountCents: 25000,
-            currency: 'EUR',
-            description: 'Réservation Maison du lagon',
-            metadata: ['accommodationId' => 'abc', 'nights' => 5],
+            accommodationId: $accommodationId,
+            checkIn: new \DateTimeImmutable('2026-06-10T15:00:00+00:00'),
+            checkOut: new \DateTimeImmutable('2026-06-14T11:00:00+00:00'),
+            userId: $userId,
         ));
 
         self::assertSame('pi_test_1', $result->paymentIntentId);
-        self::assertSame('pi_test_1_secret_1', $result->clientSecret);
 
         self::assertCount(1, $this->gateway->calls);
-        self::assertSame('createAuthorization', $this->gateway->calls[0]['type']);
-        self::assertSame(25000, $this->gateway->calls[0]['amountCents']);
-        self::assertSame('EUR', $this->gateway->calls[0]['currency']);
-        self::assertSame('Réservation Maison du lagon', $this->gateway->calls[0]['description']);
+        self::assertSame(40000, $this->gateway->calls[0]['amountCents']);
+        self::assertSame('eur', $this->gateway->calls[0]['currency']);
+        self::assertSame($accommodationId->toRfc4122(), $this->gateway->calls[0]['metadata']['accommodationId']);
+        self::assertSame($userId->toRfc4122(), $this->gateway->calls[0]['metadata']['userId']);
 
         $stored = $this->repository->findById($paymentId);
         self::assertNotNull($stored);
-        self::assertSame('pi_test_1', $stored->getStripePaymentIntentId());
         self::assertSame(PaymentStatus::Pending, $stored->getStatus());
-        self::assertSame(25000, $stored->getAmountCents());
+        self::assertSame(40000, $stored->getAmountCents());
         self::assertSame('eur', $stored->getCurrency());
         self::assertNull($stored->getReservationId());
-        self::assertSame('2026-05-17T10:00:00+00:00', $stored->getCreatedAt()->format(\DateTimeInterface::ATOM));
     }
 
-    public function test_should_reject_zero_amount(): void
+    public function test_should_apply_weekly_promotion_for_stays_of_seven_nights_or_more(): void
+    {
+        $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000a2');
+        UuidGenerator::queue([Uuid::fromString('01961e2f-dead-7000-beef-000000000002')]);
+
+        // 100€/night, 7 nights, 20% promotion => 80€ × 7 = 560€ = 56000 cents.
+        $this->pricingProvider->set($accommodationId, 100.0, 20.0);
+
+        $this->useCase->handle(new CreatePaymentIntentCommand(
+            accommodationId: $accommodationId,
+            checkIn: new \DateTimeImmutable('2026-06-10T15:00:00+00:00'),
+            checkOut: new \DateTimeImmutable('2026-06-17T11:00:00+00:00'),
+            userId: Uuid::v7(),
+        ));
+
+        self::assertSame(56000, $this->gateway->calls[0]['amountCents']);
+    }
+
+    public function test_should_reject_when_accommodation_not_found(): void
     {
         $this->expectException(InvalidPaymentException::class);
 
-        $this->useCase->handle(new CreatePaymentIntentCommand(
-            amountCents: 0,
-            currency: 'eur',
-            description: 'invalid',
-        ));
+        try {
+            $this->useCase->handle(new CreatePaymentIntentCommand(
+                accommodationId: Uuid::v7(),
+                checkIn: new \DateTimeImmutable('2026-06-10T15:00:00+00:00'),
+                checkOut: new \DateTimeImmutable('2026-06-14T11:00:00+00:00'),
+                userId: Uuid::v7(),
+            ));
+        } finally {
+            self::assertCount(0, $this->gateway->calls);
+        }
     }
 
-    public function test_should_reject_invalid_currency(): void
+    public function test_should_reject_a_zero_night_stay_before_calling_the_gateway(): void
     {
+        $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000a3');
+        $this->pricingProvider->set($accommodationId, 100.0);
+
         $this->expectException(InvalidPaymentException::class);
 
-        $this->useCase->handle(new CreatePaymentIntentCommand(
-            amountCents: 1000,
-            currency: 'EUROS',
-            description: 'invalid',
-        ));
+        try {
+            $this->useCase->handle(new CreatePaymentIntentCommand(
+                accommodationId: $accommodationId,
+                checkIn: new \DateTimeImmutable('2026-06-10T15:00:00+00:00'),
+                checkOut: new \DateTimeImmutable('2026-06-10T15:00:00+00:00'),
+                userId: Uuid::v7(),
+            ));
+        } finally {
+            self::assertCount(0, $this->gateway->calls);
+        }
     }
 }

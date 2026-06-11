@@ -22,12 +22,14 @@ describe('createPaymentIntent', () => {
     });
     const store = buildStore();
 
-    await store.dispatch(createPaymentIntent({ reservationId: 'r-1' } as any));
+    await store.dispatch(
+      createPaymentIntent({ accommodationId: 'a-1', checkIn: '2026-06-10T15:00:00', checkOut: '2026-06-15T11:00:00' })
+    );
 
     expect(store.getState().payment.status).toBe('succeeded');
     expect(mockedApi.post).toHaveBeenCalledWith(
       '/api/payment-intents',
-      { reservationId: 'r-1' },
+      { accommodationId: 'a-1', checkIn: '2026-06-10T15:00:00', checkOut: '2026-06-15T11:00:00' },
       expect.anything()
     );
   });
@@ -36,7 +38,9 @@ describe('createPaymentIntent', () => {
     mockedApi.post.mockRejectedValue({ response: { data: { detail: 'card declined' } } });
     const store = buildStore();
 
-    await store.dispatch(createPaymentIntent({ reservationId: 'r-1' } as any));
+    await store.dispatch(
+      createPaymentIntent({ accommodationId: 'a-1', checkIn: '2026-06-10T15:00:00', checkOut: '2026-06-15T11:00:00' })
+    );
 
     const state = store.getState().payment;
     expect(state.status).toBe('failed');
@@ -48,7 +52,9 @@ describe('resetPaymentStatus', () => {
   test('le store revient à idle et efface l\'erreur', async () => {
     mockedApi.post.mockRejectedValue({ response: { data: { detail: 'card declined' } } });
     const store = buildStore();
-    await store.dispatch(createPaymentIntent({ reservationId: 'r-1' } as any));
+    await store.dispatch(
+      createPaymentIntent({ accommodationId: 'a-1', checkIn: '2026-06-10T15:00:00', checkOut: '2026-06-15T11:00:00' })
+    );
 
     store.dispatch(resetPaymentStatus());
 

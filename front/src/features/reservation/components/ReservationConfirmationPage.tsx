@@ -94,14 +94,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
     const intentResult = await dispatch(
       createPaymentIntent({
-        amountCents: totalCents,
-        currency: 'eur',
-        description: `Réservation ${accommodation.title}`,
-        metadata: {
-          accommodationId,
-          checkIn: toApiDateTime(checkInDate, checkInTime),
-          checkOut: toApiDateTime(checkOutDate, checkOutTime),
-        },
+        accommodationId,
+        checkIn: toApiDateTime(checkInDate, checkInTime),
+        checkOut: toApiDateTime(checkOutDate, checkOutTime),
       })
     );
 

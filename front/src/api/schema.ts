@@ -254,7 +254,7 @@ export interface paths {
   "/api/solidarity_projects/{id}/mark-default": {
     /**
      * Définir le projet solidaire par défaut de la plateforme
-     * @description Marque ce projet comme le projet par défaut affiché sur les hébergements quand l'équipe hôte n'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut. Réservé aux utilisateurs authentifiés.
+     * @description Marque ce projet comme le projet par défaut affiché sur les hébergements quand l'équipe hôte n'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut. Action de curation réservée aux administrateurs de la plateforme (ROLE_ADMIN).
      */
     patch: operations["api_solidarity_projects_idmark-default_patch"];
   };
@@ -786,7 +786,7 @@ export interface components {
        * @description Corps du message. Doit contenir au moins un caractère non blanc et pas plus de 5000 caractères.
        * @example Bonjour, est-il possible d'avoir un lit bébé ?
        */
-      body?: string;
+      body: string;
     };
     "Conversation.jsonld-conversation.read": components["schemas"]["HydraItemBaseSchema"] & ({
       /** @description Identifiant unique de la conversation (UUID) */
@@ -913,24 +913,21 @@ export interface components {
     };
     "PaymentIntent.PaymentIntentInput-payment_intent.write": {
       /**
-       * @description Montant total à autoriser, exprimé en centimes de la devise choisie.
-       * @example 25000
+       * Format: uuid
+       * @description Identifiant UUID du logement à réserver.
+       * @example 019cf27a-96ba-7957-8622-eeccb7350e79
        */
-      amountCents?: number;
+      accommodationId: string;
       /**
-       * @description Code ISO 4217 de la devise sur 3 lettres (insensible à la casse).
-       * @example eur
+       * @description Date et heure d'arrivée (ISO 8601).
+       * @example 2026-06-10T15:00:00
        */
-      currency?: string;
+      checkIn: string;
       /**
-       * @description Description du paiement affichée dans Stripe et sur le reçu.
-       * @example Réservation Maison du lagon — 10 au 15 juin 2026
+       * @description Date et heure de départ (ISO 8601).
+       * @example 2026-06-15T11:00:00
        */
-      description?: string;
-      /** @description Métadonnées arbitraires transmises à Stripe (ex: identifiant logement, dates, voyageur). */
-      metadata?: {
-        [key: string]: boolean | number | string | null;
-      };
+      checkOut: string;
     };
     "PaymentIntent.jsonld-payment_intent.read": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -1146,24 +1143,25 @@ export interface components {
        * @description Adresse email
        * @example host@example.com
        */
-      email?: string;
+      email: string;
       /**
        * @description Mot de passe
        * @example supersecret
        */
-      password?: string;
+      password: string;
     };
     "User.RegisterUserInput-user.write": {
       /**
+       * Format: email
        * @description Adresse email
        * @example host@example.com
        */
-      email?: string;
+      email: string;
       /**
        * @description Mot de passe (8 caractères minimum)
        * @example supersecret
        */
-      password?: string;
+      password: string;
     };
     "User.UpdateUserProfileInput-user.write.jsonMergePatch": {
       /**
@@ -1177,6 +1175,7 @@ export interface components {
        */
       lastName?: string | null;
       /**
+       * Format: email
        * @description Adresse email
        * @example marie@example.com
        */
@@ -2773,7 +2772,7 @@ export interface operations {
   };
   /**
    * Définir le projet solidaire par défaut de la plateforme
-   * @description Marque ce projet comme le projet par défaut affiché sur les hébergements quand l'équipe hôte n'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut. Réservé aux utilisateurs authentifiés.
+   * @description Marque ce projet comme le projet par défaut affiché sur les hébergements quand l'équipe hôte n'a pas de coup de cœur. Démarque automatiquement le projet précédemment marqué comme défaut. Action de curation réservée aux administrateurs de la plateforme (ROLE_ADMIN).
    */
   "api_solidarity_projects_idmark-default_patch": {
     parameters: {

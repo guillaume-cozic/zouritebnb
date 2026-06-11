@@ -4,26 +4,29 @@ declare(strict_types=1);
 
 namespace App\Tests\E2e\Payment;
 
+use App\Accommodation\Infrastructure\Doctrine\AccommodationEntity;
 use App\Tests\Unit\Payment\Infrastructure\FakePaymentGateway;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Uid\Uuid;
 
 final class CreatePaymentIntentTest extends PaymentApiTestCase
 {
-    public function test_should_create_payment_intent(): void
+    private const string TEAM_ID = '00000000-0000-4000-8000-000000000abc';
+
+    public function test_should_create_payment_intent_with_server_derived_amount(): void
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
         $this->createAuthUser(email: 'traveller@example.com');
+        // 100€/night accommodation; a 4-night stay must be charged 40000 cents.
+        $accommodationId = $this->insertAccommodation(price: 100.0);
 
         $client->request('POST', '/api/payment-intents', [
             'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'amountCents' => 25000,
-                'currency' => 'eur',
-                'description' => 'Réservation Maison du lagon — 10 au 15 juin 2026',
-                'metadata' => [
-                    'accommodationId' => 'abc',
-                    'nights' => 5,
-                ],
+                'accommodationId' => $accommodationId,
+                'checkIn' => '2026-06-10T15:00:00',
+                'checkOut' => '2026-06-14T11:00:00',
             ],
         ]);
 
@@ -34,49 +37,47 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
         ]);
 
         self::assertCount(1, $gateway->calls);
-        self::assertSame('createAuthorization', $gateway->calls[0]['type']);
-        self::assertSame(25000, $gateway->calls[0]['amountCents']);
+        self::assertSame(40000, $gateway->calls[0]['amountCents']);
         self::assertSame('eur', $gateway->calls[0]['currency']);
-        self::assertSame('Réservation Maison du lagon — 10 au 15 juin 2026', $gateway->calls[0]['description']);
-        self::assertSame(['accommodationId' => 'abc', 'nights' => 5], $gateway->calls[0]['metadata']);
     }
 
-    public function test_should_create_payment_intent_without_metadata(): void
+    public function test_should_ignore_any_client_supplied_amount(): void
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
         $this->createAuthUser(email: 'traveller@example.com');
+        $accommodationId = $this->insertAccommodation(price: 100.0);
 
+        // An attacker tries to pay 1 cent by injecting amountCents/currency.
         $client->request('POST', '/api/payment-intents', [
             'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'amountCents' => 12000,
-                'currency' => 'EUR',
-                'description' => 'Réservation sans métadonnées',
+                'accommodationId' => $accommodationId,
+                'checkIn' => '2026-06-10T15:00:00',
+                'checkOut' => '2026-06-14T11:00:00',
+                'amountCents' => 1,
+                'currency' => 'usd',
             ],
         ]);
 
         self::assertResponseStatusCodeSame(201);
-        self::assertJsonContains([
-            'paymentIntentId' => 'pi_test_1',
-            'clientSecret' => 'pi_test_1_secret_1',
-        ]);
-
-        self::assertCount(1, $gateway->calls);
-        self::assertSame([], $gateway->calls[0]['metadata']);
+        // The injected fields are ignored: the amount stays server-derived.
+        self::assertSame(40000, $gateway->calls[0]['amountCents']);
+        self::assertSame('eur', $gateway->calls[0]['currency']);
     }
 
     public function test_should_return401_when_not_authenticated(): void
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
+        $accommodationId = $this->insertAccommodation(price: 100.0);
 
         $client->request('POST', '/api/payment-intents', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'amountCents' => 25000,
-                'currency' => 'eur',
-                'description' => 'Réservation sans authentification',
+                'accommodationId' => $accommodationId,
+                'checkIn' => '2026-06-10T15:00:00',
+                'checkOut' => '2026-06-14T11:00:00',
             ],
         ]);
 
@@ -84,7 +85,7 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
         self::assertCount(0, $gateway->calls);
     }
 
-    public function test_should_return422_when_amount_is_zero(): void
+    public function test_should_return422_with_violation_when_accommodation_id_is_missing(): void
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
@@ -93,53 +94,17 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
         $client->request('POST', '/api/payment-intents', [
             'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'amountCents' => 0,
-                'currency' => 'eur',
-                'description' => 'Montant invalide',
+                'checkIn' => '2026-06-10T15:00:00',
+                'checkOut' => '2026-06-14T11:00:00',
             ],
         ]);
 
         self::assertResponseStatusCodeSame(422);
-    }
-
-    public function test_should_return422_when_amount_is_negative(): void
-    {
-        $gateway = new FakePaymentGateway();
-        $client = $this->createClientWithFakeGateway($gateway);
-        $this->createAuthUser(email: 'traveller@example.com');
-
-        $client->request('POST', '/api/payment-intents', [
-            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
-            'json' => [
-                'amountCents' => -100,
-                'currency' => 'eur',
-                'description' => 'Montant négatif',
-            ],
-        ]);
-
-        self::assertResponseStatusCodeSame(422);
-    }
-
-    public function test_should_return422_with_violation_when_amount_is_missing(): void
-    {
-        $gateway = new FakePaymentGateway();
-        $client = $this->createClientWithFakeGateway($gateway);
-        $this->createAuthUser(email: 'traveller@example.com');
-
-        $client->request('POST', '/api/payment-intents', [
-            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
-            'json' => [
-                'currency' => 'eur',
-                'description' => 'Montant absent',
-            ],
-        ]);
-
-        self::assertResponseStatusCodeSame(422);
-        self::assertJsonContains(['violations' => [['propertyPath' => 'amountCents']]]);
+        self::assertJsonContains(['violations' => [['propertyPath' => 'accommodationId']]]);
         self::assertCount(0, $gateway->calls);
     }
 
-    public function test_should_return422_with_violation_when_currency_is_missing(): void
+    public function test_should_return422_when_accommodation_does_not_exist(): void
     {
         $gateway = new FakePaymentGateway();
         $client = $this->createClientWithFakeGateway($gateway);
@@ -148,31 +113,32 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
         $client->request('POST', '/api/payment-intents', [
             'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'amountCents' => 25000,
-                'description' => 'Devise absente',
+                'accommodationId' => Uuid::v7()->toRfc4122(),
+                'checkIn' => '2026-06-10T15:00:00',
+                'checkOut' => '2026-06-14T11:00:00',
             ],
         ]);
 
         self::assertResponseStatusCodeSame(422);
-        self::assertJsonContains(['violations' => [['propertyPath' => 'currency']]]);
         self::assertCount(0, $gateway->calls);
     }
 
-    public function test_should_return422_when_currency_is_invalid(): void
+    private function insertAccommodation(float $price): string
     {
-        $gateway = new FakePaymentGateway();
-        $client = $this->createClientWithFakeGateway($gateway);
-        $this->createAuthUser(email: 'traveller@example.com');
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine.orm.entity_manager');
 
-        $client->request('POST', '/api/payment-intents', [
-            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
-            'json' => [
-                'amountCents' => 25000,
-                'currency' => 'EUROS',
-                'description' => 'Devise invalide',
-            ],
-        ]);
+        $entity = new AccommodationEntity()
+            ->setId(Uuid::v7())
+            ->setTitle('Maison du lagon')
+            ->setDescription('Vue mer')
+            ->setPrice($price)
+            ->setStatus('published')
+            ->setTeamId(Uuid::fromString(self::TEAM_ID));
 
-        self::assertResponseStatusCodeSame(422);
+        $em->persist($entity);
+        $em->flush();
+
+        return $entity->getId()->toRfc4122();
     }
 }

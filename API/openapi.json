@@ -3715,7 +3715,7 @@
                     }
                 },
                 "summary": "D\u00e9finir le projet solidaire par d\u00e9faut de la plateforme",
-                "description": "Marque ce projet comme le projet par d\u00e9faut affich\u00e9 sur les h\u00e9bergements quand l'\u00e9quipe h\u00f4te n'a pas de coup de c\u0153ur. D\u00e9marque automatiquement le projet pr\u00e9c\u00e9demment marqu\u00e9 comme d\u00e9faut. R\u00e9serv\u00e9 aux utilisateurs authentifi\u00e9s.",
+                "description": "Marque ce projet comme le projet par d\u00e9faut affich\u00e9 sur les h\u00e9bergements quand l'\u00e9quipe h\u00f4te n'a pas de coup de c\u0153ur. D\u00e9marque automatiquement le projet pr\u00e9c\u00e9demment marqu\u00e9 comme d\u00e9faut. Action de curation r\u00e9serv\u00e9e aux administrateurs de la plateforme (ROLE_ADMIN).",
                 "parameters": [
                     {
                         "name": "id",
@@ -5979,52 +5979,32 @@
             },
             "PaymentIntent.PaymentIntentInput-payment_intent.write": {
                 "type": "object",
-                "properties": {
-                    "amountCents": {
-                        "minimum": 0,
-                        "exclusiveMinimum": 0,
-                        "description": "Montant total \u00e0 autoriser, exprim\u00e9 en centimes de la devise choisie.",
-                        "example": 25000,
-                        "type": "integer"
-                    },
-                    "currency": {
-                        "pattern": "^([a-zA-Z]{3})$",
-                        "description": "Code ISO 4217 de la devise sur 3 lettres (insensible \u00e0 la casse).",
-                        "example": "eur",
-                        "type": "string"
-                    },
-                    "description": {
-                        "description": "Description du paiement affich\u00e9e dans Stripe et sur le re\u00e7u.",
-                        "example": "R\u00e9servation Maison du lagon \u2014 10 au 15 juin 2026",
-                        "type": "string"
-                    },
-                    "metadata": {
-                        "description": "M\u00e9tadonn\u00e9es arbitraires transmises \u00e0 Stripe (ex: identifiant logement, dates, voyageur).",
-                        "type": "object",
-                        "additionalProperties": {
-                            "anyOf": [
-                                {
-                                    "type": "boolean"
-                                },
-                                {
-                                    "type": "number"
-                                },
-                                {
-                                    "type": "integer"
-                                },
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "null"
-                                }
-                            ]
-                        }
-                    }
-                },
                 "required": [
-                    "currency"
-                ]
+                    "accommodationId",
+                    "checkIn",
+                    "checkOut"
+                ],
+                "properties": {
+                    "accommodationId": {
+                        "format": "uuid",
+                        "description": "Identifiant UUID du logement \u00e0 r\u00e9server.",
+                        "externalDocs": {
+                            "url": "https://schema.org/identifier"
+                        },
+                        "example": "019cf27a-96ba-7957-8622-eeccb7350e79",
+                        "type": "string"
+                    },
+                    "checkIn": {
+                        "description": "Date et heure d'arriv\u00e9e (ISO 8601).",
+                        "example": "2026-06-10T15:00:00",
+                        "type": "string"
+                    },
+                    "checkOut": {
+                        "description": "Date et heure de d\u00e9part (ISO 8601).",
+                        "example": "2026-06-15T11:00:00",
+                        "type": "string"
+                    }
+                }
             },
             "PaymentIntent.jsonld-payment_intent.read": {
                 "allOf": [

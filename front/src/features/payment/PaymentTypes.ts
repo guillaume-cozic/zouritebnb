@@ -1,8 +1,8 @@
 export interface CreatePaymentIntentPayload {
-  amountCents: number;
-  currency: string;
-  description: string;
-  metadata?: Record<string, string>;
+  /** The server derives the amount, currency and metadata from these booking parameters. */
+  accommodationId: string;
+  checkIn: string;
+  checkOut: string;
 }
 
 export interface PaymentIntentResponse {
