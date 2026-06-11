@@ -28,6 +28,34 @@ final class RegisterUserTest extends UserApiTestCase
         self::assertNotEmpty($data['teamId']);
     }
 
+    public function test_should_return422_with_violation_when_email_is_invalid(): void
+    {
+        self::createClient()->request('POST', '/api/register', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'email' => 'not-an-email',
+                'password' => 'supersecret',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertJsonContains(['violations' => [['propertyPath' => 'email']]]);
+    }
+
+    public function test_should_return422_with_violation_when_password_is_too_short(): void
+    {
+        self::createClient()->request('POST', '/api/register', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'email' => 'new-host@example.com',
+                'password' => 'short',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertJsonContains(['violations' => [['propertyPath' => 'password']]]);
+    }
+
     public function test_should_return422_when_email_already_exists(): void
     {
         $this->insertUser(email: 'taken@example.com');

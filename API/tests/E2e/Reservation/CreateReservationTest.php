@@ -127,6 +127,25 @@ final class CreateReservationTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
+    public function test_should_return422_with_violations_when_dates_are_missing(): void
+    {
+        $accommodationId = $this->insertAccommodation();
+
+        $response = self::createClient()->request('POST', '/api/reservations', [
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'accommodationId' => $accommodationId,
+                'guestName' => 'Jean Dupont',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
+
+        $propertyPaths = array_column($response->toArray(false)['violations'], 'propertyPath');
+        self::assertContains('checkIn', $propertyPaths);
+        self::assertContains('checkOut', $propertyPaths);
+    }
+
     public function test_should_return422_when_accommodation_does_not_exist(): void
     {
         self::createClient()->request('POST', '/api/reservations', [

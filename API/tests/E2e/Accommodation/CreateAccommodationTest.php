@@ -69,8 +69,10 @@ final class CreateAccommodationTest extends AccommodationApiTestCase
             ],
         ]);
 
+        // The missing price is now caught by the Symfony validation layer (NotNull
+        // constraint on the input DTO) before reaching the domain.
         self::assertResponseStatusCodeSame(422);
-        self::assertJsonContains(['detail' => 'Price is required.']);
+        self::assertJsonContains(['violations' => [['propertyPath' => 'price']]]);
     }
 
     public function test_should_not_create_accommodation_with_negative_price(): void
@@ -86,7 +88,9 @@ final class CreateAccommodationTest extends AccommodationApiTestCase
             ],
         ]);
 
+        // The negative price is now caught by the Symfony validation layer (Positive
+        // constraint on the input DTO) before reaching the domain.
         self::assertResponseStatusCodeSame(422);
-        self::assertJsonContains(['detail' => 'Price must be strictly positive, got -50.']);
+        self::assertJsonContains(['violations' => [['propertyPath' => 'price']]]);
     }
 }

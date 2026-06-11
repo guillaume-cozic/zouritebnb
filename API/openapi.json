@@ -5592,8 +5592,12 @@
             },
             "Conversation.SendMessageInput-conversation.write": {
                 "type": "object",
+                "required": [
+                    "body"
+                ],
                 "properties": {
                     "body": {
+                        "maxLength": 5000,
                         "description": "Corps du message. Doit contenir au moins un caract\u00e8re non blanc et pas plus de 5000 caract\u00e8res.",
                         "example": "Bonjour, est-il possible d'avoir un lit b\u00e9b\u00e9 ?",
                         "type": "string"
@@ -5977,11 +5981,14 @@
                 "type": "object",
                 "properties": {
                     "amountCents": {
+                        "minimum": 0,
+                        "exclusiveMinimum": 0,
                         "description": "Montant total \u00e0 autoriser, exprim\u00e9 en centimes de la devise choisie.",
                         "example": 25000,
                         "type": "integer"
                     },
                     "currency": {
+                        "pattern": "^([a-zA-Z]{3})$",
                         "description": "Code ISO 4217 de la devise sur 3 lettres (insensible \u00e0 la casse).",
                         "example": "eur",
                         "type": "string"
@@ -6014,7 +6021,10 @@
                             ]
                         }
                     }
-                }
+                },
+                "required": [
+                    "currency"
+                ]
             },
             "PaymentIntent.jsonld-payment_intent.read": {
                 "allOf": [
@@ -6414,6 +6424,10 @@
             },
             "User.LoginUserInput-user.write": {
                 "type": "object",
+                "required": [
+                    "email",
+                    "password"
+                ],
                 "properties": {
                     "email": {
                         "description": "Adresse email",
@@ -6429,13 +6443,23 @@
             },
             "User.RegisterUserInput-user.write": {
                 "type": "object",
+                "required": [
+                    "email",
+                    "password"
+                ],
                 "properties": {
                     "email": {
+                        "format": "email",
+                        "maxLength": 180,
                         "description": "Adresse email",
+                        "externalDocs": {
+                            "url": "https://schema.org/email"
+                        },
                         "example": "host@example.com",
                         "type": "string"
                     },
                     "password": {
+                        "minLength": 8,
                         "description": "Mot de passe (8 caract\u00e8res minimum)",
                         "example": "supersecret",
                         "type": "string"
@@ -6446,6 +6470,7 @@
                 "type": "object",
                 "properties": {
                     "firstName": {
+                        "maxLength": 100,
                         "description": "Pr\u00e9nom",
                         "example": "Marie",
                         "type": [
@@ -6454,6 +6479,7 @@
                         ]
                     },
                     "lastName": {
+                        "maxLength": 100,
                         "description": "Nom",
                         "example": "Dupont",
                         "type": [
@@ -6462,7 +6488,12 @@
                         ]
                     },
                     "email": {
+                        "format": "email",
+                        "maxLength": 180,
                         "description": "Adresse email",
+                        "externalDocs": {
+                            "url": "https://schema.org/email"
+                        },
                         "example": "marie@example.com",
                         "type": "string"
                     }

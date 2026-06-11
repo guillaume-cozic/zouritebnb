@@ -120,6 +120,44 @@ final class CreatePaymentIntentTest extends PaymentApiTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
+    public function test_should_return422_with_violation_when_amount_is_missing(): void
+    {
+        $gateway = new FakePaymentGateway();
+        $client = $this->createClientWithFakeGateway($gateway);
+        $this->createAuthUser(email: 'traveller@example.com');
+
+        $client->request('POST', '/api/payment-intents', [
+            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'currency' => 'eur',
+                'description' => 'Montant absent',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertJsonContains(['violations' => [['propertyPath' => 'amountCents']]]);
+        self::assertCount(0, $gateway->calls);
+    }
+
+    public function test_should_return422_with_violation_when_currency_is_missing(): void
+    {
+        $gateway = new FakePaymentGateway();
+        $client = $this->createClientWithFakeGateway($gateway);
+        $this->createAuthUser(email: 'traveller@example.com');
+
+        $client->request('POST', '/api/payment-intents', [
+            'headers' => $this->authHeaders('traveller@example.com') + ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'amountCents' => 25000,
+                'description' => 'Devise absente',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertJsonContains(['violations' => [['propertyPath' => 'currency']]]);
+        self::assertCount(0, $gateway->calls);
+    }
+
     public function test_should_return422_when_currency_is_invalid(): void
     {
         $gateway = new FakePaymentGateway();
