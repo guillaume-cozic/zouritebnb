@@ -6,11 +6,13 @@ namespace App\User\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Shared\Infrastructure\Security\IpRateLimiter;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use App\Team\Domain\Entity\Team;
 use App\Team\Domain\Port\TeamRepository;
 use App\User\Application\UseCase\RegisterUser;
 use App\User\Domain\Command\RegisterUserCommand;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -22,6 +24,8 @@ final readonly class RegisterUserProcessor implements ProcessorInterface
         private RegisterUser $registerUser,
         private TeamRepository $teamRepository,
         private TransactionalUseCaseHandler $handler,
+        private IpRateLimiter $rateLimiter,
+        private RateLimiterFactoryInterface $registerLimiter,
     ) {
     }
 
@@ -30,6 +34,9 @@ final readonly class RegisterUserProcessor implements ProcessorInterface
         if (!$data instanceof RegisterUserInput) {
             throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', RegisterUserInput::class, get_debug_type($data)));
         }
+
+        // Throttle registration spam before creating anything.
+        $this->rateLimiter->enforce($this->registerLimiter);
 
         $teamId = Uuid::v7();
 

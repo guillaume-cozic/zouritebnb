@@ -1,0 +1,22 @@
+framework:
+    rate_limiter:
+        # Brute-force / credential-stuffing protection on login (per client IP).
+        login:
+            policy: 'sliding_window'
+            limit: 5
+            interval: '1 minute'
+        # Registration spam protection (per client IP).
+        register:
+            policy: 'sliding_window'
+            limit: 5
+            interval: '1 minute'
+
+# In tests many requests share the same client IP within one run; raise the
+# limits high enough that throttling never interferes with functional tests.
+when@test:
+    framework:
+        rate_limiter:
+            login:
+                limit: 100000
+            register:
+                limit: 100000

@@ -6,11 +6,13 @@ namespace App\User\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Shared\Infrastructure\Security\IpRateLimiter;
 use App\User\Application\UseCase\AuthenticateUser;
 use App\User\Domain\Command\AuthenticateUserCommand;
 use App\User\Infrastructure\Doctrine\UserEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 /**
  * @implements ProcessorInterface<LoginUserInput, UserOutput>
@@ -21,6 +23,8 @@ final readonly class LoginUserProcessor implements ProcessorInterface
         private AuthenticateUser $authenticateUser,
         private JWTTokenManagerInterface $tokenManager,
         private EntityManagerInterface $entityManager,
+        private IpRateLimiter $rateLimiter,
+        private RateLimiterFactoryInterface $loginLimiter,
     ) {
     }
 
@@ -29,6 +33,9 @@ final readonly class LoginUserProcessor implements ProcessorInterface
         if (!$data instanceof LoginUserInput) {
             throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', LoginUserInput::class, get_debug_type($data)));
         }
+
+        // Throttle credential-stuffing / brute-force before touching the DB.
+        $this->rateLimiter->enforce($this->loginLimiter);
 
         $user = $this->authenticateUser->handle(new AuthenticateUserCommand(
             email: $data->email,
