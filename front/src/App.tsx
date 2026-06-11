@@ -24,6 +24,7 @@ import ConversationDetailPage from './features/conversation/components/Conversat
 import AdminReservationsPage from './features/reservation/components/AdminReservationsPage';
 import AdminConversationsPage from './features/conversation/components/AdminConversationsPage';
 import ReservationConfirmationPage from './features/reservation/components/ReservationConfirmationPage';
+import IdentityVerificationPage from './features/userProfile/components/IdentityVerificationPage';
 
 function App() {
   return (
@@ -63,6 +64,7 @@ function App() {
               <Route path="/account/conversations" element={<ConversationsListPage />} />
               <Route path="/account/conversations/:id" element={<ConversationDetailPage />} />
               <Route path="/account/settings" element={<TeamSettingsPage />} />
+              <Route path="/account/verification" element={<IdentityVerificationPage />} />
             </Route>
           </Route>
         </Routes>

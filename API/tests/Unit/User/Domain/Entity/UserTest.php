@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\User\Domain\Entity;
 
+use App\User\Domain\Entity\IdentityDocument;
+use App\User\Domain\Entity\IdentityDocumentType;
 use App\User\Domain\Entity\User;
+use App\User\Domain\Entity\VerificationStatus;
+use App\User\Domain\Event\IdentityVerified;
 use App\User\Domain\Event\UserRegistered;
+use App\User\Domain\Exception\IdentityVerificationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Uuid;
 
@@ -145,5 +150,84 @@ final class UserTest extends TestCase
         $user->updateProfile(firstName: 'A', lastName: 'B', email: 'new@example.com');
 
         self::assertSame('hashed-secret', $user->getHashedPassword());
+    }
+
+    public function test_should_be_not_started_by_default(): void
+    {
+        $user = new User(
+            id: Uuid::v7(),
+            email: 'john@example.com',
+            hashedPassword: 'hashed-secret',
+            teamId: Uuid::v7(),
+        );
+
+        self::assertSame(VerificationStatus::NotStarted, $user->getVerificationStatus());
+        self::assertNull($user->getDocumentType());
+        self::assertNull($user->getIdentityDocumentId());
+        self::assertNull($user->getSelfieId());
+        self::assertNull($user->getVerifiedAt());
+    }
+
+    public function test_should_submit_and_verify_identity_recording_a_single_event(): void
+    {
+        $user = new User(
+            id: Uuid::v7(),
+            email: 'john@example.com',
+            hashedPassword: 'hashed-secret',
+            teamId: Uuid::v7(),
+        );
+
+        $documentId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000aa');
+        $selfieId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000bb');
+        $verifiedAt = new \DateTimeImmutable('2026-06-07T12:00:00+00:00');
+
+        $user->submitAndVerifyIdentity(
+            documentId: $documentId,
+            selfieId: $selfieId,
+            documentType: IdentityDocumentType::Passport,
+            document: new IdentityDocument('doc-bytes', 'passport.png', 'image/png', 10),
+            selfie: new IdentityDocument('selfie-bytes', 'selfie.jpg', 'image/jpeg', 20),
+            verifiedAt: $verifiedAt,
+        );
+
+        self::assertSame(VerificationStatus::Verified, $user->getVerificationStatus());
+        self::assertSame(IdentityDocumentType::Passport, $user->getDocumentType());
+        self::assertSame($documentId, $user->getIdentityDocumentId());
+        self::assertSame($selfieId, $user->getSelfieId());
+        self::assertSame($verifiedAt, $user->getVerifiedAt());
+
+        $events = $user->releaseEvents();
+        self::assertCount(1, $events);
+        self::assertInstanceOf(IdentityVerified::class, $events[0]);
+        self::assertTrue($user->getId()->equals($events[0]->userId));
+        self::assertSame($documentId->toRfc4122().'.png', $events[0]->documentFilename);
+        self::assertSame('doc-bytes', $events[0]->documentContent);
+        self::assertSame($selfieId->toRfc4122().'.jpg', $events[0]->selfieFilename);
+        self::assertSame('selfie-bytes', $events[0]->selfieContent);
+    }
+
+    public function test_should_reject_resubmission_when_already_verified(): void
+    {
+        $user = new User(
+            id: Uuid::v7(),
+            email: 'john@example.com',
+            hashedPassword: 'hashed-secret',
+            teamId: Uuid::v7(),
+        );
+
+        $submit = static fn () => $user->submitAndVerifyIdentity(
+            documentId: Uuid::v7(),
+            selfieId: Uuid::v7(),
+            documentType: IdentityDocumentType::IdCard,
+            document: new IdentityDocument('doc', 'doc.jpg', 'image/jpeg', 1),
+            selfie: new IdentityDocument('selfie', 'selfie.jpg', 'image/jpeg', 1),
+            verifiedAt: new \DateTimeImmutable(),
+        );
+
+        $submit();
+        $user->releaseEvents();
+
+        $this->expectException(IdentityVerificationException::class);
+        $submit();
     }
 }

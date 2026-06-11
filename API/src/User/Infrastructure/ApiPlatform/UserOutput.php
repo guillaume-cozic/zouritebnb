@@ -74,6 +74,10 @@ class UserOutput
     #[ApiProperty(description: 'Nom', example: 'Dupont')]
     public ?string $lastName = null;
 
+    #[Groups(['user:read'])]
+    #[ApiProperty(description: 'Statut de vérification d\'identité', example: 'verified')]
+    public string $verificationStatus = 'not_started';
+
     #[Groups(['user:token'])]
     #[ApiProperty(description: 'JWT Bearer à placer dans l\'en-tête Authorization pour les requêtes authentifiées', example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...')]
     public ?string $token = null;

@@ -9,4 +9,6 @@ api_platform:
         App\Accommodation\Domain\Exception\AccommodationNotFoundException: 404
         App\Accommodation\Domain\Exception\PhotoNotFoundException: 404
         App\Reservation\Domain\Exception\ReservationNotFoundException: 404
+        App\User\Domain\Exception\UserNotFoundException: 404
+        App\User\Domain\Exception\IdentityVerificationException: 409
         DomainException: 422

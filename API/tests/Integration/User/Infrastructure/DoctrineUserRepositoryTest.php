@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Integration\User\Infrastructure;
 
 use App\Tests\Integration\RepositoryTestCase;
+use App\User\Domain\Entity\IdentityDocument;
+use App\User\Domain\Entity\IdentityDocumentType;
 use App\User\Domain\Entity\User;
+use App\User\Domain\Entity\VerificationStatus;
 use App\User\Domain\Port\UserRepository;
 use PHPUnit\Framework\Attributes\Before;
 use Symfony\Component\Uid\Uuid;
@@ -130,5 +133,56 @@ final class DoctrineUserRepositoryTest extends RepositoryTestCase
         self::assertNotNull($found);
         self::assertNull($found->getFirstName());
         self::assertNull($found->getLastName());
+    }
+
+    public function test_should_default_to_not_started_verification_status(): void
+    {
+        $id = Uuid::v4();
+        $user = new User(
+            id: $id,
+            email: 'fresh@example.com',
+            hashedPassword: 'hash',
+            teamId: Uuid::v4(),
+        );
+
+        $this->repository->save($user);
+        $found = $this->repository->findById($id);
+
+        self::assertNotNull($found);
+        self::assertSame(VerificationStatus::NotStarted, $found->getVerificationStatus());
+        self::assertNull($found->getVerifiedAt());
+    }
+
+    public function test_should_persist_and_read_back_verification_state(): void
+    {
+        $id = Uuid::v4();
+        $documentId = Uuid::v4();
+        $selfieId = Uuid::v4();
+        $verifiedAt = new \DateTimeImmutable('2026-06-07T12:00:00+00:00');
+
+        $user = new User(
+            id: $id,
+            email: 'verified@example.com',
+            hashedPassword: 'hash',
+            teamId: Uuid::v4(),
+        );
+        $user->submitAndVerifyIdentity(
+            documentId: $documentId,
+            selfieId: $selfieId,
+            documentType: IdentityDocumentType::DrivingLicense,
+            document: new IdentityDocument('doc', 'doc.jpg', 'image/jpeg', 1),
+            selfie: new IdentityDocument('selfie', 'selfie.jpg', 'image/jpeg', 1),
+            verifiedAt: $verifiedAt,
+        );
+
+        $this->repository->save($user);
+        $found = $this->repository->findById($id);
+
+        self::assertNotNull($found);
+        self::assertSame(VerificationStatus::Verified, $found->getVerificationStatus());
+        self::assertSame(IdentityDocumentType::DrivingLicense, $found->getDocumentType());
+        self::assertEquals($documentId, $found->getIdentityDocumentId());
+        self::assertEquals($selfieId, $found->getSelfieId());
+        self::assertEquals($verifiedAt, $found->getVerifiedAt());
     }
 }

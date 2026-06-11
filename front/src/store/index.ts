@@ -11,6 +11,7 @@ import conversationReducer from '../features/conversation/ConversationSlice';
 import geographyReducer from '../features/geography/GeographySlice';
 import paymentReducer from '../features/payment/PaymentSlice';
 import reviewReducer from '../features/review/ReviewSlice';
+import userProfileReducer from '../features/userProfile/UserProfileSlice';
 import { listenerMiddleware } from './listenerMiddleware';
 import './registerListeners';
 
@@ -28,6 +29,7 @@ export const store = configureStore({
     geography: geographyReducer,
     payment: paymentReducer,
     review: reviewReducer,
+    userProfile: userProfileReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),

@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../features/auth/AuthSlice';
 import { selectAuthUser } from '../features/auth/AuthSelectors';
+import VerificationBadge from '../features/userProfile/components/VerificationBadge';
+import { VerificationStatus } from '../features/userProfile/UserProfileTypes';
 
 const Navbar: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -191,6 +193,23 @@ const Navbar: React.FC = () => {
                         <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                       </svg>
                       {t('navbar.menu.settings')}
+                    </Link>
+                    <Link
+                      to="/account/verification"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center justify-between gap-3 px-5 py-3 text-gray-700 hover:bg-gray-50"
+                    >
+                      <span className="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                          <path d="m9 12 2 2 4-4" />
+                        </svg>
+                        {t('navbar.menu.verification')}
+                      </span>
+                      <VerificationBadge
+                        status={(user.verificationStatus as VerificationStatus) || 'not_started'}
+                        compact
+                      />
                     </Link>
                   </nav>
                   <div className="border-t border-gray-100 py-1">

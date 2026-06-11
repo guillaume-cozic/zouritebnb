@@ -52,6 +52,16 @@ services:
     App\User\Domain\Port\PasswordHasher:
         alias: App\User\Infrastructure\PasswordHasher\BcryptPasswordHasher
 
+    App\User\Domain\Port\IdentityDocumentStorage:
+        alias: App\User\Infrastructure\Filesystem\LocalIdentityDocumentStorage
+
+    App\User\Infrastructure\Filesystem\LocalIdentityDocumentStorage:
+        arguments:
+            $uploadDir: '%kernel.project_dir%/var/uploads/identity-documents'
+
+    App\User\Application\Listener\StoreIdentityDocumentsOnIdentityVerified:
+        tags: [messenger.message_handler]
+
     App\Accommodation\Infrastructure\Filesystem\LocalPhotoStorage:
         arguments:
             $uploadDir: '%kernel.project_dir%/var/uploads/photos'

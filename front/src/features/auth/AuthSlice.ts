@@ -5,6 +5,11 @@ import api, {
   setStoredToken,
 } from '../../services/api';
 import { AuthUser } from './AuthTypes';
+import {
+  submitIdentityVerification,
+  fetchVerificationStatus,
+} from '../userProfile/UserProfileSlice';
+import { VerificationResult } from '../userProfile/UserProfileTypes';
 
 const STORAGE_KEY = AUTH_USER_KEY;
 
@@ -116,6 +121,19 @@ const authSlice = createSlice({
         state.user.email = action.payload.email;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
       });
+
+    const syncVerificationStatus = (
+      state: AuthState,
+      action: PayloadAction<VerificationResult>
+    ) => {
+      if (!state.user) return;
+      state.user.verificationStatus = action.payload.status;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
+    };
+
+    builder
+      .addCase(submitIdentityVerification.fulfilled, syncVerificationStatus)
+      .addCase(fetchVerificationStatus.fulfilled, syncVerificationStatus);
   },
 });
 

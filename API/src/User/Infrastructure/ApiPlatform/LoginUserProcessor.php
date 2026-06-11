@@ -45,6 +45,7 @@ final readonly class LoginUserProcessor implements ProcessorInterface
         $output->teamId = $user->getTeamId()->toRfc4122();
         $output->firstName = $user->getFirstName();
         $output->lastName = $user->getLastName();
+        $output->verificationStatus = $user->getVerificationStatus()->value;
         $output->token = $this->tokenManager->create($securityUser);
 
         return $output;
