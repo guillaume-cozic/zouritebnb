@@ -246,7 +246,9 @@ class ReservationOutput implements FromEntityInterface
 
     public static function fromEntity(object $entity): static
     {
-        \assert($entity instanceof Reservation);
+        if (!$entity instanceof Reservation) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', Reservation::class, get_debug_type($entity)));
+        }
 
         $output = new static();
         $output->id = $entity->getId()->toString();

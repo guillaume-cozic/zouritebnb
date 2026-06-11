@@ -25,7 +25,9 @@ final readonly class UpdateAccommodationCheckInOutProcessor implements Processor
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        \assert($data instanceof UpdateAccommodationCheckInOutInput);
+        if (!$data instanceof UpdateAccommodationCheckInOutInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', UpdateAccommodationCheckInOutInput::class, get_debug_type($data)));
+        }
 
         $id = Uuid::fromString($uriVariables['id']);
         $this->ownershipGuard->assertOwnedByCurrentUser($id);

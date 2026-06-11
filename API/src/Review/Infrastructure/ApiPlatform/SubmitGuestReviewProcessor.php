@@ -31,7 +31,9 @@ final readonly class SubmitGuestReviewProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        \assert($data instanceof SubmitGuestReviewInput);
+        if (!$data instanceof SubmitGuestReviewInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', SubmitGuestReviewInput::class, get_debug_type($data)));
+        }
 
         $authorUserId = $this->currentUser->id();
         $accommodationId = Uuid::fromString($data->accommodationId);

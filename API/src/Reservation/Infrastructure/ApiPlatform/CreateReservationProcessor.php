@@ -29,7 +29,9 @@ final readonly class CreateReservationProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ReservationOutput
     {
-        \assert($data instanceof ReservationInput);
+        if (!$data instanceof ReservationInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', ReservationInput::class, get_debug_type($data)));
+        }
 
         /** @var string $id */
         $id = $this->handler->execute(fn () => $this->createReservation->handle(new CreateReservationCommand(
@@ -41,7 +43,9 @@ final readonly class CreateReservationProcessor implements ProcessorInterface
         )));
 
         $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));
-        \assert(null !== $reservation);
+        if (null === $reservation) {
+            throw new \RuntimeException('Reservation could not be reloaded after the operation.');
+        }
 
         return ReservationOutput::fromEntity($reservation);
     }

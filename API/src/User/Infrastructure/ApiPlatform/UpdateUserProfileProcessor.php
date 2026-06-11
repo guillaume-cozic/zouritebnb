@@ -25,7 +25,9 @@ final readonly class UpdateUserProfileProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        \assert($data instanceof UpdateUserProfileInput);
+        if (!$data instanceof UpdateUserProfileInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', UpdateUserProfileInput::class, get_debug_type($data)));
+        }
 
         $this->handler->execute(fn () => $this->useCase->handle(new UpdateUserProfileCommand(
             id: $this->currentUser->id(),

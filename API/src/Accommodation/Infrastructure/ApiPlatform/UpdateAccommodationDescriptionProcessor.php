@@ -23,7 +23,9 @@ final readonly class UpdateAccommodationDescriptionProcessor implements Processo
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        \assert($data instanceof UpdateAccommodationDescriptionInput);
+        if (!$data instanceof UpdateAccommodationDescriptionInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', UpdateAccommodationDescriptionInput::class, get_debug_type($data)));
+        }
 
         $id = Uuid::fromString($uriVariables['id']);
         $this->ownershipGuard->assertOwnedByCurrentUser($id);

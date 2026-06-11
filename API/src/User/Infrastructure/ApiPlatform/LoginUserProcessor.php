@@ -26,7 +26,9 @@ final readonly class LoginUserProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): UserOutput
     {
-        \assert($data instanceof LoginUserInput);
+        if (!$data instanceof LoginUserInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', LoginUserInput::class, get_debug_type($data)));
+        }
 
         $user = $this->authenticateUser->handle(new AuthenticateUserCommand(
             email: $data->email,
@@ -37,7 +39,9 @@ final readonly class LoginUserProcessor implements ProcessorInterface
         $securityUser = $this->entityManager
             ->getRepository(UserEntity::class)
             ->findOneBy(['email' => $user->getEmail()]);
-        \assert($securityUser instanceof UserEntity);
+        if (!$securityUser instanceof UserEntity) {
+            throw new \RuntimeException('Security user could not be reloaded after authentication.');
+        }
 
         $output = new UserOutput();
         $output->id = $user->getId()->toRfc4122();

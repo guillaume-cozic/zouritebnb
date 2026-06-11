@@ -46,7 +46,9 @@ final readonly class ConfirmReservationProcessor implements ProcessorInterface
         )));
 
         $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));
-        \assert(null !== $reservation);
+        if (null === $reservation) {
+            throw new \RuntimeException('Reservation could not be reloaded after the operation.');
+        }
 
         return ReservationOutput::fromEntity($reservation);
     }

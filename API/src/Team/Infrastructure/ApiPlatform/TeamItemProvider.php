@@ -35,7 +35,9 @@ final readonly class TeamItemProvider implements ProviderInterface
 
         $output = $this->entityProvider->provide($operation, $uriVariables, $context);
 
-        \assert(null === $output || $output instanceof FromEntityInterface);
+        if (null !== $output && !$output instanceof FromEntityInterface) {
+            throw new \LogicException(\sprintf('Expected "%s" or null from the entity provider, got "%s".', FromEntityInterface::class, get_debug_type($output)));
+        }
 
         return $output;
     }

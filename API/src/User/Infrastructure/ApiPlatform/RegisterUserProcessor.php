@@ -27,7 +27,9 @@ final readonly class RegisterUserProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): UserOutput
     {
-        \assert($data instanceof RegisterUserInput);
+        if (!$data instanceof RegisterUserInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', RegisterUserInput::class, get_debug_type($data)));
+        }
 
         $teamId = Uuid::v7();
 

@@ -87,7 +87,9 @@ class ConversationOutput implements FromEntityInterface
 
     public static function fromEntity(object $entity): static
     {
-        \assert($entity instanceof Conversation);
+        if (!$entity instanceof Conversation) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', Conversation::class, get_debug_type($entity)));
+        }
 
         $output = new static();
         $output->id = $entity->getId()->toString();

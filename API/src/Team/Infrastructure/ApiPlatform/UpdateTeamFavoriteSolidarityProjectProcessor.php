@@ -27,7 +27,9 @@ final readonly class UpdateTeamFavoriteSolidarityProjectProcessor implements Pro
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        \assert($data instanceof UpdateTeamFavoriteSolidarityProjectInput);
+        if (!$data instanceof UpdateTeamFavoriteSolidarityProjectInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', UpdateTeamFavoriteSolidarityProjectInput::class, get_debug_type($data)));
+        }
 
         $teamId = $this->currentUser->teamId();
 

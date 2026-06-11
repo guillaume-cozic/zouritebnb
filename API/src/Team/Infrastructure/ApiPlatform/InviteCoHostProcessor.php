@@ -30,7 +30,9 @@ final readonly class InviteCoHostProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeamInvitationOutput
     {
-        \assert($data instanceof InviteCoHostInput);
+        if (!$data instanceof InviteCoHostInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', InviteCoHostInput::class, get_debug_type($data)));
+        }
 
         $teamId = $this->currentUser->teamId();
 
@@ -49,7 +51,9 @@ final readonly class InviteCoHostProcessor implements ProcessorInterface
         )));
 
         $invitation = $this->repository->findById(Uuid::fromString($id));
-        \assert(null !== $invitation);
+        if (null === $invitation) {
+            throw new \RuntimeException('Invitation could not be reloaded after the operation.');
+        }
 
         return TeamInvitationOutput::fromDomain($invitation);
     }

@@ -23,7 +23,9 @@ final readonly class ReorderAccommodationPhotosProcessor implements ProcessorInt
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        \assert($data instanceof ReorderAccommodationPhotosInput);
+        if (!$data instanceof ReorderAccommodationPhotosInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', ReorderAccommodationPhotosInput::class, get_debug_type($data)));
+        }
 
         $accommodationId = Uuid::fromString($uriVariables['id']);
         $this->ownershipGuard->assertOwnedByCurrentUser($accommodationId);

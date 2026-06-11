@@ -28,7 +28,9 @@ final readonly class CreateAccommodationProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): AccommodationOutput
     {
-        \assert($data instanceof AccommodationInput);
+        if (!$data instanceof AccommodationInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', AccommodationInput::class, get_debug_type($data)));
+        }
 
         /** @var string $id */
         $id = $this->handler->execute(fn () => $this->createAccommodation->handle(new CreateAccommodationCommand(

@@ -26,7 +26,9 @@ final readonly class SubmitAccommodationReviewProcessor implements ProcessorInte
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        \assert($data instanceof SubmitAccommodationReviewInput);
+        if (!$data instanceof SubmitAccommodationReviewInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', SubmitAccommodationReviewInput::class, get_debug_type($data)));
+        }
 
         $this->handler->execute(fn () => $this->submitAccommodationReview->handle(new SubmitAccommodationReviewCommand(
             authorUserId: $this->currentUser->id(),

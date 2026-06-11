@@ -30,7 +30,9 @@ final readonly class SendMessageProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): MessageOutput
     {
-        \assert($data instanceof SendMessageInput);
+        if (!$data instanceof SendMessageInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', SendMessageInput::class, get_debug_type($data)));
+        }
 
         $conversationId = (string) $uriVariables['id'];
         $authorUserId = $this->currentUser->id()->toRfc4122();
@@ -43,7 +45,9 @@ final readonly class SendMessageProcessor implements ProcessorInterface
         )));
 
         $conversation = $this->repository->ofId(new ConversationId(Uuid::fromString($conversationId)));
-        \assert($conversation instanceof Conversation);
+        if (!$conversation instanceof Conversation) {
+            throw new \RuntimeException('Conversation could not be reloaded after the operation.');
+        }
 
         foreach ($conversation->getMessages() as $message) {
             if ($message->getId()->toString() === $messageId) {
