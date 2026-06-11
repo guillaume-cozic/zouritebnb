@@ -179,7 +179,9 @@ final readonly class <Action><Slice>Processor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        \assert($data instanceof <InputClass>);
+        if (!$data instanceof <InputClass>) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', <InputClass>::class, get_debug_type($data)));
+        }
 
         $this-><useCaseCamelCase>->handle(new <CommandName>(
             <field>: $data-><field>,
@@ -192,7 +194,7 @@ final readonly class <Action><Slice>Processor implements ProcessorInterface
 - `final readonly`, implements `ProcessorInterface`
 - `@implements` PHPDoc with concrete generic types
 - Constructor injects only the use case (single dependency)
-- `\assert()` for type narrowing of `$data`
+- Explicit `instanceof` guard throwing `\InvalidArgumentException` for type narrowing of `$data` — never `\assert()`, which is disabled in production (`zend.assertions=0`)
 - Maps Input properties to Command named arguments 1:1
 - For DELETE/PATCH/PUT: the entity `id` comes from `$uriVariables['id']`, not from the input
 
