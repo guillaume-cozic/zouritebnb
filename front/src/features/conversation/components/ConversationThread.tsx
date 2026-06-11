@@ -51,7 +51,7 @@ const UserBubble: React.FC<{
   return (
     <div className={`flex ${onRight ? 'justify-end' : 'justify-start'} mb-2`}>
       <div className={`flex flex-col ${onRight ? 'items-end' : 'items-start'} max-w-[80%] sm:max-w-md`}>
-        <span className={`text-[10px] uppercase tracking-wider font-bold mb-1 px-1 ${isHost ? 'text-emerald-700' : 'text-blue-700'}`}>
+        <span className={`text-[10px] uppercase tracking-wider font-bold mb-1 px-1 ${isHost ? 'text-emerald-700' : 'text-primary-700'}`}>
           {authorLabel}
           {mine && <span className="ml-1 normal-case text-gray-400 font-medium">· vous</span>}
         </span>
@@ -59,11 +59,11 @@ const UserBubble: React.FC<{
           className={`rounded-2xl px-4 py-2.5 text-sm whitespace-pre-line shadow-sm ${
             isHost
               ? 'bg-white border border-emerald-200 text-gray-800 rounded-bl-md'
-              : 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-md'
+              : 'bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-br-md'
           }`}
         >
           <div className="leading-relaxed">{message.body}</div>
-          <div className={`text-[10px] mt-1 ${isHost ? 'text-gray-400' : 'text-blue-100'}`}>
+          <div className={`text-[10px] mt-1 ${isHost ? 'text-gray-400' : 'text-primary-100'}`}>
             {formatTime(message.sentAt, locale)}
           </div>
         </div>
@@ -166,7 +166,7 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
               rows={1}
               maxLength={5000}
               placeholder={t('conversation.placeholder') as string}
-              className="flex-1 resize-none border border-gray-200 bg-gray-50 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 focus:bg-white max-h-32 transition-colors"
+              className="flex-1 resize-none border border-gray-200 bg-gray-50 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 focus:bg-white max-h-32 transition-colors"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -177,7 +177,7 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
             <button
               type="submit"
               disabled={!body.trim() || sendStatus === 'loading'}
-              className="rounded-full bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white h-10 w-10 flex items-center justify-center disabled:opacity-50 transition-all shadow-sm shadow-blue-200 disabled:shadow-none"
+              className="rounded-full bg-gradient-to-br from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white h-10 w-10 flex items-center justify-center disabled:opacity-50 transition-all shadow-sm shadow-primary-200 disabled:shadow-none"
               aria-label={t('conversation.send') as string}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

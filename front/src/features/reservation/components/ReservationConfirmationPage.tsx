@@ -172,7 +172,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 type="time"
                 value={checkInTime}
                 onChange={(e) => setCheckInTime(e.target.value)}
-                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
                 required
               />
             </div>
@@ -184,7 +184,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 type="time"
                 value={checkOutTime}
                 onChange={(e) => setCheckOutTime(e.target.value)}
-                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
                 required
               />
             </div>
@@ -203,7 +203,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               type="text"
               value={guestName}
               onChange={(e) => setGuestName(e.target.value)}
-              className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+              className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
               required
             />
           </div>
@@ -218,7 +218,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               rows={3}
               maxLength={2000}
               placeholder={t('request.notePlaceholder') as string}
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white resize-none transition-all"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white resize-none transition-all"
             />
           </div>
         </div>
@@ -237,7 +237,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
         </div>
 
-        <div className="mt-5 rounded-xl bg-blue-50 border border-blue-100 px-3 py-2.5 text-xs text-blue-800 flex items-start gap-2">
+        <div className="mt-5 rounded-xl bg-primary-50 border border-primary-100 px-3 py-2.5 text-xs text-primary-800 flex items-start gap-2">
           <svg
             className="flex-shrink-0 mt-0.5"
             width="14"
@@ -280,7 +280,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             !elements ||
             totalCents <= 0
           }
-          className="inline-flex items-center justify-center h-11 px-6 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-sm shadow-blue-200 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+          className="inline-flex items-center justify-center h-11 px-6 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-sm shadow-primary-200 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
         >
           {submitting ? t('request.submitting') : t('request.submit')}
         </button>
@@ -366,11 +366,11 @@ const ReservationConfirmationPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gradient-to-b from-blue-50/30 via-white to-white">
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gradient-to-b from-primary-50/30 via-white to-white">
       <div className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Link
           to={accommodation?.id ? `/accommodations/${accommodation.id}` : '/accommodations'}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-blue-700 mb-6"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-primary-700 mb-6"
         >
           <svg
             width="14"
@@ -388,8 +388,8 @@ const ReservationConfirmationPage: React.FC = () => {
         </Link>
 
         <header className="mb-8">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-700">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-500" />
             {t('confirm.eyebrow')}
           </div>
           <h1 className="mt-2 text-3xl font-bold text-gray-900 tracking-tight">

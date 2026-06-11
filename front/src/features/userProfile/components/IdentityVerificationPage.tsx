@@ -15,6 +15,7 @@ import {
 } from '../UserProfileSelectors';
 import { IdentityDocumentType } from '../UserProfileTypes';
 import VerificationBadge from './VerificationBadge';
+import { Button } from '../../../components/ui';
 
 const DOCUMENT_TYPES: IdentityDocumentType[] = ['passport', 'id_card', 'driving_license'];
 
@@ -24,7 +25,7 @@ const FileField: React.FC<{
   file: File | null;
   onSelect: (file: File | null) => void;
 }> = ({ label, hint, file, onSelect }) => (
-  <label className="flex flex-col gap-2 rounded-xl border border-dashed border-gray-300 p-4 cursor-pointer hover:border-blue-400 transition-colors">
+  <label className="flex flex-col gap-2 rounded-xl border border-dashed border-gray-300 p-4 cursor-pointer hover:border-primary-400 transition-colors">
     <span className="text-sm font-medium text-gray-900">{label}</span>
     <span className="text-xs text-gray-500">{file ? file.name : hint}</span>
     <input
@@ -107,7 +108,7 @@ const IdentityVerificationPage: React.FC = () => {
               value={documentType}
               onChange={(e) => setDocumentType(e.target.value as IdentityDocumentType)}
               disabled={submitting}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             >
               {DOCUMENT_TYPES.map((type) => (
                 <option key={type} value={type}>
@@ -134,7 +135,7 @@ const IdentityVerificationPage: React.FC = () => {
             <div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
                 <div
-                  className="h-full rounded-full bg-blue-600 transition-all"
+                  className="h-full rounded-full bg-primary-600 transition-all"
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
@@ -150,13 +151,9 @@ const IdentityVerificationPage: React.FC = () => {
             <p className="text-sm text-red-600">{error}</p>
           )}
 
-          <button
-            type="submit"
-            disabled={!canSubmit}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <Button type="submit" disabled={!canSubmit} className="w-full">
             {t('userProfile.verification.submit')}
-          </button>
+          </Button>
         </form>
       )}
     </div>

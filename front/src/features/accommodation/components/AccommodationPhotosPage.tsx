@@ -129,7 +129,7 @@ const AccommodationPhotosPage: React.FC = () => {
       <main className="min-h-screen py-8">
         <div className="max-w-7xl mx-auto px-4 text-center py-20">
           <p className="text-red-500 mb-4">{error || t('edit.notFound')}</p>
-          <Link to="/" className="text-blue-600 hover:underline">{t('detail.backToHome')}</Link>
+          <Link to="/" className="text-primary-600 hover:underline">{t('detail.backToHome')}</Link>
         </div>
       </main>
     );
@@ -175,8 +175,8 @@ const AccommodationPhotosPage: React.FC = () => {
             onClick={() => fileInputRef.current?.click()}
             className={`relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-10 cursor-pointer transition-all ${
               dragOverUpload
-                ? 'border-blue-400 bg-blue-50/50'
-                : 'border-gray-200 bg-gray-50/50 hover:border-blue-300 hover:bg-blue-50/30'
+                ? 'border-primary-400 bg-primary-50/50'
+                : 'border-gray-200 bg-gray-50/50 hover:border-primary-300 hover:bg-primary-50/30'
             }`}
           >
             <input
@@ -190,8 +190,8 @@ const AccommodationPhotosPage: React.FC = () => {
 
             {uploading ? (
               <>
-                <svg className="animate-spin mb-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 11-6.219-8.56" /></svg>
-                <p className="text-sm font-medium text-blue-600">{t('photos.uploading')}</p>
+                <svg className="animate-spin mb-3 text-primary-500" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 11-6.219-8.56" /></svg>
+                <p className="text-sm font-medium text-primary-600">{t('photos.uploading')}</p>
               </>
             ) : (
               <>
@@ -228,7 +228,7 @@ const AccommodationPhotosPage: React.FC = () => {
                   className={`relative group aspect-[3/2] rounded-xl overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing transition-all ${
                     dragIdx === idx ? 'opacity-40 scale-95' : ''
                   } ${
-                    dragOverIdx === idx ? 'ring-2 ring-blue-400 ring-offset-2' : ''
+                    dragOverIdx === idx ? 'ring-2 ring-primary-400 ring-offset-2' : ''
                   }`}
                 >
                   <img

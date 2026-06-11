@@ -27,7 +27,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
 
   return (
     <div className={`text-center ${wrapperClasses} ${className}`.trim()}>
-      <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4 text-blue-500">
+      <div className="mx-auto w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center mb-4 text-primary-500">
         {icon ?? <InboxIcon />}
       </div>
       <h3 className="text-base font-semibold text-gray-900">{title}</h3>

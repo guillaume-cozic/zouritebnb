@@ -83,7 +83,7 @@ function StepIndicator() {
                   ${isCompleted
                     ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-lg shadow-emerald-200'
                     : isCurrent
-                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200 scale-110'
+                    ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-200 scale-110'
                     : 'bg-gray-100 text-gray-400'
                   }
                 `}
@@ -99,7 +99,7 @@ function StepIndicator() {
               <span
                 className={`
                   mt-2.5 text-xs font-semibold tracking-wide uppercase transition-colors duration-300
-                  ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-emerald-600' : 'text-gray-400'}
+                  ${isCurrent ? 'text-primary-600' : isCompleted ? 'text-emerald-600' : 'text-gray-400'}
                 `}
               >
                 {t(step.labelKey)}

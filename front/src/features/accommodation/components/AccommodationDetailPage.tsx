@@ -145,7 +145,7 @@ const AccommodationDetailPage: React.FC = () => {
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400"><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg>
           </div>
           <p className="text-red-500 mb-4">{error}</p>
-          <Link to="/" className="text-blue-600 hover:underline">{t('detail.backToHome')}</Link>
+          <Link to="/" className="text-primary-600 hover:underline">{t('detail.backToHome')}</Link>
         </div>
       </main>
     );
@@ -222,7 +222,7 @@ const AccommodationDetailPage: React.FC = () => {
                 <div className="space-y-3">
                   <button
                     onClick={() => setLightboxIndex(0)}
-                    className="block w-full aspect-[2/1] rounded-2xl overflow-hidden bg-gray-100 group focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full aspect-[2/1] rounded-2xl overflow-hidden bg-gray-100 group focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <img
                       src={photos[0]}
@@ -236,7 +236,7 @@ const AccommodationDetailPage: React.FC = () => {
                         <button
                           key={src}
                           onClick={() => setLightboxIndex(idx + 1)}
-                          className="aspect-square rounded-xl overflow-hidden bg-gray-100 group focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="aspect-square rounded-xl overflow-hidden bg-gray-100 group focus:outline-none focus:ring-2 focus:ring-primary-500"
                         >
                           <img
                             src={src}
@@ -315,7 +315,7 @@ const AccommodationDetailPage: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   {accommodation.amenities.map((code) => (
                     <div key={code} className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-blue-600" />
+                      <div className="w-2 h-2 rounded-full bg-primary-600" />
                       <span>{t(`amenities.${code}`, code)}</span>
                     </div>
                   ))}
@@ -351,12 +351,12 @@ const AccommodationDetailPage: React.FC = () => {
 
             {/* Host's featured / supported solidarity project */}
             {highlightedProject && (
-              <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6 mb-8">
+              <div className="rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-6 mb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-rose-500">
                     <path d="M19.5 12.572l-7.5 7.428l-7.5-7.428a5 5 0 1 1 7.5-6.566a5 5 0 1 1 7.5 6.572" />
                   </svg>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-blue-700">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary-700">
                     {favoriteProject ? t('detail.favoriteProjectBadge') : t('detail.defaultProjectBadge')}
                   </p>
                 </div>
@@ -373,7 +373,7 @@ const AccommodationDetailPage: React.FC = () => {
                     <p className="text-gray-600 text-sm line-clamp-3 mb-3">{highlightedProject.description}</p>
                     <Link
                       to={`/solidarity-projects/${highlightedProject.id}`}
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-700 hover:text-blue-800"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-800"
                     >
                       {t('detail.favoriteProjectDiscover')}
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -410,7 +410,7 @@ const AccommodationDetailPage: React.FC = () => {
                     monthsShown={2}
                     placeholderText={t('detail.selectDates')}
                     dateFormat="dd/MM/yyyy"
-                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
                     isClearable
                   />
                 </div>
@@ -431,7 +431,7 @@ const AccommodationDetailPage: React.FC = () => {
                         onClick={() => dispatch(setFilters({ guests: Math.max(1, guests - 1) }))}
                         disabled={guests <= 1}
                         aria-label="decrement guests"
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M5 12h14" />
@@ -448,7 +448,7 @@ const AccommodationDetailPage: React.FC = () => {
                         }}
                         disabled={!!(accommodation.maxGuests && guests >= accommodation.maxGuests)}
                         aria-label="increment guests"
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M12 5v14" />
@@ -465,7 +465,7 @@ const AccommodationDetailPage: React.FC = () => {
                   <select
                     value={selectedProjectId}
                     onChange={(e) => setSelectedProjectId(e.target.value)}
-                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
                   >
                     <option value="">{t('detail.solidarityProjectPlaceholder')}</option>
                     {activeProjects.map((p) => (
@@ -476,7 +476,7 @@ const AccommodationDetailPage: React.FC = () => {
                     const selected = activeProjects.find((p) => p.id === selectedProjectId);
                     if (!selected) return null;
                     return (
-                      <div className="mt-3 rounded-xl bg-blue-50/60 border border-blue-100 p-3">
+                      <div className="mt-3 rounded-xl bg-primary-50/60 border border-primary-100 p-3">
                         <div className="flex gap-3">
                           {selected.imageUrl && (
                             <img
@@ -493,7 +493,7 @@ const AccommodationDetailPage: React.FC = () => {
                             </p>
                             <Link
                               to={`/solidarity-projects/${selected.id}`}
-                              className="inline-flex items-center gap-1 mt-1.5 text-xs font-medium text-blue-700 hover:text-blue-800"
+                              className="inline-flex items-center gap-1 mt-1.5 text-xs font-medium text-primary-700 hover:text-primary-800"
                             >
                               {t('detail.solidarityProjectLearnMore')}
                               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -554,7 +554,7 @@ const AccommodationDetailPage: React.FC = () => {
                     }
                     navigate(target);
                   }}
-                  className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700"
+                  className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:from-primary-600 disabled:hover:to-primary-700"
                 >
                   {t('detail.reserve')}
                 </button>

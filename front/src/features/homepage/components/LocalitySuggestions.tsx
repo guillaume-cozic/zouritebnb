@@ -43,7 +43,7 @@ const LocalitySuggestions: React.FC<Props> = ({ value, open, onSelect }) => {
               e.preventDefault();
               onSelect(loc.name);
             }}
-            className="w-full text-left px-3.5 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors flex items-center gap-2"
+            className="w-full text-left px-3.5 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors flex items-center gap-2"
           >
             <svg
               width="14"

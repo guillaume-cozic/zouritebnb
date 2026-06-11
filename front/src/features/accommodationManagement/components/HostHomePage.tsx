@@ -123,7 +123,7 @@ const StayCard: React.FC<StayCardProps> = ({
   }
 
   return (
-    <article className="group bg-white rounded-3xl border border-gray-100 px-6 sm:px-10 py-10 sm:py-12 text-center hover:border-blue-200 hover:shadow-md hover:-translate-y-0.5 transition-all">
+    <article className="group bg-white rounded-3xl border border-gray-100 px-6 sm:px-10 py-10 sm:py-12 text-center hover:border-primary-200 hover:shadow-md hover:-translate-y-0.5 transition-all">
       <p className="text-sm text-gray-500">{dateRange}</p>
 
       <div className="my-7 sm:my-8 flex justify-center">
@@ -161,13 +161,13 @@ const StayCard: React.FC<StayCardProps> = ({
         {highlight && (
           <>
             <span className="text-gray-300">•</span>
-            <span className="font-medium text-blue-700">{highlight}</span>
+            <span className="font-medium text-primary-700">{highlight}</span>
           </>
         )}
         <span className="text-gray-300">•</span>
         <Link
           to={`/admin/accommodations/${reservation.accommodationId}/calendar`}
-          className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-0.5"
+          className="text-primary-600 hover:text-primary-700 font-medium inline-flex items-center gap-0.5"
         >
           {t('hostHome.viewCalendar')}
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -246,8 +246,8 @@ const HostHomePage: React.FC = () => {
     <div className="min-h-full">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
         <header className="mb-10 text-center relative">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-700">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-500" />
             {todayLabel}
           </div>
           <h1 className="mt-3 text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
@@ -274,7 +274,7 @@ const HostHomePage: React.FC = () => {
                 {tb.count > 0 && (
                   <span
                     className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-semibold ${
-                      tab === tb.key ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-700'
+                      tab === tb.key ? 'bg-white/20 text-white' : 'bg-primary-50 text-primary-700'
                     }`}
                   >
                     {tb.count}
@@ -293,8 +293,8 @@ const HostHomePage: React.FC = () => {
           </div>
         ) : list.length === 0 ? (
           <div className="rounded-3xl bg-white border border-dashed border-gray-200 px-6 py-20 text-center">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
-              <svg className="text-blue-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center mb-4">
+              <svg className="text-primary-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z" />
               </svg>
             </div>

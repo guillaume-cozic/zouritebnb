@@ -47,7 +47,7 @@ function AmenitiesStep() {
         <p className="text-sm text-gray-500">
           {t('amenitiesStep.intro')}
         </p>
-        <span className="text-sm font-semibold text-blue-600 whitespace-nowrap ml-4">
+        <span className="text-sm font-semibold text-primary-600 whitespace-nowrap ml-4">
           {t('amenitiesStep.selected', { count: selectedCodes.size })}
         </span>
       </div>
@@ -56,7 +56,7 @@ function AmenitiesStep() {
         {AMENITY_CATEGORIES.map((category) => (
           <div key={category.key}>
             <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-primary-400" />
               {t('amenityCategories.' + category.key)}
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -72,8 +72,8 @@ function AmenitiesStep() {
                       transition-all duration-200 border
                       ${
                         isSelected
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-transparent shadow-md shadow-blue-200'
-                          : 'bg-gray-100 text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                          ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white border-transparent shadow-md shadow-primary-200'
+                          : 'bg-gray-100 text-gray-700 border-gray-200 hover:border-primary-300 hover:bg-primary-50'
                       }
                     `}
                   >

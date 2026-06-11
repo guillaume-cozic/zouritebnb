@@ -70,7 +70,7 @@ const AccommodationReviews: React.FC<Props> = ({ reviews }) => {
         {reviews.map((review) => (
           <article key={review.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <header className="flex items-center gap-3 mb-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-semibold text-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-primary-700 font-semibold text-sm">
                 {initials(review.authorName)}
               </div>
               <div>

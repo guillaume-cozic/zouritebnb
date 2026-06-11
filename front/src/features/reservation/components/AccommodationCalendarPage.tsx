@@ -178,7 +178,7 @@ const AccommodationCalendarPage: React.FC = () => {
       <div className="mb-4">
         <Link
           to="/admin/calendar"
-          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 mb-2"
+          className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 mb-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

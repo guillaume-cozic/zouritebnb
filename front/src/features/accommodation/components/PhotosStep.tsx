@@ -125,15 +125,15 @@ function PhotosStep() {
           relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer
           transition-all duration-300
           ${isDragging
-            ? 'border-blue-400 bg-blue-50 scale-[1.02]'
-            : 'border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50/50'
+            ? 'border-primary-400 bg-primary-50 scale-[1.02]'
+            : 'border-gray-200 bg-gray-50 hover:border-primary-300 hover:bg-primary-50/50'
           }
         `}
       >
         <div className="flex flex-col items-center gap-3">
           <div className={`
             w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300
-            ${isDragging ? 'bg-blue-200 text-blue-600' : 'bg-gray-200 text-gray-400'}
+            ${isDragging ? 'bg-primary-200 text-primary-600' : 'bg-gray-200 text-gray-400'}
           `}>
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
@@ -166,7 +166,7 @@ function PhotosStep() {
             <h4 className="text-sm font-semibold text-gray-700">
               {t('photosStep.photosTitle')}
             </h4>
-            <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-medium text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full">
               {successCount} / 20
             </span>
           </div>
@@ -194,7 +194,7 @@ function PhotosStep() {
                     {/* Progress bar */}
                     <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/20">
                       <div
-                        className="h-full bg-blue-400 transition-all duration-300 ease-out"
+                        className="h-full bg-primary-400 transition-all duration-300 ease-out"
                         style={{ width: `${photo.progress}%` }}
                       />
                     </div>

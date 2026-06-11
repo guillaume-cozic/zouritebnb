@@ -66,7 +66,7 @@ const SolidarityProjectsSection: React.FC = () => {
             <div className="mt-10 text-center">
               <Link
                 to="/solidarity-projects"
-                className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-11 px-6 transition-all hover:shadow-md hover:shadow-blue-200"
+                className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 h-11 px-6 transition-all hover:shadow-md hover:shadow-primary-200"
               >
                 {t('projects.viewAll')}
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

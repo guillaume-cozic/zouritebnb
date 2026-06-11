@@ -28,6 +28,7 @@ import { Reservation } from '../ReservationTypes';
 import { Link } from 'react-router-dom';
 import EmptyState, { HomeIcon } from '../../../components/EmptyState';
 import { colorForStatus } from './CalendarEventColor';
+import { Button } from '../../../components/ui';
 
 moment.locale('fr');
 dayjs.locale('fr');
@@ -179,11 +180,9 @@ const AllAccommodationsCalendarPage: React.FC = () => {
     if (r) setSelectedReservation(r);
   };
 
-  const btnPrimary =
-    'px-3 py-1.5 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700';
   const segBase =
     'px-3 py-1.5 text-sm border border-gray-200 first:rounded-l-lg last:rounded-r-lg';
-  const segActive = 'bg-blue-600 text-white border-blue-600';
+  const segActive = 'bg-primary-600 text-white border-primary-600';
   const segIdle = 'bg-white text-gray-700 hover:bg-gray-50';
 
   return (
@@ -203,15 +202,15 @@ const AllAccommodationsCalendarPage: React.FC = () => {
       <div className="bg-white rounded-xl border border-gray-100 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4 p-3 border border-gray-200 rounded-xl bg-white">
           <div className="flex items-center gap-2">
-            <button type="button" className={btnPrimary} onClick={handleToday}>
+            <Button size="sm" onClick={handleToday}>
               {t('calendar.today')}
-            </button>
-            <button type="button" className={btnPrimary} onClick={handlePrev}>
+            </Button>
+            <Button size="sm" onClick={handlePrev}>
               {t('calendar.prev')}
-            </button>
-            <button type="button" className={btnPrimary} onClick={handleNext}>
+            </Button>
+            <Button size="sm" onClick={handleNext}>
               {t('calendar.next')}
-            </button>
+            </Button>
             <span className="ml-3 text-sm font-medium text-gray-700">{title}</span>
           </div>
           <div className="flex items-center gap-3">
@@ -239,7 +238,7 @@ const AllAccommodationsCalendarPage: React.FC = () => {
                 id="accommodation-filter"
                 value={accommodationFilter}
                 onChange={(e) => setAccommodationFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="all">{t('calendar.filter.all')}</option>
                 {accommodations.map((a) => (
@@ -304,7 +303,7 @@ const AllAccommodationsCalendarPage: React.FC = () => {
             description={t('calendar.empty.description')}
             action={
               <Link to="/create">
-                <button className="inline-flex items-center gap-2 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-10 px-5 shadow-sm shadow-blue-200 transition-all">
+                <button className="inline-flex items-center gap-2 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 h-10 px-5 shadow-sm shadow-primary-200 transition-all">
                   {t('navbar.createAccommodation')}
                 </button>
               </Link>

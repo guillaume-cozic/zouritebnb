@@ -81,7 +81,7 @@ const ReadingProgressBar: React.FC<{ value: number }> = ({ value }) => (
     aria-hidden="true"
   >
     <div
-      className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 transition-[width] duration-150 ease-out shadow-sm shadow-blue-500/30"
+      className="h-full bg-gradient-to-r from-primary-500 via-primary-600 to-indigo-600 transition-[width] duration-150 ease-out shadow-sm shadow-primary-500/30"
       style={{ width: `${value * 100}%` }}
     />
   </div>
@@ -122,7 +122,7 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({
     ? 'flex flex-col items-center gap-2'
     : 'flex items-center gap-2';
   const button =
-    'inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 bg-white border border-gray-200 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all';
+    'inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 bg-white border border-gray-200 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all';
 
   return (
     <div className={wrapper}>
@@ -227,7 +227,7 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
   return (
     <article>
       {/* Hero */}
-      <header className="relative h-[460px] sm:h-[560px] overflow-hidden bg-gradient-to-br from-blue-100 to-blue-200">
+      <header className="relative h-[460px] sm:h-[560px] overflow-hidden bg-gradient-to-br from-primary-100 to-primary-200">
         {project.imageUrl ? (
           <>
             <img
@@ -247,7 +247,7 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
               fill="none"
               stroke="currentColor"
               strokeWidth="1.2"
-              className="text-blue-300"
+              className="text-primary-300"
             >
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
@@ -388,14 +388,14 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
           </div>
 
           {/* CTA footer */}
-          <div className="relative px-6 sm:px-12 lg:px-16 py-10 bg-gradient-to-br from-blue-50 via-white to-indigo-50 border-t border-gray-100 overflow-hidden">
+          <div className="relative px-6 sm:px-12 lg:px-16 py-10 bg-gradient-to-br from-primary-50 via-white to-indigo-50 border-t border-gray-100 overflow-hidden">
             <div
-              className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-blue-100/60 blur-3xl"
+              className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-primary-100/60 blur-3xl"
               aria-hidden="true"
             />
             <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
               <div className="flex items-start gap-4">
-                <span className="flex-shrink-0 w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200">
+                <span className="flex-shrink-0 w-12 h-12 rounded-2xl bg-primary-600 text-white flex items-center justify-center shadow-lg shadow-primary-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="22"
@@ -415,7 +415,7 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
                   </p>
                 </div>
               </div>
-              <button className="inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-12 px-7 transition-all hover:shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5">
+              <button className="inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 h-12 px-7 transition-all hover:shadow-lg hover:shadow-primary-200 hover:-translate-y-0.5">
                 {t('projects.cta.button')}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -450,7 +450,7 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
               </div>
               <Link
                 to="/solidarity-projects"
-                className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap"
+                className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors whitespace-nowrap"
               >
                 {t('projects.viewAll')}
                 <svg

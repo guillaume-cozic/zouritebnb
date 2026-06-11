@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
             />
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link to="/solidarity-projects" className="hover:text-blue-600 transition-colors">
+            <Link to="/solidarity-projects" className="hover:text-primary-600 transition-colors">
               {t('projects.title')}
             </Link>
           </nav>
@@ -82,7 +82,7 @@ const Navbar: React.FC = () => {
           {/* Create button (host mode only) */}
           {isHostMode && (
             <Link to="/create">
-              <button className="justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md px-3 flex items-center gap-2">
+              <button className="justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md px-3 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                   <path d="M5 12h14" />
                   <path d="M12 5v14" />
@@ -96,7 +96,7 @@ const Navbar: React.FC = () => {
           {user && (
             <Link
               to={isHostMode ? '/account' : '/admin'}
-              className="hidden sm:inline-flex items-center gap-2 h-9 rounded-full px-4 text-sm font-semibold border transition-colors bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+              className="hidden sm:inline-flex items-center gap-2 h-9 rounded-full px-4 text-sm font-semibold border transition-colors bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100"
               title={isHostMode ? t('navbar.switchToTraveler') as string : t('navbar.switchToHost') as string}
             >
               {isHostMode ? (
@@ -123,7 +123,7 @@ const Navbar: React.FC = () => {
                 onClick={() => setMenuOpen((v) => !v)}
                 className="relative flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md pl-1.5 pr-3 text-sm font-medium"
               >
-                <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
+                <span className="w-6 h-6 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-semibold">
                   {initial}
                 </span>
                 <span className="max-w-[120px] truncate">{displayName}</span>
@@ -231,14 +231,14 @@ const Navbar: React.FC = () => {
               <Link to="/login" className="border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md px-3 text-sm font-medium inline-flex items-center">
                 {t('auth.login')}
               </Link>
-              <Link to="/register" className="text-white bg-blue-600 hover:bg-blue-700 h-9 rounded-md px-3 text-sm font-medium inline-flex items-center">
+              <Link to="/register" className="text-white bg-primary-600 hover:bg-primary-700 h-9 rounded-md px-3 text-sm font-medium inline-flex items-center">
                 {t('auth.register')}
               </Link>
             </div>
           )}
 
           {/* Mobile menu */}
-          <button className="inline-flex items-center justify-center rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 h-10 px-5 py-3 md:hidden">
+          <button className="inline-flex items-center justify-center rounded-md text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 h-10 px-5 py-3 md:hidden">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
               <path d="M4 5h16" />
               <path d="M4 12h16" />

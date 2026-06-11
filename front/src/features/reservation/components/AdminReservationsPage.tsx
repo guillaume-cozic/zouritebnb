@@ -114,12 +114,12 @@ const AdminReservationsPage: React.FC = () => {
               onClick={() => setStatusFilter(f.key)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full border transition-colors ${
                 active
-                  ? 'bg-blue-600 border-blue-600 text-white'
+                  ? 'bg-primary-600 border-primary-600 text-white'
                   : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
               {t(f.labelKey)}
-              <span className={`text-xs ${active ? 'text-blue-100' : 'text-gray-400'}`}>{count}</span>
+              <span className={`text-xs ${active ? 'text-primary-100' : 'text-gray-400'}`}>{count}</span>
             </button>
           );
         })}
@@ -183,7 +183,7 @@ const AdminReservationsPage: React.FC = () => {
                       </div>
                     )}
                     {conversationId && (
-                      <div className="text-xs text-blue-600 mt-0.5">{t('admin.reservations.openConversation')} →</div>
+                      <div className="text-xs text-primary-600 mt-0.5">{t('admin.reservations.openConversation')} →</div>
                     )}
                   </div>
                 </div>

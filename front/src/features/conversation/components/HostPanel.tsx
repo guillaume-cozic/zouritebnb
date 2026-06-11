@@ -35,7 +35,7 @@ const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, b
 
   return (
     <aside className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100 bg-gradient-to-br from-blue-50/60 via-white to-white">
+      <div className="px-5 py-4 border-b border-gray-100 bg-gradient-to-br from-primary-50/60 via-white to-white">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-sm font-semibold text-gray-900">{t('host.panel.title')}</h2>
           <span
@@ -109,7 +109,7 @@ const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, b
       <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/50">
         <Link
           to={`/accommodations/${reservation.accommodationId}`}
-          className="flex items-center justify-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700"
+          className="flex items-center justify-center gap-1.5 text-xs font-medium text-primary-600 hover:text-primary-700"
         >
           {t('conversation.viewAccommodation')}
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

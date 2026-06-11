@@ -135,7 +135,7 @@ const AdminConversationsPage: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t('admin.conversations.searchPlaceholder') as string}
-              className="w-full pl-9 pr-3 h-9 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 focus:bg-white transition-colors"
+              className="w-full pl-9 pr-3 h-9 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 focus:bg-white transition-colors"
             />
           </div>
           <div className="mt-2 flex items-center justify-between">
@@ -207,8 +207,8 @@ const AdminConversationsPage: React.FC = () => {
         {!id && (
           <div className="flex-1 flex items-center justify-center bg-gray-50/40">
             <div className="text-center max-w-sm px-6">
-              <div className="mx-auto w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
-                <svg className="text-blue-500" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <div className="mx-auto w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center mb-4">
+                <svg className="text-primary-500" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
               </div>

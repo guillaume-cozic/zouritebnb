@@ -60,7 +60,7 @@ const ConversationDetailPage: React.FC = () => {
         <div className="max-w-3xl mx-auto">
           <Link
             to="/conversations"
-            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-600 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-primary-600 transition-colors"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="m15 18-6-6 6-6" />
@@ -73,7 +73,7 @@ const ConversationDetailPage: React.FC = () => {
               {conversation && (
                 <Link
                   to={`/accommodations/${conversation.accommodationId}`}
-                  className="text-xs text-blue-600 hover:text-blue-700"
+                  className="text-xs text-primary-600 hover:text-primary-700"
                 >
                   {t('conversation.viewAccommodation')}
                 </Link>

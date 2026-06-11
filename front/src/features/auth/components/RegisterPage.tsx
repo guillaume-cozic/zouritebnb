@@ -29,14 +29,14 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gradient-to-b from-blue-50/40 via-white to-white">
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gradient-to-b from-primary-50/40 via-white to-white">
       <div className="flex-1 flex items-center justify-center px-4 py-16 relative overflow-hidden">
-        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-blue-200/30 blur-3xl" aria-hidden="true" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-blue-100/40 blur-3xl" aria-hidden="true" />
+        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary-200/30 blur-3xl" aria-hidden="true" />
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-primary-100/40 blur-3xl" aria-hidden="true" />
 
         <div className="w-full max-w-md relative">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg shadow-blue-200 mb-5">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg shadow-primary-200 mb-5">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z" />
               </svg>
@@ -62,7 +62,7 @@ const RegisterPage: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="w-full h-12 pl-10 pr-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-colors"
+                  className="w-full h-12 pl-10 pr-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-colors"
                 />
               </div>
             </div>
@@ -81,7 +81,7 @@ const RegisterPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="new-password"
-                  className="w-full h-12 pl-10 pr-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-colors"
+                  className="w-full h-12 pl-10 pr-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-colors"
                 />
               </div>
               <p className="text-xs text-gray-400 mt-1.5">{t('auth.passwordHint')}</p>
@@ -94,13 +94,13 @@ const RegisterPage: React.FC = () => {
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="w-full inline-flex items-center justify-center h-12 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-sm shadow-blue-200 disabled:opacity-60 transition-all"
+              className="w-full inline-flex items-center justify-center h-12 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-sm shadow-primary-200 disabled:opacity-60 transition-all"
             >
               {status === 'loading' ? t('auth.loading') : t('auth.register')}
             </button>
             <p className="text-sm text-center text-gray-500 pt-1">
               {t('auth.hasAccount')}{' '}
-              <Link to="/login" className="text-blue-700 font-medium hover:underline">{t('auth.login')}</Link>
+              <Link to="/login" className="text-primary-700 font-medium hover:underline">{t('auth.login')}</Link>
             </p>
           </form>
         </div>

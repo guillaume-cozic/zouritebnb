@@ -138,7 +138,7 @@ const HeroSection: React.FC = () => {
                     onFocus={() => setCityOpen(true)}
                     onBlur={() => setCityOpen(false)}
                     autoComplete="off"
-                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
                   />
                   <LocalitySuggestions
                     value={filters.city}
@@ -174,7 +174,7 @@ const HeroSection: React.FC = () => {
                     placeholderText={t('hero.selectDates')}
                     value={dateLabel}
                     dateFormat="dd/MM/yyyy"
-                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
                     isClearable
                   />
                 </div>
@@ -201,7 +201,7 @@ const HeroSection: React.FC = () => {
                       }}
                       disabled={!filters.guests || filters.guests <= 1}
                       aria-label="decrement guests"
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M5 12h14" />
@@ -217,7 +217,7 @@ const HeroSection: React.FC = () => {
                         dispatch(setFilters({ guests: current + 1 }));
                       }}
                       aria-label="increment guests"
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 5v14" />
@@ -235,7 +235,7 @@ const HeroSection: React.FC = () => {
                 type="button"
                 onClick={() => setAdvancedOpen((v) => !v)}
                 aria-expanded={advancedOpen}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-blue-700 hover:text-blue-800 transition-colors"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors"
               >
                 <svg
                   width="14"
@@ -252,7 +252,7 @@ const HeroSection: React.FC = () => {
                 </svg>
                 {t('listing.advanced.toggle')}
                 {advancedCount > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700">
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold bg-primary-100 text-primary-700">
                     {advancedCount}
                   </span>
                 )}
@@ -276,7 +276,7 @@ const HeroSection: React.FC = () => {
                             dispatch(setFilters({ priceMin: e.target.value ? Number(e.target.value) : null }))
                           }
                           placeholder={t('listing.advanced.priceMin') as string}
-                          className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                          className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
                         />
                       </div>
                       <span className="text-gray-300">—</span>
@@ -291,7 +291,7 @@ const HeroSection: React.FC = () => {
                             dispatch(setFilters({ priceMax: e.target.value ? Number(e.target.value) : null }))
                           }
                           placeholder={t('listing.advanced.priceMax') as string}
-                          className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 focus:bg-white transition-all"
+                          className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
                         />
                       </div>
                     </div>
@@ -316,8 +316,8 @@ const HeroSection: React.FC = () => {
                             }}
                             className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                               active
-                                ? 'bg-blue-600 text-white border-blue-600'
-                                : 'bg-white text-gray-700 border-gray-200 hover:border-blue-400'
+                                ? 'bg-primary-600 text-white border-primary-600'
+                                : 'bg-white text-gray-700 border-gray-200 hover:border-primary-400'
                             }`}
                           >
                             {t(`amenities.${code}`, code)}
@@ -333,7 +333,7 @@ const HeroSection: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/accommodations')}
-              className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+              className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                 <circle cx="11" cy="11" r="8" />

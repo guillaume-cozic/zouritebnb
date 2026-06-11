@@ -62,7 +62,7 @@ function DescriptionStep() {
             {...register('title')}
             placeholder={t('descriptionStep.titlePlaceholder')}
             className={`block w-full rounded-xl border-0 bg-gray-50 px-4 py-3.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 transition-all duration-200 outline-none ${
-              errors.title ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+              errors.title ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-primary-500'
             }`}
           />
           {errors.title && (
@@ -80,17 +80,17 @@ function DescriptionStep() {
             {...register('description')}
             placeholder={t('descriptionStep.descriptionPlaceholder')}
             className={`block w-full rounded-xl border-0 bg-gray-50 px-4 py-3.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 transition-all duration-200 resize-none outline-none ${
-              errors.description ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+              errors.description ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-primary-500'
             }`}
           />
           {errors.description && (
             <p className="mt-1.5 text-sm text-red-600">{errors.description.message}</p>
           )}
-          <div className="mt-2 flex items-start gap-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5">
-            <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <div className="mt-2 flex items-start gap-2 rounded-lg bg-primary-50 border border-primary-100 px-3 py-2.5">
+            <svg className="w-4 h-4 text-primary-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
             </svg>
-            <p className="text-xs text-blue-700">
+            <p className="text-xs text-primary-700">
               {t('descriptionStep.descriptionHint')}
             </p>
           </div>
@@ -108,7 +108,7 @@ function DescriptionStep() {
               {...register('price', { valueAsNumber: true })}
               placeholder="0.00"
               className={`block w-full rounded-xl border-0 bg-gray-50 pl-4 pr-20 py-3.5 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:bg-white focus:ring-2 transition-all duration-200 outline-none ${
-                errors.price ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+                errors.price ? 'ring-red-300 focus:ring-red-500' : 'ring-gray-200 focus:ring-primary-500'
               }`}
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
@@ -118,11 +118,11 @@ function DescriptionStep() {
           {errors.price && (
             <p className="mt-1.5 text-sm text-red-600">{errors.price.message}</p>
           )}
-          <div className="mt-2 flex items-start gap-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5">
-            <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <div className="mt-2 flex items-start gap-2 rounded-lg bg-primary-50 border border-primary-100 px-3 py-2.5">
+            <svg className="w-4 h-4 text-primary-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
             </svg>
-            <p className="text-xs text-blue-700">
+            <p className="text-xs text-primary-700">
               {t('descriptionStep.priceHint')}
             </p>
           </div>

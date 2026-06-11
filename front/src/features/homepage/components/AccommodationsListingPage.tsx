@@ -23,13 +23,13 @@ interface ChipProps {
 }
 
 const Chip: React.FC<ChipProps> = ({ label, onRemove }) => (
-  <span className="inline-flex items-center gap-1.5 h-8 pl-3 pr-1 rounded-full bg-blue-50 border border-blue-200 text-sm font-medium text-blue-800">
+  <span className="inline-flex items-center gap-1.5 h-8 pl-3 pr-1 rounded-full bg-primary-50 border border-primary-200 text-sm font-medium text-primary-800">
     {label}
     <button
       type="button"
       onClick={onRemove}
       aria-label="remove"
-      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-blue-700 hover:bg-blue-100 transition-colors"
+      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-primary-700 hover:bg-primary-100 transition-colors"
     >
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M18 6 6 18" />
@@ -130,7 +130,7 @@ const AccommodationsListingPage: React.FC = () => {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_auto] divide-y md:divide-y-0 md:divide-x divide-gray-100">
             <label className="group relative flex items-center gap-3 px-5 py-3 cursor-text">
-              <svg className="text-gray-400 group-focus-within:text-blue-500 transition-colors flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="text-gray-400 group-focus-within:text-primary-500 transition-colors flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
@@ -181,7 +181,7 @@ const AccommodationsListingPage: React.FC = () => {
                   }}
                   disabled={!filters.guests || filters.guests <= 1}
                   aria-label="decrement guests"
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 text-gray-700 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12h14" />
@@ -197,7 +197,7 @@ const AccommodationsListingPage: React.FC = () => {
                     dispatch(setFilters({ guests: current + 1 }));
                   }}
                   aria-label="increment guests"
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 text-gray-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 text-gray-700 hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 5v14" />
@@ -214,7 +214,7 @@ const AccommodationsListingPage: React.FC = () => {
                 aria-expanded={advancedOpen}
                 className={`inline-flex items-center gap-2 h-11 px-4 rounded-xl text-sm font-semibold transition-colors ${
                   advancedOpen || advancedCount > 0
-                    ? 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                    ? 'bg-primary-50 text-primary-700 hover:bg-primary-100'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -231,7 +231,7 @@ const AccommodationsListingPage: React.FC = () => {
                 </svg>
                 <span className="hidden sm:inline">{t('listing.advanced.toggle')}</span>
                 {advancedCount > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold bg-blue-600 text-white">
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold bg-primary-600 text-white">
                     {advancedCount}
                   </span>
                 )}
@@ -240,7 +240,7 @@ const AccommodationsListingPage: React.FC = () => {
           </div>
 
           {advancedOpen && (
-            <div className="border-t border-gray-100 bg-gradient-to-b from-blue-50/40 to-white px-5 sm:px-6 py-5 space-y-5">
+            <div className="border-t border-gray-100 bg-gradient-to-b from-primary-50/40 to-white px-5 sm:px-6 py-5 space-y-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-gray-600 mb-3">
                   {t('listing.advanced.priceRange')}
@@ -257,7 +257,7 @@ const AccommodationsListingPage: React.FC = () => {
                         dispatch(setFilters({ priceMin: e.target.value ? Number(e.target.value) : null }))
                       }
                       placeholder={t('listing.advanced.priceMin') as string}
-                      className="w-full h-11 rounded-xl border border-gray-200 bg-white pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                      className="w-full h-11 rounded-xl border border-gray-200 bg-white pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-all"
                     />
                   </div>
                   <span className="text-gray-300 font-medium">—</span>
@@ -272,7 +272,7 @@ const AccommodationsListingPage: React.FC = () => {
                         dispatch(setFilters({ priceMax: e.target.value ? Number(e.target.value) : null }))
                       }
                       placeholder={t('listing.advanced.priceMax') as string}
-                      className="w-full h-11 rounded-xl border border-gray-200 bg-white pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                      className="w-full h-11 rounded-xl border border-gray-200 bg-white pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-all"
                     />
                   </div>
                 </div>
@@ -292,8 +292,8 @@ const AccommodationsListingPage: React.FC = () => {
                         onClick={() => toggleAmenity(code)}
                         className={`px-3.5 py-2 rounded-full text-xs font-medium border transition-all ${
                           active
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-200'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-blue-400 hover:bg-blue-50/40'
+                            ? 'bg-primary-600 text-white border-primary-600 shadow-sm shadow-primary-200'
+                            : 'bg-white text-gray-700 border-gray-200 hover:border-primary-400 hover:bg-primary-50/40'
                         }`}
                       >
                         {t(`amenities.${code}`, code)}
@@ -336,7 +336,7 @@ const AccommodationsListingPage: React.FC = () => {
             <button
               type="button"
               onClick={resetAll}
-              className="ml-1 text-xs font-semibold text-gray-500 hover:text-blue-700 underline underline-offset-2 transition-colors"
+              className="ml-1 text-xs font-semibold text-gray-500 hover:text-primary-700 underline underline-offset-2 transition-colors"
             >
               {t('listing.reset')}
             </button>
@@ -365,7 +365,7 @@ const AccommodationsListingPage: React.FC = () => {
               aria-pressed={mapOpen}
               className={`inline-flex items-center gap-2 h-10 px-4 rounded-xl text-sm font-semibold border transition-colors ${
                 mapOpen
-                  ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                  ? 'bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100'
                   : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
               }`}
             >
@@ -411,7 +411,7 @@ const AccommodationsListingPage: React.FC = () => {
           {loadingMore && (
             <div className="flex items-center justify-center py-10 text-gray-500">
               <svg
-                className="animate-spin h-5 w-5 text-blue-600"
+                className="animate-spin h-5 w-5 text-primary-600"
                 viewBox="0 0 24 24"
                 fill="none"
                 aria-hidden="true"

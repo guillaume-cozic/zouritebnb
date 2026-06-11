@@ -118,14 +118,14 @@ const HomePage: React.FC = () => {
             {/* Diving */}
             <a href={ACTIVITY_LINKS.diving} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
-                <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                <div className="mx-auto w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
                     <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
                     <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
                     <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold leading-none tracking-tight group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-semibold leading-none tracking-tight group-hover:text-primary-600 transition-colors">
                   {t('activities.diving')}
                 </h3>
               </div>
@@ -137,12 +137,12 @@ const HomePage: React.FC = () => {
             {/* Hiking */}
             <a href={ACTIVITY_LINKS.hiking} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
-                <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                <div className="mx-auto w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
                     <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold leading-none tracking-tight group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-semibold leading-none tracking-tight group-hover:text-primary-600 transition-colors">
                   {t('activities.hiking')}
                 </h3>
               </div>
@@ -154,13 +154,13 @@ const HomePage: React.FC = () => {
             {/* Excursions */}
             <a href={ACTIVITY_LINKS.excursions} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
-                <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                <div className="mx-auto w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
                     <circle cx="12" cy="12" r="10" />
                     <path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold leading-none tracking-tight group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-semibold leading-none tracking-tight group-hover:text-primary-600 transition-colors">
                   {t('activities.excursions')}
                 </h3>
               </div>
@@ -172,14 +172,14 @@ const HomePage: React.FC = () => {
             {/* Gastronomy */}
             <a href={ACTIVITY_LINKS.gastronomy} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
-                <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                <div className="mx-auto w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
                     <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
                     <path d="M7 2v20" />
                     <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold leading-none tracking-tight group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-semibold leading-none tracking-tight group-hover:text-primary-600 transition-colors">
                   {t('activities.gastronomy')}
                 </h3>
               </div>
@@ -200,7 +200,7 @@ const HomePage: React.FC = () => {
               <p className="text-lg text-gray-600 mb-6">{t('discover.description')}</p>
               <div className="grid grid-cols-2 gap-4 mb-8">
                 <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
                     <circle cx="12" cy="12" r="4" />
                     <path d="M12 2v2" /><path d="M12 20v2" />
                     <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
@@ -210,7 +210,7 @@ const HomePage: React.FC = () => {
                   <span className="text-sm">{t('discover.climate')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
                     <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
                     <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
                     <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
@@ -218,7 +218,7 @@ const HomePage: React.FC = () => {
                   <span className="text-sm">{t('discover.beaches')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
                     <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z" />
                     <path d="M18 12v.5" />
                     <path d="M16 17.93a9.77 9.77 0 0 1 0-11.86" />
@@ -229,14 +229,14 @@ const HomePage: React.FC = () => {
                   <span className="text-sm">{t('discover.fishing')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
                     <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
                     <circle cx="12" cy="10" r="3" />
                   </svg>
                   <span className="text-sm">{t('discover.nature')}</span>
                 </div>
               </div>
-              <button className="inline-flex items-center justify-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-11 rounded-xl px-8 transition-all hover:shadow-md hover:shadow-blue-200">
+              <button className="inline-flex items-center justify-center text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 h-11 rounded-xl px-8 transition-all hover:shadow-md hover:shadow-primary-200">
                 {t('discover.learnMore')}
               </button>
             </div>

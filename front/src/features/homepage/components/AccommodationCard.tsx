@@ -114,7 +114,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
       {/* Content */}
       <div className="p-5">
         <div className="flex items-start justify-between gap-2 mb-1">
-          <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+          <h3 className="font-semibold text-lg text-gray-900 group-hover:text-primary-600 transition-colors">
             {accommodation.title}
           </h3>
           {accommodation.averageRating != null && accommodation.reviewCount > 0 && (
@@ -154,7 +154,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
           </div>
           <Link
             to={`/accommodations/${accommodation.id}`}
-            className="inline-flex items-center gap-1.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-10 px-5 transition-all hover:shadow-md hover:shadow-blue-200"
+            className="inline-flex items-center gap-1.5 rounded-xl text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 h-10 px-5 transition-all hover:shadow-md hover:shadow-primary-200"
           >
             {t('homepage.viewDetails')}
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
