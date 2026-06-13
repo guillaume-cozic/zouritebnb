@@ -48,6 +48,10 @@ final class AdminDashboardOutput
     public int $confirmedReservations = 0;
 
     #[Groups(['admin_dashboard:read'])]
+    #[ApiProperty(description: 'Nombre de séjours à venir (réservations confirmées dont l\'arrivée est dans le futur)', example: 12)]
+    public int $upcomingStays = 0;
+
+    #[Groups(['admin_dashboard:read'])]
     #[ApiProperty(description: 'Taux de commission appliqué (part du CA)', example: 0.08)]
     public float $commissionRate = 0.0;
 

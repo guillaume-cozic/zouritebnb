@@ -163,6 +163,31 @@ export function DashboardPage() {
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-surface-500">Activité</h2>
+
+        <Link
+          to="/reservations"
+          className="flex items-center justify-between rounded-2xl border border-primary-200 bg-primary-50 p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="flex items-center gap-4">
+            <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-xl text-white">
+              🧳
+            </span>
+            <div>
+              <p className="text-sm font-medium text-primary-700">Séjours à venir</p>
+              {financeLoading ? (
+                <div className="mt-1.5 h-8 w-16 animate-pulse rounded bg-primary-200" />
+              ) : (
+                <p className="text-3xl font-bold tracking-tight text-primary-900">
+                  {dashboard?.upcomingStays ?? 0}
+                </p>
+              )}
+            </div>
+          </div>
+          <span className="hidden text-sm font-medium text-primary-700 sm:inline">
+            Voir les réservations →
+          </span>
+        </Link>
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Réservations"

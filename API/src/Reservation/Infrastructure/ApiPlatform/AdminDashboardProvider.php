@@ -33,7 +33,8 @@ final readonly class AdminDashboardProvider implements ProviderInterface
                 COALESCE(SUM(total_price), 0) AS revenue,
                 COALESCE(SUM(commission_amount), 0) AS margin,
                 COALESCE(SUM(donation_amount), 0) AS donated,
-                COUNT(*) AS reservations
+                COUNT(*) AS reservations,
+                COALESCE(SUM(check_in >= NOW()), 0) AS upcoming
             FROM reservation
             WHERE status = 'confirmed'
             SQL)->fetchAssociative() ?: [];
@@ -60,6 +61,7 @@ final readonly class AdminDashboardProvider implements ProviderInterface
         $output->totalMargin = (float) ($totals['margin'] ?? 0);
         $output->totalDonated = (float) ($totals['donated'] ?? 0);
         $output->confirmedReservations = (int) ($totals['reservations'] ?? 0);
+        $output->upcomingStays = (int) ($totals['upcoming'] ?? 0);
         $output->commissionRate = ReservationPrice::COMMISSION_RATE;
         $output->donationRate = ReservationPrice::DONATION_RATE;
         $output->donationsByProject = array_map(

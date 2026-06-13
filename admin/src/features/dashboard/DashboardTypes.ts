@@ -9,6 +9,7 @@ export interface AdminDashboard {
   totalMargin: number;
   totalDonated: number;
   confirmedReservations: number;
+  upcomingStays: number;
   commissionRate: number;
   donationRate: number;
   donationsByProject: DonationByProject[];
