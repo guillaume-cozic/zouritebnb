@@ -7,6 +7,8 @@ import { ReservationsPage } from './features/reservations/components/Reservation
 import { AccommodationsPage } from './features/accommodations/components/AccommodationsPage';
 import { ReviewsPage } from './features/reviews/components/ReviewsPage';
 import { UsersPage } from './features/users/components/UsersPage';
+import { SolidarityProjectsPage } from './features/solidarityProjects/components/SolidarityProjectsPage';
+import { SolidarityProjectFormPage } from './features/solidarityProjects/components/SolidarityProjectFormPage';
 
 export function App() {
   return (
@@ -25,6 +27,9 @@ export function App() {
           <Route path="reservations" element={<ReservationsPage />} />
           <Route path="accommodations" element={<AccommodationsPage />} />
           <Route path="reviews" element={<ReviewsPage />} />
+          <Route path="solidarity-projects" element={<SolidarityProjectsPage />} />
+          <Route path="solidarity-projects/new" element={<SolidarityProjectFormPage />} />
+          <Route path="solidarity-projects/:id/edit" element={<SolidarityProjectFormPage />} />
           <Route path="users" element={<UsersPage />} />
         </Route>
       </Routes>

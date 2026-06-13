@@ -9,6 +9,7 @@ const navItems = [
   { to: '/reservations', label: 'Réservations' },
   { to: '/accommodations', label: 'Hébergements' },
   { to: '/reviews', label: 'Avis' },
+  { to: '/solidarity-projects', label: 'Projets solidaires' },
   { to: '/users', label: 'Clients' },
 ];
 
@@ -52,7 +53,7 @@ export function AdminLayout() {
             Se déconnecter
           </Button>
         </header>
-        <main className="mx-auto max-w-7xl p-6 lg:p-8">
+        <main className="w-full p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

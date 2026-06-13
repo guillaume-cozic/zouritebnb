@@ -41,7 +41,9 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             ->setStatus($reservation->getStatus()->value)
             ->setTotalPrice($reservation->getPrice()->totalPrice)
             ->setPricePerNight($reservation->getPrice()->pricePerNight)
-            ->setAppliedDiscountPercentage($reservation->getPrice()->appliedDiscountPercentage);
+            ->setAppliedDiscountPercentage($reservation->getPrice()->appliedDiscountPercentage)
+            ->setCommissionAmount($reservation->getPrice()->commissionAmount)
+            ->setDonationAmount($reservation->getPrice()->donationAmount);
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -101,6 +103,8 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
                 totalPrice: $entity->getTotalPrice(),
                 pricePerNight: $entity->getPricePerNight(),
                 appliedDiscountPercentage: $entity->getAppliedDiscountPercentage(),
+                commissionAmount: $entity->getCommissionAmount(),
+                donationAmount: $entity->getDonationAmount(),
             ),
             guestUserId: $entity->getGuestUserId(),
         );

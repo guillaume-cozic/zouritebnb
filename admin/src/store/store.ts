@@ -5,6 +5,8 @@ import reservationsReducer from '../features/reservations/ReservationsSlice';
 import accommodationsReducer from '../features/accommodations/AccommodationsSlice';
 import reviewsReducer from '../features/reviews/ReviewsSlice';
 import usersReducer from '../features/users/UsersSlice';
+import solidarityProjectsReducer from '../features/solidarityProjects/SolidarityProjectsSlice';
+import dashboardReducer from '../features/dashboard/DashboardSlice';
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +15,8 @@ export const store = configureStore({
     accommodations: accommodationsReducer,
     reviews: reviewsReducer,
     users: usersReducer,
+    solidarityProjects: solidarityProjectsReducer,
+    dashboard: dashboardReducer,
   },
 });
 

@@ -47,6 +47,12 @@ class ReservationEntity
     #[ORM\Column(nullable: true)]
     private ?float $appliedDiscountPercentage = null;
 
+    #[ORM\Column(options: ['default' => 0])]
+    private float $commissionAmount = 0.0;
+
+    #[ORM\Column(options: ['default' => 0])]
+    private float $donationAmount = 0.0;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -175,6 +181,30 @@ class ReservationEntity
     public function setAppliedDiscountPercentage(?float $appliedDiscountPercentage): static
     {
         $this->appliedDiscountPercentage = $appliedDiscountPercentage;
+
+        return $this;
+    }
+
+    public function getCommissionAmount(): float
+    {
+        return $this->commissionAmount;
+    }
+
+    public function setCommissionAmount(float $commissionAmount): static
+    {
+        $this->commissionAmount = $commissionAmount;
+
+        return $this;
+    }
+
+    public function getDonationAmount(): float
+    {
+        return $this->donationAmount;
+    }
+
+    public function setDonationAmount(float $donationAmount): static
+    {
+        $this->donationAmount = $donationAmount;
 
         return $this;
     }

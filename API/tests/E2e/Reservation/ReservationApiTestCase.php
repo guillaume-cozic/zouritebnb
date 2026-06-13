@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\E2e\Reservation;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Reservation\Domain\Entity\ReservationPrice;
 use App\Reservation\Infrastructure\Doctrine\ReservationEntity;
 use App\Tests\E2e\AuthenticatedClientTrait;
 use Doctrine\ORM\EntityManagerInterface;
@@ -43,7 +44,9 @@ abstract class ReservationApiTestCase extends ApiTestCase
             ->setStatus($status)
             ->setTotalPrice(400.0)
             ->setPricePerNight(100.0)
-            ->setAppliedDiscountPercentage(null);
+            ->setAppliedDiscountPercentage(null)
+            ->setCommissionAmount(round(400.0 * ReservationPrice::COMMISSION_RATE, 2))
+            ->setDonationAmount(round(400.0 * ReservationPrice::DONATION_RATE, 2));
 
         $em->persist($entity);
         $em->flush();

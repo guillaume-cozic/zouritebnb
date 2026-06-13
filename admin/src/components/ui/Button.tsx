@@ -1,14 +1,16 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from './cn';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type Variant = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'ghost';
 type Size = 'sm' | 'md';
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'bg-primary-600 text-white hover:bg-primary-700',
-  secondary: 'border border-surface-300 bg-white text-surface-700 hover:bg-surface-50',
-  ghost: 'text-surface-600 hover:bg-surface-100',
+  secondary: 'border border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100',
+  success: 'bg-success-600 text-white hover:bg-success-700',
+  warning: 'bg-warning-500 text-white hover:bg-warning-600',
   danger: 'bg-danger-600 text-white hover:bg-danger-700',
+  ghost: 'text-surface-600 hover:bg-surface-100',
 };
 
 const SIZES: Record<Size, string> = {

@@ -26,6 +26,10 @@ interface ListPageProps {
   page: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
+  /** Optional action rendered on the right of the page header (e.g. a "New" button). */
+  headerAction?: ReactNode;
+  /** Optional content rendered between the header and the toolbar (e.g. a create form). */
+  banner?: ReactNode;
   /** The table or card grid rendered once data is loaded. */
   children: ReactNode;
 }
@@ -51,13 +55,22 @@ export function ListPage({
   page,
   itemsPerPage,
   onPageChange,
+  headerAction,
+  banner,
   children,
 }: ListPageProps) {
   const loading = status === 'loading' || status === 'idle';
 
   return (
     <div className="space-y-6">
-      <PageHeader title={title} subtitle={subtitle} count={status === 'succeeded' ? count : undefined} />
+      <PageHeader
+        title={title}
+        subtitle={subtitle}
+        count={status === 'succeeded' ? count : undefined}
+        action={headerAction}
+      />
+
+      {banner}
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <SearchInput value={search} onChange={onSearchChange} placeholder={searchPlaceholder} />

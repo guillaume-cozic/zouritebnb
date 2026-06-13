@@ -70,6 +70,17 @@ services:
         arguments:
             $photoUploadDir: '%kernel.project_dir%/var/uploads/photos'
 
+    App\SolidarityProject\Domain\Port\SolidarityProjectImageStorage:
+        alias: App\SolidarityProject\Infrastructure\Filesystem\LocalSolidarityProjectImageStorage
+
+    App\SolidarityProject\Infrastructure\Filesystem\LocalSolidarityProjectImageStorage:
+        arguments:
+            $uploadDir: '%kernel.project_dir%/var/uploads/solidarity-projects'
+
+    App\Shared\Infrastructure\Controller\ServeSolidarityProjectImageController:
+        arguments:
+            $imageUploadDir: '%kernel.project_dir%/var/uploads/solidarity-projects'
+
     App\Accommodation\Application\Listener\StorePhotoOnPhotoUploaded:
         tags: [messenger.message_handler]
 

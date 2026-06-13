@@ -38,7 +38,7 @@ final readonly class CreateReservation
 
         $stayPrice = $this->priceCalculator->calculate($pricing, $dateRange->checkIn(), $dateRange->checkOut());
 
-        $price = new ReservationPrice(
+        $price = ReservationPrice::fromStay(
             totalPrice: $stayPrice->totalPrice,
             pricePerNight: $stayPrice->pricePerNight,
             appliedDiscountPercentage: $stayPrice->appliedDiscountPercentage,

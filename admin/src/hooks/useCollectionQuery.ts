@@ -16,19 +16,22 @@ export function useCollectionQuery(fetchPage: (query: CollectionQuery) => void) 
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [page, setPage] = useState(1);
+  const [reloadToken, setReloadToken] = useState(0);
   const debouncedSearch = useDebouncedValue(search, 300);
 
   useEffect(() => {
     fetchPage({ page, search: debouncedSearch.trim(), filter: filter === 'all' ? '' : filter });
     // `fetchPage` is provided as a stable callback by the caller.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, debouncedSearch, filter]);
+  }, [page, debouncedSearch, filter, reloadToken]);
 
   return {
     search,
     filter,
     page,
     setPage,
+    /** Re-runs the current query (e.g. after a mutation) without changing it. */
+    reload: () => setReloadToken((token) => token + 1),
     onSearchChange: (value: string) => {
       setSearch(value);
       setPage(1);

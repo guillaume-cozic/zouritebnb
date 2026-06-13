@@ -59,4 +59,30 @@ final class ReservationPriceTest extends TestCase
             appliedDiscountPercentage: null,
         );
     }
+
+    public function test_should_default_commission_and_donation_to_zero(): void
+    {
+        $price = new ReservationPrice(
+            totalPrice: 100.0,
+            pricePerNight: 100.0,
+            appliedDiscountPercentage: null,
+        );
+
+        self::assertSame(0.0, $price->commissionAmount);
+        self::assertSame(0.0, $price->donationAmount);
+    }
+
+    public function test_from_stay_should_compute_commission_and_donation(): void
+    {
+        // 99 € × 4 nuits = 396 €, commission 8 % = 31,68 €, contribution solidaire 7 % = 27,72 €.
+        $price = ReservationPrice::fromStay(
+            totalPrice: 396.0,
+            pricePerNight: 99.0,
+            appliedDiscountPercentage: null,
+        );
+
+        self::assertSame(396.0, $price->totalPrice);
+        self::assertSame(31.68, $price->commissionAmount);
+        self::assertSame(27.72, $price->donationAmount);
+    }
 }
