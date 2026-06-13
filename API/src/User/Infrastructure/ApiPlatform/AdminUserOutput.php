@@ -22,7 +22,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['admin_user:list'], 'skip_null_values' => false],
             provider: AdminUserCollectionProvider::class,
-            paginationEnabled: false,
+            paginationEnabled: true,
+            paginationItemsPerPage: 20,
+            paginationClientItemsPerPage: true,
+            paginationMaximumItemsPerPage: 100,
         ),
     ],
 )]

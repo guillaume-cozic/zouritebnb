@@ -1,21 +1,42 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import api, { extractMembers } from '../../services/api';
+import api, { extractCollection } from '../../services/api';
 import type { AdminReview, ReviewsState } from './ReviewsTypes';
 
-export const fetchReviews = createAsyncThunk<AdminReview[], void, { rejectValue: string }>(
-  'reviews/fetchAll',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await api.get('/api/admin/reviews');
-      return extractMembers<AdminReview>(response.data);
-    } catch {
-      return rejectWithValue('Impossible de charger les avis');
-    }
+export const REVIEWS_PER_PAGE = 20;
+
+export interface FetchReviewsParams {
+  page?: number;
+  search?: string;
+  type?: string;
+}
+
+export const fetchReviews = createAsyncThunk<
+  { items: AdminReview[]; totalItems: number; page: number },
+  FetchReviewsParams | void,
+  { rejectValue: string }
+>('reviews/fetchAll', async (params, { rejectWithValue }) => {
+  const { page = 1, search = '', type = '' } = params ?? {};
+  try {
+    const response = await api.get('/api/admin/reviews', {
+      params: {
+        page,
+        itemsPerPage: REVIEWS_PER_PAGE,
+        ...(search ? { search } : {}),
+        ...(type ? { type } : {}),
+      },
+    });
+    const { items, totalItems } = extractCollection<AdminReview>(response.data);
+    return { items, totalItems, page };
+  } catch {
+    return rejectWithValue('Impossible de charger les avis');
   }
-);
+});
 
 const initialState: ReviewsState = {
   items: [],
+  page: 1,
+  itemsPerPage: REVIEWS_PER_PAGE,
+  totalItems: 0,
   status: 'idle',
   error: null,
 };
@@ -32,7 +53,9 @@ const reviewsSlice = createSlice({
       })
       .addCase(fetchReviews.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.items = action.payload;
+        state.items = action.payload.items;
+        state.totalItems = action.payload.totalItems;
+        state.page = action.payload.page;
       })
       .addCase(fetchReviews.rejected, (state, action) => {
         state.status = 'failed';

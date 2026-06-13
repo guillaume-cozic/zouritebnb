@@ -1,15 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchUsers } from '../UsersSlice';
-import { selectUsers, selectUsersError, selectUsersStatus } from '../UsersSelectors';
+import {
+  selectUsers,
+  selectUsersCount,
+  selectUsersError,
+  selectUsersPage,
+  selectUsersPerPage,
+  selectUsersStatus,
+} from '../UsersSelectors';
 import type { AdminPlatformUser } from '../UsersTypes';
 import { Badge, BadgeVariant } from '../../../components/ui/Badge';
-import { ListSkeleton } from '../../../components/ui/Skeleton';
-import { ErrorMessage } from '../../../components/ui/ErrorMessage';
-import { EmptyState } from '../../../components/ui/EmptyState';
-import { SearchInput } from '../../../components/ui/SearchInput';
-import { FilterChips } from '../../../components/ui/FilterChips';
 import { Table, TBody, TD, TH, THead, TR } from '../../../components/ui/Table';
+import { ListPage } from '../../../components/ListPage';
+import { useCollectionQuery, type CollectionQuery } from '../../../hooks/useCollectionQuery';
+
+const ROLE_OPTIONS = [
+  { value: 'all', label: 'Tous' },
+  { value: 'hosts', label: 'Hôtes' },
+  { value: 'travelers', label: 'Voyageurs' },
+];
+
+const VERIFICATION_LABELS: Record<string, string> = {
+  verified: 'Vérifié',
+  pending: 'En attente',
+  rejected: 'Rejeté',
+  unverified: 'Non vérifié',
+};
 
 const verificationVariant = (status: string): BadgeVariant => {
   switch (status) {
@@ -32,83 +49,72 @@ export function UsersPage() {
   const users = useAppSelector(selectUsers);
   const status = useAppSelector(selectUsersStatus);
   const error = useAppSelector(selectUsersError);
+  const total = useAppSelector(selectUsersCount);
+  const page = useAppSelector(selectUsersPage);
+  const itemsPerPage = useAppSelector(selectUsersPerPage);
 
-  const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
+  const fetchPage = useCallback(
+    (query: CollectionQuery) => {
+      dispatch(fetchUsers({ page: query.page, search: query.search, role: query.filter }));
+    },
+    [dispatch]
+  );
 
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
-
-  const query = search.trim().toLowerCase();
-  const filtered = users.filter((u) => {
-    if (roleFilter === 'hosts' && u.accommodationCount === 0) return false;
-    if (roleFilter === 'travelers' && u.accommodationCount > 0) return false;
-    if (!query) return true;
-    return u.email.toLowerCase().includes(query) || fullName(u).toLowerCase().includes(query);
-  });
+  const { search, filter, onSearchChange, onFilterChange, setPage } = useCollectionQuery(fetchPage);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-surface-900">Clients</h1>
-
-      <div className="mt-6 flex flex-wrap items-center gap-4">
-        <SearchInput value={search} onChange={setSearch} placeholder="Rechercher par e-mail ou nom…" />
-        <FilterChips
-          options={[
-            { value: 'all', label: 'Tous' },
-            { value: 'hosts', label: 'Hôtes' },
-            { value: 'travelers', label: 'Voyageurs' },
-          ]}
-          value={roleFilter}
-          onChange={setRoleFilter}
-        />
-      </div>
-
-      <div className="mt-6">
-        {status === 'loading' || status === 'idle' ? (
-          <ListSkeleton />
-        ) : status === 'failed' ? (
-          <ErrorMessage message={error} />
-        ) : filtered.length === 0 ? (
-          <EmptyState message="Aucun client ne correspond à votre recherche." />
-        ) : (
-          <Table>
-            <THead>
-              <TH>Email</TH>
-              <TH>Nom</TH>
-              <TH>Rôles</TH>
-              <TH>Vérification</TH>
-              <TH>Hébergements</TH>
-              <TH>Réservations</TH>
-            </THead>
-            <TBody>
-              {filtered.map((u) => (
-                <TR key={u.id}>
-                  <TD>{u.email}</TD>
-                  <TD>{fullName(u)}</TD>
-                  <TD>
-                    <span className="flex flex-wrap gap-1">
-                      {u.roles.map((role) => (
-                        <Badge key={role} variant={role === 'ROLE_ADMIN' ? 'danger' : 'surface'}>
-                          {role.replace(/^ROLE_/, '').toLowerCase()}
-                        </Badge>
-                      ))}
-                    </span>
-                  </TD>
-                  <TD>
-                    <Badge variant={verificationVariant(u.verificationStatus)}>
-                      {u.verificationStatus}
+    <ListPage
+      title="Clients"
+      subtitle="Tous les comptes de la plateforme."
+      count={total}
+      search={search}
+      onSearchChange={onSearchChange}
+      searchPlaceholder="Rechercher par e-mail ou nom…"
+      filterOptions={ROLE_OPTIONS}
+      filterValue={filter}
+      onFilterChange={onFilterChange}
+      status={status}
+      error={error}
+      isEmpty={users.length === 0}
+      emptyMessage="Aucun client ne correspond à votre recherche."
+      page={page}
+      itemsPerPage={itemsPerPage}
+      onPageChange={setPage}
+    >
+      <Table>
+        <THead>
+          <TH>Email</TH>
+          <TH>Nom</TH>
+          <TH>Rôles</TH>
+          <TH>Vérification</TH>
+          <TH>Hébergements</TH>
+          <TH>Réservations</TH>
+        </THead>
+        <TBody>
+          {users.map((u) => (
+            <TR key={u.id}>
+              <TD>{u.email}</TD>
+              <TD>{fullName(u)}</TD>
+              <TD>
+                <span className="flex flex-wrap gap-1">
+                  {u.roles.map((role) => (
+                    <Badge key={role} variant={role === 'ROLE_ADMIN' ? 'danger' : 'surface'}>
+                      {role.replace(/^ROLE_/, '').toLowerCase()}
                     </Badge>
-                  </TD>
-                  <TD>{u.accommodationCount}</TD>
-                  <TD>{u.reservationCount}</TD>
-                </TR>
-              ))}
-            </TBody>
-          </Table>
-        )}
-      </div>
-    </div>
+                  ))}
+                </span>
+              </TD>
+              <TD>
+                <Badge variant={verificationVariant(u.verificationStatus)}>
+                  {VERIFICATION_LABELS[u.verificationStatus] ?? u.verificationStatus}
+                </Badge>
+              </TD>
+              <TD>{u.accommodationCount}</TD>
+              <TD>{u.reservationCount}</TD>
+            </TR>
+          ))}
+        </TBody>
+      </Table>
+    </ListPage>
   );
 }

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Review\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 
 /**
  * Lists every review of the platform for the admin back-office, most recent first.
@@ -21,15 +24,50 @@ final readonly class AdminReviewCollectionProvider implements ProviderInterface
 {
     public function __construct(
         private Connection $connection,
+        private Pagination $pagination,
     ) {
     }
 
     /**
-     * @return AdminReviewOutput[]
+     * @return TraversablePaginator<AdminReviewOutput>
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): TraversablePaginator
     {
-        $sql = <<<'SQL'
+        [$page, $offset, $limit] = $this->pagination->getPagination($operation, $context);
+
+        $filters = $context['filters'] ?? [];
+        $conditions = [];
+        $params = [];
+        $types = [];
+
+        $search = trim((string) ($filters['search'] ?? ''));
+        if ('' !== $search) {
+            $conditions[] = '(r.comment LIKE :search OR author.first_name LIKE :search OR author.last_name LIKE :search OR author.email LIKE :search OR a.title LIKE :search OR subject.first_name LIKE :search OR subject.last_name LIKE :search OR subject.email LIKE :search)';
+            $params['search'] = '%'.$search.'%';
+        }
+
+        $type = trim((string) ($filters['type'] ?? ''));
+        if ('' !== $type) {
+            $conditions[] = 'r.type = :type';
+            $params['type'] = $type;
+        }
+
+        $joins = <<<'SQL'
+            FROM review r
+            LEFT JOIN `user` author ON author.id = r.author_user_id
+            LEFT JOIN accommodation a ON a.id = r.subject_accommodation_id
+            LEFT JOIN `user` subject ON subject.id = r.subject_user_id
+            SQL;
+
+        $where = $conditions ? ' WHERE '.implode(' AND ', $conditions) : '';
+
+        $totalItems = (int) $this->connection->executeQuery(
+            'SELECT COUNT(*) '.$joins.$where,
+            $params,
+            $types,
+        )->fetchOne();
+
+        $sql = <<<SQL
             SELECT
                 BIN_TO_UUID(r.id) AS id,
                 r.type,
@@ -46,14 +84,17 @@ final readonly class AdminReviewCollectionProvider implements ProviderInterface
                 subject.first_name AS subject_first_name,
                 subject.last_name AS subject_last_name,
                 subject.email AS subject_email
-            FROM review r
-            LEFT JOIN `user` author ON author.id = r.author_user_id
-            LEFT JOIN accommodation a ON a.id = r.subject_accommodation_id
-            LEFT JOIN `user` subject ON subject.id = r.subject_user_id
+            {$joins}
+            {$where}
             ORDER BY r.created_at DESC
+            LIMIT :limit OFFSET :offset
             SQL;
 
-        $rows = $this->connection->executeQuery($sql)->fetchAllAssociative();
+        $rows = $this->connection->executeQuery(
+            $sql,
+            [...$params, 'limit' => $limit, 'offset' => $offset],
+            [...$types, 'limit' => ParameterType::INTEGER, 'offset' => ParameterType::INTEGER],
+        )->fetchAllAssociative();
 
         $reviews = [];
         foreach ($rows as $row) {
@@ -72,7 +113,7 @@ final readonly class AdminReviewCollectionProvider implements ProviderInterface
             $reviews[] = $output;
         }
 
-        return $reviews;
+        return new TraversablePaginator(new \ArrayIterator($reviews), $page, $limit, $totalItems);
     }
 
     /**

@@ -81,6 +81,55 @@ final class AdminReservationCollectionTest extends ReservationApiTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    public function test_should_paginate_reservations(): void
+    {
+        $this->createAuthUser(email: 'admin@example.com', roles: ['ROLE_ADMIN']);
+        for ($i = 0; $i < 25; ++$i) {
+            $this->insertReservation(guestName: \sprintf('Guest %02d', $i));
+        }
+
+        $response = self::createClient()->request('GET', '/api/admin/reservations?itemsPerPage=10&page=2', [
+            'headers' => $this->authHeaders('admin@example.com'),
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $data = $response->toArray();
+        self::assertCount(10, $data['member']);
+        self::assertSame(25, $data['totalItems']);
+    }
+
+    public function test_should_filter_reservations_by_search(): void
+    {
+        $this->createAuthUser(email: 'admin@example.com', roles: ['ROLE_ADMIN']);
+        $this->insertReservation(guestName: 'Alice Martin', status: 'confirmed');
+        $this->insertReservation(guestName: 'Bob Durand', status: 'pending');
+
+        $response = self::createClient()->request('GET', '/api/admin/reservations?search=Alice', [
+            'headers' => $this->authHeaders('admin@example.com'),
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $data = $response->toArray();
+        self::assertCount(1, $data['member']);
+        self::assertSame('Alice Martin', $data['member'][0]['guestName']);
+    }
+
+    public function test_should_filter_reservations_by_status(): void
+    {
+        $this->createAuthUser(email: 'admin@example.com', roles: ['ROLE_ADMIN']);
+        $this->insertReservation(guestName: 'Alice Martin', status: 'confirmed');
+        $this->insertReservation(guestName: 'Bob Durand', status: 'pending');
+
+        $response = self::createClient()->request('GET', '/api/admin/reservations?status=pending', [
+            'headers' => $this->authHeaders('admin@example.com'),
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $data = $response->toArray();
+        self::assertCount(1, $data['member']);
+        self::assertSame('Bob Durand', $data['member'][0]['guestName']);
+    }
+
     private function insertAccommodation(string $title): string
     {
         /** @var EntityManagerInterface $em */

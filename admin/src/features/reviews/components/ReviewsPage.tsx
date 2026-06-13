@@ -1,15 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchReviews } from '../ReviewsSlice';
-import { selectReviews, selectReviewsError, selectReviewsStatus } from '../ReviewsSelectors';
+import {
+  selectReviews,
+  selectReviewsCount,
+  selectReviewsError,
+  selectReviewsPage,
+  selectReviewsPerPage,
+  selectReviewsStatus,
+} from '../ReviewsSelectors';
 import type { AdminReview } from '../ReviewsTypes';
 import { Badge } from '../../../components/ui/Badge';
-import { ListSkeleton } from '../../../components/ui/Skeleton';
-import { ErrorMessage } from '../../../components/ui/ErrorMessage';
-import { EmptyState } from '../../../components/ui/EmptyState';
-import { SearchInput } from '../../../components/ui/SearchInput';
-import { FilterChips } from '../../../components/ui/FilterChips';
+import { Card } from '../../../components/ui/Card';
+import { ListPage } from '../../../components/ListPage';
+import { useCollectionQuery, type CollectionQuery } from '../../../hooks/useCollectionQuery';
 import { formatDate } from '../../../services/format';
+
+const TYPE_OPTIONS = [
+  { value: 'all', label: 'Tous' },
+  { value: 'accommodation', label: 'Hébergements' },
+  { value: 'guest', label: 'Voyageurs' },
+];
 
 const subjectLabel = (review: AdminReview): string =>
   review.type === 'accommodation'
@@ -26,7 +37,7 @@ function Stars({ rating }: { rating: number }) {
 
 function ReviewCard({ review }: { review: AdminReview }) {
   return (
-    <article className="rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
+    <Card className="p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-3">
           <Stars rating={review.rating} />
@@ -42,7 +53,7 @@ function ReviewCard({ review }: { review: AdminReview }) {
         {' → '}
         <span className="font-medium text-surface-700">{subjectLabel(review)}</span>
       </p>
-    </article>
+    </Card>
   );
 }
 
@@ -51,61 +62,43 @@ export function ReviewsPage() {
   const reviews = useAppSelector(selectReviews);
   const status = useAppSelector(selectReviewsStatus);
   const error = useAppSelector(selectReviewsError);
+  const total = useAppSelector(selectReviewsCount);
+  const page = useAppSelector(selectReviewsPage);
+  const itemsPerPage = useAppSelector(selectReviewsPerPage);
 
-  const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const fetchPage = useCallback(
+    (query: CollectionQuery) => {
+      dispatch(fetchReviews({ page: query.page, search: query.search, type: query.filter }));
+    },
+    [dispatch]
+  );
 
-  useEffect(() => {
-    dispatch(fetchReviews());
-  }, [dispatch]);
-
-  const query = search.trim().toLowerCase();
-  const filtered = reviews.filter((r) => {
-    if (typeFilter !== 'all' && r.type !== typeFilter) return false;
-    if (!query) return true;
-    return (
-      r.comment.toLowerCase().includes(query) ||
-      (r.authorName ?? '').toLowerCase().includes(query) ||
-      subjectLabel(r).toLowerCase().includes(query)
-    );
-  });
+  const { search, filter, onSearchChange, onFilterChange, setPage } = useCollectionQuery(fetchPage);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-surface-900">Avis</h1>
-
-      <div className="mt-6 flex flex-wrap items-center gap-4">
-        <SearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder="Rechercher par commentaire, auteur ou sujet…"
-        />
-        <FilterChips
-          options={[
-            { value: 'all', label: 'Tous' },
-            { value: 'accommodation', label: 'Hébergements' },
-            { value: 'guest', label: 'Voyageurs' },
-          ]}
-          value={typeFilter}
-          onChange={setTypeFilter}
-        />
+    <ListPage
+      title="Avis"
+      subtitle="Tous les avis publiés sur la plateforme."
+      count={total}
+      search={search}
+      onSearchChange={onSearchChange}
+      searchPlaceholder="Rechercher par commentaire, auteur ou sujet…"
+      filterOptions={TYPE_OPTIONS}
+      filterValue={filter}
+      onFilterChange={onFilterChange}
+      status={status}
+      error={error}
+      isEmpty={reviews.length === 0}
+      emptyMessage="Aucun avis ne correspond à votre recherche."
+      page={page}
+      itemsPerPage={itemsPerPage}
+      onPageChange={setPage}
+    >
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {reviews.map((r) => (
+          <ReviewCard key={r.id} review={r} />
+        ))}
       </div>
-
-      <div className="mt-6">
-        {status === 'loading' || status === 'idle' ? (
-          <ListSkeleton />
-        ) : status === 'failed' ? (
-          <ErrorMessage message={error} />
-        ) : filtered.length === 0 ? (
-          <EmptyState message="Aucun avis ne correspond à votre recherche." />
-        ) : (
-          <div className="space-y-4">
-            {filtered.map((r) => (
-              <ReviewCard key={r.id} review={r} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+    </ListPage>
   );
 }

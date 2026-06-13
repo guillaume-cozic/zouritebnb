@@ -18,12 +18,18 @@ cmd="${1:-start}"
 case "$cmd" in
   start)
     BLOG_PID=""
+    ADMIN_PID=""
     cleanup() {
       echo
       if [ -n "$BLOG_PID" ] && kill -0 "$BLOG_PID" 2>/dev/null; then
         echo "==> Arrêt du blog (pid $BLOG_PID)..."
         kill "$BLOG_PID" 2>/dev/null || true
         wait "$BLOG_PID" 2>/dev/null || true
+      fi
+      if [ -n "$ADMIN_PID" ] && kill -0 "$ADMIN_PID" 2>/dev/null; then
+        echo "==> Arrêt du back-office admin (pid $ADMIN_PID)..."
+        kill "$ADMIN_PID" 2>/dev/null || true
+        wait "$ADMIN_PID" 2>/dev/null || true
       fi
       echo "==> Arrêt du backend..."
       "${COMPOSE[@]}" stop
@@ -56,6 +62,14 @@ case "$cmd" in
     fi
     (cd "$SCRIPT_DIR/blog" && npm run dev) &
     BLOG_PID=$!
+
+    echo "==> Démarrage du back-office admin sur http://localhost:3001 ..."
+    if [ ! -d "$SCRIPT_DIR/admin/node_modules" ]; then
+      echo "==> Installation des dépendances du back-office admin..."
+      (cd "$SCRIPT_DIR/admin" && npm install)
+    fi
+    (cd "$SCRIPT_DIR/admin" && npm run dev) &
+    ADMIN_PID=$!
 
     echo "==> Démarrage du frontend sur http://localhost:3000 ..."
     cd "$SCRIPT_DIR/front"

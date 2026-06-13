@@ -22,7 +22,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['admin_reservation:list'], 'skip_null_values' => false],
             provider: AdminReservationCollectionProvider::class,
-            paginationEnabled: false,
+            paginationEnabled: true,
+            paginationItemsPerPage: 20,
+            paginationClientItemsPerPage: true,
+            paginationMaximumItemsPerPage: 100,
         ),
     ],
 )]

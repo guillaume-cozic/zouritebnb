@@ -92,4 +92,17 @@ export const extractMembers = <T>(data: unknown): T[] => {
   return (record['hydra:member'] ?? record['member'] ?? []) as T[];
 };
 
+export interface Collection<T> {
+  items: T[];
+  totalItems: number;
+}
+
+/** Extracts both the members and the total item count from a paginated ld+json response. */
+export const extractCollection = <T>(data: unknown): Collection<T> => {
+  const record = (data ?? {}) as Record<string, unknown>;
+  const items = extractMembers<T>(data);
+  const totalItems = (record['hydra:totalItems'] ?? record['totalItems'] ?? items.length) as number;
+  return { items, totalItems };
+};
+
 export default api;

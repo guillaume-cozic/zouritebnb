@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Reservation\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 
 /**
  * Lists every reservation of the platform for the admin back-office, most recent check-in first.
@@ -21,15 +24,43 @@ final readonly class AdminReservationCollectionProvider implements ProviderInter
 {
     public function __construct(
         private Connection $connection,
+        private Pagination $pagination,
     ) {
     }
 
     /**
-     * @return AdminReservationOutput[]
+     * @return TraversablePaginator<AdminReservationOutput>
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): TraversablePaginator
     {
-        $sql = <<<'SQL'
+        [$page, $offset, $limit] = $this->pagination->getPagination($operation, $context);
+
+        $filters = $context['filters'] ?? [];
+        $conditions = [];
+        $params = [];
+        $types = [];
+
+        $search = trim((string) ($filters['search'] ?? ''));
+        if ('' !== $search) {
+            $conditions[] = '(r.guest_name LIKE :search OR a.title LIKE :search)';
+            $params['search'] = '%'.$search.'%';
+        }
+
+        $status = trim((string) ($filters['status'] ?? ''));
+        if ('' !== $status) {
+            $conditions[] = 'r.status = :status';
+            $params['status'] = $status;
+        }
+
+        $where = $conditions ? ' WHERE '.implode(' AND ', $conditions) : '';
+
+        $totalItems = (int) $this->connection->executeQuery(
+            'SELECT COUNT(*) FROM reservation r LEFT JOIN accommodation a ON a.id = r.accommodation_id'.$where,
+            $params,
+            $types,
+        )->fetchOne();
+
+        $sql = <<<SQL
             SELECT
                 BIN_TO_UUID(r.id) AS id,
                 r.guest_name,
@@ -45,10 +76,16 @@ final readonly class AdminReservationCollectionProvider implements ProviderInter
                 r.applied_discount_percentage
             FROM reservation r
             LEFT JOIN accommodation a ON a.id = r.accommodation_id
+            {$where}
             ORDER BY r.check_in DESC
+            LIMIT :limit OFFSET :offset
             SQL;
 
-        $rows = $this->connection->executeQuery($sql)->fetchAllAssociative();
+        $rows = $this->connection->executeQuery(
+            $sql,
+            [...$params, 'limit' => $limit, 'offset' => $offset],
+            [...$types, 'limit' => ParameterType::INTEGER, 'offset' => ParameterType::INTEGER],
+        )->fetchAllAssociative();
 
         $reservations = [];
         foreach ($rows as $row) {
@@ -68,6 +105,6 @@ final readonly class AdminReservationCollectionProvider implements ProviderInter
             $reservations[] = $output;
         }
 
-        return $reservations;
+        return new TraversablePaginator(new \ArrayIterator($reservations), $page, $limit, $totalItems);
     }
 }

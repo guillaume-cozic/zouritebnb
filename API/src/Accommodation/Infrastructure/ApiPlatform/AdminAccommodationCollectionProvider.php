@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Accommodation\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 
 /**
  * Lists every accommodation of the platform for the admin back-office, sorted by title.
@@ -21,15 +24,43 @@ final readonly class AdminAccommodationCollectionProvider implements ProviderInt
 {
     public function __construct(
         private Connection $connection,
+        private Pagination $pagination,
     ) {
     }
 
     /**
-     * @return AdminAccommodationOutput[]
+     * @return TraversablePaginator<AdminAccommodationOutput>
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): TraversablePaginator
     {
-        $sql = <<<'SQL'
+        [$page, $offset, $limit] = $this->pagination->getPagination($operation, $context);
+
+        $filters = $context['filters'] ?? [];
+        $conditions = [];
+        $params = [];
+        $types = [];
+
+        $search = trim((string) ($filters['search'] ?? ''));
+        if ('' !== $search) {
+            $conditions[] = '(a.title LIKE :search OR a.city LIKE :search OR EXISTS (SELECT 1 FROM `user` su WHERE su.team_id = a.team_id AND su.email LIKE :search))';
+            $params['search'] = '%'.$search.'%';
+        }
+
+        $status = trim((string) ($filters['status'] ?? ''));
+        if ('' !== $status) {
+            $conditions[] = 'a.status = :status';
+            $params['status'] = $status;
+        }
+
+        $where = $conditions ? ' WHERE '.implode(' AND ', $conditions) : '';
+
+        $totalItems = (int) $this->connection->executeQuery(
+            'SELECT COUNT(*) FROM accommodation a'.$where,
+            $params,
+            $types,
+        )->fetchOne();
+
+        $sql = <<<SQL
             SELECT
                 BIN_TO_UUID(a.id) AS id,
                 a.title,
@@ -48,10 +79,16 @@ final readonly class AdminAccommodationCollectionProvider implements ProviderInt
                     LIMIT 1
                 ) AS host_email
             FROM accommodation a
+            {$where}
             ORDER BY a.title ASC
+            LIMIT :limit OFFSET :offset
             SQL;
 
-        $rows = $this->connection->executeQuery($sql)->fetchAllAssociative();
+        $rows = $this->connection->executeQuery(
+            $sql,
+            [...$params, 'limit' => $limit, 'offset' => $offset],
+            [...$types, 'limit' => ParameterType::INTEGER, 'offset' => ParameterType::INTEGER],
+        )->fetchAllAssociative();
 
         $accommodations = [];
         foreach ($rows as $row) {
@@ -69,6 +106,6 @@ final readonly class AdminAccommodationCollectionProvider implements ProviderInt
             $accommodations[] = $output;
         }
 
-        return $accommodations;
+        return new TraversablePaginator(new \ArrayIterator($accommodations), $page, $limit, $totalItems);
     }
 }

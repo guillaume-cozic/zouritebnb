@@ -15,6 +15,9 @@ export interface AdminReservation {
 
 export interface ReservationsState {
   items: AdminReservation[];
+  page: number;
+  itemsPerPage: number;
+  totalItems: number;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }

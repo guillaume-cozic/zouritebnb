@@ -16,6 +16,9 @@ export interface AdminReview {
 
 export interface ReviewsState {
   items: AdminReview[];
+  page: number;
+  itemsPerPage: number;
+  totalItems: number;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
