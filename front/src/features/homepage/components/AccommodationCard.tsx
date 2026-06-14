@@ -49,7 +49,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
 
   return (
     <div
-      className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1"
+      className="flex flex-col h-full rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1"
       onMouseEnter={() => { setIsHovering(true); onHoverChange?.(true); }}
       onMouseLeave={() => { setIsHovering(false); onHoverChange?.(false); }}
     >
@@ -112,7 +112,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
       </Link>
 
       {/* Content */}
-      <div className="p-5">
+      <div className="p-5 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="font-semibold text-lg text-gray-900 group-hover:text-primary-600 transition-colors">
             {accommodation.title}
@@ -141,7 +141,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
           </p>
         )}
 
-        <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+        <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
           <div>
             {accommodation.price != null ? (
               <p className="text-xl font-bold text-gray-900">
