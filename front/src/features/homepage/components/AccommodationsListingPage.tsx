@@ -51,7 +51,8 @@ const AccommodationsListingPage: React.FC = () => {
 
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
-  const [mapOpen, setMapOpen] = useState(false);
+  // The map is shown by default on the search page.
+  const [mapOpen, setMapOpen] = useState(true);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
@@ -379,7 +380,7 @@ const AccommodationsListingPage: React.FC = () => {
           {mapOpen ? (
             <div className="flex flex-col lg:flex-row gap-6 items-start">
               <div className="flex-1 min-w-0 w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {accommodations.map((item) => (
                     <AccommodationCard
                       key={item.id}
@@ -389,7 +390,7 @@ const AccommodationsListingPage: React.FC = () => {
                   ))}
                 </div>
               </div>
-              <div className="w-full lg:w-1/2 lg:sticky lg:top-24 flex-shrink-0">
+              <div className="w-full lg:w-2/5 lg:sticky lg:top-24 flex-shrink-0">
                 <AccommodationsMap
                   accommodations={accommodations}
                   height="calc(100vh - 8rem)"
