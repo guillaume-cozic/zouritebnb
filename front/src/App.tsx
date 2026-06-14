@@ -24,6 +24,7 @@ import ConversationDetailPage from './features/conversation/components/Conversat
 import AdminReservationsPage from './features/reservation/components/AdminReservationsPage';
 import AdminConversationsPage from './features/conversation/components/AdminConversationsPage';
 import ReservationConfirmationPage from './features/reservation/components/ReservationConfirmationPage';
+import ReservationSuccessPage from './features/reservation/components/ReservationSuccessPage';
 import IdentityVerificationPage from './features/userProfile/components/IdentityVerificationPage';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
           <Route path="/accommodations/:id" element={<AccommodationDetailPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/accommodations/:id/book" element={<ReservationConfirmationPage />} />
+            <Route path="/reservation-confirmed" element={<ReservationSuccessPage />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

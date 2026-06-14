@@ -32,6 +32,15 @@
       "title": "Moyen de paiement",
       "subtitle": "Vos informations de carte sont nécessaires pour confirmer mais aucun montant ne sera prélevé tant que l'hôte n'aura pas accepté votre demande.",
       "cardLabel": "Carte bancaire"
+    },
+    "success": {
+      "eyebrow": "Demande envoyée",
+      "title": "Votre demande de réservation est bien prise en compte",
+      "subtitle": "Votre paiement a été pré-autorisé. Aucun montant ne sera prélevé tant que l'hôte n'a pas accepté votre demande.",
+      "hostDelay": "L'hôte dispose de 24 h pour accepter votre demande. Vous serez notifié dès sa réponse.",
+      "summaryTitle": "Récapitulatif",
+      "viewConversations": "Voir mes messages",
+      "browseMore": "Découvrir d'autres logements"
     }
   },
   "admin": {

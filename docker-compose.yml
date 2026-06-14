@@ -22,7 +22,9 @@ services:
     environment:
       VITE_API_URL: http://localhost:8080
       VITE_BLOG_URL: http://localhost:4321/blog
-      VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY:-}
+      # VITE_STRIPE_PUBLISHABLE_KEY est lu depuis front/.env (bind-mounté).
+      # Ne pas le redéfinir ici : une valeur vide écraserait celle du .env
+      # (Vite donne priorité à process.env sur les fichiers .env).
     depends_on:
       - nginx
 

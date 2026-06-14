@@ -43,6 +43,7 @@ interface BookingFormProps {
   totalCents: number;
   missingDates: boolean;
   defaultGuestName: string;
+  totalLabel: string;
 }
 
 const BookingForm: React.FC<BookingFormProps> = ({
@@ -56,6 +57,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   totalCents,
   missingDates,
   defaultGuestName,
+  totalLabel,
 }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -136,7 +138,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
     setSubmitting(false);
 
     if (requestReservation.fulfilled.match(reservationResult)) {
-      navigate('/account/conversations');
+      navigate('/reservation-confirmed', {
+        replace: true,
+        state: {
+          accommodationTitle: accommodation.title,
+          accommodationCity: accommodation.city,
+          checkIn: checkInDate.toISOString(),
+          checkOut: checkOutDate.toISOString(),
+          guests: guestsCount,
+          totalLabel,
+        },
+      });
     }
   };
 
@@ -413,6 +425,7 @@ const ReservationConfirmationPage: React.FC = () => {
                 totalCents={totalCents}
                 missingDates={missingDates}
                 defaultGuestName={defaultGuestName}
+                totalLabel={formatPrice(total)}
               />
             </Elements>
           ) : (

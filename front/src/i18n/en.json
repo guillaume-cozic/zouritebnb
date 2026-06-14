@@ -32,6 +32,15 @@
       "title": "Payment method",
       "subtitle": "Card details are required to confirm, but nothing will be charged until the host accepts your request.",
       "cardLabel": "Bank card"
+    },
+    "success": {
+      "eyebrow": "Request sent",
+      "title": "Your booking request has been received",
+      "subtitle": "Your payment has been pre-authorized. Nothing will be charged until the host accepts your request.",
+      "hostDelay": "The host has 24 hours to accept your request. You'll be notified as soon as they respond.",
+      "summaryTitle": "Summary",
+      "viewConversations": "View my messages",
+      "browseMore": "Browse more places"
     }
   },
   "admin": {
