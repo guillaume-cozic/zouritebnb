@@ -1,0 +1,14 @@
+# Dev image — hot-reload via bind mount (see root docker-compose.yml).
+# Pinned Node major so every machine builds against the same toolchain.
+FROM node:24-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3001
+
+CMD ["npm", "run", "dev"]

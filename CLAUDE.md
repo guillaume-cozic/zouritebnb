@@ -47,20 +47,41 @@ When developing a full-stack feature:
 
 ## Commands
 
+### Toute la stack (Docker)
+
+Tout tourne en conteneur (Node 24, PHP 8.5) — aucun runtime local requis, build identique sur chaque machine.
+
+```bash
+./start.sh            # build + up -d de tout (API + front + admin + blog)
+./start.sh stop       # down
+./start.sh logs front # suivre les logs d'un service
+./start.sh status     # docker compose ps
+```
+
+| Service | URL | Stack |
+|---------|-----|-------|
+| API | http://localhost:8080 | Symfony / PHP 8.5 (php/nginx/mysql) |
+| front | http://localhost:3000 | React 19 + Vite 6 + Vitest |
+| admin | http://localhost:3001 | React 18 + Vite 6 (ROLE_ADMIN) |
+| blog | http://localhost:4321/blog/ | Astro 5 |
+
+Le `docker-compose.yml` racine inclut `API/docker-compose.yml` et ajoute les trois
+apps Node en conteneurs de dev (hot-reload : source bind-mountée, `node_modules`
+de l'image préservé par un volume anonyme).
+
 ### API (inside Docker)
 
 ```bash
-docker compose -f API/docker-compose.yml up -d          # Start services
-docker compose -f API/docker-compose.yml exec php bin/phpunit  # Tests
+docker compose -f API/docker-compose.yml exec php bin/phpunit         # Tests
 docker compose -f API/docker-compose.yml exec php bin/console cache:clear
 ```
 
-### Front
+### Front (hors Docker, si besoin)
 
 ```bash
-cd front && npm start   # Dev server (localhost:3000)
-cd front && npm run build
-cd front && npm test
+cd front && npm start        # Vite dev server (localhost:3000)
+cd front && npm run build    # tsc --noEmit && vite build
+cd front && npm test         # Vitest
 ```
 
 ### Admin

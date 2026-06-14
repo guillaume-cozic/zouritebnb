@@ -1,0 +1,55 @@
+# Single entry point for the whole stack in development.
+#
+#   docker compose up        # API (php/nginx/mysql) + front + admin + blog
+#
+# The API services are reused verbatim from API/docker-compose.yml; the three
+# Node apps run as dev containers with hot-reload (source bind-mounted, the
+# image's node_modules preserved by an anonymous volume).
+include:
+  - API/docker-compose.yml
+
+services:
+  front:
+    container_name: bnb-front
+    build:
+      context: ./front
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    environment:
+      VITE_API_URL: http://localhost:8080
+      VITE_BLOG_URL: http://localhost:4321/blog
+      VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY:-}
+    depends_on:
+      - nginx
+
+  admin:
+    container_name: bnb-admin
+    build:
+      context: ./admin
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./admin:/app
+      - /app/node_modules
+    environment:
+      VITE_API_URL: http://localhost:8080
+    depends_on:
+      - nginx
+
+  blog:
+    container_name: bnb-blog
+    build:
+      context: ./blog
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4321:4321"
+    volumes:
+      - ./blog:/app
+      - /app/node_modules
+    environment:
+      PUBLIC_FRONT_URL: http://localhost:3000

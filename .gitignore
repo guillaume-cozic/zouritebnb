@@ -35,6 +35,15 @@ front/npm-debug.log*
 front/yarn-debug.log*
 front/yarn-error.log*
 
+# Admin (React + Vite)
+admin/node_modules/
+admin/dist/
+
+# Blog (Astro)
+blog/node_modules/
+blog/dist/
+blog/.astro/
+
 # Client (generated)
 client/node_modules/
 

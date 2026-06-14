@@ -1,47 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-COMPOSE=(docker compose -f "$SCRIPT_DIR/API/docker-compose.yml")
+# Whole stack in Docker — no local Node/PHP required, identical build on every
+# machine. Services (see docker-compose.yml):
+#   API    php / nginx / mysql   http://localhost:8080
+#   front  React + Vite          http://localhost:3000
+#   admin  React + Vite          http://localhost:3001  (ROLE_ADMIN)
+#   blog   Astro                 http://localhost:4321/blog/
 
-# Charge nvm pour aligner la version de Node (le blog .nvmrc demande Node 20).
-if [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]; then
-  # shellcheck disable=SC1091
-  . "${NVM_DIR:-$HOME/.nvm}/nvm.sh"
-  if [ -f "$SCRIPT_DIR/blog/.nvmrc" ]; then
-    (cd "$SCRIPT_DIR/blog" && nvm use >/dev/null) || nvm use 20 >/dev/null
-  fi
-fi
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+COMPOSE=(docker compose -f "$SCRIPT_DIR/docker-compose.yml")
 
 cmd="${1:-start}"
 
 case "$cmd" in
   start)
-    BLOG_PID=""
-    ADMIN_PID=""
-    cleanup() {
-      echo
-      if [ -n "$BLOG_PID" ] && kill -0 "$BLOG_PID" 2>/dev/null; then
-        echo "==> Arrêt du blog (pid $BLOG_PID)..."
-        kill "$BLOG_PID" 2>/dev/null || true
-        wait "$BLOG_PID" 2>/dev/null || true
-      fi
-      if [ -n "$ADMIN_PID" ] && kill -0 "$ADMIN_PID" 2>/dev/null; then
-        echo "==> Arrêt du back-office admin (pid $ADMIN_PID)..."
-        kill "$ADMIN_PID" 2>/dev/null || true
-        wait "$ADMIN_PID" 2>/dev/null || true
-      fi
-      echo "==> Arrêt du backend..."
-      "${COMPOSE[@]}" stop
-    }
-    trap cleanup EXIT INT TERM
-
-    echo "==> Démarrage du backend (docker compose)..."
-    "${COMPOSE[@]}" up -d
+    echo "==> Build + démarrage de toute la stack (docker compose)..."
+    "${COMPOSE[@]}" up -d --build
 
     echo "==> Attente de l'API sur http://localhost:8080 ..."
     ready=false
-    for _ in $(seq 1 60); do
+    for _ in $(seq 1 90); do
       if curl -fsS http://localhost:8080/api/docs >/dev/null 2>&1; then
         ready=true
         break
@@ -49,40 +28,31 @@ case "$cmd" in
       sleep 1
     done
     if [ "$ready" = false ]; then
-      echo "!! L'API n'a pas répondu après 60s. Logs :"
-      "${COMPOSE[@]}" logs --tail=50
+      echo "!! L'API n'a pas répondu après 90s. Logs :"
+      "${COMPOSE[@]}" logs --tail=50 php nginx
       exit 1
     fi
-    echo "==> API prête."
 
-    echo "==> Démarrage du blog sur http://localhost:4321/blog/ ..."
-    if [ ! -d "$SCRIPT_DIR/blog/node_modules" ]; then
-      echo "==> Installation des dépendances du blog..."
-      (cd "$SCRIPT_DIR/blog" && npm install)
-    fi
-    (cd "$SCRIPT_DIR/blog" && npm run dev) &
-    BLOG_PID=$!
+    cat <<EOF
+==> Stack prête :
+      API    http://localhost:8080
+      front  http://localhost:3000
+      admin  http://localhost:3001
+      blog   http://localhost:4321/blog/
 
-    echo "==> Démarrage du back-office admin sur http://localhost:3001 ..."
-    if [ ! -d "$SCRIPT_DIR/admin/node_modules" ]; then
-      echo "==> Installation des dépendances du back-office admin..."
-      (cd "$SCRIPT_DIR/admin" && npm install)
-    fi
-    (cd "$SCRIPT_DIR/admin" && npm run dev) &
-    ADMIN_PID=$!
-
-    echo "==> Démarrage du frontend sur http://localhost:3000 ..."
-    cd "$SCRIPT_DIR/front"
-    npm start
+    Logs en direct : $0 logs
+    Arrêt          : $0 stop
+EOF
     ;;
 
   stop)
-    echo "==> Arrêt et suppression des conteneurs backend..."
+    echo "==> Arrêt et suppression des conteneurs..."
     "${COMPOSE[@]}" down
     ;;
 
   logs)
-    "${COMPOSE[@]}" logs -f
+    shift || true
+    "${COMPOSE[@]}" logs -f "$@"
     ;;
 
   status)
@@ -93,11 +63,10 @@ case "$cmd" in
     cat <<EOF
 Usage: $0 [start|stop|logs|status]
 
-  start   (défaut) lance le backend (docker) puis le frontend (npm start).
-          Ctrl+C arrête le frontend et stoppe les conteneurs backend.
-  stop    arrête et supprime les conteneurs backend.
-  logs    suit les logs des conteneurs backend.
-  status  affiche l'état des conteneurs backend.
+  start   (défaut) build + démarre toute la stack en arrière-plan (docker compose up -d --build).
+  stop    arrête et supprime les conteneurs.
+  logs    suit les logs (optionnel : nom de service, ex. "$0 logs front").
+  status  affiche l'état des conteneurs.
 EOF
     exit 1
     ;;
