@@ -9,3 +9,12 @@
 
 controllers:
     resource: routing.controllers
+
+# The application is an API: the root path redirects to the OpenAPI docs
+# instead of showing Symfony's default welcome page.
+homepage:
+    path: /
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction
+    defaults:
+        path: /api/docs
+        permanent: true
