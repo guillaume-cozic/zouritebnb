@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { loginUser } from '../AuthSlice';
 import { selectAuthError, selectAuthStatus, selectAuthUser } from '../AuthSelectors';
 import Footer from '../../../components/Footer';
+import BookingAuthNotice from './BookingAuthNotice';
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -20,6 +21,7 @@ const LoginPage: React.FC = () => {
   const returnTo = searchParams.get('returnTo');
   const redirectTo = returnTo ? decodeURIComponent(returnTo) : '/admin';
   const registerTo = returnTo ? `/register?returnTo=${encodeURIComponent(returnTo)}` : '/register';
+  const isBookingContext = redirectTo.includes('/book');
 
   if (user) {
     return <Navigate to={redirectTo} replace />;
@@ -49,8 +51,12 @@ const LoginPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
               {t('auth.loginTitle')}
             </h1>
-            <p className="text-gray-500 mt-2">{t('auth.loginSubtitle')}</p>
+            <p className="text-gray-500 mt-2">
+              {isBookingContext ? t('auth.bookingLoginSubtitle') : t('auth.loginSubtitle')}
+            </p>
           </div>
+
+          {isBookingContext && <BookingAuthNotice mode="login" />}
 
           <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-7 sm:p-8 space-y-5">
             <div>

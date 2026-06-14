@@ -142,7 +142,15 @@
     "register": "S'inscrire",
     "loading": "Chargement...",
     "noAccount": "Pas encore de compte ?",
-    "hasAccount": "Déjà inscrit ?"
+    "hasAccount": "Déjà inscrit ?",
+    "bookingLoginSubtitle": "Connectez-vous pour finaliser votre réservation.",
+    "bookingRegisterSubtitle": "Créez votre compte pour valider votre réservation.",
+    "bookingContext": {
+      "title": "Plus qu'une étape avant votre réservation",
+      "login": "Connectez-vous pour confirmer votre demande de réservation et procéder au paiement sécurisé.",
+      "register": "Pour valider votre réservation et procéder au paiement, créez votre compte — c'est gratuit et rapide.",
+      "reassurance": "Aucun montant ne sera prélevé tant que l'hôte n'a pas accepté votre demande."
+    }
   },
   "team": {
     "title": "Paramètres",

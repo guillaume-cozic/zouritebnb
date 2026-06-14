@@ -142,7 +142,15 @@
     "register": "Sign up",
     "loading": "Loading...",
     "noAccount": "No account yet?",
-    "hasAccount": "Already registered?"
+    "hasAccount": "Already registered?",
+    "bookingLoginSubtitle": "Sign in to complete your booking.",
+    "bookingRegisterSubtitle": "Create your account to confirm your booking.",
+    "bookingContext": {
+      "title": "One last step before your booking",
+      "login": "Sign in to confirm your booking request and proceed to secure payment.",
+      "register": "To confirm your booking and proceed to payment, create your account — it's free and quick.",
+      "reassurance": "Nothing will be charged until the host accepts your request."
+    }
   },
   "team": {
     "title": "Settings",
