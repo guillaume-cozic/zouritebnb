@@ -26,6 +26,9 @@ final class RegisterUserTest extends UserApiTestCase
         self::assertArrayHasKey('teamId', $data);
         self::assertNotEmpty($data['id']);
         self::assertNotEmpty($data['teamId']);
+        // The user is logged in straight after registering: a JWT is returned.
+        self::assertArrayHasKey('token', $data);
+        self::assertNotEmpty($data['token']);
     }
 
     public function test_should_return422_with_violation_when_email_is_invalid(): void

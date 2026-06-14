@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { registerUser } from '../AuthSlice';
@@ -10,21 +10,26 @@ const RegisterPage: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const status = useAppSelector(selectAuthStatus);
   const error = useAppSelector(selectAuthError);
   const user = useAppSelector(selectAuthUser);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const returnTo = searchParams.get('returnTo');
+  const redirectTo = returnTo ? decodeURIComponent(returnTo) : '/admin';
+  const loginTo = returnTo ? `/login?returnTo=${encodeURIComponent(returnTo)}` : '/login';
+
   if (user) {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await dispatch(registerUser({ email, password }));
     if (registerUser.fulfilled.match(result)) {
-      navigate('/admin');
+      navigate(redirectTo);
     }
   };
 
@@ -100,7 +105,7 @@ const RegisterPage: React.FC = () => {
             </button>
             <p className="text-sm text-center text-gray-500 pt-1">
               {t('auth.hasAccount')}{' '}
-              <Link to="/login" className="text-primary-700 font-medium hover:underline">{t('auth.login')}</Link>
+              <Link to={loginTo} className="text-primary-700 font-medium hover:underline">{t('auth.login')}</Link>
             </p>
           </form>
         </div>

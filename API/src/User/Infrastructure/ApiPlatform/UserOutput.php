@@ -19,9 +19,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
             status: 201,
             openapi: new OpenApiOperation(
                 summary: 'Inscription d\'un utilisateur',
-                description: 'Crée un utilisateur et son équipe associée. L\'utilisateur est le seul membre de sa team à la création.',
+                description: 'Crée un utilisateur et son équipe associée. L\'utilisateur est le seul membre de sa team à la création. La réponse contient un JWT (champ `token`) afin que l\'utilisateur soit connecté immédiatement après l\'inscription.',
             ),
-            normalizationContext: ['groups' => ['user:read']],
+            normalizationContext: ['groups' => ['user:read', 'user:token']],
             denormalizationContext: ['groups' => ['user:write']],
             input: RegisterUserInput::class,
             processor: RegisterUserProcessor::class,

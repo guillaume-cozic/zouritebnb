@@ -12,6 +12,9 @@ use App\Team\Domain\Entity\Team;
 use App\Team\Domain\Port\TeamRepository;
 use App\User\Application\UseCase\RegisterUser;
 use App\User\Domain\Command\RegisterUserCommand;
+use App\User\Infrastructure\Doctrine\UserEntity;
+use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -26,6 +29,8 @@ final readonly class RegisterUserProcessor implements ProcessorInterface
         private TransactionalUseCaseHandler $handler,
         private IpRateLimiter $rateLimiter,
         private RateLimiterFactoryInterface $registerLimiter,
+        private JWTTokenManagerInterface $tokenManager,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -52,10 +57,20 @@ final readonly class RegisterUserProcessor implements ProcessorInterface
             return ['userId' => $userId, 'teamId' => $teamId->toRfc4122()];
         });
 
+        // Reload the Symfony security user (the JWT manager needs a UserInterface)
+        // so the freshly registered user is logged in straight away.
+        $securityUser = $this->entityManager
+            ->getRepository(UserEntity::class)
+            ->findOneBy(['email' => $data->email]);
+        if (!$securityUser instanceof UserEntity) {
+            throw new \RuntimeException('Security user could not be reloaded after registration.');
+        }
+
         $output = new UserOutput();
         $output->id = $ids['userId'];
         $output->email = $data->email;
         $output->teamId = $ids['teamId'];
+        $output->token = $this->tokenManager->create($securityUser);
 
         return $output;
     }

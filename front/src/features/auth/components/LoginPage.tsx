@@ -19,6 +19,7 @@ const LoginPage: React.FC = () => {
 
   const returnTo = searchParams.get('returnTo');
   const redirectTo = returnTo ? decodeURIComponent(returnTo) : '/admin';
+  const registerTo = returnTo ? `/register?returnTo=${encodeURIComponent(returnTo)}` : '/register';
 
   if (user) {
     return <Navigate to={redirectTo} replace />;
@@ -102,7 +103,7 @@ const LoginPage: React.FC = () => {
             </button>
             <p className="text-sm text-center text-gray-500 pt-1">
               {t('auth.noAccount')}{' '}
-              <Link to="/register" className="text-primary-700 font-medium hover:underline">{t('auth.register')}</Link>
+              <Link to={registerTo} className="text-primary-700 font-medium hover:underline">{t('auth.register')}</Link>
             </p>
           </form>
         </div>
