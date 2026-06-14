@@ -1,18 +1,19 @@
-jest.mock('../../services/api', () => ({
-  __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+import type { Mocked } from 'vitest';
+vi.mock('../../services/api', async (importOriginal) => ({
+  ...((await importOriginal()) as Record<string, unknown>),
+  default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
 
 import { configureStore } from '@reduxjs/toolkit';
 import geographyReducer, { fetchLocalities, fetchRegions } from './GeographySlice';
 import api from '../../services/api';
 
-const mockedApi = api as jest.Mocked<typeof api>;
+const mockedApi = api as Mocked<typeof api>;
 
 const buildStore = () => configureStore({ reducer: { geography: geographyReducer } });
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 describe('fetchLocalities', () => {

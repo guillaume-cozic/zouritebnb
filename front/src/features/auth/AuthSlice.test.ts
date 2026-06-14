@@ -1,9 +1,10 @@
-jest.mock('../../services/api', () => {
+import type { Mocked } from 'vitest';
+vi.mock('../../services/api', () => {
   const AUTH_TOKEN_KEY = 'auth.token';
   const AUTH_USER_KEY = 'auth.user';
   return {
     __esModule: true,
-    default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+    default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
     AUTH_TOKEN_KEY,
     AUTH_USER_KEY,
     setStoredToken: (token: string) => globalThis.localStorage.setItem(AUTH_TOKEN_KEY, token),
@@ -23,7 +24,7 @@ import authReducer, {
 } from './AuthSlice';
 import api from '../../services/api';
 
-const mockedApi = api as jest.Mocked<typeof api>;
+const mockedApi = api as Mocked<typeof api>;
 
 const buildStore = () => configureStore({ reducer: { auth: authReducer } });
 
@@ -31,7 +32,7 @@ const user = { id: 'u-1', email: 'a@b.fr', firstName: null, lastName: null };
 const userWithToken = { ...user, token: 'jwt-abc-123' };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   localStorage.clear();
 });
 

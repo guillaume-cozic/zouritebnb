@@ -1,6 +1,7 @@
-jest.mock('../../services/api', () => ({
-  __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+import type { Mocked } from 'vitest';
+vi.mock('../../services/api', async (importOriginal) => ({
+  ...((await importOriginal()) as Record<string, unknown>),
+  default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
 
 import { configureStore } from '@reduxjs/toolkit';
@@ -12,7 +13,7 @@ import { listenerMiddleware } from '../../store/listenerMiddleware';
 import './AccommodationListeners';
 import api from '../../services/api';
 
-const mockedApi = api as jest.Mocked<typeof api>;
+const mockedApi = api as Mocked<typeof api>;
 
 const buildStore = () =>
   configureStore({
@@ -25,7 +26,7 @@ const flush = async () => {
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 describe('editPageOpened', () => {
@@ -49,7 +50,7 @@ describe('editPageOpened', () => {
 
 describe('accommodationFieldEdited', () => {
   test('saves the price after the debounce delay and clears the badge', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockResolvedValue({ data: {} });
       const store = buildStore();
@@ -57,7 +58,7 @@ describe('accommodationFieldEdited', () => {
       store.dispatch(accommodationFieldEdited({ field: 'price', id: 'a-1', price: 120 }));
       expect(mockedApi.patch).not.toHaveBeenCalled();
 
-      jest.advanceTimersByTime(1201);
+      vi.advanceTimersByTime(1201);
       await flush();
 
       expect(mockedApi.patch).toHaveBeenCalledWith(
@@ -67,25 +68,25 @@ describe('accommodationFieldEdited', () => {
       );
       expect(store.getState().accommodation.editSaveStatus.price).toBe('saved');
 
-      jest.advanceTimersByTime(2501);
+      vi.advanceTimersByTime(2501);
       await flush();
       expect(store.getState().accommodation.editSaveStatus.price).toBe('idle');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('debounces successive edits of the same field into a single save', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockResolvedValue({ data: {} });
       const store = buildStore();
 
       store.dispatch(accommodationFieldEdited({ field: 'price', id: 'a-1', price: 100 }));
-      jest.advanceTimersByTime(600);
+      vi.advanceTimersByTime(600);
       await flush();
       store.dispatch(accommodationFieldEdited({ field: 'price', id: 'a-1', price: 120 }));
-      jest.advanceTimersByTime(1201);
+      vi.advanceTimersByTime(1201);
       await flush();
 
       expect(mockedApi.patch).toHaveBeenCalledTimes(1);
@@ -95,22 +96,22 @@ describe('accommodationFieldEdited', () => {
         expect.anything()
       );
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('does not debounce edits of different fields against each other', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockResolvedValue({ data: {} });
       mockedApi.put.mockResolvedValue({ data: {} });
       const store = buildStore();
 
       store.dispatch(accommodationFieldEdited({ field: 'price', id: 'a-1', price: 100 }));
-      jest.advanceTimersByTime(600);
+      vi.advanceTimersByTime(600);
       await flush();
       store.dispatch(accommodationFieldEdited({ field: 'amenities', id: 'a-1', codes: ['wifi'] }));
-      jest.advanceTimersByTime(1201);
+      vi.advanceTimersByTime(1201);
       await flush();
 
       expect(mockedApi.patch).toHaveBeenCalledWith(
@@ -124,46 +125,46 @@ describe('accommodationFieldEdited', () => {
         expect.anything()
       );
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('skips the save when the payload violates the business rules', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       const store = buildStore();
 
       store.dispatch(accommodationFieldEdited({ field: 'price', id: 'a-1', price: 0 }));
       store.dispatch(accommodationFieldEdited({ field: 'description', id: 'a-1', title: '', description: 'text' }));
-      jest.advanceTimersByTime(1201);
+      vi.advanceTimersByTime(1201);
       await flush();
 
       expect(mockedApi.patch).not.toHaveBeenCalled();
       expect(mockedApi.put).not.toHaveBeenCalled();
       expect(store.getState().accommodation.editSaveStatus.price).toBeUndefined();
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('marks the section in error when the save fails', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockRejectedValue({ response: { data: { detail: 'boom' } } });
       const store = buildStore();
 
       store.dispatch(accommodationFieldEdited({ field: 'price', id: 'a-1', price: 120 }));
-      jest.advanceTimersByTime(1201);
+      vi.advanceTimersByTime(1201);
       await flush();
 
       expect(store.getState().accommodation.editSaveStatus.price).toBe('error');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('saves the weekly promotion under the price badge section', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockResolvedValue({ data: {} });
       const store = buildStore();
@@ -173,7 +174,7 @@ describe('accommodationFieldEdited', () => {
         id: 'a-1',
         weeklyPromotionPercentage: 10,
       }));
-      jest.advanceTimersByTime(1201);
+      vi.advanceTimersByTime(1201);
       await flush();
 
       expect(mockedApi.patch).toHaveBeenCalledWith(
@@ -183,7 +184,7 @@ describe('accommodationFieldEdited', () => {
       );
       expect(store.getState().accommodation.editSaveStatus.price).toBe('saved');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 });

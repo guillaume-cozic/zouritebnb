@@ -6,7 +6,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AccommodationListItem } from '../HomepageTypes';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 // Center on Rodrigues Island, used only when no accommodation is geolocated.
 const DEFAULT_CENTER: [number, number] = [-19.7245, 63.4272];

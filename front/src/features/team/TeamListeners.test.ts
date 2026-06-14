@@ -1,6 +1,7 @@
-jest.mock('../../services/api', () => ({
-  __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+import type { Mocked } from 'vitest';
+vi.mock('../../services/api', async (importOriginal) => ({
+  ...((await importOriginal()) as Record<string, unknown>),
+  default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
 
 import { configureStore } from '@reduxjs/toolkit';
@@ -15,7 +16,7 @@ import { listenerMiddleware } from '../../store/listenerMiddleware';
 import '../../store/registerListeners';
 import api from '../../services/api';
 
-const mockedApi = api as jest.Mocked<typeof api>;
+const mockedApi = api as Mocked<typeof api>;
 
 const buildStore = () =>
   configureStore({
@@ -33,7 +34,7 @@ const flushAll = async () => {
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 describe('teamSettingsPageOpened', () => {
@@ -69,7 +70,7 @@ describe('teamSettingsPageOpened', () => {
 
 describe('inviteCoHost.fulfilled — clear différé', () => {
   test('après succès et 2s, le store remet inviteStatus à idle', async () => {
-    jest.useFakeTimers('modern');
+    vi.useFakeTimers();
     try {
       mockedApi.post.mockResolvedValue({
         data: { id: 'inv-1', email: 'co@host.fr', createdAt: '2026-04-28' },
@@ -80,20 +81,20 @@ describe('inviteCoHost.fulfilled — clear différé', () => {
       expect(store.getState().team.inviteStatus).toBe('succeeded');
 
       await flushAll();
-      jest.advanceTimersByTime(2001);
+      vi.advanceTimersByTime(2001);
       await flushAll();
       await flushAll();
 
       expect(store.getState().team.inviteStatus).toBe('idle');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 });
 
 describe('bankAccountEdited', () => {
   test('après le debounce, le compte bancaire normalisé est sauvegardé puis le badge est effacé', async () => {
-    jest.useFakeTimers('modern');
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockResolvedValue({ data: {} });
       const store = buildStore();
@@ -106,7 +107,7 @@ describe('bankAccountEdited', () => {
       }));
       expect(mockedApi.patch).not.toHaveBeenCalled();
 
-      jest.advanceTimersByTime(801);
+      vi.advanceTimersByTime(801);
       await flushAll();
       await flushAll();
 
@@ -117,17 +118,17 @@ describe('bankAccountEdited', () => {
       );
       expect(store.getState().team.bankSaveState).toBe('saved');
 
-      jest.advanceTimersByTime(1501);
+      vi.advanceTimersByTime(1501);
       await flushAll();
       await flushAll();
       expect(store.getState().team.bankSaveState).toBe('idle');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('un IBAN sans titulaire ne déclenche pas de sauvegarde', async () => {
-    jest.useFakeTimers('modern');
+    vi.useFakeTimers();
     try {
       const store = buildStore();
 
@@ -137,29 +138,29 @@ describe('bankAccountEdited', () => {
         bic: '',
         holderName: '',
       }));
-      jest.advanceTimersByTime(801);
+      vi.advanceTimersByTime(801);
       await flushAll();
       await flushAll();
 
       expect(mockedApi.patch).not.toHaveBeenCalled();
       expect(store.getState().team.bankSaveState).toBe('idle');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('plusieurs frappes rapprochées ne produisent qu\'une seule sauvegarde', async () => {
-    jest.useFakeTimers('modern');
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockResolvedValue({ data: {} });
       const store = buildStore();
 
       store.dispatch(bankAccountEdited({ teamId: 'team-1', iban: '', bic: '', holderName: 'J' }));
-      jest.advanceTimersByTime(400);
+      vi.advanceTimersByTime(400);
       await flushAll();
       await flushAll();
       store.dispatch(bankAccountEdited({ teamId: 'team-1', iban: '', bic: '', holderName: 'Jane' }));
-      jest.advanceTimersByTime(801);
+      vi.advanceTimersByTime(801);
       await flushAll();
       await flushAll();
 
@@ -170,32 +171,32 @@ describe('bankAccountEdited', () => {
         expect.anything()
       );
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('en cas d\'échec, le store expose l\'erreur API', async () => {
-    jest.useFakeTimers('modern');
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockRejectedValue({ response: { data: { detail: 'IBAN invalide' } } });
       const store = buildStore();
 
       store.dispatch(bankAccountEdited({ teamId: 'team-1', iban: '', bic: '', holderName: 'Jane' }));
-      jest.advanceTimersByTime(801);
+      vi.advanceTimersByTime(801);
       await flushAll();
       await flushAll();
 
       expect(store.getState().team.bankSaveState).toBe('error');
       expect(store.getState().team.bankSaveError).toBe('IBAN invalide');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 });
 
 describe('updateTeamFavoriteProject — badge différé', () => {
   test('après succès et 1,5s, le store remet favoriteSaveState à idle', async () => {
-    jest.useFakeTimers('modern');
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockResolvedValue({ data: {} });
       const store = buildStore();
@@ -204,13 +205,13 @@ describe('updateTeamFavoriteProject — badge différé', () => {
       expect(store.getState().team.favoriteSaveState).toBe('saved');
 
       await flushAll();
-      jest.advanceTimersByTime(1501);
+      vi.advanceTimersByTime(1501);
       await flushAll();
       await flushAll();
 
       expect(store.getState().team.favoriteSaveState).toBe('idle');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 });

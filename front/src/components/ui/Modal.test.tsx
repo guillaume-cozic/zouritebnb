@@ -4,7 +4,7 @@ import { Modal } from './Modal';
 
 test('renders nothing when closed', () => {
   render(
-    <Modal open={false} onClose={jest.fn()} title="Hidden">
+    <Modal open={false} onClose={vi.fn()} title="Hidden">
       content
     </Modal>
   );
@@ -14,7 +14,7 @@ test('renders nothing when closed', () => {
 
 test('renders a dialog with its title, body and footer when open', () => {
   render(
-    <Modal open onClose={jest.fn()} title="Confirm" footer={<button>OK</button>}>
+    <Modal open onClose={vi.fn()} title="Confirm" footer={<button>OK</button>}>
       Are you sure?
     </Modal>
   );
@@ -27,7 +27,7 @@ test('renders a dialog with its title, body and footer when open', () => {
 });
 
 test('closes on Escape', () => {
-  const onClose = jest.fn();
+  const onClose = vi.fn();
   render(
     <Modal open onClose={onClose} title="Confirm">
       content
@@ -39,7 +39,7 @@ test('closes on Escape', () => {
 });
 
 test('closes on overlay click but not on panel click', () => {
-  const onClose = jest.fn();
+  const onClose = vi.fn();
   render(
     <Modal open onClose={onClose} title="Confirm">
       content

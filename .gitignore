@@ -19,13 +19,12 @@ API/.php-cs-fixer.cache
 API/phpunit.xml
 API/.phpunit.cache/
 
-# Front (React)
+# Front (React + Vite)
 front/node_modules/
 front/.pnp
 front/.pnp.js
 front/coverage/
-front/build/
-front/src/tailwind.output.css
+front/dist/
 front/.env.local
 front/.env
 front/.env.development.local

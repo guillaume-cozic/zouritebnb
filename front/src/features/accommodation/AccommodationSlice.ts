@@ -171,7 +171,7 @@ export const addPhoto = createAsyncThunk(
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
       const response = await fetch(`${baseURL}/api/accommodations/${id}/photos`, {
         method: 'POST',
         body: formData,

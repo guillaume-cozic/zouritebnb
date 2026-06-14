@@ -281,14 +281,14 @@ const AllAccommodationsCalendarPage: React.FC = () => {
                   unit="primaryHeader"
                   labelFormat={
                     (([startTime]: [dayjs.Dayjs]) =>
-                      startTime.locale(isFr ? 'fr' : 'en-gb').format('MMMM YYYY')) as unknown as string
+                      startTime.locale(isFr ? 'fr' : 'en-gb').format('MMMM YYYY')) as unknown as never
                   }
                 />
                 <DateHeader
                   unit="day"
                   labelFormat={
                     (([startTime]: [dayjs.Dayjs]) =>
-                      startTime.locale(isFr ? 'fr' : 'en-gb').format('ddd D')) as unknown as string
+                      startTime.locale(isFr ? 'fr' : 'en-gb').format('ddd D')) as unknown as never
                   }
                 />
               </TimelineHeaders>

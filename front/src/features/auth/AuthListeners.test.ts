@@ -1,9 +1,10 @@
-jest.mock('../../services/api', () => ({
+import type { Mocked } from 'vitest';
+vi.mock('../../services/api', () => ({
   __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+  default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
   AUTH_USER_KEY: 'auth.user',
-  clearStoredAuth: jest.fn(),
-  setStoredToken: jest.fn(),
+  clearStoredAuth: vi.fn(),
+  setStoredToken: vi.fn(),
 }));
 
 import { configureStore } from '@reduxjs/toolkit';
@@ -13,7 +14,7 @@ import { listenerMiddleware } from '../../store/listenerMiddleware';
 import './AuthListeners';
 import api from '../../services/api';
 
-const mockedApi = api as jest.Mocked<typeof api>;
+const mockedApi = api as Mocked<typeof api>;
 
 const buildStore = () =>
   configureStore({
@@ -26,13 +27,13 @@ const flush = async () => {
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   localStorage.clear();
 });
 
 describe('profileEdited', () => {
   test('saves the profile after the debounce delay and clears the badge', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockResolvedValue({ data: {} });
       const store = buildStore();
@@ -45,7 +46,7 @@ describe('profileEdited', () => {
       }));
       expect(mockedApi.patch).not.toHaveBeenCalled();
 
-      jest.advanceTimersByTime(801);
+      vi.advanceTimersByTime(801);
       await flush();
 
       expect(mockedApi.patch).toHaveBeenCalledWith(
@@ -55,41 +56,41 @@ describe('profileEdited', () => {
       );
       expect(store.getState().auth.profileSaveState).toBe('saved');
 
-      jest.advanceTimersByTime(1501);
+      vi.advanceTimersByTime(1501);
       await flush();
       expect(store.getState().auth.profileSaveState).toBe('idle');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('skips the save while the email is empty', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       const store = buildStore();
 
       store.dispatch(profileEdited({ userId: 'u-1', firstName: 'Jane', lastName: 'Doe', email: '' }));
-      jest.advanceTimersByTime(801);
+      vi.advanceTimersByTime(801);
       await flush();
 
       expect(mockedApi.patch).not.toHaveBeenCalled();
       expect(store.getState().auth.profileSaveState).toBe('idle');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('debounces successive edits into a single save', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockResolvedValue({ data: {} });
       const store = buildStore();
 
       store.dispatch(profileEdited({ userId: 'u-1', firstName: 'J', lastName: '', email: 'jane@example.com' }));
-      jest.advanceTimersByTime(400);
+      vi.advanceTimersByTime(400);
       await flush();
       store.dispatch(profileEdited({ userId: 'u-1', firstName: 'Jane', lastName: '', email: 'jane@example.com' }));
-      jest.advanceTimersByTime(801);
+      vi.advanceTimersByTime(801);
       await flush();
 
       expect(mockedApi.patch).toHaveBeenCalledTimes(1);
@@ -99,23 +100,23 @@ describe('profileEdited', () => {
         expect.anything()
       );
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 
   test('marks the profile in error when the save fails', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     try {
       mockedApi.patch.mockRejectedValue({ response: { data: { detail: 'boom' } } });
       const store = buildStore();
 
       store.dispatch(profileEdited({ userId: 'u-1', firstName: 'Jane', lastName: '', email: 'jane@example.com' }));
-      jest.advanceTimersByTime(801);
+      vi.advanceTimersByTime(801);
       await flush();
 
       expect(store.getState().auth.profileSaveState).toBe('error');
     } finally {
-      jest.useRealTimers();
+      vi.useRealTimers();
     }
   });
 });

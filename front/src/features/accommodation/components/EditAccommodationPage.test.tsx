@@ -1,9 +1,10 @@
-jest.mock('../../../services/api', () => ({
-  __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+import type { Mocked } from 'vitest';
+vi.mock('../../../services/api', async (importOriginal) => ({
+  ...((await importOriginal()) as Record<string, unknown>),
+  default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
 
-jest.mock('../../../components/MapSelector', () => ({
+vi.mock('../../../components/MapSelector', () => ({
   __esModule: true,
   default: () => <div data-testid="map-selector" />,
 }));
@@ -20,7 +21,7 @@ import '../AccommodationListeners';
 import api from '../../../services/api';
 import EditAccommodationPage from './EditAccommodationPage';
 
-const mockedApi = api as jest.Mocked<typeof api>;
+const mockedApi = api as Mocked<typeof api>;
 
 const ACCOMMODATION = {
   id: 'a-1',
@@ -64,7 +65,7 @@ const renderPage = () => {
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockedApi.get.mockResolvedValue({ data: ACCOMMODATION });
   mockedApi.patch.mockResolvedValue({ data: {} });
   mockedApi.put.mockResolvedValue({ data: {} });

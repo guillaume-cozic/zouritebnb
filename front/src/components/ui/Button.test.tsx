@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Button } from './Button';
 
 test('renders a type=button by default and fires onClick', () => {
-  const onClick = jest.fn();
+  const onClick = vi.fn();
   render(<Button onClick={onClick}>Save</Button>);
 
   const button = screen.getByRole('button', { name: 'Save' });
@@ -14,7 +14,7 @@ test('renders a type=button by default and fires onClick', () => {
 });
 
 test('is disabled and silent while loading', () => {
-  const onClick = jest.fn();
+  const onClick = vi.fn();
   render(<Button loading onClick={onClick}>Save</Button>);
 
   const button = screen.getByRole('button', { name: 'Save' });

@@ -13,7 +13,7 @@ import { Reservation } from '../../reservation/ReservationTypes';
 
 type Tab = 'today' | 'upcoming' | 'leaving';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const startOfDay = (d: Date): Date => {
   const x = new Date(d);

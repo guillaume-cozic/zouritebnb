@@ -38,7 +38,7 @@ const toStr = (d: Date | null): string => {
 const PLATFORM_COMMISSION_RATE = 0.08;
 const SOLIDARITY_RATE = 0.07;
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const AccommodationDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

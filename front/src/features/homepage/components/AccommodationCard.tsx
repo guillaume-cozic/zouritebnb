@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AccommodationListItem } from '../HomepageTypes';
 import RatingBadge from '../../review/components/RatingBadge';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const PHOTO_CYCLE_MS = 1200;
 
 interface AccommodationCardProps {

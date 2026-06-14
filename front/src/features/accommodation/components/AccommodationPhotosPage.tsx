@@ -7,7 +7,7 @@ import { selectCurrentAccommodation, selectAccommodationStatus, selectAccommodat
 import EditLayout, { SECTIONS } from './EditLayout';
 import { extractErrorMessage } from '../../../services/errors';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const AccommodationPhotosPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

@@ -22,7 +22,7 @@ import MapSelector from '../../../components/MapSelector';
 import { Card, Field, Input, SaveIndicator, Textarea } from '../../../components/ui';
 import EditLayout, { SECTIONS, EditSection } from './EditLayout';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const SECTION_CARD_CLASS = 'sm:p-8 hover:shadow-md transition-shadow';
 

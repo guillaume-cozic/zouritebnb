@@ -1,9 +1,10 @@
-jest.mock('../../../services/api', () => ({
+import type { Mocked } from 'vitest';
+vi.mock('../../../services/api', () => ({
   __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+  default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
   AUTH_USER_KEY: 'auth.user',
-  clearStoredAuth: jest.fn(),
-  setStoredToken: jest.fn(),
+  clearStoredAuth: vi.fn(),
+  setStoredToken: vi.fn(),
 }));
 
 import React from 'react';
@@ -21,7 +22,7 @@ import '../../../store/registerListeners';
 import api from '../../../services/api';
 import TeamSettingsPage from './TeamSettingsPage';
 
-const mockedApi = api as jest.Mocked<typeof api>;
+const mockedApi = api as Mocked<typeof api>;
 
 const USER = {
   id: 'u-1',
@@ -66,7 +67,7 @@ const renderPage = () => {
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   localStorage.clear();
   mockedApi.get.mockImplementation((url: string) => {
     if (url === '/api/teams/team-1') return Promise.resolve({ data: TEAM });

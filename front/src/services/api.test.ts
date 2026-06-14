@@ -5,10 +5,13 @@
  */
 
 // Capture the request/response interceptors axios registers so we can drive them.
-const requestInterceptors: Array<(config: any) => any> = [];
-const responseInterceptors: Array<{ onFulfilled: (r: any) => any; onRejected: (e: any) => any }> = [];
+// vi.hoisted keeps these initialised when the (hoisted) vi.mock factory runs.
+const { requestInterceptors, responseInterceptors } = vi.hoisted(() => ({
+  requestInterceptors: [] as Array<(config: any) => any>,
+  responseInterceptors: [] as Array<{ onFulfilled: (r: any) => any; onRejected: (e: any) => any }>,
+}));
 
-jest.mock('axios', () => ({
+vi.mock('axios', () => ({
   __esModule: true,
   default: {
     create: () => ({
@@ -61,7 +64,7 @@ describe('response interceptor (401)', () => {
   test('purges stored auth and calls the unauthorized handler on 401', async () => {
     localStorage.setItem(AUTH_TOKEN_KEY, 'jwt-xyz');
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify({ id: 'u-1' }));
-    const handler = jest.fn();
+    const handler = vi.fn();
     setUnauthorizedHandler(handler);
 
     await runResponseRejected({ response: { status: 401 } });
@@ -73,7 +76,7 @@ describe('response interceptor (401)', () => {
 
   test('leaves auth untouched and does not call the handler on other errors', async () => {
     localStorage.setItem(AUTH_TOKEN_KEY, 'jwt-xyz');
-    const handler = jest.fn();
+    const handler = vi.fn();
     setUnauthorizedHandler(handler);
 
     await runResponseRejected({ response: { status: 500 } });

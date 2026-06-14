@@ -10,7 +10,7 @@ import RodriguesMap from './RodriguesMap';
 import SolidarityProjectsSection from '../../solidarityProject/components/SolidarityProjectsSection';
 import Footer from '../../../components/Footer';
 
-const BLOG_URL = process.env.REACT_APP_BLOG_URL ?? '/blog';
+const BLOG_URL = import.meta.env.VITE_BLOG_URL ?? '/blog';
 const ACTIVITY_LINKS = {
   diving: `${BLOG_URL}/#tag=Snorkeling`,
   hiking: `${BLOG_URL}/#cat-randonnees`,
