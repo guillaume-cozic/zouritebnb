@@ -380,7 +380,7 @@ const AccommodationsListingPage: React.FC = () => {
           {mapOpen ? (
             <div className="flex flex-col lg:flex-row gap-6 items-start">
               <div className="flex-1 min-w-0 w-full lg:w-1/2">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {accommodations.map((item) => (
                     <AccommodationCard
                       key={item.id}
