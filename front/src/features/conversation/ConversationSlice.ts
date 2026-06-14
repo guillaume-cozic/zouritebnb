@@ -2,6 +2,11 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import { extractErrorMessage } from '../../services/errors';
 import { Conversation, ConversationMessage, SendMessagePayload } from './ConversationTypes';
+import {
+  ConversationReads,
+  loadConversationReads,
+  saveConversationReads,
+} from './conversationReads';
 
 type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
 
@@ -14,7 +19,18 @@ interface ConversationState {
   currentError: string | null;
   sendStatus: Status;
   sendError: string | null;
+  reads: ConversationReads;
 }
+
+const latestMessageAt = (conversation: Conversation): string | null => {
+  let latest: string | null = null;
+  for (const message of conversation.messages) {
+    if (!latest || new Date(message.sentAt).getTime() > new Date(latest).getTime()) {
+      latest = message.sentAt;
+    }
+  }
+  return latest;
+};
 
 const initialState: ConversationState = {
   items: [],
@@ -25,6 +41,7 @@ const initialState: ConversationState = {
   currentError: null,
   sendStatus: 'idle',
   sendError: null,
+  reads: loadConversationReads(),
 };
 
 export const fetchConversationsForUser = createAsyncThunk(
@@ -107,6 +124,11 @@ const conversationSlice = createSlice({
       state.sendError = null;
       state.sendStatus = 'idle';
     },
+    // Marks a conversation read up to the given timestamp (defaults handled by callers).
+    markConversationRead(state, action: { payload: { conversationId: string; at: string } }) {
+      state.reads[action.payload.conversationId] = action.payload.at;
+      saveConversationReads(state.reads);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -142,6 +164,12 @@ const conversationSlice = createSlice({
       .addCase(fetchConversationById.fulfilled, (state, action) => {
         state.currentStatus = 'succeeded';
         state.current = action.payload;
+        // Opening a conversation marks every message it currently holds as read.
+        const at = latestMessageAt(action.payload);
+        if (at) {
+          state.reads[action.payload.id] = at;
+          saveConversationReads(state.reads);
+        }
       })
       .addCase(fetchConversationById.rejected, (state, action) => {
         state.currentStatus = 'failed';
@@ -165,5 +193,5 @@ const conversationSlice = createSlice({
   },
 });
 
-export const { clearCurrent, clearSendError } = conversationSlice.actions;
+export const { clearCurrent, clearSendError, markConversationRead } = conversationSlice.actions;
 export default conversationSlice.reducer;

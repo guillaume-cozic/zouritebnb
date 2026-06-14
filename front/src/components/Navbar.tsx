@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../features/auth/AuthSlice';
 import { selectAuthUser } from '../features/auth/AuthSelectors';
+import { fetchConversationsForUser } from '../features/conversation/ConversationSlice';
+import { selectUnreadCount } from '../features/conversation/ConversationSelectors';
 import VerificationBadge from '../features/userProfile/components/VerificationBadge';
 import { VerificationStatus } from '../features/userProfile/UserProfileTypes';
 
@@ -14,8 +16,14 @@ const Navbar: React.FC = () => {
   const user = useAppSelector(selectAuthUser);
   const location = useLocation();
   const isHostMode = location.pathname.startsWith('/admin');
+  const unreadCount = useAppSelector(selectUnreadCount);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  // Load the user's conversations so the notification badge reflects unread messages.
+  useEffect(() => {
+    if (user) dispatch(fetchConversationsForUser());
+  }, [dispatch, user]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -127,9 +135,11 @@ const Navbar: React.FC = () => {
                   {initial}
                 </span>
                 <span className="max-w-[120px] truncate">{displayName}</span>
-                <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center">
-                  3
-                </span>
+                {unreadCount > 0 && (
+                  <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${menuOpen ? 'rotate-180' : ''}`}>
                   <path d="m6 9 6 6 6-6" />
                 </svg>
@@ -141,19 +151,6 @@ const Navbar: React.FC = () => {
                     <p className="text-xs text-gray-500 truncate">{user.email}</p>
                   </div>
                   <nav className="py-1 text-sm">
-                    <button
-                      type="button"
-                      className="flex items-center justify-between w-full px-5 py-3 text-gray-700 hover:bg-gray-50"
-                    >
-                      <span className="flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M10.268 21a2 2 0 0 0 3.464 0" />
-                          <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
-                        </svg>
-                        {t('navbar.menu.notifications')}
-                      </span>
-                      <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center">3</span>
-                    </button>
                     {/* Host-only pages: hidden in traveler mode */}
                     {isHostMode && (
                       <>

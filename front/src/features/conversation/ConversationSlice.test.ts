@@ -11,7 +11,9 @@ import conversationReducer, {
   fetchConversationsForUser,
   fetchConversationById,
   sendMessage,
+  markConversationRead,
 } from './ConversationSlice';
+import { selectUnreadCount } from './ConversationSelectors';
 import api from '../../services/api';
 
 const mockedApi = api as Mocked<typeof api>;
@@ -20,6 +22,7 @@ const buildStore = () => configureStore({ reducer: { conversation: conversationR
 
 beforeEach(() => {
   vi.clearAllMocks();
+  localStorage.clear();
 });
 
 describe('fetchConversationsForUser', () => {
@@ -111,5 +114,53 @@ describe('clearCurrent / clearSendError', () => {
     const state = store.getState().conversation;
     expect(state.sendStatus).toBe('idle');
     expect(state.sendError).toBeNull();
+  });
+});
+
+describe('unread count', () => {
+  const conversation = {
+    id: 'c-1',
+    reservationId: 'r-1',
+    accommodationId: 'a-1',
+    teamId: 't-1',
+    guestUserId: 'me',
+    createdAt: '2026-01-01T09:00:00Z',
+    messages: [
+      { id: 'm1', body: 'Réservation demandée', authorUserId: null, sentAt: '2026-01-01T10:00:00Z', isSystem: true },
+      { id: 'm2', body: 'Bonjour', authorUserId: 'host', sentAt: '2026-01-02T10:00:00Z', isSystem: false },
+      { id: 'm3', body: 'Merci', authorUserId: 'me', sentAt: '2026-01-03T10:00:00Z', isSystem: false },
+    ],
+  };
+
+  const stateWith = (reads: Record<string, string>) =>
+    ({
+      auth: { user: { id: 'me' } },
+      conversation: { items: [conversation], reads },
+    }) as unknown as Parameters<typeof selectUnreadCount>[0];
+
+  test('compte les messages entrants non lus, hors messages système et messages de l\'utilisateur', () => {
+    // Only m2 counts: m1 is a system message, m3 was sent by the user.
+    expect(selectUnreadCount(stateWith({}))).toBe(1);
+  });
+
+  test('ne compte plus un message une fois la conversation lue', () => {
+    expect(selectUnreadCount(stateWith({ 'c-1': '2026-01-02T10:00:00Z' }))).toBe(0);
+  });
+
+  test('fetchConversationById marque la conversation lue jusqu\'au dernier message', async () => {
+    mockedApi.get.mockResolvedValue({ data: conversation });
+    const store = buildStore();
+
+    await store.dispatch(fetchConversationById('c-1'));
+
+    expect(store.getState().conversation.reads['c-1']).toBe('2026-01-03T10:00:00Z');
+  });
+
+  test('markConversationRead enregistre l\'horodatage de lecture', () => {
+    const store = buildStore();
+
+    store.dispatch(markConversationRead({ conversationId: 'c-1', at: '2026-02-01T00:00:00Z' }));
+
+    expect(store.getState().conversation.reads['c-1']).toBe('2026-02-01T00:00:00Z');
   });
 });
