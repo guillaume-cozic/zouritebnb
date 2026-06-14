@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import {
   fetchConversationsForTeam,
+  fetchConversationsForUser,
   fetchConversationById,
 } from '../ConversationSlice';
 import {
@@ -23,14 +24,29 @@ import {
   selectReservationById,
   selectReservations,
 } from '../../reservation/ReservationSelectors';
+import { isStayCompleted } from '../../review/reviewEligibility';
+import { selectHasReviewed } from '../../review/ReviewSelectors';
+import ReviewModal from '../../review/components/ReviewModal';
 import ConversationListItem from './ConversationListItem';
 import ConversationThread from './ConversationThread';
 import HostPanel from './HostPanel';
 
-const AdminConversationsPage: React.FC = () => {
+interface MessagingPageProps {
+  role: 'host' | 'guest';
+}
+
+/**
+ * Shared master-detail messaging page used by both hosts (/admin/conversations) and
+ * travelers (/account/conversations): the same list + thread layout, with role-specific
+ * side panel — accept/refuse actions for hosts, read-only reservation detail and a
+ * review CTA for travelers.
+ */
+const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
+  const isHost = role === 'host';
+  const basePath = isHost ? '/admin/conversations' : '/account/conversations';
 
   const user = useAppSelector(selectAuthUser);
   const readOnly = !user;
@@ -40,10 +56,14 @@ const AdminConversationsPage: React.FC = () => {
   const currentStatus = useAppSelector(selectCurrentConversationStatus);
   const reservation = useAppSelector(selectReservationById(current?.reservationId));
   const reservations = useAppSelector(selectReservations);
+  const hasReviewedAccommodation = useAppSelector(
+    selectHasReviewed(current?.reservationId ?? '', 'accommodation')
+  );
 
   const [search, setSearch] = useState('');
   const [onlyNeedsAction, setOnlyNeedsAction] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
 
   const reservationStatusById = useMemo(() => {
     const map: Record<string, string> = {};
@@ -52,43 +72,54 @@ const AdminConversationsPage: React.FC = () => {
   }, [reservations]);
 
   useEffect(() => {
-    dispatch(fetchConversationsForTeam());
-    dispatch(fetchReservations({}));
-  }, [dispatch]);
+    if (isHost) {
+      dispatch(fetchConversationsForTeam());
+      dispatch(fetchReservations({}));
+    } else {
+      dispatch(fetchConversationsForUser());
+    }
+  }, [dispatch, isHost]);
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchConversationById(id));
-    }
+    if (id) dispatch(fetchConversationById(id));
   }, [dispatch, id]);
 
   useEffect(() => {
-    if (current?.reservationId) {
-      dispatch(fetchReservationById(current.reservationId));
-    }
+    if (current?.reservationId) dispatch(fetchReservationById(current.reservationId));
   }, [dispatch, current?.reservationId]);
 
   const locale = i18n.language.startsWith('fr') ? 'fr-FR' : 'en-GB';
 
   const needsActionCount = useMemo(
-    () => conversations.filter((c) => reservationStatusById[c.reservationId] === 'pending').length,
-    [conversations, reservationStatusById]
+    () =>
+      isHost
+        ? conversations.filter((c) => reservationStatusById[c.reservationId] === 'pending').length
+        : 0,
+    [isHost, conversations, reservationStatusById]
   );
 
   const filtered = useMemo(() => {
     const sorted = [...conversations].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-    const byAction = onlyNeedsAction
-      ? sorted.filter((c) => reservationStatusById[c.reservationId] === 'pending')
-      : sorted;
+    const byAction =
+      isHost && onlyNeedsAction
+        ? sorted.filter((c) => reservationStatusById[c.reservationId] === 'pending')
+        : sorted;
     const q = search.trim().toLowerCase();
     if (!q) return byAction;
-    return byAction.filter((c) =>
-      c.reservationId.toLowerCase().includes(q) ||
-      c.messages.some((m) => m.body.toLowerCase().includes(q))
+    return byAction.filter(
+      (c) =>
+        c.reservationId.toLowerCase().includes(q) ||
+        c.messages.some((m) => m.body.toLowerCase().includes(q))
     );
-  }, [conversations, search, onlyNeedsAction, reservationStatusById]);
+  }, [isHost, conversations, search, onlyNeedsAction, reservationStatusById]);
+
+  const canReviewAccommodation =
+    !isHost &&
+    !!reservation &&
+    isStayCompleted(reservation) &&
+    !hasReviewedAccommodation;
 
   const handleAccept = async () => {
     if (!reservation) return;
@@ -110,10 +141,10 @@ const AdminConversationsPage: React.FC = () => {
       <div className="w-72 xl:w-80 flex-shrink-0 border-r border-gray-100 flex flex-col bg-gray-50/40">
         <div className="px-5 pt-5 pb-3 border-b border-gray-100 bg-white">
           <h1 className="text-xl font-bold text-gray-900 tracking-tight">
-            {t('admin.conversations.title')}
+            {isHost ? t('admin.conversations.title') : t('conversation.inboxTitle')}
           </h1>
           <p className="text-xs text-gray-500 mt-0.5">
-            {t('admin.conversations.subtitle')}
+            {isHost ? t('admin.conversations.subtitle') : t('conversation.inboxSubtitle')}
           </p>
           <div className="mt-3 relative">
             <svg
@@ -138,34 +169,36 @@ const AdminConversationsPage: React.FC = () => {
               className="w-full pl-9 pr-3 h-9 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 focus:bg-white transition-colors"
             />
           </div>
-          <div className="mt-2 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => setOnlyNeedsAction((v) => !v)}
-              aria-pressed={onlyNeedsAction}
-              className={`inline-flex items-center gap-1.5 h-7 pl-2 pr-2.5 rounded-full text-xs font-semibold border transition-colors ${
-                onlyNeedsAction
-                  ? 'bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-200'
-                  : 'bg-white text-amber-700 border-amber-200 hover:bg-amber-50'
-              }`}
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  onlyNeedsAction ? 'bg-white' : 'bg-amber-500'
+          {isHost && (
+            <div className="mt-2 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setOnlyNeedsAction((v) => !v)}
+                aria-pressed={onlyNeedsAction}
+                className={`inline-flex items-center gap-1.5 h-7 pl-2 pr-2.5 rounded-full text-xs font-semibold border transition-colors ${
+                  onlyNeedsAction
+                    ? 'bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-200'
+                    : 'bg-white text-amber-700 border-amber-200 hover:bg-amber-50'
                 }`}
-              />
-              {t('admin.conversations.needsActionToggle')}
-              {needsActionCount > 0 && (
+              >
                 <span
-                  className={`ml-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold ${
-                    onlyNeedsAction ? 'bg-white/25 text-white' : 'bg-amber-100 text-amber-800'
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    onlyNeedsAction ? 'bg-white' : 'bg-amber-500'
                   }`}
-                >
-                  {needsActionCount}
-                </span>
-              )}
-            </button>
-          </div>
+                />
+                {t('admin.conversations.needsActionToggle')}
+                {needsActionCount > 0 && (
+                  <span
+                    className={`ml-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold ${
+                      onlyNeedsAction ? 'bg-white/25 text-white' : 'bg-amber-100 text-amber-800'
+                    }`}
+                  >
+                    {needsActionCount}
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 py-2">
@@ -181,9 +214,11 @@ const AdminConversationsPage: React.FC = () => {
             <div className="px-4 py-10 text-center text-sm text-gray-400">
               {search
                 ? t('admin.conversations.noMatch')
-                : onlyNeedsAction
+                : isHost && onlyNeedsAction
                   ? t('admin.conversations.noNeedsAction')
-                  : t('admin.conversations.empty')}
+                  : isHost
+                    ? t('admin.conversations.empty')
+                    : t('conversation.empty')}
             </div>
           )}
 
@@ -192,17 +227,17 @@ const AdminConversationsPage: React.FC = () => {
               <ConversationListItem
                 key={c.id}
                 conversation={c}
-                to={`/admin/conversations/${c.id}`}
+                to={`${basePath}/${c.id}`}
                 active={c.id === id}
                 locale={locale}
-                needsAction={reservationStatusById[c.reservationId] === 'pending'}
+                needsAction={isHost && reservationStatusById[c.reservationId] === 'pending'}
               />
             ))}
           </div>
         </div>
       </div>
 
-      {/* Right: thread + host panel */}
+      {/* Right: thread + reservation panel */}
       <div className="flex-1 min-w-0 flex flex-col">
         {!id && (
           <div className="flex-1 flex items-center justify-center bg-gray-50/40">
@@ -237,7 +272,11 @@ const AdminConversationsPage: React.FC = () => {
                     {t('conversation.reservation')}
                   </p>
                   <p className="text-sm font-semibold text-gray-900 truncate">
-                    {reservation ? reservation.guestName : current.reservationId.slice(0, 8) + '…'}
+                    {isHost
+                      ? reservation
+                        ? reservation.guestName
+                        : current.reservationId.slice(0, 8) + '…'
+                      : t('conversation.detailTitle')}
                   </p>
                 </div>
                 {reservation && (
@@ -247,7 +286,7 @@ const AdminConversationsPage: React.FC = () => {
                     {new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short' }).format(new Date(reservation.checkOut))}
                   </span>
                 )}
-                {reservation?.status === 'pending' && !readOnly && (
+                {isHost && reservation?.status === 'pending' && !readOnly && (
                   <div className="flex items-center gap-2 2xl:hidden">
                     <button
                       type="button"
@@ -270,6 +309,18 @@ const AdminConversationsPage: React.FC = () => {
                     </button>
                   </div>
                 )}
+                {canReviewAccommodation && (
+                  <button
+                    type="button"
+                    onClick={() => setReviewOpen(true)}
+                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    </svg>
+                    {t('review.rateAccommodation')}
+                  </button>
+                )}
               </header>
               <div className="flex-1 min-h-0">
                 <ConversationThread
@@ -288,15 +339,25 @@ const AdminConversationsPage: React.FC = () => {
                   onAccept={handleAccept}
                   onRefuse={handleRefuse}
                   busy={busy}
-                  readOnly={readOnly}
+                  readOnly={readOnly || !isHost}
                 />
               )}
             </div>
           </div>
         )}
       </div>
+
+      {current && reviewOpen && (
+        <ReviewModal
+          open={reviewOpen}
+          target="accommodation"
+          reservationId={current.reservationId}
+          accommodationId={current.accommodationId}
+          onClose={() => setReviewOpen(false)}
+        />
+      )}
     </div>
   );
 };
 
-export default AdminConversationsPage;
+export default MessagingPage;

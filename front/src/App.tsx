@@ -19,10 +19,8 @@ import SolidarityProjectDetailPage from './features/solidarityProject/components
 import AccommodationCalendarPage from './features/reservation/components/AccommodationCalendarPage';
 import AllAccommodationsCalendarPage from './features/reservation/components/AllAccommodationsCalendarPage';
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
-import ConversationsListPage from './features/conversation/components/ConversationsListPage';
-import ConversationDetailPage from './features/conversation/components/ConversationDetailPage';
+import MessagingPage from './features/conversation/components/MessagingPage';
 import AdminReservationsPage from './features/reservation/components/AdminReservationsPage';
-import AdminConversationsPage from './features/conversation/components/AdminConversationsPage';
 import ReservationConfirmationPage from './features/reservation/components/ReservationConfirmationPage';
 import ReservationSuccessPage from './features/reservation/components/ReservationSuccessPage';
 import IdentityVerificationPage from './features/userProfile/components/IdentityVerificationPage';
@@ -58,13 +56,13 @@ function App() {
                 <Route path="/admin/reservations" element={<AdminReservationsPage />} />
               </Route>
               <Route path="/admin/team" element={<TeamSettingsPage />} />
-              <Route path="/admin/conversations" element={<AdminConversationsPage />} />
-              <Route path="/admin/conversations/:id" element={<AdminConversationsPage />} />
+              <Route path="/admin/conversations" element={<MessagingPage role="host" />} />
+              <Route path="/admin/conversations/:id" element={<MessagingPage role="host" />} />
               <Route path="/accommodations/:id/edit" element={<EditAccommodationPage />} />
               <Route path="/accommodations/:id/photos" element={<AccommodationPhotosPage />} />
               <Route path="/account" element={<Navigate to="/account/conversations" replace />} />
-              <Route path="/account/conversations" element={<ConversationsListPage />} />
-              <Route path="/account/conversations/:id" element={<ConversationDetailPage />} />
+              <Route path="/account/conversations" element={<MessagingPage role="guest" />} />
+              <Route path="/account/conversations/:id" element={<MessagingPage role="guest" />} />
               <Route path="/account/settings" element={<TeamSettingsPage />} />
               <Route path="/account/verification" element={<IdentityVerificationPage />} />
             </Route>
