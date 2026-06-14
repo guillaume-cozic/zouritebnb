@@ -63,7 +63,7 @@ const ConversationsListPage: React.FC = () => {
               <ConversationListItem
                 key={c.id}
                 conversation={c}
-                to={`/conversations/${c.id}`}
+                to={`/account/conversations/${c.id}`}
                 locale={locale}
               />
             ))}

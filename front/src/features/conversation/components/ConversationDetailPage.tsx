@@ -59,7 +59,7 @@ const ConversationDetailPage: React.FC = () => {
       <header className="border-b border-gray-100 bg-white px-4 sm:px-8 py-3">
         <div className="max-w-3xl mx-auto">
           <Link
-            to="/conversations"
+            to="/account/conversations"
             className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-primary-600 transition-colors"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
