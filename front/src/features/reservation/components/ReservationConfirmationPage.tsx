@@ -78,6 +78,38 @@ const BookingForm: React.FC<BookingFormProps> = ({
     if (defaultGuestName) setGuestName((prev) => prev || defaultGuestName);
   }, [defaultGuestName]);
 
+  // Creates the reservation and, on success, navigates to the confirmation page.
+  // `paymentIntentId` is optional: the real flow passes the authorized Stripe intent,
+  // the dev bypass passes none.
+  const submitReservation = async (paymentIntentId?: string) => {
+    if (!user || !checkInDate || !checkOutDate || !guestName.trim()) return;
+
+    const reservationResult = await dispatch(
+      requestReservation({
+        accommodationId,
+        checkIn: toApiDateTime(checkInDate, checkInTime),
+        checkOut: toApiDateTime(checkOutDate, checkOutTime),
+        guestName: guestName.trim(),
+        note: note.trim() || undefined,
+        paymentIntentId,
+      })
+    );
+
+    if (requestReservation.fulfilled.match(reservationResult)) {
+      navigate('/reservation-confirmed', {
+        replace: true,
+        state: {
+          accommodationTitle: accommodation.title,
+          accommodationCity: accommodation.city,
+          checkIn: checkInDate.toISOString(),
+          checkOut: checkOutDate.toISOString(),
+          guests: guestsCount,
+          totalLabel,
+        },
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) return;
@@ -125,31 +157,25 @@ const BookingForm: React.FC<BookingFormProps> = ({
       return;
     }
 
-    const reservationResult = await dispatch(
-      requestReservation({
-        accommodationId,
-        checkIn: toApiDateTime(checkInDate, checkInTime),
-        checkOut: toApiDateTime(checkOutDate, checkOutTime),
-        guestName: guestName.trim(),
-        note: note.trim() || undefined,
-        paymentIntentId,
-      })
-    );
+    await submitReservation(paymentIntentId);
     setSubmitting(false);
+  };
 
-    if (requestReservation.fulfilled.match(reservationResult)) {
-      navigate('/reservation-confirmed', {
-        replace: true,
-        state: {
-          accommodationTitle: accommodation.title,
-          accommodationCity: accommodation.city,
-          checkIn: checkInDate.toISOString(),
-          checkOut: checkOutDate.toISOString(),
-          guests: guestsCount,
-          totalLabel,
-        },
-      });
-    }
+  // --- Dev-only payment bypass -------------------------------------------------
+  // `import.meta.env.DEV` is a build-time constant (true under `vite`, false under
+  // `vite build`). These handlers and the buttons that call them are therefore
+  // dead-code-eliminated from production bundles — they cannot exist or be invoked
+  // in prod. They only short-circuit Stripe on the client; the backend reservation
+  // endpoint is unchanged, so no server-side check is weakened.
+  const handleDevPaymentAccepted = async () => {
+    setPaymentError(null);
+    setSubmitting(true);
+    await submitReservation();
+    setSubmitting(false);
+  };
+
+  const handleDevPaymentRefused = () => {
+    setPaymentError('Paiement refusé (simulation dev) — la carte a été déclinée.');
   };
 
   return (
@@ -266,6 +292,36 @@ const BookingForm: React.FC<BookingFormProps> = ({
       {(paymentError || mutationError) && (
         <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
           {paymentError || mutationError}
+        </div>
+      )}
+
+      {import.meta.env.DEV && (
+        <div className="rounded-xl border border-dashed border-amber-400 bg-amber-50 px-4 py-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-700">
+            Dev · bypass paiement
+          </p>
+          <p className="mt-1 text-xs text-amber-700/80">
+            Visible uniquement en développement (retiré du build de production). Simule le
+            résultat du paiement pour tester la navigation, sans appeler Stripe.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={handleDevPaymentAccepted}
+              disabled={submitting || missingDates || !guestName.trim() || totalCents <= 0}
+              className="inline-flex items-center justify-center h-10 px-4 rounded-lg text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            >
+              Paiement accepté
+            </button>
+            <button
+              type="button"
+              onClick={handleDevPaymentRefused}
+              disabled={submitting}
+              className="inline-flex items-center justify-center h-10 px-4 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            >
+              Paiement refusé
+            </button>
+          </div>
         </div>
       )}
 
