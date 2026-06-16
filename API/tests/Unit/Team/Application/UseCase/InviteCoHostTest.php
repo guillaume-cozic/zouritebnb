@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Team\Application\UseCase;
 
+use App\Shared\Domain\Event\CoHostInvited;
 use App\Shared\Domain\Port\UuidGenerator;
 use App\Team\Application\UseCase\InviteCoHost;
 use App\Team\Domain\Command\InviteCoHostCommand;
 use App\Team\Domain\Entity\InvitationStatus;
-use App\Team\Domain\Event\CoHostInvited;
 use App\Team\Domain\Exception\InvalidInvitationException;
 use App\Tests\Unit\Shared\Infrastructure\InMemoryEventBus;
 use App\Tests\Unit\Team\Infrastructure\InMemoryTeamInvitationRepository;

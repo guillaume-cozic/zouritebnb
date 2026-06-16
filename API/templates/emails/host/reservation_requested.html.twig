@@ -1,0 +1,11 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block heading %}Nouvelle demande de réservation{% endblock %}
+
+{% block content %}
+  {% set p = 'margin:0 0 16px;line-height:1.6;color:#374151;' %}
+  <p style="{{ p }}">Bonjour {{ greetingName }},</p>
+  <p style="{{ p }}">Vous avez reçu une <strong>nouvelle demande de réservation</strong> de {{ guestName }} pour « {{ accommodationTitle }} »{% if city %}, {{ city }}{% endif %}.</p>
+  <p style="{{ p }}">📅 Du <strong>{{ checkIn|date('d/m/Y') }}</strong> au <strong>{{ checkOut|date('d/m/Y') }}</strong> ({{ nights }} nuit{{ nights > 1 ? 's' }}).</p>
+  <p style="{{ p }}">⏳ Vous disposez de <strong>24 heures</strong> pour accepter ou refuser cette demande. Sans réponse, elle sera automatiquement refusée et l'autorisation de paiement libérée.</p>
+{% endblock %}

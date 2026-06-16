@@ -1,0 +1,12 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block heading %}Réservation confirmée 🎉{% endblock %}
+
+{% block content %}
+  {% set p = 'margin:0 0 16px;line-height:1.6;color:#374151;' %}
+  <p style="{{ p }}">Bonjour {{ greetingName }},</p>
+  <p style="{{ p }}">Excellente nouvelle : votre hôte a <strong>accepté votre réservation</strong> pour « {{ accommodationTitle }} »{% if city %}, {{ city }}{% endif %} ! 🎉</p>
+  <p style="{{ p }}">📅 Du <strong>{{ checkIn|date('d/m/Y') }}</strong> au <strong>{{ checkOut|date('d/m/Y') }}</strong> ({{ nights }} nuit{{ nights > 1 ? 's' }}).</p>
+  <p style="{{ p }}">Votre séjour est confirmé et votre paiement a été encaissé. Votre hôte vous communiquera les détails pratiques (arrivée, clés, accès) via la messagerie.</p>
+  <p style="{{ p }}">Merci d'avoir voyagé solidaire — votre séjour soutient un projet local de Rodrigues. 💚</p>
+{% endblock %}

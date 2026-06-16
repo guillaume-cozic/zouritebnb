@@ -40,7 +40,7 @@
 | 5 | Réservation refusée (`ReservationRefused`) | Demande non retenue |
 | 6 | Expiration automatique (24 h) | Demande expirée |
 | 7 | Annulation (`ReservationCancelled`) | Réservation annulée |
-| 8 | Nouveau message (`MessagePosted`) | Nouveau message de votre hôte |
+| 8 | Nouveau message (`MessagePosted`, de l'hôte) | Nouveau message de votre hôte ✅ branché |
 | 9 | Avant l'arrivée (J-3) | Votre séjour approche |
 | 10 | Après le départ | Partagez votre avis |
 
@@ -55,6 +55,11 @@ L'envoi suit un **transactional outbox pattern**, dans le module `API/src/Notifi
    `ReservationCancelled`) et **persistent l'email dans la table `outbox_email`** (statut
    `pending`) via le cas d'usage `QueueEmail`. L'email à envoyer est donc enregistré comme une
    donnée, dans la même unité de travail que la réaction métier.
+   - **Vues HTML** : le corps est une **vue Twig** (`API/templates/emails/traveler/*.html.twig`,
+     étendant `emails/base.html.twig`). Le builder `TravelerEmails` ne produit que
+     `(template, sujet, variables)` ; le rendu HTML est fait par le port `EmailRenderer`
+     (adaptateur `TwigEmailRenderer`) au moment de la mise en file, et le HTML est figé dans
+     l'outbox.
 2. **Relais d'envoi.** La commande `bin/console app:emails:send-pending` (cas d'usage
    `SendPendingEmails`) lit les emails `pending` et les envoie via le port `EmailSender`
    (adaptateur Symfony Mailer). Chaque email est sauvegardé indépendamment : un échec n'interrompt
@@ -73,8 +78,9 @@ L'envoi suit un **transactional outbox pattern**, dans le module `API/src/Notifi
   `bin/console app:emails:send-pending`.
 - Configurer l'expéditeur et le transport via `MAILER_DSN`, `MAILER_FROM_EMAIL`, `MAILER_FROM_NAME`.
 
-> Les emails « nouveau message », « rappel J-3 » et « avis après séjour » ci-dessous ne sont pas
-> encore branchés à un événement ; leur copie est prête pour quand les déclencheurs existeront.
+> Les emails « rappel J-3 » et « avis après séjour » ci-dessous ne sont pas encore branchés à un
+> événement ; leur copie est prête pour quand les déclencheurs existeront. L'email « nouveau
+> message » est désormais branché sur `MessagePosted` (voir §8).
 
 ---
 

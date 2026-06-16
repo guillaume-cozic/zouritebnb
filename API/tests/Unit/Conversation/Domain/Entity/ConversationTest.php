@@ -10,7 +10,7 @@ use App\Conversation\Domain\Entity\Message;
 use App\Conversation\Domain\Entity\MessageBody;
 use App\Conversation\Domain\Entity\MessageId;
 use App\Conversation\Domain\Event\ConversationStarted;
-use App\Conversation\Domain\Event\MessagePosted;
+use App\Shared\Domain\Event\MessagePosted;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Uuid;
 

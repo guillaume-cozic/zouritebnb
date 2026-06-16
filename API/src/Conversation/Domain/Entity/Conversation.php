@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Conversation\Domain\Entity;
 
 use App\Conversation\Domain\Event\ConversationStarted;
-use App\Conversation\Domain\Event\MessagePosted;
 use App\Shared\Domain\Entity\AggregateRoot;
+use App\Shared\Domain\Event\MessagePosted;
 use Symfony\Component\Uid\Uuid;
 
 final class Conversation extends AggregateRoot

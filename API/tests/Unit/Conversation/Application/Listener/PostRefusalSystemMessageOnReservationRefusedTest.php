@@ -8,7 +8,7 @@ use App\Conversation\Application\Listener\PostRefusalSystemMessageOnReservationR
 use App\Conversation\Application\UseCase\PostSystemMessage;
 use App\Conversation\Domain\Entity\Conversation;
 use App\Conversation\Domain\Entity\ConversationId;
-use App\Conversation\Domain\Event\MessagePosted;
+use App\Shared\Domain\Event\MessagePosted;
 use App\Shared\Domain\Event\ReservationRefused;
 use App\Shared\Domain\Port\UuidGenerator;
 use App\Tests\Unit\Conversation\Infrastructure\FixedClock;

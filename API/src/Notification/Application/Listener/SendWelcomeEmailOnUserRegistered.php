@@ -27,13 +27,14 @@ final readonly class SendWelcomeEmailOnUserRegistered
             return;
         }
 
-        $rendered = $this->emails->welcome($contact->greetingName());
+        $view = $this->emails->welcome($contact->greetingName());
 
         $this->queueEmail->handle(new QueueEmailCommand(
             recipientEmail: $contact->email,
             recipientName: $contact->firstName,
-            subject: $rendered->subject,
-            htmlBody: $rendered->htmlBody,
+            subject: $view->subject,
+            template: $view->template,
+            variables: $view->variables,
         ));
     }
 }

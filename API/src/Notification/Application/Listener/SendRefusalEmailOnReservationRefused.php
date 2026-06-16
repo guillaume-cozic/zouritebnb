@@ -27,15 +27,16 @@ final readonly class SendRefusalEmailOnReservationRefused
         }
 
         // An automatic refusal means the 24h window elapsed without a host decision.
-        $rendered = $event->isAutomatic
+        $view = $event->isAutomatic
             ? $this->emails->reservationExpired($context->guest->greetingName(), $context->accommodationTitle)
             : $this->emails->reservationRefused($context->guest->greetingName(), $context->accommodationTitle);
 
         $this->queueEmail->handle(new QueueEmailCommand(
             recipientEmail: $context->guest->email,
             recipientName: $context->guest->firstName,
-            subject: $rendered->subject,
-            htmlBody: $rendered->htmlBody,
+            subject: $view->subject,
+            template: $view->template,
+            variables: $view->variables,
         ));
     }
 }

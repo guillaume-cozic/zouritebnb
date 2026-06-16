@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Team\Domain\Event;
+namespace App\Shared\Domain\Event;
 
-use App\Shared\Domain\Event\DomainEvent;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * Integration event published by the Team context when a co-host is invited. Consumers in
+ * other contexts can react — e.g. Notification queues the invitation email.
+ */
 final readonly class CoHostInvited implements DomainEvent
 {
     public function __construct(

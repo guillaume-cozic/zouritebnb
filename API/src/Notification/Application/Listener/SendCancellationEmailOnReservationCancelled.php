@@ -26,7 +26,7 @@ final readonly class SendCancellationEmailOnReservationCancelled
             return;
         }
 
-        $rendered = $this->emails->reservationCancelled(
+        $view = $this->emails->reservationCancelled(
             $context->guest->greetingName(),
             $context->accommodationTitle,
         );
@@ -34,8 +34,9 @@ final readonly class SendCancellationEmailOnReservationCancelled
         $this->queueEmail->handle(new QueueEmailCommand(
             recipientEmail: $context->guest->email,
             recipientName: $context->guest->firstName,
-            subject: $rendered->subject,
-            htmlBody: $rendered->htmlBody,
+            subject: $view->subject,
+            template: $view->template,
+            variables: $view->variables,
         ));
     }
 }

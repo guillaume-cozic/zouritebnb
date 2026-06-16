@@ -1,0 +1,11 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block heading %}Réservation annulée{% endblock %}
+
+{% block content %}
+  {% set p = 'margin:0 0 16px;line-height:1.6;color:#374151;' %}
+  <p style="{{ p }}">Bonjour {{ greetingName }},</p>
+  <p style="{{ p }}">Votre réservation pour « {{ accommodationTitle }} » a été <strong>annulée</strong>.</p>
+  <p style="{{ p }}">Si un paiement avait été encaissé, le remboursement est traité selon les conditions d'annulation ; vous recevrez le cas échéant une confirmation séparée.</p>
+  <p style="{{ p }}">Nous espérons vous accueillir bientôt pour un prochain séjour.</p>
+{% endblock %}

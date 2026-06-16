@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Conversation\Domain\Event;
+namespace App\Shared\Domain\Event;
 
-use App\Shared\Domain\Event\DomainEvent;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * Integration event published by the Conversation context when a message is posted.
+ * Consumers in other contexts can react — e.g. Notification emails the recipient.
+ */
 final readonly class MessagePosted implements DomainEvent
 {
     public function __construct(

@@ -1,0 +1,11 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block heading %}Bienvenue 🌴{% endblock %}
+
+{% block content %}
+  {% set p = 'margin:0 0 16px;line-height:1.6;color:#374151;' %}
+  <p style="{{ p }}">Bonjour {{ greetingName }},</p>
+  <p style="{{ p }}">Bienvenue sur <strong>BnB Rodrigues</strong> ! Votre compte est désormais actif.</p>
+  <p style="{{ p }}">Ici, chaque séjour réservé soutient un projet solidaire local — voyager rime avec impact positif.</p>
+  <p style="{{ p }}">Découvrez les hébergements de l'île et trouvez votre prochain coup de cœur.</p>
+{% endblock %}

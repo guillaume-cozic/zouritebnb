@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Team\Application\UseCase;
 
+use App\Shared\Domain\Event\CoHostInvited;
 use App\Shared\Domain\Port\EventBus;
 use App\Shared\Domain\Port\UuidGenerator;
 use App\Team\Domain\Command\InviteCoHostCommand;
 use App\Team\Domain\Entity\InvitationStatus;
 use App\Team\Domain\Entity\TeamInvitation;
-use App\Team\Domain\Event\CoHostInvited;
 use App\Team\Domain\Exception\InvalidInvitationException;
 use App\Team\Domain\Port\TeamInvitationRepository;
 

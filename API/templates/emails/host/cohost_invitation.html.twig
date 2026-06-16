@@ -1,0 +1,11 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block heading %}Invitation à rejoindre une équipe{% endblock %}
+
+{% block content %}
+  {% set p = 'margin:0 0 16px;line-height:1.6;color:#374151;' %}
+  <p style="{{ p }}">Bonjour,</p>
+  <p style="{{ p }}">Vous avez été invité(e) à devenir <strong>co-hôte</strong> sur <strong>BnB Rodrigues</strong>.</p>
+  <p style="{{ p }}">En rejoignant l'équipe, vous pourrez gérer les hébergements, les réservations et les échanges avec les voyageurs.</p>
+  <p style="{{ p }}">Pour accepter l'invitation, créez votre compte avec cette adresse email ({{ invitedEmail }}) sur BnB Rodrigues.</p>
+{% endblock %}

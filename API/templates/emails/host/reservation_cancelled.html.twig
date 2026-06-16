@@ -1,0 +1,11 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block heading %}Réservation annulée{% endblock %}
+
+{% block content %}
+  {% set p = 'margin:0 0 16px;line-height:1.6;color:#374151;' %}
+  <p style="{{ p }}">Bonjour {{ greetingName }},</p>
+  <p style="{{ p }}">La réservation de {{ guestName }} pour « {{ accommodationTitle }} » a été <strong>annulée</strong>.</p>
+  <p style="{{ p }}">📅 Séjour initialement prévu du <strong>{{ checkIn|date('d/m/Y') }}</strong> au <strong>{{ checkOut|date('d/m/Y') }}</strong>.</p>
+  <p style="{{ p }}">Ces dates sont de nouveau disponibles à la réservation sur votre hébergement.</p>
+{% endblock %}

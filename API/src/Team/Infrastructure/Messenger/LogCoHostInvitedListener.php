@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Team\Infrastructure\Messenger;
 
-use App\Team\Domain\Event\CoHostInvited;
+use App\Shared\Domain\Event\CoHostInvited;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

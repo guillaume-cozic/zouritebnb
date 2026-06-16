@@ -9,6 +9,7 @@ use App\Notification\Application\Listener\SendWelcomeEmailOnUserRegistered;
 use App\Notification\Application\UseCase\QueueEmail;
 use App\Shared\Domain\Event\UserRegistered;
 use App\Shared\Domain\Port\UserContact;
+use App\Tests\Unit\Notification\Infrastructure\FakeEmailRenderer;
 use App\Tests\Unit\Notification\Infrastructure\FixedClock;
 use App\Tests\Unit\Notification\Infrastructure\InMemoryEmailOutbox;
 use App\Tests\Unit\Notification\Infrastructure\InMemoryUserContactProvider;
@@ -30,7 +31,7 @@ final class SendWelcomeEmailOnUserRegisteredTest extends TestCase
         $this->listener = new SendWelcomeEmailOnUserRegistered(
             $this->contacts,
             new TravelerEmails(),
-            new QueueEmail($this->outbox, new FixedClock(new \DateTimeImmutable('2026-06-16 09:00:00'))),
+            new QueueEmail($this->outbox, new FakeEmailRenderer(), new FixedClock(new \DateTimeImmutable('2026-06-16 09:00:00'))),
         );
     }
 
@@ -46,7 +47,8 @@ final class SendWelcomeEmailOnUserRegisteredTest extends TestCase
         self::assertCount(1, $queued);
         self::assertSame('marie@example.com', $queued[0]->getRecipient()->toString());
         self::assertStringContainsString('Bienvenue', $queued[0]->getSubject());
-        self::assertStringContainsString('Bonjour Marie', $queued[0]->getHtmlBody());
+        self::assertStringContainsString('emails/traveler/welcome.html.twig', $queued[0]->getHtmlBody());
+        self::assertStringContainsString('Marie', $queued[0]->getHtmlBody());
     }
 
     public function test_should_do_nothing_when_the_user_contact_is_unknown(): void

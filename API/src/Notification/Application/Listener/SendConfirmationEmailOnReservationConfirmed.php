@@ -26,7 +26,7 @@ final readonly class SendConfirmationEmailOnReservationConfirmed
             return;
         }
 
-        $rendered = $this->emails->reservationConfirmed(
+        $view = $this->emails->reservationConfirmed(
             $context->guest->greetingName(),
             $context->accommodationTitle,
             $context->city,
@@ -37,8 +37,9 @@ final readonly class SendConfirmationEmailOnReservationConfirmed
         $this->queueEmail->handle(new QueueEmailCommand(
             recipientEmail: $context->guest->email,
             recipientName: $context->guest->firstName,
-            subject: $rendered->subject,
-            htmlBody: $rendered->htmlBody,
+            subject: $view->subject,
+            template: $view->template,
+            variables: $view->variables,
         ));
     }
 }

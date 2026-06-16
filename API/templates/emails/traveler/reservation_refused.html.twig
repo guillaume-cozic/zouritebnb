@@ -1,0 +1,11 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block heading %}Demande non retenue{% endblock %}
+
+{% block content %}
+  {% set p = 'margin:0 0 16px;line-height:1.6;color:#374151;' %}
+  <p style="{{ p }}">Bonjour {{ greetingName }},</p>
+  <p style="{{ p }}">Malheureusement, votre hôte n'a pas pu accepter votre demande pour « {{ accommodationTitle }} ».</p>
+  <p style="{{ p }}">Pas d'inquiétude : <strong>aucun montant n'a été prélevé</strong> et l'autorisation de paiement a été libérée.</p>
+  <p style="{{ p }}">Rodrigues regorge d'autres hébergements qui pourraient vous séduire.</p>
+{% endblock %}

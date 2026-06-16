@@ -1,0 +1,10 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block heading %}Demande expirée{% endblock %}
+
+{% block content %}
+  {% set p = 'margin:0 0 16px;line-height:1.6;color:#374151;' %}
+  <p style="{{ p }}">Bonjour {{ greetingName }},</p>
+  <p style="{{ p }}">Votre hôte n'a pas répondu dans le délai de <strong>24 heures</strong>, votre demande pour « {{ accommodationTitle }} » a donc expiré.</p>
+  <p style="{{ p }}"><strong>Aucun montant n'a été prélevé.</strong> Vous pouvez renouveler votre demande ou explorer d'autres hébergements disponibles aux mêmes dates.</p>
+{% endblock %}
