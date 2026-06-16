@@ -149,6 +149,14 @@
       "login": "Sign in to confirm your booking request and proceed to secure payment.",
       "register": "To confirm your booking and proceed to payment, create your account — it's free and quick.",
       "reassurance": "Nothing will be charged until the host accepts your request."
+    },
+    "solidarity": {
+      "eyebrow": "Featured solidarity project",
+      "intro": "In Rodrigues, every booked stay supports a local solidarity project.",
+      "learnMore": "Discover this project",
+      "another": "Draw another project",
+      "fallbackTitle": "Travel with purpose in Rodrigues",
+      "fallbackText": "Every booking contributes to a project that supports the island and its people."
     }
   },
   "team": {
@@ -281,7 +289,12 @@
     "searchPlaceholder": "Where are you going?",
     "selectDates": "Select dates",
     "amenities": "Amenities",
-    "search": "Search"
+    "search": "Search",
+    "solidarity": {
+      "label": "Solidarity project to support",
+      "prev": "Previous project",
+      "next": "Next project"
+    }
   },
   "listing": {
     "title": "Accommodations",

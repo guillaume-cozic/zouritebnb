@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useFeaturedSolidarityProject } from '../../solidarityProject/useFeaturedSolidarityProject';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { fr } from 'date-fns/locale/fr';
 import { enGB } from 'date-fns/locale/en-GB';
@@ -37,6 +38,12 @@ const HeroSection: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
+  const {
+    project: solidarityProject,
+    count: solidarityCount,
+    next: nextSolidarity,
+    prev: prevSolidarity,
+  } = useFeaturedSolidarityProject();
 
   const advancedCount =
     filters.amenities.length +
@@ -72,21 +79,62 @@ const HeroSection: React.FC = () => {
       : startDate.toLocaleDateString(i18n.language)
     : '';
 
+  // Dès qu'un projet solidaire est mis en avant, le hero passe en « mode projet » :
+  // image du projet (ou dégradé de repli), navigation entre projets, pas de diaporama.
+  const projectMode = solidarityProject !== null;
+  const heroImage = solidarityProject?.imageUrl ?? null;
+
   return (
     <div className="relative">
       {/* Slider */}
       <div className="relative h-[500px] w-full overflow-hidden">
-        {SLIDES.map((src, i) => (
+        {heroImage ? (
           <img
-            key={src}
-            src={src}
-            alt=""
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
-              i === current ? 'opacity-100' : 'opacity-0'
-            }`}
+            src={heroImage}
+            alt={solidarityProject?.title ?? ''}
+            className="absolute inset-0 h-full w-full object-cover"
           />
-        ))}
+        ) : projectMode ? (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-700 to-primary-900" />
+        ) : (
+          SLIDES.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
+                i === current ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          ))
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
+
+        {/* Navigation entre projets solidaires */}
+        {projectMode && solidarityCount > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={prevSolidarity}
+              aria-label={t('hero.solidarity.prev')}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-11 w-11 rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/25 text-white hover:bg-white/30 transition-colors"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={nextSolidarity}
+              aria-label={t('hero.solidarity.next')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-11 w-11 rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/25 text-white hover:bg-white/30 transition-colors"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+          </>
+        )}
 
         {/* Hero text */}
         <div className="relative h-full flex flex-col items-center justify-center px-4 pb-16">
@@ -96,20 +144,45 @@ const HeroSection: React.FC = () => {
           <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto text-center font-light">
             {t('hero.subtitle')}
           </p>
+
+          {solidarityProject && (
+            <Link
+              to={`/solidarity-projects/${solidarityProject.id}`}
+              className="group mt-7 inline-flex items-center gap-3 rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/25 py-2 pl-4 pr-2 hover:bg-white/25 transition-colors"
+            >
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/90 whitespace-nowrap">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+                {t('hero.solidarity.label')}
+              </span>
+              <span className="text-sm font-semibold text-white truncate max-w-[40vw] sm:max-w-xs">
+                {solidarityProject.title}
+              </span>
+              <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white text-primary-700 transition-transform group-hover:translate-x-0.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              </span>
+            </Link>
+          )}
         </div>
 
         {/* Dots */}
-        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
-          {SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === current ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/70'
-              }`}
-            />
-          ))}
-        </div>
+        {!projectMode && (
+          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
+            {SLIDES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === current ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/70'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Search form */}

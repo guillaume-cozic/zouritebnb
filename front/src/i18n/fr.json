@@ -149,6 +149,14 @@
       "login": "Connectez-vous pour confirmer votre demande de réservation et procéder au paiement sécurisé.",
       "register": "Pour valider votre réservation et procéder au paiement, créez votre compte — c'est gratuit et rapide.",
       "reassurance": "Aucun montant ne sera prélevé tant que l'hôte n'a pas accepté votre demande."
+    },
+    "solidarity": {
+      "eyebrow": "Projet solidaire à l'honneur",
+      "intro": "À Rodrigues, chaque séjour réservé soutient un projet solidaire local.",
+      "learnMore": "Découvrir ce projet",
+      "another": "Tirer un autre projet",
+      "fallbackTitle": "Voyagez solidaire à Rodrigues",
+      "fallbackText": "Chaque réservation contribue à un projet qui fait vivre l'île et ses habitants."
     }
   },
   "team": {
@@ -281,7 +289,12 @@
     "searchPlaceholder": "Où allez-vous ?",
     "selectDates": "Sélectionner les dates",
     "amenities": "Équipements",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "solidarity": {
+      "label": "Projet solidaire à soutenir",
+      "prev": "Projet précédent",
+      "next": "Projet suivant"
+    }
   },
   "listing": {
     "title": "Hébergements",
