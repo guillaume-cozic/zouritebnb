@@ -443,8 +443,12 @@
     "error": "Unable to load this accommodation."
   },
   "footer": {
-    "description": "Vacation rental platform.",
-    "navigation": "Navigation",
+    "description": "Vacation rental platform in Rodrigues, where every stay supports a local solidarity project.",
+    "discover": "Discover",
+    "accommodations": "Accommodations",
+    "solidarityProjects": "Solidarity projects",
+    "blog": "Blog",
+    "hosts": "For hosts",
     "contact": "Contact",
     "copyright": "© 2026 BnB. All rights reserved."
   },

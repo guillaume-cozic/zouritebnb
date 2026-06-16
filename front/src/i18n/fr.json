@@ -443,8 +443,12 @@
     "error": "Impossible de charger cet hébergement."
   },
   "footer": {
-    "description": "Plateforme de location de vacances.",
-    "navigation": "Navigation",
+    "description": "Plateforme de location de vacances à Rodrigues, où chaque séjour soutient un projet solidaire local.",
+    "discover": "Découvrir",
+    "accommodations": "Hébergements",
+    "solidarityProjects": "Projets solidaires",
+    "blog": "Blog",
+    "hosts": "Espace hôtes",
     "contact": "Contact",
     "copyright": "© 2026 BnB. Tous droits réservés."
   },
