@@ -6,8 +6,8 @@ namespace App\Tests\Unit\Notification\Application\UseCase;
 
 use App\Notification\Application\UseCase\SendPendingEmails;
 use App\Notification\Domain\Entity\EmailAddress;
-use App\Notification\Domain\Entity\EmailStatus;
 use App\Notification\Domain\Entity\OutboxEmail;
+use App\Notification\Domain\Entity\OutboxStatus;
 use App\Tests\Unit\Notification\Infrastructure\FakeEmailSender;
 use App\Tests\Unit\Notification\Infrastructure\FixedClock;
 use App\Tests\Unit\Notification\Infrastructure\InMemoryEmailOutbox;
@@ -37,7 +37,7 @@ final class SendPendingEmailsTest extends TestCase
         self::assertSame(1, $sent);
         self::assertCount(1, $sender->sent);
         $stored = $this->outbox->findById($email->getId());
-        self::assertSame(EmailStatus::Sent, $stored?->getStatus());
+        self::assertSame(OutboxStatus::Sent, $stored?->getStatus());
         self::assertSame(1, $stored->getAttempts());
         self::assertEquals($this->clock->now(), $stored->getLastAttemptAt());
     }
@@ -51,7 +51,7 @@ final class SendPendingEmailsTest extends TestCase
 
         self::assertSame(0, $sent);
         $stored = $this->outbox->findById($email->getId());
-        self::assertSame(EmailStatus::Pending, $stored?->getStatus());
+        self::assertSame(OutboxStatus::Pending, $stored?->getStatus());
         self::assertSame(1, $stored->getAttempts());
         self::assertSame('Email delivery failed: transport down', $stored->getError());
     }
@@ -64,7 +64,7 @@ final class SendPendingEmailsTest extends TestCase
         (new SendPendingEmails($this->outbox, $sender, $this->clock, maxAttempts: 1))->handle();
 
         $stored = $this->outbox->findById($email->getId());
-        self::assertSame(EmailStatus::Failed, $stored?->getStatus());
+        self::assertSame(OutboxStatus::Failed, $stored?->getStatus());
         self::assertSame(1, $stored->getAttempts());
     }
 

@@ -26,6 +26,7 @@ final readonly class DoctrineTeamContactProvider implements TeamContactProvider
                 userId: $user->getId(),
                 email: (string) $user->getEmail(),
                 firstName: $user->getFirstName(),
+                phoneNumber: $user->getPhoneNumber(),
             ),
             $users,
         ));

@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Notification\Application\UseCase;
 
 use App\Notification\Application\UseCase\QueueEmail;
 use App\Notification\Domain\Command\QueueEmailCommand;
-use App\Notification\Domain\Entity\EmailStatus;
+use App\Notification\Domain\Entity\OutboxStatus;
 use App\Notification\Domain\Exception\InvalidEmailAddressException;
 use App\Shared\Domain\Port\UuidGenerator;
 use App\Tests\Unit\Notification\Infrastructure\FakeEmailRenderer;
@@ -59,7 +59,7 @@ final class QueueEmailTest extends TestCase
         self::assertSame('Bienvenue sur BnB Rodrigues', $email->getSubject());
         self::assertStringContainsString('emails/traveler/welcome.html.twig', $email->getHtmlBody());
         self::assertStringContainsString('Marie', $email->getHtmlBody());
-        self::assertSame(EmailStatus::Pending, $email->getStatus());
+        self::assertSame(OutboxStatus::Pending, $email->getStatus());
         self::assertSame(0, $email->getAttempts());
         self::assertEquals(new \DateTimeImmutable('2026-06-16 09:00:00'), $email->getCreatedAt());
     }

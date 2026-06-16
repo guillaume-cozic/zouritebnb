@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Notification\Infrastructure\Doctrine;
 
 use App\Notification\Domain\Entity\EmailAddress;
-use App\Notification\Domain\Entity\EmailStatus;
 use App\Notification\Domain\Entity\OutboxEmail;
+use App\Notification\Domain\Entity\OutboxStatus;
 use App\Notification\Domain\Port\EmailOutbox;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -53,7 +53,7 @@ class DoctrineEmailOutbox extends ServiceEntityRepository implements EmailOutbox
     public function findPending(int $limit): array
     {
         $entities = $this->findBy(
-            ['status' => EmailStatus::Pending->value],
+            ['status' => OutboxStatus::Pending->value],
             ['createdAt' => 'ASC'],
             $limit,
         );
@@ -69,7 +69,7 @@ class DoctrineEmailOutbox extends ServiceEntityRepository implements EmailOutbox
             recipientName: $entity->getRecipientName(),
             subject: (string) $entity->getSubject(),
             htmlBody: (string) $entity->getHtmlBody(),
-            status: EmailStatus::from($entity->getStatus()),
+            status: OutboxStatus::from($entity->getStatus()),
             attempts: $entity->getAttempts(),
             createdAt: $entity->getCreatedAt(),
             lastAttemptAt: $entity->getLastAttemptAt(),

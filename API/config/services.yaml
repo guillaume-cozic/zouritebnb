@@ -173,11 +173,18 @@ services:
     App\Notification\Domain\Port\EmailOutbox:
         alias: App\Notification\Infrastructure\Doctrine\DoctrineEmailOutbox
 
+    App\Notification\Domain\Port\SmsOutbox:
+        alias: App\Notification\Infrastructure\Doctrine\DoctrineSmsOutbox
+
     App\Notification\Domain\Port\EmailSender:
         alias: App\Notification\Infrastructure\Mailer\SymfonyEmailSender
 
     App\Notification\Domain\Port\EmailRenderer:
         alias: App\Notification\Infrastructure\Twig\TwigEmailRenderer
+
+    # No SMS provider yet: log-only stub. Swap for a provider-backed adapter later.
+    App\Notification\Domain\Port\SmsSender:
+        alias: App\Notification\Infrastructure\Sms\LogSmsSender
 
     App\Notification\Infrastructure\Mailer\SymfonyEmailSender:
         arguments:
@@ -209,6 +216,9 @@ services:
         tags: [messenger.message_handler]
 
     App\Notification\Application\Listener\SendMessageEmailOnMessagePosted:
+        tags: [messenger.message_handler]
+
+    App\Notification\Application\Listener\SendHostSmsOnReservationRequested:
         tags: [messenger.message_handler]
 
 when@dev:

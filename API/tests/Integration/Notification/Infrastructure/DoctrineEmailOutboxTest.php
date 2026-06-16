@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Notification\Infrastructure;
 
 use App\Notification\Domain\Entity\EmailAddress;
-use App\Notification\Domain\Entity\EmailStatus;
 use App\Notification\Domain\Entity\OutboxEmail;
+use App\Notification\Domain\Entity\OutboxStatus;
 use App\Notification\Domain\Port\EmailOutbox;
 use App\Tests\Integration\RepositoryTestCase;
 use PHPUnit\Framework\Attributes\Before;
@@ -44,7 +44,7 @@ final class DoctrineEmailOutboxTest extends RepositoryTestCase
         self::assertSame('Marie', $found->getRecipientName());
         self::assertSame('Bienvenue sur BnB Rodrigues', $found->getSubject());
         self::assertSame('<p>Bonjour Marie</p>', $found->getHtmlBody());
-        self::assertSame(EmailStatus::Pending, $found->getStatus());
+        self::assertSame(OutboxStatus::Pending, $found->getStatus());
         self::assertSame(0, $found->getAttempts());
         self::assertEquals($createdAt, $found->getCreatedAt());
     }
@@ -77,7 +77,7 @@ final class DoctrineEmailOutboxTest extends RepositoryTestCase
 
         $found = $this->outbox->findById($email->getId());
 
-        self::assertSame(EmailStatus::Pending, $found?->getStatus());
+        self::assertSame(OutboxStatus::Pending, $found?->getStatus());
         self::assertSame(1, $found->getAttempts());
         self::assertSame('transport down', $found->getError());
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notification\Domain\Entity;
 
-enum EmailStatus: string
+enum OutboxStatus: string
 {
     case Pending = 'pending';
     case Sent = 'sent';

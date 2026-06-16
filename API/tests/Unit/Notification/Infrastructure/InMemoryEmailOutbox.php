@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Notification\Infrastructure;
 
-use App\Notification\Domain\Entity\EmailStatus;
 use App\Notification\Domain\Entity\OutboxEmail;
+use App\Notification\Domain\Entity\OutboxStatus;
 use App\Notification\Domain\Port\EmailOutbox;
 use Symfony\Component\Uid\Uuid;
 
@@ -28,7 +28,7 @@ final class InMemoryEmailOutbox implements EmailOutbox
     {
         $pending = array_filter(
             $this->emails,
-            static fn (OutboxEmail $email): bool => EmailStatus::Pending === $email->getStatus(),
+            static fn (OutboxEmail $email): bool => OutboxStatus::Pending === $email->getStatus(),
         );
 
         return \array_slice(array_values($pending), 0, $limit);

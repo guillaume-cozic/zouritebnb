@@ -34,6 +34,20 @@ Mêmes mécanismes que les emails voyageur (cf. `emails-voyageur.md`) :
 > tous les hôtes de l'équipe (vue `emails/message_posted.html.twig`, partagée avec le sens
 > hôte→voyageur). L'auteur n'est jamais notifié de son propre message.
 
+### Notification SMS (demande de réservation)
+
+En plus de l'email #1, une **notification SMS** est envoyée à chaque hôte de l'équipe disposant
+d'un numéro de téléphone (`user.phone_number`) lors d'une `ReservationRequested`.
+
+- **Outbox** (comme les emails) : le listener `SendHostSmsOnReservationRequested` met le SMS en
+  file dans la table `outbox_sms` (via `QueueSms`, statut `pending`). Le relais
+  `app:sms:send-pending` (`SendPendingSms`) l'envoie via le port `SmsSender`, avec reprises
+  bornées (`pending → failed` après `maxAttempts`). Texte court via `HostSms` ; les hôtes sans
+  numéro sont ignorés.
+- **Aucun provider pour le moment** : l'adaptateur `LogSmsSender` se contente de journaliser le
+  SMS. Le brancher sur un vrai fournisseur (Twilio, Vonage, OVH…) = remplacer cet adaptateur.
+- Le statut d'outbox est mutualisé (`OutboxStatus`) entre emails et SMS.
+
 ---
 
 ## 1. Nouvelle demande de réservation

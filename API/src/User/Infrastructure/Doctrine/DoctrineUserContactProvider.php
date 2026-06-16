@@ -27,6 +27,7 @@ final readonly class DoctrineUserContactProvider implements UserContactProvider
             userId: $userId,
             email: $user->getEmail(),
             firstName: $user->getFirstName(),
+            phoneNumber: $user->getPhoneNumber(),
         );
     }
 }

@@ -7,20 +7,16 @@ namespace App\Notification\Domain\Entity;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * An email persisted in the transactional outbox. A listener reacting to a domain
- * event queues the email (status Pending) within the same unit of work; a separate
- * relay process later sends it and records the outcome. This decouples "we decided to
- * send this email" from "the SMTP call succeeded", giving at-least-once delivery and
- * resilience to mail-server outages.
+ * An SMS persisted in the transactional outbox. A listener queues it (status Pending) within
+ * the same unit of work; the relay later sends it and records the outcome. Same reliability
+ * guarantees as {@see OutboxEmail}.
  */
-final class OutboxEmail
+final class OutboxSms
 {
     private function __construct(
         private readonly Uuid $id,
-        private readonly EmailAddress $recipient,
-        private readonly ?string $recipientName,
-        private readonly string $subject,
-        private readonly string $htmlBody,
+        private readonly PhoneNumber $recipient,
+        private readonly string $text,
         private OutboxStatus $status,
         private int $attempts,
         private readonly \DateTimeImmutable $createdAt,
@@ -29,20 +25,12 @@ final class OutboxEmail
     ) {
     }
 
-    public static function queue(
-        Uuid $id,
-        EmailAddress $recipient,
-        ?string $recipientName,
-        string $subject,
-        string $htmlBody,
-        \DateTimeImmutable $createdAt,
-    ): self {
+    public static function queue(Uuid $id, PhoneNumber $recipient, string $text, \DateTimeImmutable $createdAt): self
+    {
         return new self(
             id: $id,
             recipient: $recipient,
-            recipientName: $recipientName,
-            subject: $subject,
-            htmlBody: $htmlBody,
+            text: $text,
             status: OutboxStatus::Pending,
             attempts: 0,
             createdAt: $createdAt,
@@ -56,10 +44,8 @@ final class OutboxEmail
      */
     public static function fromState(
         Uuid $id,
-        EmailAddress $recipient,
-        ?string $recipientName,
-        string $subject,
-        string $htmlBody,
+        PhoneNumber $recipient,
+        string $text,
         OutboxStatus $status,
         int $attempts,
         \DateTimeImmutable $createdAt,
@@ -69,15 +55,18 @@ final class OutboxEmail
         return new self(
             id: $id,
             recipient: $recipient,
-            recipientName: $recipientName,
-            subject: $subject,
-            htmlBody: $htmlBody,
+            text: $text,
             status: $status,
             attempts: $attempts,
             createdAt: $createdAt,
             lastAttemptAt: $lastAttemptAt,
             error: $error,
         );
+    }
+
+    public function toMessage(): SmsMessage
+    {
+        return new SmsMessage($this->recipient, $this->text);
     }
 
     public function markSent(\DateTimeImmutable $sentAt): void
@@ -88,11 +77,6 @@ final class OutboxEmail
         $this->error = null;
     }
 
-    /**
-     * Records a failed send attempt. The email stays Pending (and will be retried by the
-     * next relay run) until it has exhausted $maxAttempts, after which it becomes Failed
-     * (terminal / dead-lettered) so it stops being picked up.
-     */
     public function recordFailedAttempt(string $error, \DateTimeImmutable $attemptedAt, int $maxAttempts): void
     {
         ++$this->attempts;
@@ -109,24 +93,14 @@ final class OutboxEmail
         return $this->id;
     }
 
-    public function getRecipient(): EmailAddress
+    public function getRecipient(): PhoneNumber
     {
         return $this->recipient;
     }
 
-    public function getRecipientName(): ?string
+    public function getText(): string
     {
-        return $this->recipientName;
-    }
-
-    public function getSubject(): string
-    {
-        return $this->subject;
-    }
-
-    public function getHtmlBody(): string
-    {
-        return $this->htmlBody;
+        return $this->text;
     }
 
     public function getStatus(): OutboxStatus

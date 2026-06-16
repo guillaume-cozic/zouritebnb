@@ -12,7 +12,13 @@ final readonly class UserContact
         public Uuid $userId,
         public string $email,
         public ?string $firstName,
+        public ?string $phoneNumber = null,
     ) {
+    }
+
+    public function hasPhone(): bool
+    {
+        return null !== $this->phoneNumber && '' !== trim($this->phoneNumber);
     }
 
     /**

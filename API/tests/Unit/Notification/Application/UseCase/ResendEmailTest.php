@@ -7,8 +7,8 @@ namespace App\Tests\Unit\Notification\Application\UseCase;
 use App\Notification\Application\UseCase\ResendEmail;
 use App\Notification\Domain\Command\ResendEmailCommand;
 use App\Notification\Domain\Entity\EmailAddress;
-use App\Notification\Domain\Entity\EmailStatus;
 use App\Notification\Domain\Entity\OutboxEmail;
+use App\Notification\Domain\Entity\OutboxStatus;
 use App\Notification\Domain\Exception\EmailDeliveryException;
 use App\Notification\Domain\Exception\OutboxEmailNotFoundException;
 use App\Tests\Unit\Notification\Infrastructure\FakeEmailSender;
@@ -39,7 +39,7 @@ final class ResendEmailTest extends TestCase
 
         self::assertCount(1, $sender->sent);
         $stored = $this->outbox->findById($email->getId());
-        self::assertSame(EmailStatus::Sent, $stored?->getStatus());
+        self::assertSame(OutboxStatus::Sent, $stored?->getStatus());
         self::assertEquals($this->clock->now(), $stored->getLastAttemptAt());
     }
 
