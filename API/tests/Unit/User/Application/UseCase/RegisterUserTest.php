@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\User\Application\UseCase;
 
+use App\Shared\Domain\Event\UserRegistered;
 use App\Shared\Domain\Port\UuidGenerator;
 use App\Tests\Unit\Shared\Infrastructure\InMemoryEventBus;
 use App\Tests\Unit\User\Infrastructure\FakePasswordHasher;
@@ -11,7 +12,6 @@ use App\Tests\Unit\User\Infrastructure\InMemoryUserRepository;
 use App\User\Application\UseCase\RegisterUser;
 use App\User\Domain\Command\RegisterUserCommand;
 use App\User\Domain\Entity\User;
-use App\User\Domain\Event\UserRegistered;
 use App\User\Domain\Exception\UserAlreadyExistsException;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;

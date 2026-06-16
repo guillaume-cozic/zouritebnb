@@ -68,6 +68,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Review/Infrastructure/Doctrine'
                 prefix: 'App\Review\Infrastructure\Doctrine'
                 alias: Review
+            Notification:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Notification/Infrastructure/Doctrine'
+                prefix: 'App\Notification\Infrastructure\Doctrine'
+                alias: Notification
         controller_resolver:
             auto_mapping: false
 

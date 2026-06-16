@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\User\Domain\Entity;
 
 use App\Shared\Domain\Entity\AggregateRoot;
+use App\Shared\Domain\Event\UserRegistered;
 use App\User\Domain\Event\IdentityVerified;
-use App\User\Domain\Event\UserRegistered;
 use App\User\Domain\Exception\IdentityVerificationException;
 use Symfony\Component\Uid\Uuid;
 

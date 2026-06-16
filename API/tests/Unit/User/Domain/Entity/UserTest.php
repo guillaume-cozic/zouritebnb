@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\User\Domain\Entity;
 
+use App\Shared\Domain\Event\UserRegistered;
 use App\User\Domain\Entity\IdentityDocument;
 use App\User\Domain\Entity\IdentityDocumentType;
 use App\User\Domain\Entity\User;
 use App\User\Domain\Entity\VerificationStatus;
 use App\User\Domain\Event\IdentityVerified;
-use App\User\Domain\Event\UserRegistered;
 use App\User\Domain\Exception\IdentityVerificationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Uuid;

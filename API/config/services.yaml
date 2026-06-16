@@ -156,6 +156,40 @@ services:
     App\Payment\Application\Listener\LinkPaymentOnReservationRequested:
         tags: [messenger.message_handler]
 
+    # --- Notification (transactional email outbox) ---
+
+    App\Shared\Domain\Port\UserContactProvider:
+        alias: App\User\Infrastructure\Doctrine\DoctrineUserContactProvider
+
+    App\Shared\Domain\Port\AccommodationSummaryProvider:
+        alias: App\Accommodation\Infrastructure\Doctrine\DoctrineAccommodationSummaryProvider
+
+    App\Notification\Domain\Port\EmailOutbox:
+        alias: App\Notification\Infrastructure\Doctrine\DoctrineEmailOutbox
+
+    App\Notification\Domain\Port\EmailSender:
+        alias: App\Notification\Infrastructure\Mailer\SymfonyEmailSender
+
+    App\Notification\Infrastructure\Mailer\SymfonyEmailSender:
+        arguments:
+            $fromEmail: '%env(MAILER_FROM_EMAIL)%'
+            $fromName: '%env(MAILER_FROM_NAME)%'
+
+    App\Notification\Application\Listener\SendWelcomeEmailOnUserRegistered:
+        tags: [messenger.message_handler]
+
+    App\Notification\Application\Listener\SendRequestedEmailOnReservationRequested:
+        tags: [messenger.message_handler]
+
+    App\Notification\Application\Listener\SendConfirmationEmailOnReservationConfirmed:
+        tags: [messenger.message_handler]
+
+    App\Notification\Application\Listener\SendRefusalEmailOnReservationRefused:
+        tags: [messenger.message_handler]
+
+    App\Notification\Application\Listener\SendCancellationEmailOnReservationCancelled:
+        tags: [messenger.message_handler]
+
 when@dev:
     services:
         App\Tests\Fixtures\:
