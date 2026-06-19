@@ -87,7 +87,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
           cache-dependency-path: front/package-lock.json
 
@@ -97,7 +97,7 @@ jobs:
 
       - name: Run front tests
         working-directory: front
-        run: npm test -- --watchAll=false
+        run: npm test
 
   build-front:
     name: Build front
@@ -113,7 +113,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
           cache-dependency-path: front/package-lock.json
 
@@ -124,14 +124,85 @@ jobs:
       - name: Build
         working-directory: front
         env:
-          REACT_APP_API_URL: ${{ vars.REACT_APP_API_URL }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: npm run build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: front-build
-          path: front/build
+          path: front/dist
+          retention-days: 7
+
+  build-admin:
+    name: Build admin
+    needs: [test]
+    if: ${{ always() && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install dependencies
+        working-directory: admin
+        run: npm ci
+
+      - name: Build
+        working-directory: admin
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-build
+          path: admin/dist
+          retention-days: 7
+
+  build-blog:
+    name: Build blog
+    needs: [test]
+    if: ${{ always() && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: blog/package-lock.json
+
+      - name: Install dependencies
+        working-directory: blog
+        run: npm ci
+
+      # Astro is configured with base '/blog'; output is served under www/blog.
+      - name: Build
+        working-directory: blog
+        env:
+          PUBLIC_FRONT_URL: https://www.zouritebnb.com
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: blog-build
+          path: blog/dist
           retention-days: 7
 
   build-api:
@@ -196,7 +267,7 @@ jobs:
 
   deploy:
     name: Deploy to VPS
-    needs: [build-front, build-api]
+    needs: [build-front, build-admin, build-blog, build-api]
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -213,6 +284,18 @@ jobs:
           name: front-build
           path: front-build
 
+      - name: Download admin build
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-build
+          path: admin-build
+
+      - name: Download blog build
+        uses: actions/download-artifact@v4
+        with:
+          name: blog-build
+          path: blog-build
+
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -220,12 +303,28 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Sync front build to VPS
+      # --delete prunes stale files, but /blog lives inside the front docroot
+      # (served at www/blog) and is synced separately — exclude it here.
+      - name: Sync front build to VPS (www.zouritebnb.com)
         run: |
-          rsync -az --delete \
+          rsync -az --delete --exclude '/blog' \
             -e "ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT || 22 }}" \
             front-build/ \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.FRONT_DEPLOY_PATH }}/"
+
+      - name: Sync admin build to VPS (adm.zouritebnb.com)
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT || 22 }}" \
+            admin-build/ \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.ADMIN_DEPLOY_PATH }}/"
+
+      - name: Sync blog build to VPS (www.zouritebnb.com/blog)
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT || 22 }}" \
+            blog-build/ \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.FRONT_DEPLOY_PATH }}/blog/"
 
       - name: Sync prod compose file to VPS
         run: |

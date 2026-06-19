@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
-  site: 'https://rodrigues-bnb.com',
+  site: 'https://www.zouritebnb.com',
   base: '/blog',
   trailingSlash: 'always',
   server: {
