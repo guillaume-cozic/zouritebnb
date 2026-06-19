@@ -34,9 +34,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libwebp-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install -j"$(nproc)" pdo_mysql intl zip opcache \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j"$(nproc)" gd
+# intl is installed on its own WITHOUT -j: its parallel make races on the
+# .libs dirs ("File exists" / "modules/* No such file"). The others stay parallel.
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql zip opcache gd \
+    && docker-php-ext-install intl
 
 COPY docker/php/php-prod.ini /usr/local/etc/php/conf.d/zz-app.ini
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
