@@ -34,11 +34,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libwebp-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# intl is installed on its own WITHOUT -j: its parallel make races on the
-# .libs dirs ("File exists" / "modules/* No such file"). The others stay parallel.
+# NB: opcache is compiled statically into php:8.5 (see `php -v`), so it must NOT
+# be passed to docker-php-ext-install (it builds no shared module -> "modules/*
+# No such file"); it is configured via opcache.ini below. gd is configured then
+# installed on its own, as in the dev image.
+RUN docker-php-ext-install pdo_mysql intl zip
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j"$(nproc)" pdo_mysql zip opcache gd \
-    && docker-php-ext-install intl
+    && docker-php-ext-install gd
 
 COPY docker/php/php-prod.ini /usr/local/etc/php/conf.d/zz-app.ini
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
@@ -53,21 +55,20 @@ COPY --chown=www-data:www-data . .
 # Symfony Dotenv exige un .env (les vraies valeurs sont surchargees via env_file en prod)
 RUN cp .env.dist .env
 
-# Cles JWT (gitignorees, donc absentes du contexte de build) : generees ici avec
-# la passphrase de .env. NB: chaque build regenere les cles -> les tokens emis
-# avant un redeploiement sont invalides (re-login). Pour des cles stables,
-# monter un volume sur config/jwt et les generer une fois sur le VPS.
-RUN php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction \
-    && chown -R www-data:www-data config/jwt
-
-# Autoloader optimisé + assets bundles + warmup du cache prod
+# Autoloader optimisé + cles JWT + assets bundles + warmup du cache prod.
 # (DATABASE_URL factice acceptable: aucun warmer ne touche la BDD)
+# dump-autoload d'abord: le stage vendor a installe sans autoloader, donc
+# bin/console ne fonctionne pas avant. Les cles JWT sont gitignorees (absentes
+# du contexte de build) et generees ici avec la passphrase de .env. NB: chaque
+# build regenere les cles -> re-login apres un redeploiement. Pour des cles
+# stables, monter un volume sur config/jwt et les generer une fois sur le VPS.
 RUN DATABASE_URL="mysql://build:build@127.0.0.1:3306/build?serverVersion=8.4" \
     composer dump-autoload --no-dev --classmap-authoritative --no-interaction \
+    && php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction \
     && mkdir -p var/cache var/log \
     && php bin/console assets:install public --no-debug \
     && php bin/console cache:warmup --env=prod --no-debug \
-    && chown -R www-data:www-data var public/bundles
+    && chown -R www-data:www-data var public/bundles config/jwt
 
 USER www-data
 
