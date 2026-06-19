@@ -70,6 +70,12 @@ jobs:
         working-directory: API
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      # JWT keys are gitignored; generate them with the passphrase from .env so
+      # auth-dependent tests can encode tokens.
+      - name: Generate JWT keypair
+        working-directory: API
+        run: bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
+
       - name: Prepare test database
         working-directory: API
         run: |

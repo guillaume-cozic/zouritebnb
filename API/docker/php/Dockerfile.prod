@@ -51,6 +51,13 @@ COPY --chown=www-data:www-data . .
 # Symfony Dotenv exige un .env (les vraies valeurs sont surchargees via env_file en prod)
 RUN cp .env.dist .env
 
+# Cles JWT (gitignorees, donc absentes du contexte de build) : generees ici avec
+# la passphrase de .env. NB: chaque build regenere les cles -> les tokens emis
+# avant un redeploiement sont invalides (re-login). Pour des cles stables,
+# monter un volume sur config/jwt et les generer une fois sur le VPS.
+RUN php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction \
+    && chown -R www-data:www-data config/jwt
+
 # Autoloader optimisé + assets bundles + warmup du cache prod
 # (DATABASE_URL factice acceptable: aucun warmer ne touche la BDD)
 RUN DATABASE_URL="mysql://build:build@127.0.0.1:3306/build?serverVersion=8.4" \
