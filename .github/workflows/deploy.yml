@@ -134,7 +134,7 @@ jobs:
         run: npm run build
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: front-build
           path: front/dist
@@ -169,7 +169,7 @@ jobs:
         run: npm run build
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: admin-build
           path: admin/dist
@@ -205,7 +205,7 @@ jobs:
         run: npm run build
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: blog-build
           path: blog/dist
@@ -236,17 +236,17 @@ jobs:
           echo "nginx_repo=${NGINX_LC}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Log in to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build & push PHP image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./API
           file: ./API/docker/php/Dockerfile.prod
@@ -258,7 +258,7 @@ jobs:
           cache-to: type=registry,ref=${{ steps.tags.outputs.php_repo }}:buildcache,mode=max
 
       - name: Build & push nginx image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./API
           file: ./API/docker/nginx/Dockerfile.prod
@@ -285,19 +285,19 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: Download front build
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: front-build
           path: front-build
 
       - name: Download admin build
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: admin-build
           path: admin-build
 
       - name: Download blog build
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: blog-build
           path: blog-build
