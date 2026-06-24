@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import counterReducer from '../features/counter/counterSlice';
 import accommodationReducer from '../features/accommodation/AccommodationSlice';
+import accommodationSummaryReducer from '../features/accommodation/AccommodationSummarySlice';
 import homepageReducer from '../features/homepage/HomepageSlice';
 import accommodationManagementReducer from '../features/accommodationManagement/AccommodationManagementSlice';
 import solidarityProjectReducer from '../features/solidarityProject/SolidarityProjectSlice';
@@ -19,6 +20,7 @@ export const store = configureStore({
   reducer: {
     counter: counterReducer,
     accommodation: accommodationReducer,
+    accommodationSummary: accommodationSummaryReducer,
     homepage: homepageReducer,
     accommodationManagement: accommodationManagementReducer,
     solidarityProject: solidarityProjectReducer,

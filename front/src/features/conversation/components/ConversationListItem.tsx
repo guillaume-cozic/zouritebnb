@@ -9,6 +9,10 @@ interface Props {
   active?: boolean;
   locale: string;
   needsAction?: boolean;
+  /** Traveler inbox: accommodation name shown as the item title. */
+  accommodationTitle?: string | null;
+  /** Traveler inbox: accommodation city shown under the title. */
+  accommodationCity?: string | null;
 }
 
 const lastMessage = (conversation: Conversation): ConversationMessage | null => {
@@ -44,13 +48,26 @@ const avatarHueFromUuid = (uuid: string): number => {
   return Math.abs(hash) % 360;
 };
 
-const ConversationListItem: React.FC<Props> = ({ conversation, to, active = false, locale, needsAction = false }) => {
+const ConversationListItem: React.FC<Props> = ({
+  conversation,
+  to,
+  active = false,
+  locale,
+  needsAction = false,
+  accommodationTitle = null,
+  accommodationCity = null,
+}) => {
   const { t } = useTranslation();
   const last = lastMessage(conversation);
 
-  const previewLabel = t('conversation.itemTitle');
-  const hue = avatarHueFromUuid(conversation.guestUserId);
-  const avatar = initials(previewLabel);
+  // Traveler inbox labels conversations with the accommodation name; the host inbox
+  // keeps the generic "réservation" label. Fall back while the summary is loading.
+  const title = accommodationTitle || t('conversation.itemTitle');
+  const previewLabel = title;
+  // Color per accommodation in the traveler inbox (its guestUserId never varies),
+  // per guest in the host inbox.
+  const hue = avatarHueFromUuid(accommodationTitle ? conversation.accommodationId : conversation.guestUserId);
+  const avatar = initials(title);
 
   return (
     <Link
@@ -91,6 +108,15 @@ const ConversationListItem: React.FC<Props> = ({ conversation, to, active = fals
               </span>
             )}
           </div>
+          {accommodationCity && (
+            <p className="flex items-center gap-1 text-[11px] text-gray-500 truncate mt-0.5">
+              <svg className="flex-shrink-0" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span className="truncate">{accommodationCity}</span>
+            </p>
+          )}
           <div className="flex items-center gap-2 mt-0.5">
             {last && (
               <p className={`text-xs truncate flex-1 ${last.isSystem ? 'italic text-gray-500' : 'text-gray-600'}`}>

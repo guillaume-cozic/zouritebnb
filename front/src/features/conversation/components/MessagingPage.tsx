@@ -15,6 +15,8 @@ import {
 } from '../ConversationSelectors';
 import { selectAuthUser } from '../../auth/AuthSelectors';
 import { selectHasAccommodation } from '../../accommodationManagement/AccommodationManagementSelectors';
+import { fetchAccommodationSummary } from '../../accommodation/AccommodationSummarySlice';
+import { selectAccommodationSummaries } from '../../accommodation/AccommodationSummarySelectors';
 import {
   confirmReservation,
   fetchReservationById,
@@ -51,6 +53,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
 
   const user = useAppSelector(selectAuthUser);
   const hasAccommodation = useAppSelector(selectHasAccommodation);
+  const accommodationSummaries = useAppSelector(selectAccommodationSummaries);
   const readOnly = !user;
   const conversations = useAppSelector(selectConversations);
   const listStatus = useAppSelector(selectConversationsStatus);
@@ -85,6 +88,14 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
   useEffect(() => {
     if (id) dispatch(fetchConversationById(id));
   }, [dispatch, id]);
+
+  // Traveler inbox: label each conversation with its accommodation (name + city).
+  // The summary thunk is cached by id, so this fetches each accommodation at most once.
+  useEffect(() => {
+    if (isHost) return;
+    const ids = new Set(conversations.map((c) => c.accommodationId));
+    ids.forEach((accommodationId) => dispatch(fetchAccommodationSummary(accommodationId)));
+  }, [dispatch, isHost, conversations]);
 
   useEffect(() => {
     if (current?.reservationId) dispatch(fetchReservationById(current.reservationId));
@@ -233,6 +244,8 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                 active={c.id === id}
                 locale={locale}
                 needsAction={isHost && reservationStatusById[c.reservationId] === 'pending'}
+                accommodationTitle={isHost ? undefined : accommodationSummaries[c.accommodationId]?.title}
+                accommodationCity={isHost ? undefined : accommodationSummaries[c.accommodationId]?.city}
               />
             ))}
           </div>
