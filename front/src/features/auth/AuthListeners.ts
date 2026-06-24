@@ -13,13 +13,13 @@ startAppListening({
   effect: async (action, api) => {
     api.cancelActiveListeners();
     await api.delay(PROFILE_AUTOSAVE_DELAY);
-    const { userId, firstName, lastName, email } = action.payload;
+    const { firstName, lastName, email, bio } = action.payload;
     if (!email) return;
     const result = await api.dispatch(updateUserProfile({
-      id: userId,
       firstName: firstName || null,
       lastName: lastName || null,
       email,
+      bio: bio || null,
     }));
     if (updateUserProfile.fulfilled.match(result)) {
       await api.delay(SAVED_BADGE_DELAY);

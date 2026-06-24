@@ -43,6 +43,7 @@ describe('profileEdited', () => {
         firstName: 'Jane',
         lastName: '',
         email: 'jane@example.com',
+        bio: '',
       }));
       expect(mockedApi.patch).not.toHaveBeenCalled();
 
@@ -50,8 +51,8 @@ describe('profileEdited', () => {
       await flush();
 
       expect(mockedApi.patch).toHaveBeenCalledWith(
-        '/api/users/u-1/profile',
-        { firstName: 'Jane', lastName: null, email: 'jane@example.com' },
+        '/api/users/profile',
+        { firstName: 'Jane', lastName: null, email: 'jane@example.com', bio: null },
         expect.anything()
       );
       expect(store.getState().auth.profileSaveState).toBe('saved');
@@ -69,7 +70,7 @@ describe('profileEdited', () => {
     try {
       const store = buildStore();
 
-      store.dispatch(profileEdited({ userId: 'u-1', firstName: 'Jane', lastName: 'Doe', email: '' }));
+      store.dispatch(profileEdited({ userId: 'u-1', firstName: 'Jane', lastName: 'Doe', email: '', bio: '' }));
       vi.advanceTimersByTime(801);
       await flush();
 
@@ -86,17 +87,17 @@ describe('profileEdited', () => {
       mockedApi.patch.mockResolvedValue({ data: {} });
       const store = buildStore();
 
-      store.dispatch(profileEdited({ userId: 'u-1', firstName: 'J', lastName: '', email: 'jane@example.com' }));
+      store.dispatch(profileEdited({ userId: 'u-1', firstName: 'J', lastName: '', email: 'jane@example.com', bio: '' }));
       vi.advanceTimersByTime(400);
       await flush();
-      store.dispatch(profileEdited({ userId: 'u-1', firstName: 'Jane', lastName: '', email: 'jane@example.com' }));
+      store.dispatch(profileEdited({ userId: 'u-1', firstName: 'Jane', lastName: '', email: 'jane@example.com', bio: '' }));
       vi.advanceTimersByTime(801);
       await flush();
 
       expect(mockedApi.patch).toHaveBeenCalledTimes(1);
       expect(mockedApi.patch).toHaveBeenCalledWith(
-        '/api/users/u-1/profile',
-        { firstName: 'Jane', lastName: null, email: 'jane@example.com' },
+        '/api/users/profile',
+        { firstName: 'Jane', lastName: null, email: 'jane@example.com', bio: null },
         expect.anything()
       );
     } finally {
@@ -110,7 +111,7 @@ describe('profileEdited', () => {
       mockedApi.patch.mockRejectedValue({ response: { data: { detail: 'boom' } } });
       const store = buildStore();
 
-      store.dispatch(profileEdited({ userId: 'u-1', firstName: 'Jane', lastName: '', email: 'jane@example.com' }));
+      store.dispatch(profileEdited({ userId: 'u-1', firstName: 'Jane', lastName: '', email: 'jane@example.com', bio: '' }));
       vi.advanceTimersByTime(801);
       await flush();
 

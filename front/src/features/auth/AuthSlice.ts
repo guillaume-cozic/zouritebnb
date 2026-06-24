@@ -34,6 +34,7 @@ export const profileEdited = createAction<{
   firstName: string;
   lastName: string;
   email: string;
+  bio: string;
 }>('auth/profileEdited');
 
 interface AuthState {
@@ -66,16 +67,31 @@ export const registerUser = createAsyncThunk(
 
 export const updateUserProfile = createAsyncThunk(
   'auth/updateProfile',
-  async (payload: { id: string; firstName: string | null; lastName: string | null; email: string }, { rejectWithValue }) => {
+  async (payload: { firstName: string | null; lastName: string | null; email: string; bio: string | null }, { rejectWithValue }) => {
     try {
+      // The authenticated user is resolved from the JWT server-side (no id in the path).
       await api.patch(
-        `/api/users/${payload.id}/profile`,
-        { firstName: payload.firstName, lastName: payload.lastName, email: payload.email },
+        '/api/users/profile',
+        { firstName: payload.firstName, lastName: payload.lastName, email: payload.email, bio: payload.bio },
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
-      return { firstName: payload.firstName, lastName: payload.lastName, email: payload.email };
+      return { firstName: payload.firstName, lastName: payload.lastName, email: payload.email, bio: payload.bio };
     } catch (err) {
       return rejectWithValue(extractErrorMessage(err, 'Erreur lors de la mise à jour du profil'));
+    }
+  }
+);
+
+export const uploadAvatar = createAsyncThunk(
+  'auth/uploadAvatar',
+  async (file: File, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await api.post('/api/users/avatar', formData);
+      return { avatarUrl: response.data.avatarUrl as string };
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors de l\'envoi de la photo'));
     }
   }
 );
@@ -142,10 +158,16 @@ const authSlice = createSlice({
         state.user.firstName = action.payload.firstName;
         state.user.lastName = action.payload.lastName;
         state.user.email = action.payload.email;
+        state.user.bio = action.payload.bio;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
       })
       .addCase(updateUserProfile.rejected, (state) => {
         state.profileSaveState = 'error';
+      })
+      .addCase(uploadAvatar.fulfilled, (state, action) => {
+        if (!state.user) return;
+        state.user.avatarUrl = action.payload.avatarUrl;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
       });
 
     const syncVerificationStatus = (

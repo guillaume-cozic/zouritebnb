@@ -22,16 +22,15 @@ const initialState: AccommodationSummaryState = {
  * label conversations in the traveler inbox. Cached by id: a no-op when already
  * loaded, so dispatching it per conversation costs at most one request each.
  */
-export const fetchAccommodationSummary = createAsyncThunk<
-  AccommodationSummary | null,
-  string,
-  { state: RootState }
->('accommodationSummary/fetchOne', async (id, { getState }) => {
-  if (getState().accommodationSummary.byId[id]) return null;
-  const response = await api.get(`/api/accommodations/${id}`);
-  const data = response.data;
-  return { id, title: data.title ?? null, city: data.city ?? null };
-});
+export const fetchAccommodationSummary = createAsyncThunk(
+  'accommodationSummary/fetchOne',
+  async (id: string, { getState }) => {
+    if ((getState() as RootState).accommodationSummary.byId[id]) return null;
+    const response = await api.get(`/api/accommodations/${id}`);
+    const data = response.data;
+    return { id, title: data.title ?? null, city: data.city ?? null };
+  }
+);
 
 const accommodationSummarySlice = createSlice({
   name: 'accommodationSummary',

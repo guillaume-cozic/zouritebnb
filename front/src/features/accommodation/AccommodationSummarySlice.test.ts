@@ -9,6 +9,7 @@ import accommodationSummaryReducer, {
   fetchAccommodationSummary,
 } from './AccommodationSummarySlice';
 import { selectAccommodationSummaryById } from './AccommodationSummarySelectors';
+import type { RootState } from '../../store';
 import api from '../../services/api';
 
 const mockedApi = api as Mocked<typeof api>;
@@ -30,7 +31,7 @@ describe('fetchAccommodationSummary', () => {
     await store.dispatch(fetchAccommodationSummary('a-1'));
 
     expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations/a-1');
-    expect(selectAccommodationSummaryById('a-1')(store.getState())).toEqual({
+    expect(selectAccommodationSummaryById('a-1')(store.getState() as unknown as RootState)).toEqual({
       id: 'a-1',
       title: 'Villa Tropicale',
       city: 'Saint-Denis',
@@ -43,7 +44,7 @@ describe('fetchAccommodationSummary', () => {
 
     await store.dispatch(fetchAccommodationSummary('a-2'));
 
-    expect(selectAccommodationSummaryById('a-2')(store.getState())).toEqual({
+    expect(selectAccommodationSummaryById('a-2')(store.getState() as unknown as RootState)).toEqual({
       id: 'a-2',
       title: null,
       city: null,

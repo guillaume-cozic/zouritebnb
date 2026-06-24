@@ -33,6 +33,7 @@ import ReviewModal from '../../review/components/ReviewModal';
 import ConversationListItem from './ConversationListItem';
 import ConversationThread from './ConversationThread';
 import HostPanel from './HostPanel';
+import HostProfileCard from '../../hostProfile/components/HostProfileCard';
 
 interface MessagingPageProps {
   role: 'host' | 'guest';
@@ -347,6 +348,12 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
             </div>
 
             <div className="hidden 2xl:block border-l border-gray-100 bg-gray-50/40 p-4 overflow-y-auto">
+              {/* Travelers see who their host is at the top of the side panel. */}
+              {!isHost && (
+                <div className="mb-4 rounded-2xl border border-gray-100 bg-white px-4 py-3">
+                  <HostProfileCard teamId={current.teamId} variant="compact" />
+                </div>
+              )}
               {reservation && (
                 <HostPanel
                   reservation={reservation}

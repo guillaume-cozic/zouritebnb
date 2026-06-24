@@ -20,6 +20,7 @@ import LocationMap from '../../../components/LocationMap';
 import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
 import RatingBadge from '../../review/components/RatingBadge';
+import HostProfileCard from '../../hostProfile/components/HostProfileCard';
 import AccommodationReviews from '../../review/components/AccommodationReviews';
 import { fetchAccommodationReviews } from '../../review/ReviewSlice';
 import { selectAccommodationReviews } from '../../review/ReviewSelectors';
@@ -385,6 +386,9 @@ const AccommodationDetailPage: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Host presentation */}
+            <HostProfileCard teamId={accommodation.teamId} variant="full" />
           </div>
 
           {/* Right column - Booking card */}

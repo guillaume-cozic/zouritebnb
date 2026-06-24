@@ -94,6 +94,11 @@
       "pendingNotice": "Vous avez 24h pour accepter ou refuser cette demande.",
       "accept": "Accepter",
       "refuse": "Refuser"
+    },
+    "profile": {
+      "title": "À propos de l'hôte",
+      "label": "Votre hôte",
+      "fallbackName": "Hôte"
     }
   },
   "conversation": {
@@ -175,6 +180,11 @@
     "firstName": "Prénom",
     "lastName": "Nom",
     "email": "Email",
+    "photo": "Photo",
+    "changePhoto": "Changer la photo",
+    "photoHelp": "JPEG, PNG ou WebP, 10 Mo maximum.",
+    "bio": "Présentation",
+    "bioHelp": "Quelques mots sur vous, affichés publiquement aux voyageurs.",
     "save": "Enregistrer",
     "coHostsTitle": "Co-hôtes",
     "coHostsHelp": "Invitez des co-hôtes par email pour partager la gestion de vos hébergements.",

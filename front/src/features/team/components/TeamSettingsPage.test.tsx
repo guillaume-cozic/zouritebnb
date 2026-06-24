@@ -95,8 +95,8 @@ test('editing the first name auto-saves the profile after the debounce', async (
   await waitFor(
     () =>
       expect(mockedApi.patch).toHaveBeenCalledWith(
-        '/api/users/u-1/profile',
-        { firstName: 'Janet', lastName: 'Doe', email: 'host@example.com' },
+        '/api/users/profile',
+        { firstName: 'Janet', lastName: 'Doe', email: 'host@example.com', bio: null },
         expect.anything()
       ),
     { timeout: 3000 }

@@ -22,10 +22,12 @@ import {
 } from '../TeamSelectors';
 import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
 import { selectAuthTeamId, selectAuthUser, selectProfileSaveState } from '../../auth/AuthSelectors';
-import { profileEdited } from '../../auth/AuthSlice';
+import { profileEdited, uploadAvatar } from '../../auth/AuthSlice';
 import { AuthUser } from '../../auth/AuthTypes';
 import { DEFAULT_TEAM_ID, Team } from '../TeamTypes';
-import { Button, Card, Field, Input, Modal, SaveIndicator, Select } from '../../../components/ui';
+import { Button, Card, Field, Input, Modal, SaveIndicator, Select, Textarea } from '../../../components/ui';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 /**
  * Profile form, keyed by user id so the controlled inputs hydrate from props.
@@ -40,14 +42,24 @@ const ProfileSection: React.FC<{ user: AuthUser }> = ({ user }) => {
   const [firstName, setFirstName] = useState(user.firstName ?? '');
   const [lastName, setLastName] = useState(user.lastName ?? '');
   const [email, setEmail] = useState(user.email);
+  const [bio, setBio] = useState(user.bio ?? '');
 
-  const handleChange = (next: { firstName?: string; lastName?: string; email?: string }) => {
-    const values = { firstName, lastName, email, ...next };
+  const handleChange = (next: { firstName?: string; lastName?: string; email?: string; bio?: string }) => {
+    const values = { firstName, lastName, email, bio, ...next };
     if (next.firstName !== undefined) setFirstName(next.firstName);
     if (next.lastName !== undefined) setLastName(next.lastName);
     if (next.email !== undefined) setEmail(next.email);
+    if (next.bio !== undefined) setBio(next.bio);
     dispatch(profileEdited({ userId: user.id, ...values }));
   };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) dispatch(uploadAvatar(file));
+    e.target.value = '';
+  };
+
+  const initial = (firstName || user.email).charAt(0).toUpperCase();
 
   return (
     <Card
@@ -56,6 +68,26 @@ const ProfileSection: React.FC<{ user: AuthUser }> = ({ user }) => {
       action={<SaveIndicator status={profileSaveState} />}
       className="mb-6"
     >
+      <div className="flex items-center gap-4 mb-4">
+        {user.avatarUrl ? (
+          <img
+            src={`${API_BASE}${user.avatarUrl}`}
+            alt={t('team.photo') as string}
+            className="w-20 h-20 rounded-full object-cover border border-gray-200"
+          />
+        ) : (
+          <span className="w-20 h-20 rounded-full bg-primary-600 text-white flex items-center justify-center text-2xl font-semibold">
+            {initial}
+          </span>
+        )}
+        <div>
+          <label className="inline-flex items-center gap-2 h-9 px-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium cursor-pointer">
+            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarChange} className="hidden" />
+            {t('team.changePhoto')}
+          </label>
+          <p className="text-xs text-gray-500 mt-1">{t('team.photoHelp')}</p>
+        </div>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label={t('team.firstName')}>
           <Input
@@ -76,6 +108,14 @@ const ProfileSection: React.FC<{ user: AuthUser }> = ({ user }) => {
             type="email"
             value={email}
             onChange={(e) => handleChange({ email: e.target.value })}
+          />
+        </Field>
+        <Field label={t('team.bio')} hint={t('team.bioHelp') as string} className="md:col-span-2">
+          <Textarea
+            rows={4}
+            value={bio}
+            maxLength={2000}
+            onChange={(e) => handleChange({ bio: e.target.value })}
           />
         </Field>
       </div>

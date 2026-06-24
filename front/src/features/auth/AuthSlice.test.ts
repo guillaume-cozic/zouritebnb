@@ -93,13 +93,14 @@ describe('updateUserProfile', () => {
     await store.dispatch(loginUser({ email: 'a@b.fr', password: 'secret' }));
 
     await store.dispatch(
-      updateUserProfile({ id: 'u-1', firstName: 'Jane', lastName: 'Doe', email: 'jane@doe.fr' })
+      updateUserProfile({ firstName: 'Jane', lastName: 'Doe', email: 'jane@doe.fr', bio: 'Bonjour' })
     );
 
     const updated = store.getState().auth.user;
     expect(updated?.firstName).toBe('Jane');
     expect(updated?.lastName).toBe('Doe');
     expect(updated?.email).toBe('jane@doe.fr');
+    expect(updated?.bio).toBe('Bonjour');
   });
 });
 

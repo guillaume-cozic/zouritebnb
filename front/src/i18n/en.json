@@ -94,6 +94,11 @@
       "pendingNotice": "You have 24h to accept or decline this request.",
       "accept": "Accept",
       "refuse": "Decline"
+    },
+    "profile": {
+      "title": "About the host",
+      "label": "Your host",
+      "fallbackName": "Host"
     }
   },
   "conversation": {
@@ -175,6 +180,11 @@
     "firstName": "First name",
     "lastName": "Last name",
     "email": "Email",
+    "photo": "Photo",
+    "changePhoto": "Change photo",
+    "photoHelp": "JPEG, PNG or WebP, 10 MB max.",
+    "bio": "About you",
+    "bioHelp": "A few words about yourself, shown publicly to travelers.",
     "save": "Save",
     "coHostsTitle": "Co-hosts",
     "coHostsHelp": "Invite co-hosts by email to share accommodation management.",
