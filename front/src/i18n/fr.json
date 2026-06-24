@@ -119,7 +119,8 @@
     "login": "Se connecter",
     "host": "Hôte",
     "guest": "Loueur",
-    "downloadInvoice": "Télécharger la facture"
+    "downloadInvoice": "Télécharger la facture",
+    "accommodation": "Logement"
   },
   "navbar": {
     "home": "Accueil",

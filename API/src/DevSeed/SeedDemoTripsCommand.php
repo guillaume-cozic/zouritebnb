@@ -130,6 +130,14 @@ final class SeedDemoTripsCommand extends Command
     {
         $existing = $this->em->getRepository(UserEntity::class)->findOneBy(['email' => self::GUEST_EMAIL]);
         if (null !== $existing) {
+            // The existing account may have no name; a reservation needs a non-empty
+            // guest name (the GuestName value object rejects empty), so backfill it.
+            if (null === $existing->getFirstName() || '' === trim((string) $existing->getFirstName())) {
+                $existing->setFirstName('Guillaume');
+            }
+            if (null === $existing->getLastName() || '' === trim((string) $existing->getLastName())) {
+                $existing->setLastName('Cozic');
+            }
             $io->writeln(\sprintf('Voyageur existant réutilisé : <info>%s</info>', self::GUEST_EMAIL));
 
             return $existing;
@@ -220,6 +228,10 @@ final class SeedDemoTripsCommand extends Command
         $checkOut = $checkIn->modify(\sprintf('+%d days', $nights));
         $pricePerNight = (float) $accommodation->getPrice();
         $totalPrice = round($pricePerNight * $nights, 2);
+        $guestName = trim($guest->getFirstName().' '.$guest->getLastName());
+        if ('' === $guestName) {
+            $guestName = 'Voyageur';
+        }
 
         $entity = $this->em->find(ReservationEntity::class, $uuid) ?? new ReservationEntity();
         $entity
@@ -229,7 +241,7 @@ final class SeedDemoTripsCommand extends Command
             ->setGuestUserId($guest->getId())
             ->setCheckIn($checkIn)
             ->setCheckOut($checkOut)
-            ->setGuestName(trim($guest->getFirstName().' '.$guest->getLastName()))
+            ->setGuestName($guestName)
             ->setStatus('confirmed')
             ->setTotalPrice($totalPrice)
             ->setPricePerNight($pricePerNight)

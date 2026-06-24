@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import {
@@ -296,15 +296,25 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
               <header className="px-5 py-3 border-b border-gray-100 bg-white flex items-center gap-3">
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-                    {t('conversation.reservation')}
+                    {isHost ? t('conversation.reservation') : t('conversation.accommodation')}
                   </p>
-                  <p className="text-sm font-semibold text-gray-900 truncate">
-                    {isHost
-                      ? reservation
-                        ? reservation.guestName
-                        : current.reservationId.slice(0, 8) + '…'
-                      : t('conversation.detailTitle')}
-                  </p>
+                  {isHost ? (
+                    <p className="text-sm font-semibold text-gray-900 truncate">
+                      {reservation ? reservation.guestName : current.reservationId.slice(0, 8) + '…'}
+                    </p>
+                  ) : (
+                    // Travelers can open the listing straight from the conversation header
+                    // (the full side panel is only shown on very wide screens).
+                    <Link
+                      to={`/accommodations/${current.accommodationId}`}
+                      className="block text-sm font-semibold text-gray-900 truncate hover:text-primary-700 transition-colors"
+                    >
+                      {accommodationSummaries[current.accommodationId]?.title ?? t('conversation.detailTitle')}
+                      {accommodationSummaries[current.accommodationId]?.city
+                        ? ` · ${accommodationSummaries[current.accommodationId]?.city}`
+                        : ''}
+                    </Link>
+                  )}
                 </div>
                 {reservation && (
                   <span className="text-xs text-gray-500 hidden sm:block">

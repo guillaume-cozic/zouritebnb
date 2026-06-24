@@ -119,7 +119,8 @@
     "login": "Log in",
     "host": "Host",
     "guest": "Guest",
-    "downloadInvoice": "Download invoice"
+    "downloadInvoice": "Download invoice",
+    "accommodation": "Accommodation"
   },
   "navbar": {
     "home": "Home",
