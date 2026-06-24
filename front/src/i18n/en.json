@@ -118,7 +118,8 @@
     "readOnly": "Read-only mode — log in to reply.",
     "login": "Log in",
     "host": "Host",
-    "guest": "Guest"
+    "guest": "Guest",
+    "downloadInvoice": "Download invoice"
   },
   "navbar": {
     "home": "Home",

@@ -118,7 +118,8 @@
     "readOnly": "Mode lecture seule — connectez-vous pour répondre.",
     "login": "Se connecter",
     "host": "Hôte",
-    "guest": "Loueur"
+    "guest": "Loueur",
+    "downloadInvoice": "Télécharger la facture"
   },
   "navbar": {
     "home": "Accueil",
