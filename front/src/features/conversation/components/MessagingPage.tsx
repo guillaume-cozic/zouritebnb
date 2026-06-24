@@ -291,7 +291,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
         )}
 
         {id && current && (
-          <div className="flex-1 grid grid-cols-1 2xl:grid-cols-[1fr_300px] min-h-0">
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_300px] min-h-0">
             <div className="min-h-0 flex flex-col">
               <header className="px-5 py-3 border-b border-gray-100 bg-white flex items-center gap-3">
                 <div className="flex-1 min-w-0">
@@ -304,7 +304,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                     </p>
                   ) : (
                     // Travelers can open the listing straight from the conversation header
-                    // (the full side panel is only shown on very wide screens).
+                    // (the full side panel is hidden on narrow screens, below lg).
                     <Link
                       to={`/accommodations/${current.accommodationId}`}
                       className="block text-sm font-semibold text-gray-900 truncate hover:text-primary-700 transition-colors"
@@ -324,7 +324,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                   </span>
                 )}
                 {isHost && reservation?.status === 'pending' && !readOnly && (
-                  <div className="flex items-center gap-2 2xl:hidden">
+                  <div className="flex items-center gap-2 lg:hidden">
                     <button
                       type="button"
                       onClick={handleAccept}
@@ -383,7 +383,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
               </div>
             </div>
 
-            <div className="hidden 2xl:block border-l border-gray-100 bg-gray-50/40 p-4 overflow-y-auto">
+            <div className="hidden lg:block border-l border-gray-100 bg-gray-50/40 p-4 overflow-y-auto">
               {/* Travelers see who their host is at the top of the side panel. */}
               {!isHost && (
                 <div className="mb-4 rounded-2xl border border-gray-100 bg-white px-4 py-3">
