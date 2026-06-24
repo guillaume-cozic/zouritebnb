@@ -1,0 +1,21 @@
+---
+# Docker apt packages installed from the official Docker repository.
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+
+# Users added to the `docker` group so they can run docker without sudo.
+# The deploy user from the GitHub Actions workflow goes here.
+docker_users:
+  - "{{ ansible_user }}"
+
+# Docker daemon configuration written to /etc/docker/daemon.json.
+# Log rotation keeps container logs from filling the disk.
+docker_daemon_config:
+  log-driver: json-file
+  log-opts:
+    max-size: "10m"
+    max-file: "3"

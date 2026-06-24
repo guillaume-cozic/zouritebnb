@@ -1,0 +1,5 @@
+---
+# Core modules used by this project ship with ansible-core, so no Galaxy
+# collections are strictly required. This file documents the baseline and
+# leaves room to add collections later (e.g. community.docker).
+collections: []

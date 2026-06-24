@@ -1,0 +1,16 @@
+---
+# Provision the production VPS so it can run the stack deployed by
+# .github/workflows/deploy.yml (which expects `docker` + `docker compose`).
+#
+# Usage:
+#   cd ansible
+#   ansible-playbook site.yml                 # provision the inventory
+#   ansible-playbook site.yml --check         # dry-run, no changes applied
+#   ansible-playbook site.yml --limit vps     # a single host
+- name: Provision Docker hosts
+  hosts: production
+  roles:
+    - docker
+    # deploy runs after docker: it adds the deploy user to the docker group
+    # (created by the docker role) and installs rsync + the deploy directories.
+    - deploy

@@ -1,0 +1,3 @@
+# Real inventory holds the server address / SSH user — keep only the template.
+inventory/hosts.ini
+*.retry

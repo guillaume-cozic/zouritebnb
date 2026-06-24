@@ -1,0 +1,25 @@
+---
+# Make the host ready for .github/workflows/deploy.yml: the workflow rsyncs the
+# built front/admin/blog over SSH and runs `docker compose` as `deploy_user`.
+
+- name: Install rsync (the deploy workflow syncs static builds with it)
+  ansible.builtin.apt:
+    name: rsync
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure the deploy user can run docker without sudo
+  ansible.builtin.user:
+    name: "{{ deploy_user }}"
+    groups: docker
+    append: true
+
+- name: Create the deploy directories owned by the deploy user
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0755"
+  loop: "{{ deploy_paths }}"
