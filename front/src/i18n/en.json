@@ -120,7 +120,8 @@
     "host": "Host",
     "guest": "Guest",
     "downloadInvoice": "Download invoice",
-    "accommodation": "Accommodation"
+    "accommodation": "Accommodation",
+    "reviewable": "To review"
   },
   "navbar": {
     "home": "Home",
@@ -223,8 +224,7 @@
       "calendar": "Calendar",
       "reservations": "Reservations",
       "conversations": "Messages",
-      "team": "My settings",
-      "reviewable": "To review"
+      "team": "My settings"
     },
     "sidebarFooter": "Your gîte, your world. Take care of every guest.",
     "travelerSidebarFooter": "Your messages and personal info, all in one quiet place.",

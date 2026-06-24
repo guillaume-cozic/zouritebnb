@@ -120,7 +120,8 @@
     "host": "Hôte",
     "guest": "Loueur",
     "downloadInvoice": "Télécharger la facture",
-    "accommodation": "Logement"
+    "accommodation": "Logement",
+    "reviewable": "À noter"
   },
   "navbar": {
     "home": "Accueil",
@@ -223,8 +224,7 @@
       "calendar": "Calendrier",
       "reservations": "Réservations",
       "conversations": "Messagerie",
-      "team": "Mes paramètres",
-      "reviewable": "À noter"
+      "team": "Mes paramètres"
     },
     "sidebarFooter": "Votre gîte, votre univers. Prenez soin de chaque voyageur.",
     "travelerSidebarFooter": "Vos messages et vos infos personnelles, au calme.",

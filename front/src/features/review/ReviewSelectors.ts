@@ -17,23 +17,29 @@ export const selectHasReviewed = (reservationId: string, target: ReviewTarget) =
   );
 
 /**
- * How many of the current user's stays can still be rated: completed stays (as guest)
- * not yet reviewed. Mirrors the per-conversation "rate" eligibility, surfaced in the menu.
+ * Set (keyed by reservation id) of the current user's stays that can still be rated:
+ * completed stays (as guest) not yet reviewed. Mirrors the per-conversation "rate"
+ * eligibility, surfaced as a label in the conversation list.
  */
-export const selectReviewableCount = createSelector(
+export const selectReviewableReservationIds = createSelector(
   [
     (state: RootState) => state.auth?.user?.id ?? null,
     (state: RootState) => state.reservation?.items ?? [],
     selectSubmittedReviews,
   ],
-  (userId, reservations, submitted): number => {
+  (userId, reservations, submitted): Record<string, true> => {
     const now = new Date();
-    return reservations.filter(
-      (r) =>
+    const map: Record<string, true> = {};
+    for (const r of reservations) {
+      if (
         !!userId &&
         r.guestUserId === userId &&
         isStayCompleted(r, now) &&
         !submitted.some((s) => s.reservationId === r.id && s.target === 'accommodation')
-    ).length;
+      ) {
+        map[r.id] = true;
+      }
+    }
+    return map;
   }
 );

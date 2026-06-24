@@ -29,7 +29,7 @@ import {
   selectReservations,
 } from '../../reservation/ReservationSelectors';
 import { isStayCompleted } from '../../review/reviewEligibility';
-import { selectHasReviewed } from '../../review/ReviewSelectors';
+import { selectHasReviewed, selectReviewableReservationIds } from '../../review/ReviewSelectors';
 import { downloadReservationInvoice } from '../../reservation/invoiceDownload';
 import ReviewModal from '../../review/components/ReviewModal';
 import ConversationListItem from './ConversationListItem';
@@ -60,6 +60,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
   const readOnly = !user;
   const conversations = useAppSelector(selectConversations);
   const unreadByConversation = useAppSelector(selectUnreadCountByConversation);
+  const reviewableByReservation = useAppSelector(selectReviewableReservationIds);
   const listStatus = useAppSelector(selectConversationsStatus);
   const current = useAppSelector(selectCurrentConversation);
   const currentStatus = useAppSelector(selectCurrentConversationStatus);
@@ -259,6 +260,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                 locale={locale}
                 needsAction={isHost && reservationStatusById[c.reservationId] === 'pending'}
                 unreadCount={unreadByConversation[c.id] ?? 0}
+                reviewable={!isHost && !!reviewableByReservation[c.reservationId]}
                 accommodationTitle={isHost ? undefined : accommodationSummaries[c.accommodationId]?.title}
                 accommodationCity={isHost ? undefined : accommodationSummaries[c.accommodationId]?.city}
               />

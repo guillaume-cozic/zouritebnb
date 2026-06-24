@@ -12,6 +12,8 @@ interface Props {
   needsAction?: boolean;
   /** Number of unread messages in this conversation (red badge). */
   unreadCount?: number;
+  /** Traveler inbox: the stay can still be rated (shows an "À noter" label). */
+  reviewable?: boolean;
   /** Traveler inbox: accommodation name shown as the item title. */
   accommodationTitle?: string | null;
   /** Traveler inbox: accommodation city shown under the title. */
@@ -58,6 +60,7 @@ const ConversationListItem: React.FC<Props> = ({
   locale,
   needsAction = false,
   unreadCount = 0,
+  reviewable = false,
   accommodationTitle = null,
   accommodationCity = null,
 }) => {
@@ -139,6 +142,14 @@ const ConversationListItem: React.FC<Props> = ({
             {needsAction && (
               <span className="flex-shrink-0 inline-flex items-center h-[18px] px-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
                 {t('conversation.needsActionBadge')}
+              </span>
+            )}
+            {reviewable && (
+              <span className="flex-shrink-0 inline-flex items-center gap-1 h-[18px] px-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                </svg>
+                {t('conversation.reviewable')}
               </span>
             )}
             <UnreadBadge count={unreadCount} className="flex-shrink-0" />
