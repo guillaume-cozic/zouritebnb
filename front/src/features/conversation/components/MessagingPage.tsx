@@ -12,6 +12,7 @@ import {
   selectConversationsStatus,
   selectCurrentConversation,
   selectCurrentConversationStatus,
+  selectUnreadCountByConversation,
 } from '../ConversationSelectors';
 import { selectAuthUser } from '../../auth/AuthSelectors';
 import { selectHasAccommodation } from '../../accommodationManagement/AccommodationManagementSelectors';
@@ -58,6 +59,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
   const accommodationSummaries = useAppSelector(selectAccommodationSummaries);
   const readOnly = !user;
   const conversations = useAppSelector(selectConversations);
+  const unreadByConversation = useAppSelector(selectUnreadCountByConversation);
   const listStatus = useAppSelector(selectConversationsStatus);
   const current = useAppSelector(selectCurrentConversation);
   const currentStatus = useAppSelector(selectCurrentConversationStatus);
@@ -256,6 +258,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                 active={c.id === id}
                 locale={locale}
                 needsAction={isHost && reservationStatusById[c.reservationId] === 'pending'}
+                unreadCount={unreadByConversation[c.id] ?? 0}
                 accommodationTitle={isHost ? undefined : accommodationSummaries[c.accommodationId]?.title}
                 accommodationCity={isHost ? undefined : accommodationSummaries[c.accommodationId]?.city}
               />

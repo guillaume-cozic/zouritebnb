@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Conversation, ConversationMessage } from '../ConversationTypes';
+import { UnreadBadge } from '../../../components/ui';
 
 interface Props {
   conversation: Conversation;
@@ -9,6 +10,8 @@ interface Props {
   active?: boolean;
   locale: string;
   needsAction?: boolean;
+  /** Number of unread messages in this conversation (red badge). */
+  unreadCount?: number;
   /** Traveler inbox: accommodation name shown as the item title. */
   accommodationTitle?: string | null;
   /** Traveler inbox: accommodation city shown under the title. */
@@ -54,11 +57,13 @@ const ConversationListItem: React.FC<Props> = ({
   active = false,
   locale,
   needsAction = false,
+  unreadCount = 0,
   accommodationTitle = null,
   accommodationCity = null,
 }) => {
   const { t } = useTranslation();
   const last = lastMessage(conversation);
+  const hasUnread = unreadCount > 0;
 
   // Traveler inbox labels conversations with the accommodation name; the host inbox
   // keeps the generic "réservation" label. Fall back while the summary is loading.
@@ -119,7 +124,15 @@ const ConversationListItem: React.FC<Props> = ({
           )}
           <div className="flex items-center gap-2 mt-0.5">
             {last && (
-              <p className={`text-xs truncate flex-1 ${last.isSystem ? 'italic text-gray-500' : 'text-gray-600'}`}>
+              <p
+                className={`text-xs truncate flex-1 ${
+                  last.isSystem
+                    ? 'italic text-gray-500'
+                    : hasUnread
+                      ? 'text-gray-900 font-semibold'
+                      : 'text-gray-600'
+                }`}
+              >
                 {last.body}
               </p>
             )}
@@ -128,6 +141,7 @@ const ConversationListItem: React.FC<Props> = ({
                 {t('conversation.needsActionBadge')}
               </span>
             )}
+            <UnreadBadge count={unreadCount} className="flex-shrink-0" />
           </div>
         </div>
       </div>

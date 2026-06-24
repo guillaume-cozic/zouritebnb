@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 
 export const selectConversations = (state: RootState) =>
@@ -26,6 +27,35 @@ export const selectUnreadCount = (state: RootState): number => {
   }
   return count;
 };
+
+/**
+ * Unread message count per conversation id (same rule as {@link selectUnreadCount}:
+ * incoming, non-system messages newer than the last open). Conversations with none
+ * are omitted. Memoized so the returned map keeps a stable reference.
+ */
+export const selectUnreadCountByConversation = createSelector(
+  [
+    (state: RootState) => state.auth?.user?.id ?? null,
+    (state: RootState) => state.conversation?.reads ?? {},
+    (state: RootState) => state.conversation?.items ?? [],
+  ],
+  (userId, reads, conversations): Record<string, number> => {
+    const result: Record<string, number> = {};
+    for (const conversation of conversations) {
+      const lastReadMs = reads[conversation.id]
+        ? new Date(reads[conversation.id]).getTime()
+        : 0;
+      let count = 0;
+      for (const message of conversation.messages) {
+        if (message.isSystem) continue;
+        if (message.authorUserId === userId) continue;
+        if (new Date(message.sentAt).getTime() > lastReadMs) count++;
+      }
+      if (count > 0) result[conversation.id] = count;
+    }
+    return result;
+  }
+);
 
 export const selectConversationsStatus = (state: RootState) =>
   state.conversation?.listStatus ?? 'idle';
