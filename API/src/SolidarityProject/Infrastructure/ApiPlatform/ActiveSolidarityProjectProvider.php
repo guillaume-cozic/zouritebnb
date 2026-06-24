@@ -16,6 +16,7 @@ final readonly class ActiveSolidarityProjectProvider implements ProviderInterfac
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private LocaleResolver $localeResolver,
     ) {
     }
 
@@ -33,8 +34,10 @@ final readonly class ActiveSolidarityProjectProvider implements ProviderInterfac
             ->getQuery()
             ->getResult();
 
+        $locale = $this->localeResolver->current();
+
         return array_map(
-            static fn (SolidarityProjectEntity $entity): SolidarityProjectOutput => SolidarityProjectOutput::fromEntity($entity),
+            static fn (SolidarityProjectEntity $entity): SolidarityProjectOutput => SolidarityProjectOutput::fromEntity($entity, $locale),
             $entities,
         );
     }

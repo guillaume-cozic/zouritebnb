@@ -1,12 +1,25 @@
 ---
 import '../styles/global.css';
 
+type Lang = 'fr' | 'en';
+
 interface Props {
   title: string;
   description?: string;
+  lang?: Lang;
+  /** Localized home URL, used by the header nav + the "Réserver" CTA fallback. */
+  homeUrl?: string;
+  /** Optional language switcher: link to the same content in the other language. */
+  langSwitch?: { href: string; lang: Lang } | null;
 }
 
-const { title, description = 'Le blog des activités, balades et sorties à Rodrigues.' } = Astro.props;
+const {
+  title,
+  description = 'Le blog des activités, balades et sorties à Rodrigues.',
+  lang = 'fr',
+  homeUrl,
+  langSwitch = null,
+} = Astro.props;
 
 const baseUrl = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -14,10 +27,16 @@ const baseUrl = import.meta.env.BASE_URL.endsWith('/')
 const logoHref = `${baseUrl}logo.png`;
 const faviconHref = `${baseUrl}favicon.ico`;
 const frontUrl = import.meta.env.PUBLIC_FRONT_URL ?? '/';
+const blogHome = homeUrl ?? baseUrl;
+
+const t = {
+  fr: { notebook: 'Carnet de Rodrigues', book: 'Réserver un hébergement', accommodation: 'Hébergements', other: 'EN' },
+  en: { notebook: 'Rodrigues Notebook', book: 'Book a stay', accommodation: 'Accommodation', other: 'FR' },
+}[lang];
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -38,18 +57,28 @@ const frontUrl = import.meta.env.PUBLIC_FRONT_URL ?? '/';
             />
           </a>
           <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
-            <a href={baseUrl} class="hover:text-blue-600 transition-colors">
-              Carnet de Rodrigues
+            <a href={blogHome} class="hover:text-blue-600 transition-colors">
+              {t.notebook}
             </a>
           </nav>
         </div>
 
         <div class="flex items-center gap-4">
+          {langSwitch && (
+            <a
+              href={langSwitch.href}
+              hreflang={langSwitch.lang}
+              class="inline-flex items-center justify-center text-sm font-semibold text-gray-700 hover:text-blue-600 border border-gray-200 hover:border-blue-400 h-10 rounded-xl px-3 transition-colors"
+              aria-label={langSwitch.lang === 'en' ? 'Read in English' : 'Lire en français'}
+            >
+              {t.other}
+            </a>
+          )}
           <a
             href={frontUrl}
             class="inline-flex items-center justify-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 h-10 rounded-xl px-5 transition-all hover:shadow-md hover:shadow-blue-200"
           >
-            Réserver un hébergement
+            {t.book}
           </a>
         </div>
       </div>
@@ -80,10 +109,10 @@ const frontUrl = import.meta.env.PUBLIC_FRONT_URL ?? '/';
             <h4 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Navigation</h4>
             <ul class="space-y-2.5 text-sm">
               <li>
-                <a href={frontUrl} class="hover:text-white transition-colors">Hébergements</a>
+                <a href={frontUrl} class="hover:text-white transition-colors">{t.accommodation}</a>
               </li>
               <li>
-                <a href={baseUrl} class="hover:text-white transition-colors">Carnet de Rodrigues</a>
+                <a href={blogHome} class="hover:text-white transition-colors">{t.notebook}</a>
               </li>
             </ul>
           </div>

@@ -1,6 +1,7 @@
 ---
 title: "Parc des tortues François Leguat"
 summary: "Visite guidée toutes les 45 minutes au cœur d'un sanctuaire de tortues réintroduites depuis Madagascar — avec la possibilité de parrainer votre tortue."
+translationKey: "parc-tortues-francois-leguat"
 category: "reserves-et-parcs"
 duration: "1h environ"
 guideRequired: true

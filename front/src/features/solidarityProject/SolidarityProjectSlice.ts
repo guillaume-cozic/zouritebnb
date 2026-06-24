@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import i18n from '../../i18n';
 import api from '../../services/api';
 import { extractErrorMessage } from '../../services/errors';
 import { SolidarityProject } from './SolidarityProjectTypes';
@@ -25,7 +26,9 @@ export const fetchSolidarityProjects = createAsyncThunk(
   'solidarityProject/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/solidarity_projects');
+      const response = await api.get('/api/solidarity_projects', {
+        headers: { 'Accept-Language': i18n.language },
+      });
       const data = response.data;
       return (data['hydra:member'] ?? data['member'] ?? []) as SolidarityProject[];
     } catch (err) {
@@ -40,7 +43,9 @@ export const fetchSolidarityProjectById = createAsyncThunk(
   'solidarityProject/fetchById',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/api/solidarity_projects/${id}`);
+      const response = await api.get(`/api/solidarity_projects/${id}`, {
+        headers: { 'Accept-Language': i18n.language },
+      });
       return response.data as SolidarityProject;
     } catch (err) {
       return rejectWithValue(

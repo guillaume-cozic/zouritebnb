@@ -11,15 +11,16 @@ import SolidarityProjectCard from './SolidarityProjectCard';
 import Footer from '../../../components/Footer';
 
 const SolidarityProjectsPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const projects = useAppSelector(selectSolidarityProjects);
   const status = useAppSelector(selectSolidarityProjectsStatus);
   const error = useAppSelector(selectSolidarityProjectsError);
 
+  // Recharge le contenu localisé quand la langue change.
   useEffect(() => {
     dispatch(fetchSolidarityProjects());
-  }, [dispatch]);
+  }, [dispatch, i18n.language]);
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gray-50/50">

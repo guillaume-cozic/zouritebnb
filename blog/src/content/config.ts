@@ -5,6 +5,8 @@ const articles = defineCollection({
   schema: z.object({
     title: z.string(),
     summary: z.string(),
+    lang: z.enum(['fr', 'en']).default('fr'),
+    translationKey: z.string().optional(),
     category: z.enum([
       'reserves-et-parcs',
       'points-de-vue',

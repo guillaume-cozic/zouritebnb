@@ -1,6 +1,7 @@
 ---
 title: "La Caverne Patate"
 summary: "L'une des plus grandes grottes calcaires de Rodrigues, à parcourir lors d'une visite guidée."
+translationKey: "caverne-patate"
 category: "sites-naturels"
 duration: "Environ 1h"
 guideRequired: true

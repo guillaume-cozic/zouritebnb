@@ -90,11 +90,11 @@ final class AdminSolidarityProjectOutput
     public ?string $id = null;
 
     #[Groups(['admin_solidarity_project:list'])]
-    #[ApiProperty(description: 'Titre du projet solidaire', example: 'Reforestation de l\'île Rodrigues')]
+    #[ApiProperty(description: 'Titre du projet dans la langue par défaut (fr)', example: 'Reforestation de l\'île Rodrigues')]
     public ?string $title = null;
 
     #[Groups(['admin_solidarity_project:list'])]
-    #[ApiProperty(description: 'Description détaillée du projet', example: 'Plantation de 10 000 arbres endémiques sur trois ans.')]
+    #[ApiProperty(description: 'Description du projet dans la langue par défaut (fr)', example: 'Plantation de 10 000 arbres endémiques sur trois ans.')]
     public ?string $description = null;
 
     #[Groups(['admin_solidarity_project:list'])]
@@ -118,8 +118,21 @@ final class AdminSolidarityProjectOutput
      */
     #[Groups(['admin_solidarity_project:list'])]
     #[ApiProperty(
-        description: 'Chiffres clés du projet (valeur + libellé)',
+        description: 'Chiffres clés du projet dans la langue par défaut (fr)',
         example: [['value' => '10 000', 'label' => 'arbres plantés']],
     )]
     public array $keyFigures = [];
+
+    /**
+     * @var array<string, array{title: string, description: string, keyFigures: array<array{value: string, label: string}>}>
+     */
+    #[Groups(['admin_solidarity_project:list'])]
+    #[ApiProperty(
+        description: 'Contenu traduisible par langue (fr requis, en optionnel). Sert à éditer chaque langue dans le back-office.',
+        example: [
+            'fr' => ['title' => 'Reforestation de l\'île Rodrigues', 'description' => 'Plantation de 10 000 arbres endémiques.', 'keyFigures' => [['value' => '10 000', 'label' => 'arbres plantés']]],
+            'en' => ['title' => 'Reforesting Rodrigues', 'description' => 'Planting 10,000 endemic trees.', 'keyFigures' => [['value' => '10,000', 'label' => 'trees planted']]],
+        ],
+    )]
+    public array $translations = [];
 }

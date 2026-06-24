@@ -39,22 +39,24 @@ final class CreateSolidarityProjectTest extends TestCase
         UuidGenerator::freeze($id);
 
         $returnedId = $this->useCase->handle(new CreateSolidarityProjectCommand(
-            title: 'Reforestation',
-            description: 'Plant 10 000 trees.',
+            translations: [
+                'fr' => ['title' => 'Reforestation', 'description' => 'Plant 10 000 trees.', 'keyFigures' => [['value' => '10 000', 'label' => 'arbres']]],
+                'en' => ['title' => 'Reforestation', 'description' => 'Plant 10,000 trees.', 'keyFigures' => [['value' => '10,000', 'label' => 'trees']]],
+            ],
             imageUrl: 'https://example.com/img.jpg',
             status: SolidarityProject::STATUS_ACTIVE,
-            keyFigures: [['value' => '10 000', 'label' => 'arbres']],
         ));
 
         self::assertSame($id->toRfc4122(), $returnedId);
 
         $project = $this->repository->findById($id);
         self::assertInstanceOf(SolidarityProject::class, $project);
-        self::assertSame('Reforestation', $project->getTitle());
+        self::assertSame('Reforestation', $project->translation('fr')->getTitle());
+        self::assertSame('Plant 10,000 trees.', $project->translation('en')->getDescription());
         self::assertSame(SolidarityProject::STATUS_ACTIVE, $project->getStatus());
         self::assertFalse($project->isDefault());
-        self::assertCount(1, $project->getKeyFigures());
-        self::assertSame('arbres', $project->getKeyFigures()[0]->label());
+        self::assertCount(1, $project->translation('fr')->getKeyFigures());
+        self::assertSame('arbres', $project->translation('fr')->getKeyFigures()[0]->label());
     }
 
     public function test_should_throw_when_status_is_invalid(): void
@@ -62,8 +64,7 @@ final class CreateSolidarityProjectTest extends TestCase
         $this->expectException(InvalidSolidarityProjectException::class);
 
         $this->useCase->handle(new CreateSolidarityProjectCommand(
-            title: 'Reforestation',
-            description: 'Plant 10 000 trees.',
+            translations: ['fr' => ['title' => 'Reforestation', 'description' => 'Plant 10 000 trees.', 'keyFigures' => []]],
             imageUrl: null,
             status: 'paused',
         ));

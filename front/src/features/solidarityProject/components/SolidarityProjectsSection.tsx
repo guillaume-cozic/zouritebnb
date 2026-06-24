@@ -11,17 +11,18 @@ import {
 import SolidarityProjectCard from './SolidarityProjectCard';
 
 const SolidarityProjectsSection: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const projects = useAppSelector(selectSolidarityProjects);
   const status = useAppSelector(selectSolidarityProjectsStatus);
   const error = useAppSelector(selectSolidarityProjectsError);
 
+  // Charge la liste au premier rendu, puis la recharge dès que la langue change
+  // pour récupérer le contenu localisé.
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchSolidarityProjects());
-    }
-  }, [dispatch, status]);
+    dispatch(fetchSolidarityProjects());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, i18n.language]);
 
   const preview = projects.slice(0, 3);
 

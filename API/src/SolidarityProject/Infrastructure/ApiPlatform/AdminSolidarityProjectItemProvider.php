@@ -7,6 +7,7 @@ namespace App\SolidarityProject\Infrastructure\ApiPlatform;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\SolidarityProject\Domain\Entity\KeyFigure;
+use App\SolidarityProject\Domain\Entity\ProjectTranslation;
 use App\SolidarityProject\Domain\Entity\SolidarityProject;
 use App\SolidarityProject\Domain\Port\SolidarityProjectRepository;
 use Symfony\Component\Uid\Uuid;
@@ -32,19 +33,39 @@ final readonly class AdminSolidarityProjectItemProvider implements ProviderInter
             return null;
         }
 
+        $translations = [];
+        foreach ($project->getTranslations() as $locale => $translation) {
+            $translations[$locale] = self::translationToArray($translation);
+        }
+
+        $default = $project->translation(SolidarityProject::DEFAULT_LOCALE);
+
         $output = new AdminSolidarityProjectOutput();
         $output->id = $project->getId()->toRfc4122();
-        $output->title = $project->getTitle();
-        $output->description = $project->getDescription();
+        $output->title = $default->getTitle();
+        $output->description = $default->getDescription();
         $output->imageUrl = $project->getImageUrl();
         $output->status = $project->getStatus();
         $output->createdAt = $project->getCreatedAt()->format(\DateTimeInterface::ATOM);
         $output->isDefault = $project->isDefault();
-        $output->keyFigures = array_map(
-            static fn (KeyFigure $keyFigure): array => ['value' => $keyFigure->value(), 'label' => $keyFigure->label()],
-            $project->getKeyFigures(),
-        );
+        $output->keyFigures = $translations[SolidarityProject::DEFAULT_LOCALE]['keyFigures'] ?? [];
+        $output->translations = $translations;
 
         return $output;
+    }
+
+    /**
+     * @return array{title: string, description: string, keyFigures: array<array{value: string, label: string}>}
+     */
+    private static function translationToArray(ProjectTranslation $translation): array
+    {
+        return [
+            'title' => $translation->getTitle(),
+            'description' => $translation->getDescription(),
+            'keyFigures' => array_map(
+                static fn (KeyFigure $keyFigure): array => ['value' => $keyFigure->value(), 'label' => $keyFigure->label()],
+                $translation->getKeyFigures(),
+            ),
+        ];
     }
 }

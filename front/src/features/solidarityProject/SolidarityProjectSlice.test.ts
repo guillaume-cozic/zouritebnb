@@ -32,7 +32,9 @@ describe('fetchSolidarityProjects', () => {
     const state = store.getState().solidarityProject;
     expect(state.status).toBe('succeeded');
     expect(state.items).toHaveLength(2);
-    expect(mockedApi.get).toHaveBeenCalledWith('/api/solidarity_projects');
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/solidarity_projects', {
+      headers: { 'Accept-Language': expect.any(String) },
+    });
   });
 
   test('le store passe à failed avec le message d\'erreur après rejected', async () => {

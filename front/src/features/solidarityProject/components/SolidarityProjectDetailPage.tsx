@@ -11,7 +11,6 @@ import {
   selectCurrentSolidarityProjectStatus,
   selectCurrentSolidarityProjectError,
   selectSolidarityProjects,
-  selectSolidarityProjectsStatus,
 } from '../SolidarityProjectSelectors';
 import { KeyFigure, SolidarityProject } from '../SolidarityProjectTypes';
 import { stripHtml } from '../SolidarityProjectText';
@@ -509,25 +508,26 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
 
 const SolidarityProjectDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const project = useAppSelector(selectCurrentSolidarityProject);
   const status = useAppSelector(selectCurrentSolidarityProjectStatus);
   const error = useAppSelector(selectCurrentSolidarityProjectError);
   const allProjects = useAppSelector(selectSolidarityProjects);
-  const allStatus = useAppSelector(selectSolidarityProjectsStatus);
   const progress = useScrollProgress();
 
+  // Recharge le projet courant quand l'id ou la langue change.
   useEffect(() => {
     if (id) {
       dispatch(fetchSolidarityProjectById(id));
     }
-  }, [dispatch, id]);
+  }, [dispatch, id, i18n.language]);
 
+  // Recharge les projets liés au premier rendu puis à chaque changement de langue.
   useEffect(() => {
-    if (allStatus === 'idle') {
-      dispatch(fetchSolidarityProjects());
-    }
-  }, [dispatch, allStatus]);
+    dispatch(fetchSolidarityProjects());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, i18n.language]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });

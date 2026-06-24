@@ -25,4 +25,19 @@ final class InvalidSolidarityProjectException extends \DomainException
     {
         return new self('Solidarity project image URL must not be blank when provided.');
     }
+
+    public static function becauseDefaultTranslationIsMissing(string $defaultLocale): self
+    {
+        return new self(\sprintf('Solidarity project must have a translation for the default locale "%s".', $defaultLocale));
+    }
+
+    public static function becauseLocaleIsUnsupported(string $locale): self
+    {
+        return new self(\sprintf('Solidarity project locale "%s" is not supported.', $locale));
+    }
+
+    public static function becauseTranslationIsInvalid(string $locale): self
+    {
+        return new self(\sprintf('Solidarity project translation for locale "%s" must be a ProjectTranslation instance.', $locale));
+    }
 }

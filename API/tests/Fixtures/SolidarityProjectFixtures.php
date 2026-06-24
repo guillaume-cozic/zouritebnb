@@ -11,52 +11,106 @@ use Symfony\Component\Uid\Uuid;
 
 class SolidarityProjectFixtures extends Fixture
 {
-    private const REFORESTATION_DESCRIPTION = <<<'HTML'
-        <p>Rodrigues a perdu près de 95 % de sa forêt indigène depuis sa colonisation. Avec elle, ce sont des dizaines d'espèces endémiques — plantes, oiseaux, chauves-souris — qui ont vu leur habitat disparaître, et des sols entiers qui partent à la mer à chaque saison des pluies. Ce projet veut inverser la tendance, vallée par vallée.</p>
-        <h2>Pourquoi replanter ?</h2>
-        <p>Les arbres endémiques comme le bois d'olive, le bois puant ou le café marron sont adaptés depuis des millénaires au climat rodriguais. Leurs racines profondes retiennent les sols sur les pentes, leur canopée abrite la faune locale et leurs fruits nourrissent la roussette de Rodrigues, l'une des chauves-souris les plus rares au monde.</p>
-        <figure><img src="https://images.unsplash.com/photo-1457530378978-8bac673b8062?w=1200&q=80" alt="Jeunes plants en pépinière" /><figcaption>La pépinière communautaire de Grande Montagne produit 4 000 plants par an.</figcaption></figure>
-        <h2>Un programme en trois ans</h2>
-        <p>La première année est consacrée à la production en pépinière et à la préparation des parcelles avec les familles riveraines. Les deux années suivantes alternent plantations en saison humide et entretien en saison sèche — désherbage, paillage, remplacement des plants perdus.</p>
-        <ul><li>Production de 10 000 plants endémiques en pépinière communautaire</li><li>Restauration de 45 hectares sur les bassins versants prioritaires</li><li>Formation de 120 bénévoles aux techniques de plantation et de suivi</li></ul>
-        <blockquote>« Chaque arbre planté ici, c'est un peu de notre île qu'on rend à nos enfants. » — Marie-Ange, responsable de la pépinière</blockquote>
-        <p>Le projet est mené avec les associations locales et le service forestier de Rodrigues. Chaque contribution finance directement les plants, les outils et les journées de formation des équipes de terrain.</p>
+    private const GRANDE_MONTAGNE_DESCRIPTION_FR = <<<'HTML'
+        <p>Perchée dans les hauteurs du centre-est de l'île, la Réserve naturelle de Grande Montagne protège 20 hectares parmi les derniers vestiges de la forêt endémique de Rodrigues. Elle est gérée par la Mauritian Wildlife Foundation (MWF), aux côtés du service forestier de Rodrigues, qui y mènent un travail de restauration depuis les années 1980.</p>
+        <h2>Une forêt que l'on reconstruit</h2>
+        <p>Rodrigues a perdu la quasi-totalité de sa forêt indigène, et avec elle l'habitat de ses espèces endémiques. Sur Grande Montagne, plus de 156 516 plants ont été remis en terre et 40 espèces végétales rares de l'île y sont aujourd'hui sauvegardées : l'aloès de Rodrigues — dont c'est le dernier habitat —, le café marron, la mandrinette, le bois de fer ou encore le bois puant.</p>
+        <figure><img src="https://images.unsplash.com/photo-1457530378978-8bac673b8062?w=1200&q=80" alt="Forêt endémique de Grande Montagne" /><figcaption>La réserve conserve aussi la mémoire d'espèces disparues, comme le solitaire et la tortue géante de Rodrigues.</figcaption></figure>
+        <h2>Un refuge pour les dernières espèces endémiques</h2>
+        <p>La réserve est le sanctuaire des trois seules espèces de vertébrés endémiques encore vivantes de Rodrigues, toutes inscrites sur la liste rouge de l'UICN : la roussette de Rodrigues (l'une des chauves-souris les plus rares au monde), le foudia de Rodrigues et la rousserolle de Rodrigues.</p>
+        <p>La restauration de leur habitat a permis des retours spectaculaires : le foudia de Rodrigues est passé d'une trentaine d'oiseaux dans les années 1980 à environ 8 000 individus en 2010, tandis que la rousserolle a dépassé les 4 000 individus sur la même période.</p>
+        <p>Ouverte au public, la réserve propose depuis 2013 des écotours guidés et un centre d'éducation à l'environnement. Chaque contribution soutient la production en pépinière, la plantation et l'entretien des parcelles menés par les équipes de terrain.</p>
+        HTML;
+
+    private const GRANDE_MONTAGNE_DESCRIPTION_EN = <<<'HTML'
+        <p>High in the central-east of the island, the Grande Montagne Nature Reserve protects 20 hectares of one of the last remnants of Rodrigues' endemic forest. It is run by the Mauritian Wildlife Foundation (MWF), alongside the Rodrigues Forestry Service, which have been restoring it since the 1980s.</p>
+        <h2>Rebuilding a forest</h2>
+        <p>Rodrigues lost almost all of its native forest, and with it the habitat of its endemic species. On Grande Montagne, more than 156,516 plants have been put back in the ground and 40 rare plant species of the island are now safeguarded: the Rodrigues aloe — whose last habitat this is —, the café marron, the mandrinette, the bois de fer and the bois puant.</p>
+        <figure><img src="https://images.unsplash.com/photo-1457530378978-8bac673b8062?w=1200&q=80" alt="Endemic forest of Grande Montagne" /><figcaption>The reserve also keeps the memory of extinct species, such as the solitaire and the Rodrigues giant tortoise.</figcaption></figure>
+        <h2>A refuge for the last endemic species</h2>
+        <p>The reserve is the sanctuary of the only three endemic vertebrate species still alive on Rodrigues, all red-listed by the IUCN: the Rodrigues fruit bat (one of the rarest bats in the world), the Rodrigues fody and the Rodrigues warbler.</p>
+        <p>Restoring their habitat has driven spectacular recoveries: the Rodrigues fody grew from around thirty birds in the 1980s to about 8,000 individuals in 2010, while the warbler passed 4,000 individuals over the same period.</p>
+        <p>Open to the public, the reserve has offered guided ecotours and an environmental education centre since 2013. Every contribution supports nursery production, planting and the upkeep of the plots carried out by the field teams.</p>
         HTML;
 
     private const PROJECTS = [
         [
-            'title' => 'Reforestation de l\'île Rodrigues',
-            'description' => self::REFORESTATION_DESCRIPTION,
             'imageUrl' => 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80',
             'status' => 'active',
             'daysAgo' => 10,
-            'keyFigures' => [
-                ['value' => '10 000', 'label' => 'arbres plantés'],
-                ['value' => '45 ha', 'label' => 'restaurés'],
-                ['value' => '120', 'label' => 'bénévoles formés'],
-                ['value' => '3 ans', 'label' => 'de programme'],
+            'translations' => [
+                'fr' => [
+                    'title' => 'Réserve naturelle de Grande Montagne',
+                    'description' => self::GRANDE_MONTAGNE_DESCRIPTION_FR,
+                    'keyFigures' => [
+                        ['value' => '156 516', 'label' => 'plants replantés'],
+                        ['value' => '20 ha', 'label' => 'de forêt endémique protégée'],
+                        ['value' => '40', 'label' => 'espèces végétales sauvegardées'],
+                        ['value' => '8 000', 'label' => 'foudias de Rodrigues (30 en 1980)'],
+                    ],
+                ],
+                'en' => [
+                    'title' => 'Grande Montagne Nature Reserve',
+                    'description' => self::GRANDE_MONTAGNE_DESCRIPTION_EN,
+                    'keyFigures' => [
+                        ['value' => '156,516', 'label' => 'plants replanted'],
+                        ['value' => '20 ha', 'label' => 'of endemic forest protected'],
+                        ['value' => '40', 'label' => 'plant species safeguarded'],
+                        ['value' => '8,000', 'label' => 'Rodrigues fodies (30 in 1980)'],
+                    ],
+                ],
             ],
         ],
         [
-            'title' => 'Soutien aux pêcheurs artisanaux',
-            'description' => 'Programme d\'aide aux pêcheurs locaux : équipement durable, formation à la pêche raisonnée et reconstruction des pirogues traditionnelles.',
             'imageUrl' => 'https://images.unsplash.com/photo-1502085671122-2d218cd434e6?w=800&q=80',
             'status' => 'active',
             'daysAgo' => 30,
+            'translations' => [
+                'fr' => [
+                    'title' => 'Soutien aux pêcheurs artisanaux',
+                    'description' => 'Programme d\'aide aux pêcheurs locaux : équipement durable, formation à la pêche raisonnée et reconstruction des pirogues traditionnelles.',
+                    'keyFigures' => [],
+                ],
+                'en' => [
+                    'title' => 'Support for small-scale fishers',
+                    'description' => 'A programme helping local fishers: durable equipment, training in sustainable fishing and rebuilding traditional pirogues.',
+                    'keyFigures' => [],
+                ],
+            ],
         ],
         [
-            'title' => 'École ouverte pour tous',
-            'description' => 'Financement de fournitures scolaires et de repas chauds pour 200 enfants des villages reculés de l\'île.',
             'imageUrl' => 'https://images.unsplash.com/photo-1588072432836-e10032774350?w=800&q=80',
             'status' => 'active',
             'daysAgo' => 60,
+            'translations' => [
+                'fr' => [
+                    'title' => 'École ouverte pour tous',
+                    'description' => 'Financement de fournitures scolaires et de repas chauds pour 200 enfants des villages reculés de l\'île.',
+                    'keyFigures' => [],
+                ],
+                'en' => [
+                    'title' => 'School open to all',
+                    'description' => 'Funding school supplies and hot meals for 200 children from the island\'s remote villages.',
+                    'keyFigures' => [],
+                ],
+            ],
         ],
         [
-            'title' => 'Récif corallien préservé',
-            'description' => 'Projet de restauration du récif corallien mené en partenariat avec les ONG locales. Campagne clôturée avec succès.',
             'imageUrl' => 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800&q=80',
             'status' => 'closed',
             'daysAgo' => 365,
+            'translations' => [
+                'fr' => [
+                    'title' => 'Récif corallien préservé',
+                    'description' => 'Projet de restauration du récif corallien mené en partenariat avec les ONG locales. Campagne clôturée avec succès.',
+                    'keyFigures' => [],
+                ],
+                'en' => [
+                    'title' => 'Coral reef preserved',
+                    'description' => 'A coral reef restoration project run with local NGOs. Campaign successfully closed.',
+                    'keyFigures' => [],
+                ],
+            ],
         ],
     ];
 
@@ -65,12 +119,10 @@ class SolidarityProjectFixtures extends Fixture
         foreach (self::PROJECTS as $project) {
             $entity = new SolidarityProjectEntity()
                 ->setId(Uuid::v7())
-                ->setTitle($project['title'])
-                ->setDescription($project['description'])
                 ->setImageUrl($project['imageUrl'])
                 ->setStatus($project['status'])
                 ->setCreatedAt(new \DateTimeImmutable(\sprintf('-%d days', $project['daysAgo'])))
-                ->setKeyFigures($project['keyFigures'] ?? []);
+                ->setTranslations($project['translations']);
 
             $manager->persist($entity);
         }

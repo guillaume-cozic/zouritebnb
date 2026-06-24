@@ -14,7 +14,8 @@ abstract class SolidarityProjectApiTestCase extends ApiTestCase
     protected static ?bool $alwaysBootKernel = true;
 
     /**
-     * @param array<array{value: string, label: string}> $keyFigures
+     * @param array<array{value: string, label: string}>                                                                        $keyFigures   key figures for the default locale (fr)
+     * @param array<string, array{title: string, description: string, keyFigures?: array<array{value: string, label: string}>}> $translations extra locales (e.g. "en"); the default locale (fr) is built from the flat arguments
      */
     protected function insertSolidarityProject(
         string $title,
@@ -23,18 +24,31 @@ abstract class SolidarityProjectApiTestCase extends ApiTestCase
         string $status = 'active',
         ?\DateTimeImmutable $createdAt = null,
         array $keyFigures = [],
+        array $translations = [],
     ): string {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine.orm.entity_manager');
 
+        $allTranslations = [
+            'fr' => ['title' => $title, 'description' => $description, 'keyFigures' => $keyFigures],
+        ];
+        foreach ($translations as $locale => $translation) {
+            if ('fr' === $locale) {
+                continue;
+            }
+            $allTranslations[$locale] = [
+                'title' => $translation['title'],
+                'description' => $translation['description'],
+                'keyFigures' => $translation['keyFigures'] ?? [],
+            ];
+        }
+
         $entity = new SolidarityProjectEntity()
             ->setId(Uuid::v7())
-            ->setTitle($title)
-            ->setDescription($description)
             ->setImageUrl($imageUrl)
             ->setStatus($status)
             ->setCreatedAt($createdAt ?? new \DateTimeImmutable())
-            ->setKeyFigures($keyFigures);
+            ->setTranslations($allTranslations);
 
         $em->persist($entity);
         $em->flush();

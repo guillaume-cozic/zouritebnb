@@ -12,33 +12,42 @@ final readonly class SolidarityProject
     public const STATUS_ACTIVE = 'active';
     public const STATUS_CLOSED = 'closed';
 
+    public const DEFAULT_LOCALE = 'fr';
+    public const SUPPORTED_LOCALES = ['fr', 'en'];
+
     private const ALLOWED_STATUSES = [self::STATUS_ACTIVE, self::STATUS_CLOSED];
 
-    private string $title;
-    private string $description;
     private ?string $imageUrl;
 
     /**
-     * @param KeyFigure[] $keyFigures
+     * @var array<string, ProjectTranslation> the translatable content keyed by locale,
+     *                                        always containing at least the default locale
+     */
+    private array $translations;
+
+    /**
+     * @param array<string, ProjectTranslation> $translations
      */
     public function __construct(
         private Uuid $id,
-        string $title,
-        string $description,
+        array $translations,
         ?string $imageUrl,
         private string $status,
         private \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
         private bool $isDefault = false,
-        private array $keyFigures = [],
     ) {
-        $title = trim($title);
-        if ('' === $title) {
-            throw InvalidSolidarityProjectException::becauseTitleIsBlank();
+        if (!isset($translations[self::DEFAULT_LOCALE])) {
+            throw InvalidSolidarityProjectException::becauseDefaultTranslationIsMissing(self::DEFAULT_LOCALE);
         }
 
-        $description = trim($description);
-        if ('' === $description) {
-            throw InvalidSolidarityProjectException::becauseDescriptionIsBlank();
+        foreach ($translations as $locale => $translation) {
+            if (!\in_array($locale, self::SUPPORTED_LOCALES, true)) {
+                throw InvalidSolidarityProjectException::becauseLocaleIsUnsupported((string) $locale);
+            }
+
+            if (!$translation instanceof ProjectTranslation) {
+                throw InvalidSolidarityProjectException::becauseTranslationIsInvalid((string) $locale);
+            }
         }
 
         if (!\in_array($status, self::ALLOWED_STATUSES, true)) {
@@ -52,8 +61,7 @@ final readonly class SolidarityProject
             }
         }
 
-        $this->title = $title;
-        $this->description = $description;
+        $this->translations = $translations;
         $this->imageUrl = $imageUrl;
     }
 
@@ -62,14 +70,21 @@ final readonly class SolidarityProject
         return $this->id;
     }
 
-    public function getTitle(): string
+    /**
+     * @return array<string, ProjectTranslation>
+     */
+    public function getTranslations(): array
     {
-        return $this->title;
+        return $this->translations;
     }
 
-    public function getDescription(): string
+    /**
+     * Returns the content for the requested locale, falling back to the default
+     * locale when the project has not been translated into it.
+     */
+    public function translation(string $locale): ProjectTranslation
     {
-        return $this->description;
+        return $this->translations[$locale] ?? $this->translations[self::DEFAULT_LOCALE];
     }
 
     public function getImageUrl(): ?string
@@ -90,13 +105,5 @@ final readonly class SolidarityProject
     public function isDefault(): bool
     {
         return $this->isDefault;
-    }
-
-    /**
-     * @return KeyFigure[]
-     */
-    public function getKeyFigures(): array
-    {
-        return $this->keyFigures;
     }
 }

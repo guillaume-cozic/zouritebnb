@@ -6,6 +6,7 @@ namespace App\Tests\Unit\SolidarityProject\Application\UseCase;
 
 use App\SolidarityProject\Application\UseCase\MarkSolidarityProjectAsDefault;
 use App\SolidarityProject\Domain\Command\MarkSolidarityProjectAsDefaultCommand;
+use App\SolidarityProject\Domain\Entity\ProjectTranslation;
 use App\SolidarityProject\Domain\Entity\SolidarityProject;
 use App\SolidarityProject\Domain\Exception\SolidarityProjectNotFoundException;
 use App\Tests\Unit\SolidarityProject\Infrastructure\InMemorySolidarityProjectRepository;
@@ -61,8 +62,7 @@ final class MarkSolidarityProjectAsDefaultTest extends TestCase
     {
         $this->repository->save(new SolidarityProject(
             id: $id,
-            title: 'Help refugees',
-            description: 'A solidarity project to help refugees.',
+            translations: ['fr' => new ProjectTranslation('Help refugees', 'A solidarity project to help refugees.')],
             imageUrl: null,
             status: SolidarityProject::STATUS_ACTIVE,
         ));

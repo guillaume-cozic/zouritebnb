@@ -42,7 +42,7 @@ final readonly class AdminDashboardProvider implements ProviderInterface
         $byProject = $this->connection->executeQuery(<<<'SQL'
             SELECT
                 BIN_TO_UUID(sp.id) AS project_id,
-                sp.title AS title,
+                JSON_UNQUOTE(JSON_EXTRACT(sp.translations, '$.fr.title')) AS title,
                 COALESCE(SUM(r.donation_amount), 0) AS amount
             FROM reservation r
             LEFT JOIN team t ON t.id = r.team_id
@@ -52,7 +52,7 @@ final readonly class AdminDashboardProvider implements ProviderInterface
                     (SELECT id FROM solidarity_project WHERE is_default = 1 LIMIT 1)
                 )
             WHERE r.status = 'confirmed'
-            GROUP BY sp.id, sp.title
+            GROUP BY sp.id, title
             ORDER BY amount DESC
             SQL)->fetchAllAssociative();
 

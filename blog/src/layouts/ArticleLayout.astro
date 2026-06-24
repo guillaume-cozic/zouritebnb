@@ -1,35 +1,50 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import type { CollectionEntry } from 'astro:content';
+import { bareSlug, homeHref, type Lang } from '../lib/i18n';
 
 interface Props {
   entry: CollectionEntry<'articles'>;
+  langSwitch?: { href: string; lang: Lang } | null;
 }
 
-const { entry } = Astro.props;
+const { entry, langSwitch = null } = Astro.props;
 const { data } = entry;
+const lang = data.lang;
 
 const baseUrl = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
 
-const cover = data.cover ?? `https://picsum.photos/seed/${entry.slug}/1600/900`;
+const blogHome = homeHref(baseUrl, lang);
+const cover = data.cover ?? `https://picsum.photos/seed/${bareSlug(entry)}/1600/900`;
+const backLabel = lang === 'en' ? 'All articles' : 'Tous les articles';
 
 const categoryLabels: Record<string, string> = {
-  'reserves-et-parcs': 'Réserves & parcs',
-  'points-de-vue': 'Points de vue',
-  'randonnees': 'Randonnées',
-  'sorties-en-mer': 'Sorties en mer',
-  'sites-naturels': 'Sites naturels',
-  'patrimoine': 'Patrimoine',
-  'itineraires': 'Itinéraires',
-};
+  fr: {
+    'reserves-et-parcs': 'Réserves & parcs',
+    'points-de-vue': 'Points de vue',
+    'randonnees': 'Randonnées',
+    'sorties-en-mer': 'Sorties en mer',
+    'sites-naturels': 'Sites naturels',
+    'patrimoine': 'Patrimoine',
+    'itineraires': 'Itinéraires',
+  },
+  en: {
+    'reserves-et-parcs': 'Reserves & parks',
+    'points-de-vue': 'Viewpoints',
+    'randonnees': 'Hikes',
+    'sorties-en-mer': 'Sea trips',
+    'sites-naturels': 'Natural sites',
+    'patrimoine': 'Heritage',
+    'itineraires': 'Itineraries',
+  },
+}[lang];
 
-const difficultyLabels: Record<string, string> = {
-  facile: 'Facile',
-  modere: 'Modéré',
-  difficile: 'Difficile',
-};
+const difficultyLabels: Record<string, string> =
+  lang === 'en'
+    ? { facile: 'Easy', modere: 'Moderate', difficile: 'Hard' }
+    : { facile: 'Facile', modere: 'Modéré', difficile: 'Difficile' };
 
 const difficultyClasses: Record<string, string> = {
   facile: 'bg-green-50 text-green-700',
@@ -38,16 +53,22 @@ const difficultyClasses: Record<string, string> = {
 };
 ---
 
-<BaseLayout title={`${data.title} — Carnet de Rodrigues`} description={data.summary}>
+<BaseLayout
+  title={`${data.title} — ${lang === 'en' ? 'Rodrigues Notebook' : 'Carnet de Rodrigues'}`}
+  description={data.summary}
+  lang={lang}
+  homeUrl={blogHome}
+  langSwitch={langSwitch}
+>
   <article class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20">
     <div class="max-w-5xl mx-auto">
       <nav class="mb-8">
-        <a href={baseUrl} class="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium">
+        <a href={blogHome} class="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m12 19-7-7 7-7" />
             <path d="M19 12H5" />
           </svg>
-          Tous les articles
+          {backLabel}
         </a>
       </nav>
 
@@ -83,7 +104,7 @@ const difficultyClasses: Record<string, string> = {
           )}
           {(data.tags ?? []).map((tag) => (
             <a
-              href={`${baseUrl}#tag=${encodeURIComponent(tag)}`}
+              href={`${blogHome}#tag=${encodeURIComponent(tag)}`}
               class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100 transition-colors"
             >
               {tag}

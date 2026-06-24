@@ -7,6 +7,7 @@ namespace App\Tests\Unit\SolidarityProject\Application\UseCase;
 use App\SolidarityProject\Application\UseCase\UpdateSolidarityProject;
 use App\SolidarityProject\Domain\Command\UpdateSolidarityProjectCommand;
 use App\SolidarityProject\Domain\Entity\KeyFigure;
+use App\SolidarityProject\Domain\Entity\ProjectTranslation;
 use App\SolidarityProject\Domain\Entity\SolidarityProject;
 use App\SolidarityProject\Domain\Exception\SolidarityProjectNotFoundException;
 use App\Tests\Unit\SolidarityProject\Infrastructure\InMemorySolidarityProjectRepository;
@@ -32,34 +33,34 @@ final class UpdateSolidarityProjectTest extends TestCase
         $createdAt = new \DateTimeImmutable('2026-01-01T10:00:00+00:00');
         $this->repository->save(new SolidarityProject(
             id: $id,
-            title: 'Ancien titre',
-            description: 'Ancienne description',
+            translations: ['fr' => new ProjectTranslation('Ancien titre', 'Ancienne description', [new KeyFigure('1', 'a')])],
             imageUrl: null,
             status: SolidarityProject::STATUS_ACTIVE,
             createdAt: $createdAt,
             isDefault: true,
-            keyFigures: [new KeyFigure('1', 'a')],
         ));
 
         $this->useCase->handle(new UpdateSolidarityProjectCommand(
             projectId: $id,
-            title: 'Nouveau titre',
-            description: 'Nouvelle description',
+            translations: [
+                'fr' => ['title' => 'Nouveau titre', 'description' => 'Nouvelle description', 'keyFigures' => [['value' => '5 ans', 'label' => 'de programme']]],
+                'en' => ['title' => 'New title', 'description' => 'New description', 'keyFigures' => []],
+            ],
             imageUrl: 'https://example.com/img.jpg',
             status: SolidarityProject::STATUS_CLOSED,
-            keyFigures: [['value' => '5 ans', 'label' => 'de programme']],
         ));
 
         $project = $this->repository->findById($id);
         self::assertInstanceOf(SolidarityProject::class, $project);
-        self::assertSame('Nouveau titre', $project->getTitle());
-        self::assertSame('Nouvelle description', $project->getDescription());
+        self::assertSame('Nouveau titre', $project->translation('fr')->getTitle());
+        self::assertSame('Nouvelle description', $project->translation('fr')->getDescription());
+        self::assertSame('New title', $project->translation('en')->getTitle());
         self::assertSame('https://example.com/img.jpg', $project->getImageUrl());
         self::assertSame(SolidarityProject::STATUS_CLOSED, $project->getStatus());
         self::assertTrue($project->isDefault());
         self::assertEquals($createdAt, $project->getCreatedAt());
-        self::assertCount(1, $project->getKeyFigures());
-        self::assertSame('de programme', $project->getKeyFigures()[0]->label());
+        self::assertCount(1, $project->translation('fr')->getKeyFigures());
+        self::assertSame('de programme', $project->translation('fr')->getKeyFigures()[0]->label());
     }
 
     public function test_should_throw_not_found_when_project_does_not_exist(): void
@@ -70,8 +71,7 @@ final class UpdateSolidarityProjectTest extends TestCase
 
         $this->useCase->handle(new UpdateSolidarityProjectCommand(
             projectId: $id,
-            title: 'Titre',
-            description: 'Description',
+            translations: ['fr' => ['title' => 'Titre', 'description' => 'Description', 'keyFigures' => []]],
             imageUrl: null,
             status: SolidarityProject::STATUS_ACTIVE,
         ));

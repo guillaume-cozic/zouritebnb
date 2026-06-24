@@ -85,8 +85,9 @@ final class AdminDashboardTest extends ReservationApiTestCase
 
         $entity = new SolidarityProjectEntity()
             ->setId(Uuid::v7())
-            ->setTitle($title)
-            ->setDescription('Description du projet par défaut.')
+            ->setTranslations([
+                'fr' => ['title' => $title, 'description' => 'Description du projet par défaut.', 'keyFigures' => []],
+            ])
             ->setStatus('active')
             ->setCreatedAt(new \DateTimeImmutable())
             ->setIsDefault(true);

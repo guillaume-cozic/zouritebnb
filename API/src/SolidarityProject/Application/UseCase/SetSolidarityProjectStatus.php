@@ -24,16 +24,14 @@ final readonly class SetSolidarityProjectStatus
         }
 
         // Rebuild the immutable aggregate with the new status, preserving the
-        // creation date, the platform-default flag and the key figures.
+        // creation date, the platform-default flag and every translation.
         $updated = new SolidarityProject(
             id: $project->getId(),
-            title: $project->getTitle(),
-            description: $project->getDescription(),
+            translations: $project->getTranslations(),
             imageUrl: $project->getImageUrl(),
             status: $command->status,
             createdAt: $project->getCreatedAt(),
             isDefault: $project->isDefault(),
-            keyFigures: $project->getKeyFigures(),
         );
 
         $this->repository->save($updated);

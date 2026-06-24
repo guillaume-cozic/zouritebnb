@@ -11,8 +11,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
-use App\Shared\ApiPlatform\State\EntityProvider;
 use App\Shared\ApiPlatform\State\FromEntityInterface;
+use App\SolidarityProject\Domain\Entity\SolidarityProject;
 use App\SolidarityProject\Infrastructure\Doctrine\SolidarityProjectEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -23,16 +23,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/solidarity_projects/{id}',
             openapi: new OpenApiOperation(
                 summary: 'Récupérer un projet solidaire',
-                description: 'Retourne le détail complet d\'un projet solidaire par son identifiant UUID.',
+                description: 'Retourne le détail complet d\'un projet solidaire par son identifiant UUID. Le contenu (titre, description, chiffres clés) est servi dans la langue négociée via l\'en-tête Accept-Language (fr par défaut, en disponible).',
             ),
             normalizationContext: ['groups' => ['solidarity_project:read']],
-            provider: EntityProvider::class,
+            provider: SolidarityProjectItemProvider::class,
         ),
         new GetCollection(
             uriTemplate: '/solidarity_projects',
             openapi: new OpenApiOperation(
                 summary: 'Lister les projets solidaires actifs',
-                description: 'Retourne la liste des projets solidaires actifs, triés par date de création décroissante.',
+                description: 'Retourne la liste des projets solidaires actifs, triés par date de création décroissante. Le contenu est servi dans la langue négociée via l\'en-tête Accept-Language (fr par défaut, en disponible).',
             ),
             normalizationContext: ['groups' => ['solidarity_project:list']],
             provider: ActiveSolidarityProjectProvider::class,
@@ -85,6 +85,10 @@ class SolidarityProjectOutput implements FromEntityInterface
     #[ApiProperty(description: 'Vrai si ce projet est marqué comme défaut de la plateforme', example: false)]
     public ?bool $isDefault = null;
 
+    #[Groups(['solidarity_project:read', 'solidarity_project:list'])]
+    #[ApiProperty(description: 'Langue dans laquelle le contenu (titre, description, chiffres clés) est servi', example: 'fr')]
+    public ?string $locale = null;
+
     /**
      * @var array<array{value: string, label: string}>
      */
@@ -106,18 +110,24 @@ class SolidarityProjectOutput implements FromEntityInterface
     )]
     public array $keyFigures = [];
 
-    public static function fromEntity(object $entity): static
+    public static function fromEntity(object $entity, string $locale = SolidarityProject::DEFAULT_LOCALE): static
     {
         /** @var SolidarityProjectEntity $entity */
+        $translations = $entity->getTranslations();
+        $translation = $translations[$locale]
+            ?? $translations[SolidarityProject::DEFAULT_LOCALE]
+            ?? ['title' => null, 'description' => null, 'keyFigures' => []];
+
         $output = new static();
         $output->id = $entity->getId()?->toRfc4122();
-        $output->title = $entity->getTitle();
-        $output->description = $entity->getDescription();
+        $output->title = $translation['title'] ?? null;
+        $output->description = $translation['description'] ?? null;
         $output->imageUrl = $entity->getImageUrl();
         $output->status = $entity->getStatus();
         $output->createdAt = $entity->getCreatedAt()?->format(\DateTimeInterface::ATOM);
         $output->isDefault = $entity->isDefault();
-        $output->keyFigures = $entity->getKeyFigures();
+        $output->locale = isset($translations[$locale]) ? $locale : SolidarityProject::DEFAULT_LOCALE;
+        $output->keyFigures = $translation['keyFigures'] ?? [];
 
         return $output;
     }

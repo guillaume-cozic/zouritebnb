@@ -17,12 +17,6 @@ class SolidarityProjectEntity
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     private ?Uuid $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $title = null;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $description = null;
-
     #[ORM\Column(length: 2048, nullable: true)]
     private ?string $imageUrl = null;
 
@@ -36,10 +30,13 @@ class SolidarityProjectEntity
     private bool $isDefault = false;
 
     /**
-     * @var array<array{value: string, label: string}>
+     * Translatable content keyed by locale, e.g.
+     * {"fr": {"title": "...", "description": "...", "keyFigures": [{"value": "...", "label": "..."}]}}.
+     *
+     * @var array<string, array{title: string, description: string, keyFigures: array<array{value: string, label: string}>}>
      */
     #[ORM\Column(type: Types::JSON)]
-    private array $keyFigures = [];
+    private array $translations = [];
 
     public function getId(): ?Uuid
     {
@@ -49,30 +46,6 @@ class SolidarityProjectEntity
     public function setId(Uuid $id): static
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): static
-    {
-        $this->description = $description;
 
         return $this;
     }
@@ -126,19 +99,19 @@ class SolidarityProjectEntity
     }
 
     /**
-     * @return array<array{value: string, label: string}>
+     * @return array<string, array{title: string, description: string, keyFigures: array<array{value: string, label: string}>}>
      */
-    public function getKeyFigures(): array
+    public function getTranslations(): array
     {
-        return $this->keyFigures;
+        return $this->translations;
     }
 
     /**
-     * @param array<array{value: string, label: string}> $keyFigures
+     * @param array<string, array{title: string, description: string, keyFigures: array<array{value: string, label: string}>}> $translations
      */
-    public function setKeyFigures(array $keyFigures): static
+    public function setTranslations(array $translations): static
     {
-        $this->keyFigures = $keyFigures;
+        $this->translations = $translations;
 
         return $this;
     }

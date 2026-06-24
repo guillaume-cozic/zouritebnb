@@ -12,4 +12,6 @@ export interface SolidarityProject {
   createdAt: string;
   isDefault: boolean;
   keyFigures?: KeyFigure[];
+  /** Langue dans laquelle title/description/keyFigures sont renvoyés par l'API. */
+  locale?: string;
 }

@@ -21,7 +21,7 @@ import {
   selectSolidarityProjectSaveError,
   selectSolidarityProjectSaveState,
 } from '../SolidarityProjectsSelectors';
-import type { KeyFigure } from '../SolidarityProjectsTypes';
+import type { CreateSolidarityProjectPayload, KeyFigure } from '../SolidarityProjectsTypes';
 
 export function SolidarityProjectFormPage() {
   const dispatch = useAppDispatch();
@@ -40,6 +40,11 @@ export function SolidarityProjectFormPage() {
   const [imageUrl, setImageUrl] = useState('');
   const [active, setActive] = useState(true);
   const [keyFigures, setKeyFigures] = useState<KeyFigure[]>([]);
+
+  // English (optional) version.
+  const [titleEn, setTitleEn] = useState('');
+  const [descriptionEn, setDescriptionEn] = useState('');
+  const [keyFiguresEn, setKeyFiguresEn] = useState<KeyFigure[]>([]);
 
   // Load the project to edit (and clear the slice form state on leave).
   useEffect(() => {
@@ -60,28 +65,68 @@ export function SolidarityProjectFormPage() {
       setImageUrl(current.imageUrl ?? '');
       setActive(current.status === 'active');
       setKeyFigures(current.keyFigures ?? []);
+
+      const en = current.translations?.en;
+      setTitleEn(en?.title ?? '');
+      setDescriptionEn(en?.description ?? '');
+      setKeyFiguresEn(en?.keyFigures ?? []);
     }
   }, [isEdit, current]);
 
   const saving = saveState === 'saving';
   const canSubmit = title.trim() !== '' && description.trim() !== '' && !saving;
 
-  const updateKeyFigure = (index: number, patch: Partial<KeyFigure>) => {
-    setKeyFigures((rows) => rows.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  const cleanKeyFigures = (rows: KeyFigure[]) =>
+    rows
+      .map((k) => ({ value: k.value.trim(), label: k.label.trim() }))
+      .filter((k) => k.value !== '' && k.label !== '');
+
+  const updateKeyFigure = (
+    setRows: React.Dispatch<React.SetStateAction<KeyFigure[]>>,
+    index: number,
+    patch: Partial<KeyFigure>,
+  ) => {
+    setRows((rows) => rows.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  };
+
+  const addKeyFigure = (setRows: React.Dispatch<React.SetStateAction<KeyFigure[]>>) => {
+    setRows((rows) => [...rows, { value: '', label: '' }]);
+  };
+
+  const removeKeyFigure = (
+    setRows: React.Dispatch<React.SetStateAction<KeyFigure[]>>,
+    index: number,
+  ) => {
+    setRows((rows) => rows.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!canSubmit) return;
 
-    const payload = {
+    const trimmedTitleEn = titleEn.trim();
+    const trimmedDescriptionEn = descriptionEn.trim();
+    // Only send the `en` locale when both title and description are filled,
+    // otherwise the API rejects a blank translation (422).
+    const hasEn = trimmedTitleEn !== '' && trimmedDescriptionEn !== '';
+
+    const payload: CreateSolidarityProjectPayload = {
       title: title.trim(),
       description: description.trim(),
       imageUrl: imageUrl.trim() === '' ? null : imageUrl.trim(),
       status: active ? ('active' as const) : ('closed' as const),
-      keyFigures: keyFigures
-        .map((k) => ({ value: k.value.trim(), label: k.label.trim() }))
-        .filter((k) => k.value !== '' && k.label !== ''),
+      keyFigures: cleanKeyFigures(keyFigures),
+      ...(hasEn
+        ? {
+            translations: {
+              en: {
+                title: trimmedTitleEn,
+                description: trimmedDescriptionEn,
+                keyFigures: cleanKeyFigures(keyFiguresEn),
+              },
+            },
+          }
+        : {}),
     };
 
     const result =
@@ -164,47 +209,49 @@ export function SolidarityProjectFormPage() {
             />
           </Field>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-surface-700">Chiffres clés</span>
-              <button
-                type="button"
-                onClick={() => setKeyFigures((rows) => [...rows, { value: '', label: '' }])}
-                className="text-sm font-medium text-primary-600 hover:text-primary-700"
-              >
-                + Ajouter
-              </button>
-            </div>
-            {keyFigures.length === 0 ? (
+          <KeyFiguresEditor
+            figures={keyFigures}
+            onAdd={() => addKeyFigure(setKeyFigures)}
+            onChange={(index, patch) => updateKeyFigure(setKeyFigures, index, patch)}
+            onRemove={(index) => removeKeyFigure(setKeyFigures, index)}
+          />
+
+          <div className="space-y-5 rounded-lg border border-surface-200 bg-surface-50 p-4">
+            <div>
+              <h3 className="text-sm font-semibold text-surface-700">Version anglaise (optionnelle)</h3>
               <p className="text-xs text-surface-400">
-                Aucun chiffre clé. Ex. « 10 000 » / « arbres plantés ».
+                Laissez vide pour ne pas publier de traduction anglaise. Le titre et la description
+                doivent tous deux être renseignés pour enregistrer la version anglaise.
               </p>
-            ) : (
-              <div className="space-y-2">
-                {keyFigures.map((figure, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Input
-                      value={figure.value}
-                      onChange={(e) => updateKeyFigure(index, { value: e.target.value })}
-                      placeholder="Valeur (ex. 10 000)"
-                    />
-                    <Input
-                      value={figure.label}
-                      onChange={(e) => updateKeyFigure(index, { label: e.target.value })}
-                      placeholder="Libellé (ex. arbres plantés)"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setKeyFigures((rows) => rows.filter((_, i) => i !== index))}
-                      className="shrink-0 rounded-lg px-2 py-1 text-sm text-danger-600 hover:bg-danger-50"
-                      aria-label="Supprimer ce chiffre clé"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+            </div>
+
+            <Field label="Titre (EN)">
+              <Input
+                value={titleEn}
+                onChange={(e) => setTitleEn(e.target.value)}
+                placeholder="Reforestation of Rodrigues Island"
+                maxLength={255}
+              />
+            </Field>
+
+            <Field
+              label="Description HTML (EN)"
+              hint="Version anglaise de l'article HTML. Affichée telle quelle sur la page publique."
+            >
+              <HtmlEditor
+                value={descriptionEn}
+                onChange={setDescriptionEn}
+                placeholder="<h2>Our goal</h2> <p>…</p>"
+              />
+            </Field>
+
+            <KeyFiguresEditor
+              label="Chiffres clés (EN)"
+              figures={keyFiguresEn}
+              onAdd={() => addKeyFigure(setKeyFiguresEn)}
+              onChange={(index, patch) => updateKeyFigure(setKeyFiguresEn, index, patch)}
+              onRemove={(index) => removeKeyFigure(setKeyFiguresEn, index)}
+            />
           </div>
 
           <label className="flex items-center gap-2 text-sm text-surface-700">
@@ -227,6 +274,67 @@ export function SolidarityProjectFormPage() {
           </div>
         </form>
       </Card>
+    </div>
+  );
+}
+
+interface KeyFiguresEditorProps {
+  figures: KeyFigure[];
+  label?: string;
+  onAdd: () => void;
+  onChange: (index: number, patch: Partial<KeyFigure>) => void;
+  onRemove: (index: number) => void;
+}
+
+function KeyFiguresEditor({
+  figures,
+  label = 'Chiffres clés',
+  onAdd,
+  onChange,
+  onRemove,
+}: KeyFiguresEditorProps) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-surface-700">{label}</span>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="text-sm font-medium text-primary-600 hover:text-primary-700"
+        >
+          + Ajouter
+        </button>
+      </div>
+      {figures.length === 0 ? (
+        <p className="text-xs text-surface-400">
+          Aucun chiffre clé. Ex. « 10 000 » / « arbres plantés ».
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {figures.map((figure, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Input
+                value={figure.value}
+                onChange={(e) => onChange(index, { value: e.target.value })}
+                placeholder="Valeur (ex. 10 000)"
+              />
+              <Input
+                value={figure.label}
+                onChange={(e) => onChange(index, { label: e.target.value })}
+                placeholder="Libellé (ex. arbres plantés)"
+              />
+              <button
+                type="button"
+                onClick={() => onRemove(index)}
+                className="shrink-0 rounded-lg px-2 py-1 text-sm text-danger-600 hover:bg-danger-50"
+                aria-label="Supprimer ce chiffre clé"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

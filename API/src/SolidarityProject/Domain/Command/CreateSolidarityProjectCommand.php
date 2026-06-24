@@ -7,14 +7,13 @@ namespace App\SolidarityProject\Domain\Command;
 final readonly class CreateSolidarityProjectCommand
 {
     /**
-     * @param array<array{value: string|null, label: string|null}> $keyFigures
+     * @param array<string, array{title: string, description: string, keyFigures: array<array{value: string|null, label: string|null}>}> $translations
+     *                                                                                                                                                 translatable content keyed by locale (must contain the default locale)
      */
     public function __construct(
-        public string $title,
-        public string $description,
+        public array $translations,
         public ?string $imageUrl,
         public string $status,
-        public array $keyFigures = [],
     ) {
     }
 }

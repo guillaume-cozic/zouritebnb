@@ -5,6 +5,15 @@ export interface KeyFigure {
 
 export type SolidarityProjectStatus = 'active' | 'closed';
 
+export type SolidarityProjectLocale = 'fr' | 'en';
+
+/** Translatable content of a project for a given locale. */
+export interface SolidarityProjectTranslation {
+  title: string;
+  description: string;
+  keyFigures: KeyFigure[];
+}
+
 export interface AdminSolidarityProject {
   id: string;
   title: string | null;
@@ -14,6 +23,8 @@ export interface AdminSolidarityProject {
   createdAt: string | null;
   isDefault: boolean;
   keyFigures: KeyFigure[];
+  /** Per-locale content. `fr` (default) is always present; `en` is optional. */
+  translations: Partial<Record<SolidarityProjectLocale, SolidarityProjectTranslation>>;
 }
 
 export interface CreateSolidarityProjectPayload {
@@ -22,6 +33,11 @@ export interface CreateSolidarityProjectPayload {
   imageUrl: string | null;
   status: SolidarityProjectStatus;
   keyFigures: KeyFigure[];
+  /**
+   * Non-default locales only (never `fr`). Only include a locale when it is
+   * fully filled (non-blank title AND description), otherwise omit it.
+   */
+  translations?: Partial<Record<Exclude<SolidarityProjectLocale, 'fr'>, SolidarityProjectTranslation>>;
 }
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error';

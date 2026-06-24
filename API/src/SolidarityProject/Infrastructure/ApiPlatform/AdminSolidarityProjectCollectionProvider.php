@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\SolidarityProject\Domain\Entity\SolidarityProject;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 
@@ -39,7 +40,15 @@ final readonly class AdminSolidarityProjectCollectionProvider implements Provide
 
         $search = trim((string) ($filters['search'] ?? ''));
         if ('' !== $search) {
-            $conditions[] = '(p.title LIKE :search OR p.description LIKE :search)';
+            // Search the title/description of every locale stored in the translations JSON.
+            $conditions[] = <<<'SQL'
+                (
+                    JSON_UNQUOTE(JSON_EXTRACT(p.translations, '$.fr.title')) LIKE :search
+                    OR JSON_UNQUOTE(JSON_EXTRACT(p.translations, '$.fr.description')) LIKE :search
+                    OR JSON_UNQUOTE(JSON_EXTRACT(p.translations, '$.en.title')) LIKE :search
+                    OR JSON_UNQUOTE(JSON_EXTRACT(p.translations, '$.en.description')) LIKE :search
+                )
+                SQL;
             $params['search'] = '%'.$search.'%';
         }
 
@@ -60,13 +69,11 @@ final readonly class AdminSolidarityProjectCollectionProvider implements Provide
         $sql = <<<SQL
             SELECT
                 BIN_TO_UUID(p.id) AS id,
-                p.title,
-                p.description,
+                p.translations,
                 p.image_url,
                 p.status,
                 p.created_at,
-                p.is_default,
-                p.key_figures
+                p.is_default
             FROM solidarity_project p
             {$where}
             ORDER BY p.is_default DESC, p.created_at DESC
@@ -81,16 +88,20 @@ final readonly class AdminSolidarityProjectCollectionProvider implements Provide
 
         $projects = [];
         foreach ($rows as $row) {
+            $translations = json_decode((string) $row['translations'], true);
+            $translations = \is_array($translations) ? $translations : [];
+            $default = $translations[SolidarityProject::DEFAULT_LOCALE] ?? ['title' => null, 'description' => null, 'keyFigures' => []];
+
             $output = new AdminSolidarityProjectOutput();
             $output->id = $row['id'];
-            $output->title = $row['title'];
-            $output->description = $row['description'];
+            $output->title = $default['title'] ?? null;
+            $output->description = $default['description'] ?? null;
             $output->imageUrl = $row['image_url'];
             $output->status = $row['status'];
             $output->createdAt = (new \DateTimeImmutable((string) $row['created_at']))->format(\DateTimeInterface::ATOM);
             $output->isDefault = (bool) $row['is_default'];
-            $decoded = json_decode((string) $row['key_figures'], true);
-            $output->keyFigures = \is_array($decoded) ? $decoded : [];
+            $output->keyFigures = $default['keyFigures'] ?? [];
+            $output->translations = $translations;
             $projects[] = $output;
         }
 

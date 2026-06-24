@@ -37,11 +37,9 @@ final readonly class UpdateSolidarityProjectProcessor implements ProcessorInterf
 
         $this->handler->execute(fn () => $this->useCase->handle(new UpdateSolidarityProjectCommand(
             projectId: Uuid::fromString($uriVariables['id']),
-            title: $data->title,
-            description: $data->description,
+            translations: $data->toTranslations(),
             imageUrl: $data->imageUrl,
             status: $data->status,
-            keyFigures: $data->keyFigures,
         )));
     }
 }

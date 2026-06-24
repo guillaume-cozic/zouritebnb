@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\SolidarityProject\Infrastructure\Doctrine;
 
 use App\SolidarityProject\Domain\Entity\KeyFigure;
+use App\SolidarityProject\Domain\Entity\ProjectTranslation;
 use App\SolidarityProject\Domain\Entity\SolidarityProject;
 use App\SolidarityProject\Domain\Port\SolidarityProjectRepository as SolidarityProjectRepositoryPort;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -26,15 +27,20 @@ class DoctrineSolidarityProjectRepository extends ServiceEntityRepository implem
     {
         $entity = $this->find($project->getId()) ?? new SolidarityProjectEntity();
         $entity->setId($project->getId())
-            ->setTitle($project->getTitle())
-            ->setDescription($project->getDescription())
             ->setImageUrl($project->getImageUrl())
             ->setStatus($project->getStatus())
             ->setCreatedAt($project->getCreatedAt())
             ->setIsDefault($project->isDefault())
-            ->setKeyFigures(array_map(
-                static fn (KeyFigure $keyFigure): array => ['value' => $keyFigure->value(), 'label' => $keyFigure->label()],
-                $project->getKeyFigures(),
+            ->setTranslations(array_map(
+                static fn (ProjectTranslation $translation): array => [
+                    'title' => $translation->getTitle(),
+                    'description' => $translation->getDescription(),
+                    'keyFigures' => array_map(
+                        static fn (KeyFigure $keyFigure): array => ['value' => $keyFigure->value(), 'label' => $keyFigure->label()],
+                        $translation->getKeyFigures(),
+                    ),
+                ],
+                $project->getTranslations(),
             ));
 
         $em = $this->getEntityManager();
@@ -77,18 +83,27 @@ class DoctrineSolidarityProjectRepository extends ServiceEntityRepository implem
 
     private function toDomain(SolidarityProjectEntity $entity): SolidarityProject
     {
+        $translations = [];
+        foreach ($entity->getTranslations() as $locale => $translation) {
+            $keyFigures = array_map(
+                static fn (array $keyFigure): KeyFigure => new KeyFigure($keyFigure['value'] ?? null, $keyFigure['label'] ?? null),
+                $translation['keyFigures'] ?? [],
+            );
+
+            $translations[$locale] = new ProjectTranslation(
+                $translation['title'] ?? '',
+                $translation['description'] ?? '',
+                $keyFigures,
+            );
+        }
+
         return new SolidarityProject(
             id: $entity->getId(),
-            title: $entity->getTitle(),
-            description: $entity->getDescription(),
+            translations: $translations,
             imageUrl: $entity->getImageUrl(),
             status: $entity->getStatus(),
             createdAt: $entity->getCreatedAt(),
             isDefault: $entity->isDefault(),
-            keyFigures: array_map(
-                static fn (array $keyFigure): KeyFigure => new KeyFigure($keyFigure['value'] ?? null, $keyFigure['label'] ?? null),
-                $entity->getKeyFigures(),
-            ),
         );
     }
 }

@@ -34,13 +34,13 @@ final readonly class CreateSolidarityProjectProcessor implements ProcessorInterf
         // defense-in-depth 401 if the endpoint is ever reached anonymously.
         $this->currentUser->id();
 
+        $translations = $data->toTranslations();
+
         /** @var string $id */
         $id = $this->handler->execute(fn () => $this->useCase->handle(new CreateSolidarityProjectCommand(
-            title: $data->title,
-            description: $data->description,
+            translations: $translations,
             imageUrl: $data->imageUrl,
             status: $data->status,
-            keyFigures: $data->keyFigures,
         )));
 
         $output = new AdminSolidarityProjectOutput();
@@ -51,6 +51,7 @@ final readonly class CreateSolidarityProjectProcessor implements ProcessorInterf
         $output->status = $data->status;
         $output->isDefault = false;
         $output->keyFigures = $data->keyFigures;
+        $output->translations = $translations;
 
         return $output;
     }
