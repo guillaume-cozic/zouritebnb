@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, createAction, PayloadAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import { extractErrorMessage } from '../../services/errors';
+import type { RootState } from '../../store';
 import { AccommodationListItem, SearchFilters } from './HomepageTypes';
 
 export const ITEMS_PER_PAGE = 12;
@@ -98,6 +99,15 @@ export const fetchHomepageFeatured = createAsyncThunk<AccommodationListItem[]>(
         extractErrorMessage(err, 'Erreur lors du chargement des hébergements')
       );
     }
+  },
+  {
+    // Déduplique les appels concurrents : on ne relance pas tant qu'une requête
+    // est déjà en vol. Évite les appels redondants dus au double-montage
+    // StrictMode et aux remontages du composant pendant le chargement.
+    condition: (_, { getState }) => {
+      const { status } = (getState() as RootState).homepage;
+      return status !== 'loading';
+    },
   }
 );
 

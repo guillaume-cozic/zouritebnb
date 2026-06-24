@@ -158,4 +158,17 @@ describe('fetchHomepageFeatured', () => {
       params: { itemsPerPage: '9' },
     });
   });
+
+  test('déduplique les appels concurrents : une seule requête tant que la précédente est en vol', async () => {
+    mockedApi.get.mockResolvedValue({ data: { member: [{ id: 'a-1' }] } });
+    const store = buildStore();
+
+    // Simule le double-montage StrictMode : deux dispatches avant résolution.
+    await Promise.all([
+      store.dispatch(fetchHomepageFeatured()),
+      store.dispatch(fetchHomepageFeatured()),
+    ]);
+
+    expect(mockedApi.get).toHaveBeenCalledTimes(1);
+  });
 });
