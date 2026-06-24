@@ -98,6 +98,7 @@
     "profile": {
       "title": "À propos de l'hôte",
       "label": "Votre hôte",
+      "subtitle": "Hôte sur ZouriteBnb",
       "fallbackName": "Hôte"
     }
   },
