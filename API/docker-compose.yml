@@ -5,6 +5,7 @@ services:
       context: ./docker/php
     volumes:
       - .:/var/www/html
+      - ./docker/php/php-dev.ini:/usr/local/etc/php/conf.d/zz-dev.ini
     depends_on:
       - mysql
     environment:
