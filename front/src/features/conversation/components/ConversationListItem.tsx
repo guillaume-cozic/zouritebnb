@@ -18,6 +18,8 @@ interface Props {
   accommodationTitle?: string | null;
   /** Traveler inbox: accommodation city shown under the title. */
   accommodationCity?: string | null;
+  /** Host inbox: the guest's name shown as the item title (and avatar initials). */
+  guestName?: string | null;
 }
 
 const lastMessage = (conversation: Conversation): ConversationMessage | null => {
@@ -63,14 +65,15 @@ const ConversationListItem: React.FC<Props> = ({
   reviewable = false,
   accommodationTitle = null,
   accommodationCity = null,
+  guestName = null,
 }) => {
   const { t } = useTranslation();
   const last = lastMessage(conversation);
   const hasUnread = unreadCount > 0;
 
   // Traveler inbox labels conversations with the accommodation name; the host inbox
-  // keeps the generic "réservation" label. Fall back while the summary is loading.
-  const title = accommodationTitle || t('conversation.itemTitle');
+  // with the guest's name. Fall back to a generic label while the summary loads.
+  const title = accommodationTitle || guestName || t('conversation.itemTitle');
   const previewLabel = title;
   // Color per accommodation in the traveler inbox (its guestUserId never varies),
   // per guest in the host inbox.

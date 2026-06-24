@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
@@ -417,6 +417,13 @@ const ReservationConfirmationPage: React.FC = () => {
     `${n.toLocaleString(i18n.language, { maximumFractionDigits: 2 })} €`;
 
   const missingDates = !checkInDate || !checkOutDate;
+
+  // Dates are picked on the accommodation page, not here. Reaching /book without
+  // them (e.g. direct link) is a dead-end: send the user back to choose dates
+  // rather than showing a form that can't be submitted.
+  if (missingDates) {
+    return <Navigate to={id ? `/accommodations/${id}` : '/accommodations'} replace />;
+  }
 
   // Stripe Elements requires a stable amount; if no nights yet, use a placeholder.
   const elementsAmount = totalCents > 0 ? totalCents : 100;

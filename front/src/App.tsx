@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import DocumentTitle from './components/DocumentTitle';
 import HomePage from './features/homepage/components/HomePage';
 import AccommodationsListingPage from './features/homepage/components/AccommodationsListingPage';
 import CreateAccommodationWizard from './features/accommodation/components/CreateAccommodationWizard';
@@ -29,6 +30,7 @@ import IdentityVerificationPage from './features/userProfile/components/Identity
 function App() {
   return (
     <BrowserRouter>
+      <DocumentTitle />
       <Navbar />
       <div className="pt-16 min-h-screen">
         <Routes>

@@ -81,6 +81,13 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
     return map;
   }, [reservations]);
 
+  // Host inbox: label each conversation with the guest's name (from its reservation).
+  const guestNameByReservation = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const r of reservations) map[r.id] = r.guestName;
+    return map;
+  }, [reservations]);
+
   useEffect(() => {
     if (isHost) {
       dispatch(fetchConversationsForTeam());
@@ -263,6 +270,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                 reviewable={!isHost && !!reviewableByReservation[c.reservationId]}
                 accommodationTitle={isHost ? undefined : accommodationSummaries[c.accommodationId]?.title}
                 accommodationCity={isHost ? undefined : accommodationSummaries[c.accommodationId]?.city}
+                guestName={isHost ? guestNameByReservation[c.reservationId] : undefined}
               />
             ))}
           </div>

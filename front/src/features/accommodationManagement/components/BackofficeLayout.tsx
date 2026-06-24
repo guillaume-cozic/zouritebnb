@@ -157,7 +157,7 @@ const BackofficeLayout: React.FC = () => {
               </svg>
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900 leading-tight">BnB</p>
+              <p className="text-sm font-bold text-gray-900 leading-tight">ZouriteBnb</p>
               <p className="text-[11px] text-primary-700/70 font-medium leading-tight mt-0.5">
                 {t(titleKey)}
               </p>

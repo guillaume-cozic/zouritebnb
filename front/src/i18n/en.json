@@ -1,4 +1,30 @@
 {
+  "meta": {
+    "brand": "ZouriteBnb",
+    "titles": {
+      "home": "Holiday rentals in Rodrigues",
+      "accommodations": "Accommodations",
+      "accommodation": "Accommodation details",
+      "book": "Request a booking",
+      "reservationConfirmed": "Booking confirmed",
+      "editAccommodation": "Edit accommodation",
+      "photos": "Accommodation photos",
+      "solidarityProjects": "Solidarity projects",
+      "solidarityProject": "Solidarity project",
+      "login": "Sign in",
+      "register": "Sign up",
+      "create": "Create a listing",
+      "adminHome": "Host area",
+      "manageAccommodations": "My listings",
+      "calendar": "Calendar",
+      "reservations": "Bookings",
+      "team": "My team",
+      "conversations": "Messages",
+      "account": "Traveler area",
+      "settings": "Settings",
+      "verification": "Identity verification"
+    }
+  },
   "autosave": {
     "saving": "Saving...",
     "saved": "Saved",
@@ -125,6 +151,7 @@
   },
   "navbar": {
     "home": "Home",
+    "openMenu": "Open menu",
     "createAccommodation": "Create accommodation",
     "backoffice": "Back office",
     "switchToHost": "Hosting mode",
@@ -464,7 +491,7 @@
     "blog": "Blog",
     "hosts": "For hosts",
     "contact": "Contact",
-    "copyright": "© 2026 BnB. All rights reserved."
+    "copyright": "© 2026 ZouriteBnb. All rights reserved."
   },
   "wizard": {
     "newAccommodation": "New accommodation",
