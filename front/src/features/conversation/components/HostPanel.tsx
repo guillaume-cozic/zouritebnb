@@ -63,11 +63,13 @@ const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, b
           </div>
         </div>
 
-        {typeof reservation.totalPrice === 'number' && (
+        {typeof (reservation.totalPaid ?? reservation.totalPrice) === 'number' && (
           <div className="pt-3 border-t border-gray-100 flex items-baseline justify-between">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">{t('host.panel.total')}</p>
             <p className="text-base font-bold text-gray-900">
-              {new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(reservation.totalPrice)}
+              {new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+                reservation.totalPaid ?? reservation.totalPrice ?? 0
+              )}
             </p>
           </div>
         )}

@@ -244,6 +244,10 @@ class ReservationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Pourcentage de remise appliqué (null si aucune remise)', example: 20.0)]
     public ?float $appliedDiscountPercentage = null;
 
+    #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Montant total réglé par le voyageur : séjour + frais de service + don solidaire (identique au total de la facture)', example: 460.0)]
+    public ?float $totalPaid = null;
+
     public static function fromEntity(object $entity): static
     {
         if (!$entity instanceof Reservation) {
@@ -259,9 +263,12 @@ class ReservationOutput implements FromEntityInterface
         $output->checkOut = $entity->getDateRange()->checkOut()->format(\DateTimeInterface::ATOM);
         $output->guestName = $entity->getGuestName()->toString();
         $output->status = $entity->getStatus()->value;
-        $output->totalPrice = $entity->getPrice()->totalPrice;
-        $output->pricePerNight = $entity->getPrice()->pricePerNight;
-        $output->appliedDiscountPercentage = $entity->getPrice()->appliedDiscountPercentage;
+        $price = $entity->getPrice();
+        $output->totalPrice = $price->totalPrice;
+        $output->pricePerNight = $price->pricePerNight;
+        $output->appliedDiscountPercentage = $price->appliedDiscountPercentage;
+        // Grand total actually paid, mirroring the invoice (stay + frozen fee + donation).
+        $output->totalPaid = round($price->totalPrice + $price->commissionAmount + $price->donationAmount, 2);
 
         return $output;
     }

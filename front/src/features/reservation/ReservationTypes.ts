@@ -13,6 +13,8 @@ export interface Reservation {
   totalPrice?: number;
   pricePerNight?: number;
   appliedDiscountPercentage?: number | null;
+  /** Grand total paid by the guest (stay + service fee + donation), matching the invoice. */
+  totalPaid?: number;
 }
 
 export interface CreateReservationPayload {
