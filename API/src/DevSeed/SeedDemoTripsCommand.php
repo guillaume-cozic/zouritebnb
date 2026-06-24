@@ -44,6 +44,16 @@ final class SeedDemoTripsCommand extends Command
     private const string CONV_PAST_UUID = '0ade5eed-0000-7000-8000-000000000020';
     private const string CONV_UPCOMING_UUID = '0ade5eed-0000-7000-8000-000000000021';
 
+    /** @var list<string> Fixed ids of the unread host messages, refreshed on each run. */
+    private const array UNREAD_MESSAGE_UUIDS_PAST = [
+        '0ade5eed-0000-7000-8000-000000000030',
+        '0ade5eed-0000-7000-8000-000000000031',
+    ];
+    private const array UNREAD_MESSAGE_UUIDS_UPCOMING = [
+        '0ade5eed-0000-7000-8000-000000000032',
+        '0ade5eed-0000-7000-8000-000000000033',
+    ];
+
     private bool $guestCreated = false;
 
     public function __construct(
@@ -71,6 +81,9 @@ final class SeedDemoTripsCommand extends Command
         $accoUpcoming = $this->ensureAccommodation(self::ACCO_UPCOMING_UUID, 'Villa vue lagon', 'Trou d\'Eau Douce', 'Île Maurice', 220.0, $io);
 
         $today = new \DateTimeImmutable('today');
+        // Unread messages are "unread" client-side when newer than the last time the
+        // user opened the conversation; refreshing them to ~now on each run keeps them so.
+        $now = new \DateTimeImmutable('now');
 
         // Past, completed stay (7 nights, ~2 months ago).
         $this->upsertReservation(
@@ -81,7 +94,7 @@ final class SeedDemoTripsCommand extends Command
             nights: 7,
             io: $io,
         );
-        $this->ensureConversation(
+        $convPast = $this->ensureConversation(
             id: self::CONV_PAST_UUID,
             reservationId: self::RES_PAST_UUID,
             accommodation: $accoPast,
@@ -91,6 +104,7 @@ final class SeedDemoTripsCommand extends Command
             past: true,
             io: $io,
         );
+        $this->refreshUnreadHostMessages($convPast, $host, $now, self::UNREAD_MESSAGE_UUIDS_PAST, $io);
 
         // Upcoming, accepted reservation (5 nights, in ~3 weeks).
         $this->upsertReservation(
@@ -101,7 +115,7 @@ final class SeedDemoTripsCommand extends Command
             nights: 5,
             io: $io,
         );
-        $this->ensureConversation(
+        $convUpcoming = $this->ensureConversation(
             id: self::CONV_UPCOMING_UUID,
             reservationId: self::RES_UPCOMING_UUID,
             accommodation: $accoUpcoming,
@@ -111,6 +125,7 @@ final class SeedDemoTripsCommand extends Command
             past: false,
             io: $io,
         );
+        $this->refreshUnreadHostMessages($convUpcoming, $host, $now, self::UNREAD_MESSAGE_UUIDS_UPCOMING, $io);
 
         $this->em->flush();
 
@@ -118,7 +133,8 @@ final class SeedDemoTripsCommand extends Command
             ? \sprintf(' Mot de passe : "%s".', self::GUEST_PASSWORD)
             : ' (compte existant : mot de passe inchangé).';
         $io->success(\sprintf(
-            'Seed terminé pour %s : 1 réservation à venir (acceptée) + 1 voyage passé.%s',
+            'Seed terminé pour %s : 1 réservation à venir (acceptée) + 1 voyage passé, '
+            .'avec des messages non lus dans chaque conversation.%s',
             self::GUEST_EMAIL,
             $credentials,
         ));
@@ -267,10 +283,11 @@ final class SeedDemoTripsCommand extends Command
         \DateTimeImmutable $createdAt,
         bool $past,
         SymfonyStyle $io,
-    ): void {
+    ): ConversationEntity {
         $uuid = Uuid::fromString($id);
-        if (null !== $this->em->find(ConversationEntity::class, $uuid)) {
-            return;
+        $existing = $this->em->find(ConversationEntity::class, $uuid);
+        if (null !== $existing) {
+            return $existing;
         }
 
         $conversation = (new ConversationEntity())
@@ -304,5 +321,42 @@ final class SeedDemoTripsCommand extends Command
 
         $this->em->persist($conversation);
         $io->writeln('Conversation créée pour la réservation.');
+
+        return $conversation;
+    }
+
+    /**
+     * Upserts a couple of recent host messages (so they read as unread for the guest,
+     * who hasn't opened the conversation since), refreshing their date on each run.
+     *
+     * @param list<string> $messageIds
+     */
+    private function refreshUnreadHostMessages(
+        ConversationEntity $conversation,
+        UserEntity $host,
+        \DateTimeImmutable $now,
+        array $messageIds,
+        SymfonyStyle $io,
+    ): void {
+        $bodies = [
+            'Petit rappel : pensez à m\'indiquer votre heure d\'arrivée approximative 🙂',
+            'N\'hésitez pas si vous avez la moindre question sur le logement !',
+        ];
+
+        foreach ($messageIds as $index => $id) {
+            $uuid = Uuid::fromString($id);
+            $message = $this->em->find(MessageEntity::class, $uuid) ?? new MessageEntity();
+            $message
+                ->setId($uuid)
+                ->setConversation($conversation)
+                ->setAuthorUserId($host->getId())
+                ->setBody($bodies[$index] ?? 'Message de l\'hôte.')
+                // Spread the messages over the last few minutes, newest last.
+                ->setSentAt($now->modify(\sprintf('-%d minutes', (\count($messageIds) - $index) * 3)))
+                ->setIsSystem(false);
+            $this->em->persist($message);
+        }
+
+        $io->writeln(\sprintf('<info>%d</info> message(s) non lu(s) (hôte → voyageur).', \count($messageIds)));
     }
 }
