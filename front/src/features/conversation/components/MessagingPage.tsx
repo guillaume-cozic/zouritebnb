@@ -291,8 +291,8 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
         )}
 
         {id && current && (
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_300px] min-h-0">
-            <div className="min-h-0 flex flex-col">
+          <div className="flex-1 flex flex-col lg:flex-row min-h-0">
+            <div className="min-h-0 flex flex-col flex-1 order-2 lg:order-1">
               <header className="px-5 py-3 border-b border-gray-100 bg-white flex items-center gap-3">
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
@@ -303,8 +303,8 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                       {reservation ? reservation.guestName : current.reservationId.slice(0, 8) + '…'}
                     </p>
                   ) : (
-                    // Travelers can open the listing straight from the conversation header
-                    // (the full side panel is hidden on narrow screens, below lg).
+                    // Quick link to the listing from the header (the reservation panel
+                    // below/aside also links to it).
                     <Link
                       to={`/accommodations/${current.accommodationId}`}
                       className="block text-sm font-semibold text-gray-900 truncate hover:text-primary-700 transition-colors"
@@ -322,29 +322,6 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                     {' → '}
                     {new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short' }).format(new Date(reservation.checkOut))}
                   </span>
-                )}
-                {isHost && reservation?.status === 'pending' && !readOnly && (
-                  <div className="flex items-center gap-2 lg:hidden">
-                    <button
-                      type="button"
-                      onClick={handleAccept}
-                      disabled={busy}
-                      className="inline-flex items-center gap-1 h-8 px-3 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 shadow-sm shadow-emerald-200"
-                    >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 6 9 17l-5-5" />
-                      </svg>
-                      {t('host.panel.accept')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleRefuse}
-                      disabled={busy}
-                      className="inline-flex items-center h-8 px-3 rounded-lg text-xs font-semibold text-rose-700 bg-white border border-rose-200 hover:bg-rose-50 disabled:opacity-60"
-                    >
-                      {t('host.panel.refuse')}
-                    </button>
-                  </div>
                 )}
                 {reservation?.status === 'confirmed' && (
                   <button
@@ -383,24 +360,26 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
               </div>
             </div>
 
-            <div className="hidden lg:block border-l border-gray-100 bg-gray-50/40 p-4 overflow-y-auto">
-              {/* Travelers see who their host is at the top of the side panel. */}
-              {!isHost && (
-                <div className="mb-4 rounded-2xl border border-gray-100 bg-white px-4 py-3">
-                  <HostProfileCard teamId={current.teamId} variant="compact" />
-                </div>
-              )}
-              {reservation && (
-                <HostPanel
-                  reservation={reservation}
-                  locale={locale}
-                  onAccept={handleAccept}
-                  onRefuse={handleRefuse}
-                  busy={busy}
-                  readOnly={readOnly || !isHost}
-                />
-              )}
-            </div>
+            {(!isHost || reservation) && (
+              <div className="order-1 lg:order-2 shrink-0 lg:w-[300px] max-h-[45vh] lg:max-h-none overflow-y-auto border-b lg:border-b-0 lg:border-l border-gray-100 bg-gray-50/40 p-4">
+                {/* Travelers see who their host is at the top of the panel. */}
+                {!isHost && (
+                  <div className="mb-4 rounded-2xl border border-gray-100 bg-white px-4 py-3">
+                    <HostProfileCard teamId={current.teamId} variant="compact" />
+                  </div>
+                )}
+                {reservation && (
+                  <HostPanel
+                    reservation={reservation}
+                    locale={locale}
+                    onAccept={handleAccept}
+                    onRefuse={handleRefuse}
+                    busy={busy}
+                    readOnly={readOnly || !isHost}
+                  />
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
