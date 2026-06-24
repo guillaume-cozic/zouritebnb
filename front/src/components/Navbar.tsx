@@ -17,9 +17,12 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const user = useAppSelector(selectAuthUser);
   const location = useLocation();
-  const isHostMode = location.pathname.startsWith('/admin');
   const unreadCount = useAppSelector(selectUnreadCount);
   const hasAccommodation = useAppSelector(selectHasAccommodation);
+  // A traveler with no listing can still land on /admin (e.g. the default
+  // post-login redirect). Treat confirmed non-owners as travelers so menu links
+  // (conversations, settings) point to their /account space, not the host backoffice.
+  const isHostMode = location.pathname.startsWith('/admin') && hasAccommodation !== false;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 

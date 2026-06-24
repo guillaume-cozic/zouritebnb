@@ -106,7 +106,9 @@ const BackofficeLayout: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const hasAccommodation = useAppSelector(selectHasAccommodation);
-  const isTraveler = location.pathname.startsWith('/account');
+  // Confirmed non-owners are travelers even on /admin (e.g. landing there via the
+  // default post-login redirect), so they get the traveler menu pointing to /account.
+  const isTraveler = location.pathname.startsWith('/account') || hasAccommodation === false;
   const titleKey = isTraveler ? 'backoffice.menu.travelerTitle' : 'backoffice.menu.title';
   const footerKey = isTraveler ? 'backoffice.travelerSidebarFooter' : 'backoffice.sidebarFooter';
 
