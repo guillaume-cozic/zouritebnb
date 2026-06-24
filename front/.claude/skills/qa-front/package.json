@@ -1,0 +1,9 @@
+{
+  "name": "qa-front",
+  "private": true,
+  "type": "module",
+  "description": "Browser QA crawler for the front app — isolated deps (Playwright)",
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}
