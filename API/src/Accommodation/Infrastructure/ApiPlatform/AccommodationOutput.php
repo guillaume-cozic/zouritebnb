@@ -485,6 +485,10 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Identifiant UUID de l\'équipe propriétaire', example: '019cf27a-96ba-7957-8622-eeccb7350e79')]
     public ?string $teamId = null;
 
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Projet solidaire mis en avant par l\'hôte (UUID), ou null. Information publique évitant un appel à /api/teams/{id}.', example: '019cf27a-96ba-7957-8622-eeccb7350e79')]
+    public ?string $favoriteSolidarityProjectId = null;
+
     #[Groups(['accommodation:list'])]
     #[ApiProperty(description: 'URL de la photo principale', example: '/uploads/photos/abc123.jpg')]
     public ?string $thumbnailUrl = null;

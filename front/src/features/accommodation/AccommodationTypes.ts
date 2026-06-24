@@ -21,6 +21,8 @@ export interface Accommodation {
   checkIn?: string | null;
   checkOut?: string | null;
   teamId?: string | null;
+  /** Host's featured solidarity project (UUID), exposed publicly. */
+  favoriteSolidarityProjectId?: string | null;
   thumbnailUrl?: string | null;
   photos?: { id: string; url: string }[];
   averageRating?: number | null;

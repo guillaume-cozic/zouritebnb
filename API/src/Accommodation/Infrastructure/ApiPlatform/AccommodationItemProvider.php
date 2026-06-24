@@ -94,6 +94,22 @@ final readonly class AccommodationItemProvider implements ProviderInterface
             ? round((float) $ratingRow['avg_rating'], 1)
             : null;
 
+        // Host's featured solidarity project — exposed publicly here so the listing page
+        // doesn't have to hit the members-only GET /api/teams/{id} (which carries bank data).
+        if (null !== $output->teamId) {
+            $favoriteSql = <<<'SQL'
+                SELECT BIN_TO_UUID(favorite_solidarity_project_id)
+                FROM team
+                WHERE id = UUID_TO_BIN(:teamId)
+                SQL;
+            $favorite = $this->connection->executeQuery($favoriteSql, [
+                'teamId' => $output->teamId,
+            ])->fetchOne();
+            $output->favoriteSolidarityProjectId = (false !== $favorite && null !== $favorite)
+                ? (string) $favorite
+                : null;
+        }
+
         return $output;
     }
 }

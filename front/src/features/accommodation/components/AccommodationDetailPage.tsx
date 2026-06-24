@@ -13,8 +13,6 @@ import { selectHomepageFilters } from '../../homepage/HomepageSelectors';
 import { fetchSolidarityProjects } from '../../solidarityProject/SolidarityProjectSlice';
 import { selectSolidarityProjects } from '../../solidarityProject/SolidarityProjectSelectors';
 import { projectExcerpt } from '../../solidarityProject/SolidarityProjectText';
-import { fetchTeam } from '../../team/TeamSlice';
-import { selectCurrentTeam } from '../../team/TeamSelectors';
 import { selectAuthUser } from '../../auth/AuthSelectors';
 import LocationMap from '../../../components/LocationMap';
 import PhotoLightbox from '../../../components/PhotoLightbox';
@@ -50,7 +48,6 @@ const AccommodationDetailPage: React.FC = () => {
   const error = useAppSelector(selectAccommodationError);
   const filters = useAppSelector(selectHomepageFilters);
   const solidarityProjects = useAppSelector(selectSolidarityProjects);
-  const team = useAppSelector(selectCurrentTeam);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const user = useAppSelector(selectAuthUser);
@@ -93,18 +90,11 @@ const AccommodationDetailPage: React.FC = () => {
     dispatch(fetchSolidarityProjects());
   }, [dispatch]);
 
-  // The team endpoint is authenticated (it carries the host's bank details), so
-  // only fetch it for logged-in users. The page itself stays public; anonymous
-  // visitors simply fall back to the platform's default solidarity project.
-  useEffect(() => {
-    if (accommodation?.teamId && user) {
-      dispatch(fetchTeam(accommodation.teamId));
-    }
-  }, [dispatch, accommodation?.teamId, user]);
-
+  // The host's featured project id is exposed publicly on the accommodation, so the
+  // page stays public and never hits the members-only team endpoint (bank details).
   const activeProjects = solidarityProjects.filter((p) => p.status === 'active');
-  const favoriteProject = team?.favoriteSolidarityProjectId
-    ? activeProjects.find((p) => p.id === team.favoriteSolidarityProjectId) ?? null
+  const favoriteProject = accommodation?.favoriteSolidarityProjectId
+    ? activeProjects.find((p) => p.id === accommodation.favoriteSolidarityProjectId) ?? null
     : null;
   const platformDefaultProject = activeProjects.find((p) => p.isDefault) ?? null;
   const preselectedProject = favoriteProject ?? platformDefaultProject ?? activeProjects[0] ?? null;
