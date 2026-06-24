@@ -6,6 +6,8 @@ import { logout } from '../features/auth/AuthSlice';
 import { selectAuthUser } from '../features/auth/AuthSelectors';
 import { fetchConversationsForUser } from '../features/conversation/ConversationSlice';
 import { selectUnreadCount } from '../features/conversation/ConversationSelectors';
+import { fetchOwnsAccommodation } from '../features/accommodationManagement/AccommodationManagementSlice';
+import { selectHasAccommodation } from '../features/accommodationManagement/AccommodationManagementSelectors';
 import VerificationBadge from '../features/userProfile/components/VerificationBadge';
 import { VerificationStatus } from '../features/userProfile/UserProfileTypes';
 
@@ -17,12 +19,17 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const isHostMode = location.pathname.startsWith('/admin');
   const unreadCount = useAppSelector(selectUnreadCount);
+  const hasAccommodation = useAppSelector(selectHasAccommodation);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  // Load the user's conversations so the notification badge reflects unread messages.
+  // Load the user's conversations so the notification badge reflects unread messages,
+  // and resolve whether they own a listing (gates the host/traveler mode switch).
   useEffect(() => {
-    if (user) dispatch(fetchConversationsForUser());
+    if (user) {
+      dispatch(fetchConversationsForUser());
+      dispatch(fetchOwnsAccommodation());
+    }
   }, [dispatch, user]);
 
   useEffect(() => {
@@ -100,8 +107,9 @@ const Navbar: React.FC = () => {
             </Link>
           )}
 
-          {/* Mode switch (host ↔ traveler), authenticated users only */}
-          {user && (
+          {/* Mode switch (host ↔ traveler): only for hosts who own at least one listing.
+              Hidden while ownership is unresolved (null) to avoid showing it to travelers. */}
+          {user && hasAccommodation && (
             <Link
               to={isHostMode ? '/account' : '/admin'}
               className="hidden sm:inline-flex items-center gap-2 h-9 rounded-full px-4 text-sm font-semibold border transition-colors bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100"
@@ -151,8 +159,8 @@ const Navbar: React.FC = () => {
                     <p className="text-xs text-gray-500 truncate">{user.email}</p>
                   </div>
                   <nav className="py-1 text-sm">
-                    {/* Host-only pages: hidden in traveler mode */}
-                    {isHostMode && (
+                    {/* Listing-gated host pages: hidden in traveler mode and for hosts with no listing */}
+                    {isHostMode && hasAccommodation && (
                       <>
                         <Link
                           to="/admin/accommodations"

@@ -14,6 +14,7 @@ import {
   selectCurrentConversationStatus,
 } from '../ConversationSelectors';
 import { selectAuthUser } from '../../auth/AuthSelectors';
+import { selectHasAccommodation } from '../../accommodationManagement/AccommodationManagementSelectors';
 import {
   confirmReservation,
   fetchReservationById,
@@ -49,6 +50,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
   const basePath = isHost ? '/admin/conversations' : '/account/conversations';
 
   const user = useAppSelector(selectAuthUser);
+  const hasAccommodation = useAppSelector(selectHasAccommodation);
   const readOnly = !user;
   const conversations = useAppSelector(selectConversations);
   const listStatus = useAppSelector(selectConversationsStatus);
@@ -169,7 +171,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
               className="w-full pl-9 pr-3 h-9 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 focus:bg-white transition-colors"
             />
           </div>
-          {isHost && (
+          {isHost && hasAccommodation && (
             <div className="mt-2 flex items-center justify-between">
               <button
                 type="button"
