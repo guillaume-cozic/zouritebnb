@@ -223,7 +223,8 @@
       "calendar": "Calendar",
       "reservations": "Reservations",
       "conversations": "Messages",
-      "team": "My settings"
+      "team": "My settings",
+      "reviewable": "To review"
     },
     "sidebarFooter": "Your gîte, your world. Take care of every guest.",
     "travelerSidebarFooter": "Your messages and personal info, all in one quiet place.",

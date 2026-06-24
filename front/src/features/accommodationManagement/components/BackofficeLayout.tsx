@@ -5,6 +5,8 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchOwnsAccommodation } from '../AccommodationManagementSlice';
 import { selectHasAccommodation } from '../AccommodationManagementSelectors';
 import { selectUnreadCount } from '../../conversation/ConversationSelectors';
+import { fetchReservations } from '../../reservation/ReservationSlice';
+import { selectReviewableCount } from '../../review/ReviewSelectors';
 import { UnreadBadge } from '../../../components/ui';
 
 interface MenuItem {
@@ -118,6 +120,7 @@ const BackofficeLayout: React.FC = () => {
   const dispatch = useAppDispatch();
   const hasAccommodation = useAppSelector(selectHasAccommodation);
   const unreadCount = useAppSelector(selectUnreadCount);
+  const reviewableCount = useAppSelector(selectReviewableCount);
   // Confirmed non-owners are travelers even on /admin (e.g. landing there via the
   // default post-login redirect), so they get the traveler menu pointing to /account.
   const isTraveler = location.pathname.startsWith('/account') || hasAccommodation === false;
@@ -127,6 +130,13 @@ const BackofficeLayout: React.FC = () => {
   useEffect(() => {
     if (!isTraveler) {
       dispatch(fetchOwnsAccommodation());
+    }
+  }, [dispatch, isTraveler]);
+
+  // Load the traveler's reservations so the menu can flag stays that can still be rated.
+  useEffect(() => {
+    if (isTraveler) {
+      dispatch(fetchReservations({}));
     }
   }, [dispatch, isTraveler]);
 
@@ -184,6 +194,15 @@ const BackofficeLayout: React.FC = () => {
                       {item.icon}
                     </span>
                     <span className="flex-1">{t(item.labelKey)}</span>
+                    {isTraveler && item.labelKey === 'backoffice.menu.conversations' && reviewableCount > 0 && (
+                      <span
+                        className={`inline-flex items-center h-[18px] px-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {t('backoffice.menu.reviewable')}
+                      </span>
+                    )}
                     {item.labelKey === 'backoffice.menu.conversations' && (
                       <UnreadBadge count={unreadCount} />
                     )}

@@ -223,7 +223,8 @@
       "calendar": "Calendrier",
       "reservations": "Réservations",
       "conversations": "Messagerie",
-      "team": "Mes paramètres"
+      "team": "Mes paramètres",
+      "reviewable": "À noter"
     },
     "sidebarFooter": "Votre gîte, votre univers. Prenez soin de chaque voyageur.",
     "travelerSidebarFooter": "Vos messages et vos infos personnelles, au calme.",
