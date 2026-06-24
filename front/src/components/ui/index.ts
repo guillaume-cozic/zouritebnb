@@ -5,6 +5,8 @@ export { Field } from './Field';
 export { Card } from './Card';
 export { Avatar } from './Avatar';
 export type { AvatarProps } from './Avatar';
+export { UnreadBadge } from './UnreadBadge';
+export type { UnreadBadgeProps } from './UnreadBadge';
 export { Modal } from './Modal';
 export { SaveIndicator } from './SaveIndicator';
 export type { SaveIndicatorStatus } from './SaveIndicator';

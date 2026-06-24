@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchOwnsAccommodation } from '../AccommodationManagementSlice';
 import { selectHasAccommodation } from '../AccommodationManagementSelectors';
+import { selectUnreadCount } from '../../conversation/ConversationSelectors';
+import { UnreadBadge } from '../../../components/ui';
 
 interface MenuItem {
   to: string;
@@ -106,6 +108,7 @@ const BackofficeLayout: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const hasAccommodation = useAppSelector(selectHasAccommodation);
+  const unreadCount = useAppSelector(selectUnreadCount);
   // Confirmed non-owners are travelers even on /admin (e.g. landing there via the
   // default post-login redirect), so they get the traveler menu pointing to /account.
   const isTraveler = location.pathname.startsWith('/account') || hasAccommodation === false;
@@ -171,7 +174,10 @@ const BackofficeLayout: React.FC = () => {
                     <span className={isActive ? 'text-white' : 'text-gray-400 group-hover:text-primary-600'}>
                       {item.icon}
                     </span>
-                    {t(item.labelKey)}
+                    <span className="flex-1">{t(item.labelKey)}</span>
+                    {item.labelKey === 'backoffice.menu.conversations' && (
+                      <UnreadBadge count={unreadCount} />
+                    )}
                   </>
                 )}
               </NavLink>
