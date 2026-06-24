@@ -761,5 +761,24 @@
         "rejected": "Refusé"
       }
     }
+  },
+  "travelerHome": {
+    "greeting": "Bonjour",
+    "greetingNamed": "Bonjour {{name}}",
+    "subtitle": "Retrouvez ici vos prochains voyages.",
+    "upcomingTitle": "Mes prochains voyages",
+    "pastTitle": "Voyages passés",
+    "emptyTitle": "Aucun voyage à venir",
+    "emptyText": "Quand vous réserverez un logement, vos voyages apparaîtront ici.",
+    "browse": "Explorer les logements",
+    "inProgress": "Séjour en cours",
+    "startsToday": "Commence aujourd'hui",
+    "inDays_one": "Dans {{count}} jour",
+    "inDays_other": "Dans {{count}} jours",
+    "nights_one": "{{count}} nuit",
+    "nights_other": "{{count}} nuits",
+    "viewConversation": "Voir la conversation",
+    "viewAccommodation": "Voir le logement",
+    "accommodationFallback": "Logement"
   }
 }

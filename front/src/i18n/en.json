@@ -761,5 +761,24 @@
         "rejected": "Rejected"
       }
     }
+  },
+  "travelerHome": {
+    "greeting": "Hello",
+    "greetingNamed": "Hello {{name}}",
+    "subtitle": "Find your upcoming trips here.",
+    "upcomingTitle": "My upcoming trips",
+    "pastTitle": "Past trips",
+    "emptyTitle": "No upcoming trips",
+    "emptyText": "Once you book a place, your trips will show up here.",
+    "browse": "Browse places",
+    "inProgress": "Stay in progress",
+    "startsToday": "Starts today",
+    "inDays_one": "In {{count}} day",
+    "inDays_other": "In {{count}} days",
+    "nights_one": "{{count}} night",
+    "nights_other": "{{count}} nights",
+    "viewConversation": "View conversation",
+    "viewAccommodation": "View place",
+    "accommodationFallback": "Accommodation"
   }
 }

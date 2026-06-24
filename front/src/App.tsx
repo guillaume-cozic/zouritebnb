@@ -10,6 +10,7 @@ import AccommodationPhotosPage from './features/accommodation/components/Accommo
 import ManageAccommodationsPage from './features/accommodationManagement/components/ManageAccommodationsPage';
 import BackofficeLayout from './features/accommodationManagement/components/BackofficeLayout';
 import HostHomePage from './features/accommodationManagement/components/HostHomePage';
+import TravelerHomePage from './features/account/components/TravelerHomePage';
 import RequireAccommodation from './features/accommodationManagement/components/RequireAccommodation';
 import TeamSettingsPage from './features/team/components/TeamSettingsPage';
 import LoginPage from './features/auth/components/LoginPage';
@@ -60,7 +61,7 @@ function App() {
               <Route path="/admin/conversations/:id" element={<MessagingPage role="host" />} />
               <Route path="/accommodations/:id/edit" element={<EditAccommodationPage />} />
               <Route path="/accommodations/:id/photos" element={<AccommodationPhotosPage />} />
-              <Route path="/account" element={<Navigate to="/account/conversations" replace />} />
+              <Route path="/account" element={<TravelerHomePage />} />
               <Route path="/account/conversations" element={<MessagingPage role="guest" />} />
               <Route path="/account/conversations/:id" element={<MessagingPage role="guest" />} />
               <Route path="/account/settings" element={<TeamSettingsPage />} />

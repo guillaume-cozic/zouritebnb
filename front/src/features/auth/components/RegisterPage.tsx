@@ -19,7 +19,7 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
 
   const returnTo = searchParams.get('returnTo');
-  const redirectTo = returnTo ? decodeURIComponent(returnTo) : '/admin';
+  const redirectTo = returnTo ? decodeURIComponent(returnTo) : '/account';
   const loginTo = returnTo ? `/login?returnTo=${encodeURIComponent(returnTo)}` : '/login';
   const isBookingContext = redirectTo.includes('/book');
 
