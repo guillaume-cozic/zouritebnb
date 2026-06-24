@@ -29,6 +29,17 @@ final class InMemoryUserRepository implements UserRepository
         return null;
     }
 
+    public function findByTeamId(Uuid $teamId): ?User
+    {
+        foreach ($this->users as $user) {
+            if ($user->getTeamId()->equals($teamId)) {
+                return $user;
+            }
+        }
+
+        return null;
+    }
+
     public function save(User $user): void
     {
         $this->users[$user->getId()->toRfc4122()] = $user;

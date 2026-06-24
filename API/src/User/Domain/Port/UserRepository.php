@@ -13,5 +13,7 @@ interface UserRepository
 
     public function findByEmail(string $email): ?User;
 
+    public function findByTeamId(Uuid $teamId): ?User;
+
     public function save(User $user): void;
 }

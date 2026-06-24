@@ -36,6 +36,15 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
         return $entity ? $this->toDomain($entity) : null;
     }
 
+    public function findByTeamId(Uuid $teamId): ?DomainUser
+    {
+        // A team currently has a single member (the host); the earliest-registered
+        // user is treated as the canonical host when displaying a public profile.
+        $entity = $this->findOneBy(['teamId' => $teamId], ['email' => 'ASC']);
+
+        return $entity ? $this->toDomain($entity) : null;
+    }
+
     public function save(DomainUser $user): void
     {
         $entity = $this->find($user->getId()) ?? (new UserEntity())->setId($user->getId());
@@ -45,6 +54,8 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
             ->setTeamId($user->getTeamId())
             ->setFirstName($user->getFirstName())
             ->setLastName($user->getLastName())
+            ->setBio($user->getBio())
+            ->setAvatarFilename($user->getAvatarFilename())
             ->setVerificationStatus($user->getVerificationStatus()->value)
             ->setIdentityDocumentId($user->getIdentityDocumentId())
             ->setSelfieId($user->getSelfieId())
@@ -67,6 +78,8 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
             teamId: $entity->getTeamId(),
             firstName: $entity->getFirstName(),
             lastName: $entity->getLastName(),
+            bio: $entity->getBio(),
+            avatarFilename: $entity->getAvatarFilename(),
             verificationStatus: VerificationStatus::from($entity->getVerificationStatus()),
             identityDocumentId: $entity->getIdentityDocumentId(),
             selfieId: $entity->getSelfieId(),

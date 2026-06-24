@@ -66,6 +66,14 @@ services:
         arguments:
             $uploadDir: '%kernel.project_dir%/var/uploads/photos'
 
+    App\User\Domain\Port\AvatarStorage:
+        alias: App\User\Infrastructure\Filesystem\LocalAvatarStorage
+
+    App\User\Infrastructure\Filesystem\LocalAvatarStorage:
+        arguments:
+            # Host avatars share the photos directory so the shared ServePhotoController serves them.
+            $uploadDir: '%kernel.project_dir%/var/uploads/photos'
+
     App\Shared\Infrastructure\Controller\ServePhotoController:
         arguments:
             $photoUploadDir: '%kernel.project_dir%/var/uploads/photos'

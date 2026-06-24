@@ -19,6 +19,8 @@ final class User extends AggregateRoot
         private readonly Uuid $teamId,
         private ?string $firstName = null,
         private ?string $lastName = null,
+        private ?string $bio = null,
+        private ?string $avatarFilename = null,
         private VerificationStatus $verificationStatus = VerificationStatus::NotStarted,
         private ?Uuid $identityDocumentId = null,
         private ?Uuid $selfieId = null,
@@ -65,11 +67,27 @@ final class User extends AggregateRoot
         return $this->lastName;
     }
 
-    public function updateProfile(?string $firstName, ?string $lastName, string $email): void
+    public function updateProfile(?string $firstName, ?string $lastName, string $email, ?string $bio = null): void
     {
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->email = $email;
+        $this->bio = $bio;
+    }
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function getAvatarFilename(): ?string
+    {
+        return $this->avatarFilename;
+    }
+
+    public function changeAvatar(?string $avatarFilename): void
+    {
+        $this->avatarFilename = $avatarFilename;
     }
 
     public function getVerificationStatus(): VerificationStatus

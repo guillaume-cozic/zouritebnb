@@ -25,6 +25,10 @@ final readonly class UpdateUserProfileInput
         #[Assert\Email]
         #[Assert\Length(max: 180)]
         public string $email = '',
+        #[Groups(['user:write'])]
+        #[ApiProperty(description: 'Présentation de l\'hôte affichée publiquement', example: 'Passionné de randonnée, je loue mon gîte familial depuis 2015.')]
+        #[Assert\Length(max: 2000)]
+        public ?string $bio = null,
     ) {
     }
 }

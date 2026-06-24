@@ -34,6 +34,7 @@ final readonly class UpdateUserProfileProcessor implements ProcessorInterface
             firstName: $data->firstName ?: null,
             lastName: $data->lastName ?: null,
             email: $data->email,
+            bio: $data->bio ?: null,
         )));
     }
 }

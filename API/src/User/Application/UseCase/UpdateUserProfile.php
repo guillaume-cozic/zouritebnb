@@ -31,7 +31,7 @@ final readonly class UpdateUserProfile
             }
         }
 
-        $user->updateProfile($command->firstName, $command->lastName, $command->email);
+        $user->updateProfile($command->firstName, $command->lastName, $command->email, $command->bio);
         $this->repository->save($user);
     }
 }

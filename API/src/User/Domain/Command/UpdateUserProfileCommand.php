@@ -13,6 +13,7 @@ final readonly class UpdateUserProfileCommand
         public ?string $firstName,
         public ?string $lastName,
         public string $email,
+        public ?string $bio = null,
     ) {
     }
 }

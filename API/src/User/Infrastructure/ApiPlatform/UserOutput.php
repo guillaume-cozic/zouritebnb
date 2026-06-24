@@ -50,6 +50,21 @@ use Symfony\Component\Serializer\Attribute\Groups;
             output: false,
             processor: UpdateUserProfileProcessor::class,
         ),
+        new Post(
+            uriTemplate: '/users/avatar',
+            status: 201,
+            openapi: new OpenApiOperation(
+                summary: 'Téléverser la photo de l\'hôte courant',
+                description: 'Envoie une image (multipart/form-data, champ `file`) qui devient la photo de profil publique de l\'utilisateur authentifié. Formats JPEG, PNG ou WebP, 10 Mo maximum. Retourne l\'URL de la photo.',
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            inputFormats: ['multipart' => ['multipart/form-data']],
+            deserialize: false,
+            read: false,
+            input: false,
+            output: HostAvatarOutput::class,
+            processor: UploadHostAvatarProcessor::class,
+        ),
     ],
 )]
 class UserOutput
@@ -73,6 +88,14 @@ class UserOutput
     #[Groups(['user:read'])]
     #[ApiProperty(description: 'Nom', example: 'Dupont')]
     public ?string $lastName = null;
+
+    #[Groups(['user:read'])]
+    #[ApiProperty(description: 'Présentation publique de l\'hôte', example: 'Passionné de randonnée, je loue mon gîte familial depuis 2015.')]
+    public ?string $bio = null;
+
+    #[Groups(['user:read'])]
+    #[ApiProperty(description: 'URL (relative) de la photo de l\'hôte, ou null', example: '/uploads/photos/019cf27a-96ba-7957-8622-eeccb7350e79.jpg')]
+    public ?string $avatarUrl = null;
 
     #[Groups(['user:read'])]
     #[ApiProperty(description: 'Statut de vérification d\'identité', example: 'verified')]
