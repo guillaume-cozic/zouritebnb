@@ -29,9 +29,7 @@ import {
 } from '../../reservation/ReservationSelectors';
 import { isStayCompleted } from '../../review/reviewEligibility';
 import { selectHasReviewed } from '../../review/ReviewSelectors';
-import { fetchHostProfile } from '../../hostProfile/HostProfileSlice';
-import { selectHostProfileByTeamId } from '../../hostProfile/HostProfileSelectors';
-import { generateInvoicePdf } from '../../reservation/invoicePdf';
+import { downloadReservationInvoice } from '../../reservation/invoiceDownload';
 import ReviewModal from '../../review/components/ReviewModal';
 import ConversationListItem from './ConversationListItem';
 import ConversationThread from './ConversationThread';
@@ -65,7 +63,6 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
   const currentStatus = useAppSelector(selectCurrentConversationStatus);
   const reservation = useAppSelector(selectReservationById(current?.reservationId));
   const reservations = useAppSelector(selectReservations);
-  const host = useAppSelector(selectHostProfileByTeamId(current?.teamId));
   const hasReviewedAccommodation = useAppSelector(
     selectHasReviewed(current?.reservationId ?? '', 'accommodation')
   );
@@ -105,14 +102,6 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
   useEffect(() => {
     if (current?.reservationId) dispatch(fetchReservationById(current.reservationId));
   }, [dispatch, current?.reservationId]);
-
-  // Data backing the downloadable invoice, loaded for the open conversation
-  // regardless of role (the inbox-labelling effect above is guest-only).
-  useEffect(() => {
-    if (!current) return;
-    dispatch(fetchAccommodationSummary(current.accommodationId));
-    dispatch(fetchHostProfile(current.teamId));
-  }, [dispatch, current]);
 
   const locale = i18n.language.startsWith('fr') ? 'fr-FR' : 'en-GB';
 
@@ -161,17 +150,14 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
     setBusy(false);
   };
 
-  const handleDownloadInvoice = () => {
+  const handleDownloadInvoice = async () => {
     if (!reservation) return;
-    const summary = accommodationSummaries[reservation.accommodationId];
-    generateInvoicePdf({
-      reservation,
-      accommodationTitle: summary?.title,
-      accommodationCity: summary?.city,
-      hostName: [host?.firstName, host?.lastName].filter(Boolean).join(' ').trim() || null,
-      guestName: reservation.guestName,
-      locale: i18n.language,
-    });
+    setBusy(true);
+    try {
+      await downloadReservationInvoice(reservation.id);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -354,7 +340,8 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                   <button
                     type="button"
                     onClick={handleDownloadInvoice}
-                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+                    disabled={busy}
+                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-60 transition-colors"
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />

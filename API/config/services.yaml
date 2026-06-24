@@ -40,6 +40,9 @@ services:
     App\Reservation\Domain\Port\ReservationRepository:
         alias: App\Reservation\Infrastructure\Doctrine\DoctrineReservationRepository
 
+    App\Reservation\Domain\Port\InvoiceRenderer:
+        alias: App\Reservation\Infrastructure\Pdf\DompdfInvoiceRenderer
+
     App\Team\Domain\Port\TeamRepository:
         alias: App\Team\Infrastructure\Doctrine\DoctrineTeamRepository
 
