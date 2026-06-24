@@ -10,6 +10,7 @@ import { fetchOwnsAccommodation } from '../features/accommodationManagement/Acco
 import { selectHasAccommodation } from '../features/accommodationManagement/AccommodationManagementSelectors';
 import VerificationBadge from '../features/userProfile/components/VerificationBadge';
 import { VerificationStatus } from '../features/userProfile/UserProfileTypes';
+import { Avatar } from './ui';
 
 const Navbar: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -52,7 +53,6 @@ const Navbar: React.FC = () => {
   };
 
   const displayName = user?.firstName || user?.email.split('@')[0] || '';
-  const initial = displayName.charAt(0).toUpperCase();
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -142,9 +142,12 @@ const Navbar: React.FC = () => {
                 onClick={() => setMenuOpen((v) => !v)}
                 className="relative flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md pl-1.5 pr-3 text-sm font-medium"
               >
-                <span className="w-6 h-6 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-semibold">
-                  {initial}
-                </span>
+                <Avatar
+                  avatarUrl={user.avatarUrl}
+                  name={displayName}
+                  sizeClassName="w-6 h-6"
+                  textClassName="text-xs"
+                />
                 <span className="max-w-[120px] truncate">{displayName}</span>
                 {unreadCount > 0 && (
                   <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center">
@@ -157,9 +160,12 @@ const Navbar: React.FC = () => {
               </button>
               {menuOpen && (
                 <div className="absolute right-0 mt-2 w-[350px] bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
-                  <div className="px-5 py-3 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
-                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                  <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-3">
+                    <Avatar avatarUrl={user.avatarUrl} name={displayName} sizeClassName="w-10 h-10" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
                   </div>
                   <nav className="py-1 text-sm">
                     {/* Listing-gated host pages: hidden in traveler mode and for hosts with no listing */}

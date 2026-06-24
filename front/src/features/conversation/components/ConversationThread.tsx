@@ -4,6 +4,10 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { sendMessage, clearSendError } from '../ConversationSlice';
 import { selectSendMessageStatus, selectSendMessageError } from '../ConversationSelectors';
 import { Conversation, ConversationMessage } from '../ConversationTypes';
+import { selectAuthUser } from '../../auth/AuthSelectors';
+import { fetchHostProfile } from '../../hostProfile/HostProfileSlice';
+import { selectHostProfileByTeamId } from '../../hostProfile/HostProfileSelectors';
+import { Avatar } from '../../../components/ui';
 
 interface Props {
   conversation: Conversation;
@@ -45,11 +49,24 @@ const UserBubble: React.FC<{
   isHost: boolean;
   authorLabel: string;
   mine: boolean;
-}> = ({ message, locale, isHost, authorLabel, mine }) => {
+  avatarUrl?: string | null;
+  avatarName: string;
+}> = ({ message, locale, isHost, authorLabel, mine, avatarUrl, avatarName }) => {
   // Host messages always on the LEFT (white card, emerald accent), guest always on the RIGHT (blue gradient).
   const onRight = !isHost;
+  const avatar = (
+    <Avatar
+      avatarUrl={avatarUrl}
+      name={avatarName}
+      sizeClassName="w-8 h-8"
+      textClassName="text-xs"
+      fallbackClassName={isHost ? 'bg-emerald-600 text-white' : 'bg-primary-600 text-white'}
+      className="shrink-0 self-end border border-white shadow-sm"
+    />
+  );
   return (
-    <div className={`flex ${onRight ? 'justify-end' : 'justify-start'} mb-2`}>
+    <div className={`flex items-end gap-2 ${onRight ? 'justify-end' : 'justify-start'} mb-2`}>
+      {!onRight && avatar}
       <div className={`flex flex-col ${onRight ? 'items-end' : 'items-start'} max-w-[80%] sm:max-w-md`}>
         <span className={`text-[10px] uppercase tracking-wider font-bold mb-1 px-1 ${isHost ? 'text-emerald-700' : 'text-primary-700'}`}>
           {authorLabel}
@@ -68,6 +85,7 @@ const UserBubble: React.FC<{
           </div>
         </div>
       </div>
+      {onRight && avatar}
     </div>
   );
 };
@@ -87,6 +105,17 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
   const dispatch = useAppDispatch();
   const sendStatus = useAppSelector(selectSendMessageStatus);
   const sendError = useAppSelector(selectSendMessageError);
+  const authUser = useAppSelector(selectAuthUser);
+  const host = useAppSelector(selectHostProfileByTeamId(conversation.teamId));
+
+  // The host avatar/name shown on host-side bubbles comes from the public host profile.
+  useEffect(() => {
+    dispatch(fetchHostProfile(conversation.teamId));
+  }, [dispatch, conversation.teamId]);
+
+  const myName = authUser?.firstName || authUser?.email.split('@')[0] || t('conversation.guest');
+  const hostName =
+    [host?.firstName, host?.lastName].filter(Boolean).join(' ').trim() || t('conversation.host');
 
   const [body, setBody] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -126,6 +155,11 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
           const showDivider = !prev || !sameDay(prev.sentAt, m.sentAt);
           const isGuest = m.authorUserId === conversation.guestUserId;
           const isHost = !m.isSystem && !isGuest;
+          const mine = m.authorUserId === currentUserId;
+          // My own photo for my messages; the host's photo for host-side messages.
+          // The other party's guest photo isn't exposed by the API, so it falls back to an initial.
+          const avatarUrl = mine ? authUser?.avatarUrl : isHost ? host?.avatarUrl : null;
+          const avatarName = mine ? myName : isHost ? hostName : t('conversation.guest');
           return (
             <React.Fragment key={m.id}>
               {showDivider && <DayDivider iso={m.sentAt} locale={locale} />}
@@ -137,7 +171,9 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
                   locale={locale}
                   isHost={isHost}
                   authorLabel={isHost ? t('conversation.host') : t('conversation.guest')}
-                  mine={m.authorUserId === currentUserId}
+                  mine={mine}
+                  avatarUrl={avatarUrl}
+                  avatarName={avatarName}
                 />
               )}
             </React.Fragment>

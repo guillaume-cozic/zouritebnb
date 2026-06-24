@@ -3,6 +3,8 @@ export type { ButtonProps } from './Button';
 export { Input, Textarea, Select, inputBaseClass } from './Input';
 export { Field } from './Field';
 export { Card } from './Card';
+export { Avatar } from './Avatar';
+export type { AvatarProps } from './Avatar';
 export { Modal } from './Modal';
 export { SaveIndicator } from './SaveIndicator';
 export type { SaveIndicatorStatus } from './SaveIndicator';
