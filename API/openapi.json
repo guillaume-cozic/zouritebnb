@@ -2041,7 +2041,7 @@
                                     "description": "AdminAccommodation.jsonld-admin_accommodation.list collection.",
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchema"
                                         },
                                         {
                                             "type": "object",
@@ -2086,6 +2086,100 @@
                 },
                 "summary": "Lister tous les h\u00e9bergements (administration)",
                 "description": "Retourne la liste compl\u00e8te des h\u00e9bergements de la plateforme (brouillons inclus), tri\u00e9s par titre, avec l'email d'un membre de l'\u00e9quipe h\u00f4te. Endpoint en lecture seule r\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The collection page number",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "style": "form",
+                        "explode": false
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "in": "query",
+                        "description": "The number of items per page",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "minimum": 0,
+                            "maximum": 100
+                        },
+                        "style": "form",
+                        "explode": false
+                    }
+                ]
+            }
+        },
+        "/api/admin/dashboard": {
+            "get": {
+                "operationId": "api_admindashboard_get",
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AdminDashboard resource",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminDashboard.jsonld-admin_dashboard.read"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Indicateurs financiers du tableau de bord (administration)",
+                "description": "Retourne un aper\u00e7u financier de la plateforme : chiffre d'affaires encaiss\u00e9, marge (commission), total revers\u00e9 aux projets solidaires et r\u00e9partition par projet. Calcul\u00e9 sur les r\u00e9servations confirm\u00e9es. R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
                 "parameters": []
             }
         },
@@ -2105,7 +2199,7 @@
                                     "description": "AdminReservation.jsonld-admin_reservation.list collection.",
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchema"
                                         },
                                         {
                                             "type": "object",
@@ -2150,7 +2244,36 @@
                 },
                 "summary": "Lister toutes les r\u00e9servations (administration)",
                 "description": "Retourne la liste compl\u00e8te des r\u00e9servations de la plateforme, tri\u00e9es par date d'arriv\u00e9e d\u00e9croissante, avec le titre de l'h\u00e9bergement associ\u00e9. Endpoint en lecture seule r\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
-                "parameters": []
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The collection page number",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "style": "form",
+                        "explode": false
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "in": "query",
+                        "description": "The number of items per page",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "minimum": 0,
+                            "maximum": 100
+                        },
+                        "style": "form",
+                        "explode": false
+                    }
+                ]
             }
         },
         "/api/admin/reviews": {
@@ -2169,7 +2292,7 @@
                                     "description": "AdminReview.jsonld-admin_review.list collection.",
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchema"
                                         },
                                         {
                                             "type": "object",
@@ -2214,6 +2337,637 @@
                 },
                 "summary": "Lister tous les avis (administration)",
                 "description": "Retourne la liste compl\u00e8te des avis de la plateforme (avis sur h\u00e9bergements et avis sur voyageurs), du plus r\u00e9cent au plus ancien, avec les noms de l'auteur et du sujet de l'avis. Endpoint en lecture seule r\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The collection page number",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "style": "form",
+                        "explode": false
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "in": "query",
+                        "description": "The number of items per page",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "minimum": 0,
+                            "maximum": 100
+                        },
+                        "style": "form",
+                        "explode": false
+                    }
+                ]
+            }
+        },
+        "/api/admin/solidarity-projects": {
+            "get": {
+                "operationId": "api_adminsolidarity-projects_get_collection",
+                "tags": [
+                    "AdminSolidarityProject"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AdminSolidarityProject collection",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "AdminSolidarityProject.jsonld-admin_solidarity_project.list collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchema"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AdminSolidarityProject.jsonld-admin_solidarity_project.list"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Lister tous les projets solidaires (administration)",
+                "description": "Retourne la liste compl\u00e8te des projets solidaires de la plateforme (actifs et cl\u00f4tur\u00e9s), le projet coup de c\u0153ur en premier puis du plus r\u00e9cent au plus ancien. R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The collection page number",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "style": "form",
+                        "explode": false
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "in": "query",
+                        "description": "The number of items per page",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "minimum": 0,
+                            "maximum": 100
+                        },
+                        "style": "form",
+                        "explode": false
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "api_adminsolidarity-projects_post",
+                "tags": [
+                    "AdminSolidarityProject"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "AdminSolidarityProject resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminSolidarityProject.jsonld-admin_solidarity_project.list"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Cr\u00e9er un projet solidaire (administration)",
+                "description": "Cr\u00e9e un nouveau projet solidaire. Le statut par d\u00e9faut est \"active\". R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new AdminSolidarityProject resource",
+                    "content": {
+                        "application/ld+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdminSolidarityProject.AdminSolidarityProjectInput-admin_solidarity_project.write"
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/api/admin/solidarity-projects/{id}": {
+            "get": {
+                "operationId": "api_adminsolidarity-projects_id_get",
+                "tags": [
+                    "AdminSolidarityProject"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AdminSolidarityProject resource",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminSolidarityProject.jsonld-admin_solidarity_project.list"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "R\u00e9cup\u00e9rer un projet solidaire (administration)",
+                "description": "Retourne le d\u00e9tail complet d'un projet solidaire, quel que soit son statut. R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AdminSolidarityProject identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ]
+            },
+            "patch": {
+                "operationId": "api_adminsolidarity-projects_id_patch",
+                "tags": [
+                    "AdminSolidarityProject"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AdminSolidarityProject resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Modifier un projet solidaire (administration)",
+                "description": "Met \u00e0 jour les informations d'un projet solidaire (titre, description, image, statut, chiffres cl\u00e9s). Le coup de c\u0153ur de la plateforme et la date de cr\u00e9ation sont pr\u00e9serv\u00e9s. R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AdminSolidarityProject identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AdminSolidarityProject resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdminSolidarityProject.AdminSolidarityProjectInput-admin_solidarity_project.write.jsonMergePatch"
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/api/admin/solidarity-projects/{id}/status": {
+            "patch": {
+                "operationId": "api_adminsolidarity-projects_idstatus_patch",
+                "tags": [
+                    "AdminSolidarityProject"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AdminSolidarityProject resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Activer ou d\u00e9sactiver un projet solidaire (administration)",
+                "description": "Change le statut d'un projet solidaire (\"active\" pour l'afficher publiquement, \"closed\" pour le retirer). R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AdminSolidarityProject identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AdminSolidarityProject resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdminSolidarityProject.AdminSolidarityProjectStatusInput-admin_solidarity_project.status.jsonMergePatch"
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/api/admin/solidarity-project-images": {
+            "post": {
+                "operationId": "api_adminsolidarity-project-images_post",
+                "tags": [
+                    "AdminSolidarityProjectImage"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "AdminSolidarityProjectImage resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminSolidarityProjectImage.jsonld-admin_solidarity_project_image.read"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "T\u00e9l\u00e9verser une image de projet solidaire (administration)",
+                "description": "T\u00e9l\u00e9verse une image (JPEG, PNG ou WebP, 10 Mo maximum) et retourne son URL publique, \u00e0 utiliser comme image d'un projet solidaire. R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
                 "parameters": []
             }
         },
@@ -2233,7 +2987,7 @@
                                     "description": "AdminUser.jsonld-admin_user.list collection.",
                                     "allOf": [
                                         {
-                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchema"
                                         },
                                         {
                                             "type": "object",
@@ -2278,7 +3032,36 @@
                 },
                 "summary": "Lister tous les utilisateurs (administration)",
                 "description": "Retourne la liste compl\u00e8te des utilisateurs de la plateforme, tri\u00e9s par email, avec leurs r\u00f4les, leur statut de v\u00e9rification d'identit\u00e9 et leurs compteurs d'activit\u00e9 (h\u00e9bergements de leur \u00e9quipe, r\u00e9servations effectu\u00e9es). Le mot de passe hach\u00e9 n'est jamais expos\u00e9. Endpoint en lecture seule r\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
-                "parameters": []
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The collection page number",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "style": "form",
+                        "explode": false
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "in": "query",
+                        "description": "The number of items per page",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "minimum": 0,
+                            "maximum": 100
+                        },
+                        "style": "form",
+                        "explode": false
+                    }
+                ]
             }
         },
         "/api/conversations": {
@@ -2546,6 +3329,63 @@
                     },
                     "required": true
                 }
+            }
+        },
+        "/api/host-profiles/{teamId}": {
+            "get": {
+                "operationId": "api_host-profiles_teamId_get",
+                "tags": [
+                    "HostProfile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HostProfile resource",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HostProfile.jsonld-host_profile.read"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Profil public de l'h\u00f4te d'une \u00e9quipe",
+                "description": "Retourne le profil public de l'h\u00f4te (pr\u00e9nom, nom, photo, pr\u00e9sentation) \u00e0 partir de l'identifiant de son \u00e9quipe. Accessible sans authentification : utilis\u00e9 sur la page publique d'une annonce et dans la messagerie. 404 si l'\u00e9quipe n'a aucun h\u00f4te.",
+                "parameters": [
+                    {
+                        "name": "teamId",
+                        "in": "path",
+                        "description": "HostProfile identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ]
             }
         },
         "/api/localities": {
@@ -3813,7 +4653,7 @@
                     }
                 },
                 "summary": "Lister les projets solidaires actifs",
-                "description": "Retourne la liste des projets solidaires actifs, tri\u00e9s par date de cr\u00e9ation d\u00e9croissante.",
+                "description": "Retourne la liste des projets solidaires actifs, tri\u00e9s par date de cr\u00e9ation d\u00e9croissante. Le contenu est servi dans la langue n\u00e9goci\u00e9e via l'en-t\u00eate Accept-Language (fr par d\u00e9faut, en disponible).",
                 "parameters": []
             }
         },
@@ -3857,7 +4697,7 @@
                     }
                 },
                 "summary": "R\u00e9cup\u00e9rer un projet solidaire",
-                "description": "Retourne le d\u00e9tail complet d'un projet solidaire par son identifiant UUID.",
+                "description": "Retourne le d\u00e9tail complet d'un projet solidaire par son identifiant UUID. Le contenu (titre, description, chiffres cl\u00e9s) est servi dans la langue n\u00e9goci\u00e9e via l'en-t\u00eate Accept-Language (fr par d\u00e9faut, en disponible).",
                 "parameters": [
                     {
                         "name": "id",
@@ -4711,7 +5551,7 @@
                         "content": {
                             "application/ld+json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/User.jsonld-user.read"
+                                    "$ref": "#/components/schemas/User.jsonld-user.read_user.token"
                                 }
                             }
                         },
@@ -4761,7 +5601,7 @@
                     }
                 },
                 "summary": "Inscription d'un utilisateur",
-                "description": "Cr\u00e9e un utilisateur et son \u00e9quipe associ\u00e9e. L'utilisateur est le seul membre de sa team \u00e0 la cr\u00e9ation.",
+                "description": "Cr\u00e9e un utilisateur et son \u00e9quipe associ\u00e9e. L'utilisateur est le seul membre de sa team \u00e0 la cr\u00e9ation. La r\u00e9ponse contient un JWT (champ `token`) afin que l'utilisateur soit connect\u00e9 imm\u00e9diatement apr\u00e8s l'inscription.",
                 "parameters": [],
                 "requestBody": {
                     "description": "The new User resource",
@@ -4774,6 +5614,93 @@
                     },
                     "required": true
                 }
+            }
+        },
+        "/api/users/avatar": {
+            "post": {
+                "operationId": "api_usersavatar_post",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User.HostAvatarOutput.jsonld"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "T\u00e9l\u00e9verser la photo de l'h\u00f4te courant",
+                "description": "Envoie une image (multipart/form-data, champ `file`) qui devient la photo de profil publique de l'utilisateur authentifi\u00e9. Formats JPEG, PNG ou WebP, 10 Mo maximum. Retourne l'URL de la photo.",
+                "parameters": []
             }
         },
         "/api/users/profile": {
@@ -5204,6 +6131,14 @@
                                     "null"
                                 ]
                             },
+                            "favoriteSolidarityProjectId": {
+                                "description": "Projet solidaire mis en avant par l'h\u00f4te (UUID), ou null. Information publique \u00e9vitant un appel \u00e0 /api/teams/{id}.",
+                                "example": "019cf27a-96ba-7957-8622-eeccb7350e79",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
                             "thumbnailUrl": {
                                 "description": "URL de la photo principale",
                                 "example": "/uploads/photos/abc123.jpg",
@@ -5591,6 +6526,14 @@
                                     "null"
                                 ]
                             },
+                            "favoriteSolidarityProjectId": {
+                                "description": "Projet solidaire mis en avant par l'h\u00f4te (UUID), ou null. Information publique \u00e9vitant un appel \u00e0 /api/teams/{id}.",
+                                "example": "019cf27a-96ba-7957-8622-eeccb7350e79",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
                             "photos": {
                                 "description": "Liste des photos de l'h\u00e9bergement",
                                 "type": [
@@ -5643,6 +6586,14 @@
                             "authorName": {
                                 "description": "Nom affich\u00e9 de l'auteur (pr\u00e9nom + initiale du nom)",
                                 "example": "Marie D.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "authorAvatarUrl": {
+                                "description": "URL relative de la photo de l'auteur (\u00e0 pr\u00e9fixer par l'URL de l'API), ou null",
+                                "example": "/uploads/photos/avatar.jpg",
                                 "type": [
                                     "string",
                                     "null"
@@ -5747,6 +6698,90 @@
                                     "string",
                                     "null"
                                 ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "AdminDashboard.jsonld-admin_dashboard.read": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Identifiant logique du tableau de bord",
+                                "default": "current",
+                                "example": "current",
+                                "type": "string"
+                            },
+                            "totalRevenue": {
+                                "description": "Chiffre d'affaires total encaiss\u00e9 (r\u00e9servations confirm\u00e9es), en euros",
+                                "default": 0,
+                                "example": 12450,
+                                "type": "number"
+                            },
+                            "totalMargin": {
+                                "description": "Marge totale de la plateforme (commission), en euros",
+                                "default": 0,
+                                "example": 1867.5,
+                                "type": "number"
+                            },
+                            "totalDonated": {
+                                "description": "Total revers\u00e9 aux projets solidaires, en euros",
+                                "default": 0,
+                                "example": 249,
+                                "type": "number"
+                            },
+                            "confirmedReservations": {
+                                "description": "Nombre de r\u00e9servations confirm\u00e9es prises en compte",
+                                "default": 0,
+                                "example": 87,
+                                "type": "integer"
+                            },
+                            "upcomingStays": {
+                                "description": "Nombre de s\u00e9jours \u00e0 venir (r\u00e9servations confirm\u00e9es dont l'arriv\u00e9e est dans le futur)",
+                                "default": 0,
+                                "example": 12,
+                                "type": "integer"
+                            },
+                            "commissionRate": {
+                                "description": "Taux de commission appliqu\u00e9 (part du CA)",
+                                "default": 0,
+                                "example": 0.08,
+                                "type": "number"
+                            },
+                            "donationRate": {
+                                "description": "Taux de reversement aux projets (part du CA)",
+                                "default": 0,
+                                "example": 0.07,
+                                "type": "number"
+                            },
+                            "donationsByProject": {
+                                "description": "Total revers\u00e9 par projet solidaire (attribu\u00e9 au coup de c\u0153ur de l'\u00e9quipe h\u00f4te, sinon au projet par d\u00e9faut)",
+                                "example": [
+                                    {
+                                        "projectId": "01961e2f-dead-7000-beef-000000000001",
+                                        "title": "Reforestation de Rodrigues",
+                                        "amount": 180
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
                             }
                         }
                     }
@@ -5951,6 +6986,351 @@
                             "subjectUserName": {
                                 "description": "Nom complet du voyageur not\u00e9, ou son email \u00e0 d\u00e9faut (null pour un avis sur h\u00e9bergement)",
                                 "example": "Paul Martin",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "AdminSolidarityProject.AdminSolidarityProjectInput-admin_solidarity_project.write": {
+                "type": "object",
+                "required": [
+                    "title",
+                    "description"
+                ],
+                "properties": {
+                    "title": {
+                        "maxLength": 255,
+                        "description": "Titre du projet dans la langue par d\u00e9faut (fr)",
+                        "example": "Reforestation de l'\u00eele Rodrigues",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Description du projet dans la langue par d\u00e9faut (fr)",
+                        "example": "Plantation de 10 000 arbres end\u00e9miques sur trois ans.",
+                        "type": "string"
+                    },
+                    "imageUrl": {
+                        "format": "uri",
+                        "maxLength": 2048,
+                        "description": "URL de l'image du projet (optionnelle)",
+                        "externalDocs": {
+                            "url": "https://schema.org/url"
+                        },
+                        "example": "https://example.com/images/project.jpg",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "status": {
+                        "enum": [
+                            "active",
+                            "closed"
+                        ],
+                        "description": "Statut initial du projet (active ou closed)",
+                        "example": "active",
+                        "type": "string"
+                    },
+                    "keyFigures": {
+                        "description": "Chiffres cl\u00e9s du projet (valeur + libell\u00e9)",
+                        "example": [
+                            {
+                                "value": "10 000",
+                                "label": "arbres plant\u00e9s"
+                            }
+                        ],
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "translations": {
+                        "description": "Traductions du projet dans les langues autres que la langue par d\u00e9faut (ex. \"en\"). La langue par d\u00e9faut (fr) provient des champs title/description/keyFigures.",
+                        "example": {
+                            "en": {
+                                "title": "Reforesting Rodrigues",
+                                "description": "Planting 10,000 endemic trees.",
+                                "keyFigures": [
+                                    {
+                                        "value": "10,000",
+                                        "label": "trees planted"
+                                    }
+                                ]
+                            }
+                        },
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "anyOf": [
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "AdminSolidarityProject.AdminSolidarityProjectInput-admin_solidarity_project.write.jsonMergePatch": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "maxLength": 255,
+                        "description": "Titre du projet dans la langue par d\u00e9faut (fr)",
+                        "example": "Reforestation de l'\u00eele Rodrigues",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Description du projet dans la langue par d\u00e9faut (fr)",
+                        "example": "Plantation de 10 000 arbres end\u00e9miques sur trois ans.",
+                        "type": "string"
+                    },
+                    "imageUrl": {
+                        "format": "uri",
+                        "maxLength": 2048,
+                        "description": "URL de l'image du projet (optionnelle)",
+                        "externalDocs": {
+                            "url": "https://schema.org/url"
+                        },
+                        "example": "https://example.com/images/project.jpg",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "status": {
+                        "enum": [
+                            "active",
+                            "closed"
+                        ],
+                        "description": "Statut initial du projet (active ou closed)",
+                        "example": "active",
+                        "type": "string"
+                    },
+                    "keyFigures": {
+                        "description": "Chiffres cl\u00e9s du projet (valeur + libell\u00e9)",
+                        "example": [
+                            {
+                                "value": "10 000",
+                                "label": "arbres plant\u00e9s"
+                            }
+                        ],
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "translations": {
+                        "description": "Traductions du projet dans les langues autres que la langue par d\u00e9faut (ex. \"en\"). La langue par d\u00e9faut (fr) provient des champs title/description/keyFigures.",
+                        "example": {
+                            "en": {
+                                "title": "Reforesting Rodrigues",
+                                "description": "Planting 10,000 endemic trees.",
+                                "keyFigures": [
+                                    {
+                                        "value": "10,000",
+                                        "label": "trees planted"
+                                    }
+                                ]
+                            }
+                        },
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "anyOf": [
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "AdminSolidarityProject.AdminSolidarityProjectStatusInput-admin_solidarity_project.status.jsonMergePatch": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "enum": [
+                            "active",
+                            "closed"
+                        ],
+                        "description": "Nouveau statut : \"active\" pour publier, \"closed\" pour d\u00e9sactiver",
+                        "example": "closed",
+                        "type": "string"
+                    }
+                }
+            },
+            "AdminSolidarityProject.jsonld-admin_solidarity_project.list": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Identifiant unique du projet (UUID)",
+                                "example": "01961e2f-dead-7000-beef-000000000001",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "title": {
+                                "description": "Titre du projet dans la langue par d\u00e9faut (fr)",
+                                "example": "Reforestation de l'\u00eele Rodrigues",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "description": {
+                                "description": "Description du projet dans la langue par d\u00e9faut (fr)",
+                                "example": "Plantation de 10 000 arbres end\u00e9miques sur trois ans.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "imageUrl": {
+                                "description": "URL de l'image du projet (null si aucune)",
+                                "example": "https://example.com/images/project.jpg",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "status": {
+                                "description": "Statut du projet (active ou closed)",
+                                "example": "active",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "createdAt": {
+                                "description": "Date de cr\u00e9ation (ISO 8601)",
+                                "example": "2026-04-13T10:00:00+00:00",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "isDefault": {
+                                "description": "Vrai si ce projet est le coup de c\u0153ur (projet par d\u00e9faut) de la plateforme",
+                                "example": false,
+                                "type": [
+                                    "boolean",
+                                    "null"
+                                ]
+                            },
+                            "keyFigures": {
+                                "description": "Chiffres cl\u00e9s du projet dans la langue par d\u00e9faut (fr)",
+                                "example": [
+                                    {
+                                        "value": "10 000",
+                                        "label": "arbres plant\u00e9s"
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "translations": {
+                                "description": "Contenu traduisible par langue (fr requis, en optionnel). Sert \u00e0 \u00e9diter chaque langue dans le back-office.",
+                                "example": {
+                                    "fr": {
+                                        "title": "Reforestation de l'\u00eele Rodrigues",
+                                        "description": "Plantation de 10 000 arbres end\u00e9miques.",
+                                        "keyFigures": [
+                                            {
+                                                "value": "10 000",
+                                                "label": "arbres plant\u00e9s"
+                                            }
+                                        ]
+                                    },
+                                    "en": {
+                                        "title": "Reforesting Rodrigues",
+                                        "description": "Planting 10,000 endemic trees.",
+                                        "keyFigures": [
+                                            {
+                                                "value": "10,000",
+                                                "label": "trees planted"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "AdminSolidarityProjectImage.jsonld-admin_solidarity_project_image.read": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "imageUrl": {
+                                "description": "URL publique de l'image t\u00e9l\u00e9vers\u00e9e",
+                                "example": "http://localhost:8080/uploads/solidarity-projects/0199....webp",
                                 "type": [
                                     "string",
                                     "null"
@@ -6410,6 +7790,57 @@
                 ],
                 "description": "A representation of common errors."
             },
+            "HostProfile.jsonld-host_profile.read": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "teamId": {
+                                "description": "Identifiant UUID de l'\u00e9quipe h\u00f4te",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "firstName": {
+                                "description": "Pr\u00e9nom de l'h\u00f4te",
+                                "example": "Marie",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "lastName": {
+                                "description": "Nom de l'h\u00f4te",
+                                "example": "Dupont",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "bio": {
+                                "description": "Pr\u00e9sentation publique de l'h\u00f4te",
+                                "example": "Passionn\u00e9e de randonn\u00e9e, je loue mon g\u00eete familial depuis 2015.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "avatarUrl": {
+                                "description": "URL (relative) de la photo de l'h\u00f4te, ou null",
+                                "example": "/uploads/photos/019cf27a-96ba-7957-8622-eeccb7350e79.jpg",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
             "HydraCollectionBaseSchema": {
                 "allOf": [
                     {
@@ -6807,6 +8238,14 @@
                                     "number",
                                     "null"
                                 ]
+                            },
+                            "totalPaid": {
+                                "description": "Montant total r\u00e9gl\u00e9 par le voyageur : s\u00e9jour + frais de service + don solidaire (identique au total de la facture)",
+                                "example": 460,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
                             }
                         }
                     }
@@ -6875,6 +8314,14 @@
                                     "boolean",
                                     "null"
                                 ]
+                            },
+                            "locale": {
+                                "description": "Langue dans laquelle le contenu (titre, description, chiffres cl\u00e9s) est servi",
+                                "example": "fr",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
                             }
                         }
                     }
@@ -6941,6 +8388,14 @@
                                 "example": false,
                                 "type": [
                                     "boolean",
+                                    "null"
+                                ]
+                            },
+                            "locale": {
+                                "description": "Langue dans laquelle le contenu (titre, description, chiffres cl\u00e9s) est servi",
+                                "example": "fr",
+                                "type": [
+                                    "string",
                                     "null"
                                 ]
                             },
@@ -7073,6 +8528,26 @@
                     }
                 ]
             },
+            "User.HostAvatarOutput.jsonld": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "avatarUrl": {
+                                "description": "URL (relative) de la photo de l'h\u00f4te qui vient d'\u00eatre t\u00e9l\u00e9vers\u00e9e",
+                                "example": "/uploads/photos/019cf27a-96ba-7957-8622-eeccb7350e79.jpg",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
             "User.LoginUserInput-user.write": {
                 "type": "object",
                 "required": [
@@ -7147,66 +8622,17 @@
                         },
                         "example": "marie@example.com",
                         "type": "string"
+                    },
+                    "bio": {
+                        "maxLength": 2000,
+                        "description": "Pr\u00e9sentation de l'h\u00f4te affich\u00e9e publiquement",
+                        "example": "Passionn\u00e9 de randonn\u00e9e, je loue mon g\u00eete familial depuis 2015.",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
                     }
                 }
-            },
-            "User.jsonld-user.read": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/HydraItemBaseSchema"
-                    },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "description": "Identifiant UUID de l'utilisateur",
-                                "example": "019cf27a-96ba-7957-8622-eeccb7350e79",
-                                "type": [
-                                    "string",
-                                    "null"
-                                ]
-                            },
-                            "email": {
-                                "description": "Adresse email",
-                                "example": "host@example.com",
-                                "type": [
-                                    "string",
-                                    "null"
-                                ]
-                            },
-                            "teamId": {
-                                "description": "Identifiant UUID de l'\u00e9quipe de l'utilisateur",
-                                "example": "019cf27a-96ba-7957-8622-eeccb7350e99",
-                                "type": [
-                                    "string",
-                                    "null"
-                                ]
-                            },
-                            "firstName": {
-                                "description": "Pr\u00e9nom",
-                                "example": "Marie",
-                                "type": [
-                                    "string",
-                                    "null"
-                                ]
-                            },
-                            "lastName": {
-                                "description": "Nom",
-                                "example": "Dupont",
-                                "type": [
-                                    "string",
-                                    "null"
-                                ]
-                            },
-                            "verificationStatus": {
-                                "description": "Statut de v\u00e9rification d'identit\u00e9",
-                                "default": "not_started",
-                                "example": "verified",
-                                "type": "string"
-                            }
-                        }
-                    }
-                ]
             },
             "User.jsonld-user.read_user.token": {
                 "allOf": [
@@ -7251,6 +8677,22 @@
                             "lastName": {
                                 "description": "Nom",
                                 "example": "Dupont",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "bio": {
+                                "description": "Pr\u00e9sentation publique de l'h\u00f4te",
+                                "example": "Passionn\u00e9 de randonn\u00e9e, je loue mon g\u00eete familial depuis 2015.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "avatarUrl": {
+                                "description": "URL (relative) de la photo de l'h\u00f4te, ou null",
+                                "example": "/uploads/photos/019cf27a-96ba-7957-8622-eeccb7350e79.jpg",
                                 "type": [
                                     "string",
                                     "null"
@@ -7351,6 +8793,10 @@
             "description": "Resource 'PaymentIntent' operations."
         },
         {
+            "name": "AdminDashboard",
+            "description": "Resource 'AdminDashboard' operations."
+        },
+        {
             "name": "AdminReservation",
             "description": "Resource 'AdminReservation' operations."
         },
@@ -7371,6 +8817,14 @@
             "description": "Resource 'Review' operations."
         },
         {
+            "name": "AdminSolidarityProjectImage",
+            "description": "Resource 'AdminSolidarityProjectImage' operations."
+        },
+        {
+            "name": "AdminSolidarityProject",
+            "description": "Resource 'AdminSolidarityProject' operations."
+        },
+        {
             "name": "SolidarityProject",
             "description": "Resource 'SolidarityProject' operations."
         },
@@ -7385,6 +8839,10 @@
         {
             "name": "AdminUser",
             "description": "Resource 'AdminUser' operations."
+        },
+        {
+            "name": "HostProfile",
+            "description": "Resource 'HostProfile' operations."
         },
         {
             "name": "User",

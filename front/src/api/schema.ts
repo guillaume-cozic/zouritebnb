@@ -141,6 +141,13 @@ export interface paths {
      */
     get: operations["api_adminaccommodations_get_collection"];
   };
+  "/api/admin/dashboard": {
+    /**
+     * Indicateurs financiers du tableau de bord (administration)
+     * @description Retourne un aperçu financier de la plateforme : chiffre d'affaires encaissé, marge (commission), total reversé aux projets solidaires et répartition par projet. Calculé sur les réservations confirmées. Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    get: operations["api_admindashboard_get"];
+  };
   "/api/admin/reservations": {
     /**
      * Lister toutes les réservations (administration)
@@ -154,6 +161,44 @@ export interface paths {
      * @description Retourne la liste complète des avis de la plateforme (avis sur hébergements et avis sur voyageurs), du plus récent au plus ancien, avec les noms de l'auteur et du sujet de l'avis. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
      */
     get: operations["api_adminreviews_get_collection"];
+  };
+  "/api/admin/solidarity-projects": {
+    /**
+     * Lister tous les projets solidaires (administration)
+     * @description Retourne la liste complète des projets solidaires de la plateforme (actifs et clôturés), le projet coup de cœur en premier puis du plus récent au plus ancien. Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    get: operations["api_adminsolidarity-projects_get_collection"];
+    /**
+     * Créer un projet solidaire (administration)
+     * @description Crée un nouveau projet solidaire. Le statut par défaut est "active". Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    post: operations["api_adminsolidarity-projects_post"];
+  };
+  "/api/admin/solidarity-projects/{id}": {
+    /**
+     * Récupérer un projet solidaire (administration)
+     * @description Retourne le détail complet d'un projet solidaire, quel que soit son statut. Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    get: operations["api_adminsolidarity-projects_id_get"];
+    /**
+     * Modifier un projet solidaire (administration)
+     * @description Met à jour les informations d'un projet solidaire (titre, description, image, statut, chiffres clés). Le coup de cœur de la plateforme et la date de création sont préservés. Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    patch: operations["api_adminsolidarity-projects_id_patch"];
+  };
+  "/api/admin/solidarity-projects/{id}/status": {
+    /**
+     * Activer ou désactiver un projet solidaire (administration)
+     * @description Change le statut d'un projet solidaire ("active" pour l'afficher publiquement, "closed" pour le retirer). Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    patch: operations["api_adminsolidarity-projects_idstatus_patch"];
+  };
+  "/api/admin/solidarity-project-images": {
+    /**
+     * Téléverser une image de projet solidaire (administration)
+     * @description Téléverse une image (JPEG, PNG ou WebP, 10 Mo maximum) et retourne son URL publique, à utiliser comme image d'un projet solidaire. Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    post: operations["api_adminsolidarity-project-images_post"];
   };
   "/api/admin/users": {
     /**
@@ -182,6 +227,13 @@ export interface paths {
      * @description Ajoute un nouveau message à une conversation existante. L'auteur est l'utilisateur authentifié, qui doit être soit le loueur, soit un membre de l'équipe hôte. Authentification requise (401 sinon). Retourne 422 si la conversation est introuvable ou si l'auteur n'est pas participant.
      */
     post: operations["api_conversations_idmessages_post"];
+  };
+  "/api/host-profiles/{teamId}": {
+    /**
+     * Profil public de l'hôte d'une équipe
+     * @description Retourne le profil public de l'hôte (prénom, nom, photo, présentation) à partir de l'identifiant de son équipe. Accessible sans authentification : utilisé sur la page publique d'une annonce et dans la messagerie. 404 si l'équipe n'a aucun hôte.
+     */
+    get: operations["api_host-profiles_teamId_get"];
   };
   "/api/localities": {
     /**
@@ -268,14 +320,14 @@ export interface paths {
   "/api/solidarity_projects": {
     /**
      * Lister les projets solidaires actifs
-     * @description Retourne la liste des projets solidaires actifs, triés par date de création décroissante.
+     * @description Retourne la liste des projets solidaires actifs, triés par date de création décroissante. Le contenu est servi dans la langue négociée via l'en-tête Accept-Language (fr par défaut, en disponible).
      */
     get: operations["api_solidarity_projects_get_collection"];
   };
   "/api/solidarity_projects/{id}": {
     /**
      * Récupérer un projet solidaire
-     * @description Retourne le détail complet d'un projet solidaire par son identifiant UUID.
+     * @description Retourne le détail complet d'un projet solidaire par son identifiant UUID. Le contenu (titre, description, chiffres clés) est servi dans la langue négociée via l'en-tête Accept-Language (fr par défaut, en disponible).
      */
     get: operations["api_solidarity_projects_id_get"];
   };
@@ -336,9 +388,16 @@ export interface paths {
   "/api/register": {
     /**
      * Inscription d'un utilisateur
-     * @description Crée un utilisateur et son équipe associée. L'utilisateur est le seul membre de sa team à la création.
+     * @description Crée un utilisateur et son équipe associée. L'utilisateur est le seul membre de sa team à la création. La réponse contient un JWT (champ `token`) afin que l'utilisateur soit connecté immédiatement après l'inscription.
      */
     post: operations["api_register_post"];
+  };
+  "/api/users/avatar": {
+    /**
+     * Téléverser la photo de l'hôte courant
+     * @description Envoie une image (multipart/form-data, champ `file`) qui devient la photo de profil publique de l'utilisateur authentifié. Formats JPEG, PNG ou WebP, 10 Mo maximum. Retourne l'URL de la photo.
+     */
+    post: operations["api_usersavatar_post"];
   };
   "/api/users/profile": {
     /**
@@ -486,6 +545,11 @@ export interface components {
        * @example 019cf27a-96ba-7957-8622-eeccb7350e79
        */
       teamId?: string | null;
+      /**
+       * @description Projet solidaire mis en avant par l'hôte (UUID), ou null. Information publique évitant un appel à /api/teams/{id}.
+       * @example 019cf27a-96ba-7957-8622-eeccb7350e79
+       */
+      favoriteSolidarityProjectId?: string | null;
       /**
        * @description URL de la photo principale
        * @example /uploads/photos/abc123.jpg
@@ -715,6 +779,11 @@ export interface components {
        * @example 019cf27a-96ba-7957-8622-eeccb7350e79
        */
       teamId?: string | null;
+      /**
+       * @description Projet solidaire mis en avant par l'hôte (UUID), ou null. Information publique évitant un appel à /api/teams/{id}.
+       * @example 019cf27a-96ba-7957-8622-eeccb7350e79
+       */
+      favoriteSolidarityProjectId?: string | null;
       /** @description Liste des photos de l'hébergement */
       photos?: {
           [key: string]: string;
@@ -741,6 +810,11 @@ export interface components {
        * @example Marie D.
        */
       authorName?: string | null;
+      /**
+       * @description URL relative de la photo de l'auteur (à préfixer par l'URL de l'API), ou null
+       * @example /uploads/photos/avatar.jpg
+       */
+      authorAvatarUrl?: string | null;
       /**
        * @description Date de publication de l'avis (ISO 8601)
        * @example 2026-05-12T14:30:00+00:00
@@ -798,6 +872,69 @@ export interface components {
        * @example host@example.com
        */
       hostEmail?: string | null;
+    });
+    "AdminDashboard.jsonld-admin_dashboard.read": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant logique du tableau de bord
+       * @default current
+       * @example current
+       */
+      id?: string;
+      /**
+       * @description Chiffre d'affaires total encaissé (réservations confirmées), en euros
+       * @default 0
+       * @example 12450
+       */
+      totalRevenue?: number;
+      /**
+       * @description Marge totale de la plateforme (commission), en euros
+       * @default 0
+       * @example 1867.5
+       */
+      totalMargin?: number;
+      /**
+       * @description Total reversé aux projets solidaires, en euros
+       * @default 0
+       * @example 249
+       */
+      totalDonated?: number;
+      /**
+       * @description Nombre de réservations confirmées prises en compte
+       * @default 0
+       * @example 87
+       */
+      confirmedReservations?: number;
+      /**
+       * @description Nombre de séjours à venir (réservations confirmées dont l'arrivée est dans le futur)
+       * @default 0
+       * @example 12
+       */
+      upcomingStays?: number;
+      /**
+       * @description Taux de commission appliqué (part du CA)
+       * @default 0
+       * @example 0.08
+       */
+      commissionRate?: number;
+      /**
+       * @description Taux de reversement aux projets (part du CA)
+       * @default 0
+       * @example 0.07
+       */
+      donationRate?: number;
+      /**
+       * @description Total reversé par projet solidaire (attribué au coup de cœur de l'équipe hôte, sinon au projet par défaut)
+       * @example [
+       *   {
+       *     "projectId": "01961e2f-dead-7000-beef-000000000001",
+       *     "title": "Reforestation de Rodrigues",
+       *     "amount": 180
+       *   }
+       * ]
+       */
+      donationsByProject?: ({
+          [key: string]: number | string;
+        })[];
     });
     "AdminReservation.jsonld-admin_reservation.list": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -917,6 +1054,218 @@ export interface components {
        * @example Paul Martin
        */
       subjectUserName?: string | null;
+    });
+    "AdminSolidarityProject.AdminSolidarityProjectInput-admin_solidarity_project.write": {
+      /**
+       * @description Titre du projet dans la langue par défaut (fr)
+       * @example Reforestation de l'île Rodrigues
+       */
+      title: string;
+      /**
+       * @description Description du projet dans la langue par défaut (fr)
+       * @example Plantation de 10 000 arbres endémiques sur trois ans.
+       */
+      description: string;
+      /**
+       * Format: uri
+       * @description URL de l'image du projet (optionnelle)
+       * @example https://example.com/images/project.jpg
+       */
+      imageUrl?: string | null;
+      /**
+       * @description Statut initial du projet (active ou closed)
+       * @example active
+       * @enum {string}
+       */
+      status?: "active" | "closed";
+      /**
+       * @description Chiffres clés du projet (valeur + libellé)
+       * @example [
+       *   {
+       *     "value": "10 000",
+       *     "label": "arbres plantés"
+       *   }
+       * ]
+       */
+      keyFigures?: {
+          [key: string]: string;
+        }[];
+      /**
+       * @description Traductions du projet dans les langues autres que la langue par défaut (ex. "en"). La langue par défaut (fr) provient des champs title/description/keyFigures.
+       * @example {
+       *   "en": {
+       *     "title": "Reforesting Rodrigues",
+       *     "description": "Planting 10,000 endemic trees.",
+       *     "keyFigures": [
+       *       {
+       *         "value": "10,000",
+       *         "label": "trees planted"
+       *       }
+       *     ]
+       *   }
+       * }
+       */
+      translations?: {
+        [key: string]: {
+          [key: string]: {
+              [key: string]: string;
+            }[] | string;
+        };
+      };
+    };
+    "AdminSolidarityProject.AdminSolidarityProjectInput-admin_solidarity_project.write.jsonMergePatch": {
+      /**
+       * @description Titre du projet dans la langue par défaut (fr)
+       * @example Reforestation de l'île Rodrigues
+       */
+      title?: string;
+      /**
+       * @description Description du projet dans la langue par défaut (fr)
+       * @example Plantation de 10 000 arbres endémiques sur trois ans.
+       */
+      description?: string;
+      /**
+       * Format: uri
+       * @description URL de l'image du projet (optionnelle)
+       * @example https://example.com/images/project.jpg
+       */
+      imageUrl?: string | null;
+      /**
+       * @description Statut initial du projet (active ou closed)
+       * @example active
+       * @enum {string}
+       */
+      status?: "active" | "closed";
+      /**
+       * @description Chiffres clés du projet (valeur + libellé)
+       * @example [
+       *   {
+       *     "value": "10 000",
+       *     "label": "arbres plantés"
+       *   }
+       * ]
+       */
+      keyFigures?: {
+          [key: string]: string;
+        }[];
+      /**
+       * @description Traductions du projet dans les langues autres que la langue par défaut (ex. "en"). La langue par défaut (fr) provient des champs title/description/keyFigures.
+       * @example {
+       *   "en": {
+       *     "title": "Reforesting Rodrigues",
+       *     "description": "Planting 10,000 endemic trees.",
+       *     "keyFigures": [
+       *       {
+       *         "value": "10,000",
+       *         "label": "trees planted"
+       *       }
+       *     ]
+       *   }
+       * }
+       */
+      translations?: {
+        [key: string]: {
+          [key: string]: {
+              [key: string]: string;
+            }[] | string;
+        };
+      };
+    };
+    "AdminSolidarityProject.AdminSolidarityProjectStatusInput-admin_solidarity_project.status.jsonMergePatch": {
+      /**
+       * @description Nouveau statut : "active" pour publier, "closed" pour désactiver
+       * @example closed
+       * @enum {string}
+       */
+      status?: "active" | "closed";
+    };
+    "AdminSolidarityProject.jsonld-admin_solidarity_project.list": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant unique du projet (UUID)
+       * @example 01961e2f-dead-7000-beef-000000000001
+       */
+      id?: string | null;
+      /**
+       * @description Titre du projet dans la langue par défaut (fr)
+       * @example Reforestation de l'île Rodrigues
+       */
+      title?: string | null;
+      /**
+       * @description Description du projet dans la langue par défaut (fr)
+       * @example Plantation de 10 000 arbres endémiques sur trois ans.
+       */
+      description?: string | null;
+      /**
+       * @description URL de l'image du projet (null si aucune)
+       * @example https://example.com/images/project.jpg
+       */
+      imageUrl?: string | null;
+      /**
+       * @description Statut du projet (active ou closed)
+       * @example active
+       */
+      status?: string | null;
+      /**
+       * @description Date de création (ISO 8601)
+       * @example 2026-04-13T10:00:00+00:00
+       */
+      createdAt?: string | null;
+      /**
+       * @description Vrai si ce projet est le coup de cœur (projet par défaut) de la plateforme
+       * @example false
+       */
+      isDefault?: boolean | null;
+      /**
+       * @description Chiffres clés du projet dans la langue par défaut (fr)
+       * @example [
+       *   {
+       *     "value": "10 000",
+       *     "label": "arbres plantés"
+       *   }
+       * ]
+       */
+      keyFigures?: {
+          [key: string]: string;
+        }[];
+      /**
+       * @description Contenu traduisible par langue (fr requis, en optionnel). Sert à éditer chaque langue dans le back-office.
+       * @example {
+       *   "fr": {
+       *     "title": "Reforestation de l'île Rodrigues",
+       *     "description": "Plantation de 10 000 arbres endémiques.",
+       *     "keyFigures": [
+       *       {
+       *         "value": "10 000",
+       *         "label": "arbres plantés"
+       *       }
+       *     ]
+       *   },
+       *   "en": {
+       *     "title": "Reforesting Rodrigues",
+       *     "description": "Planting 10,000 endemic trees.",
+       *     "keyFigures": [
+       *       {
+       *         "value": "10,000",
+       *         "label": "trees planted"
+       *       }
+       *     ]
+       *   }
+       * }
+       */
+      translations?: {
+        [key: string]: {
+          [key: string]: {
+              [key: string]: string;
+            }[] | string;
+        };
+      };
+    });
+    "AdminSolidarityProjectImage.jsonld-admin_solidarity_project_image.read": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description URL publique de l'image téléversée
+       * @example http://localhost:8080/uploads/solidarity-projects/0199....webp
+       */
+      imageUrl?: string | null;
     });
     "AdminUser.jsonld-admin_user.list": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -1077,6 +1426,30 @@ export interface components {
       /** @description A URI reference that identifies the problem type */
       type?: string;
       description?: string | null;
+    });
+    "HostProfile.jsonld-host_profile.read": components["schemas"]["HydraItemBaseSchema"] & ({
+      /** @description Identifiant UUID de l'équipe hôte */
+      teamId?: string | null;
+      /**
+       * @description Prénom de l'hôte
+       * @example Marie
+       */
+      firstName?: string | null;
+      /**
+       * @description Nom de l'hôte
+       * @example Dupont
+       */
+      lastName?: string | null;
+      /**
+       * @description Présentation publique de l'hôte
+       * @example Passionnée de randonnée, je loue mon gîte familial depuis 2015.
+       */
+      bio?: string | null;
+      /**
+       * @description URL (relative) de la photo de l'hôte, ou null
+       * @example /uploads/photos/019cf27a-96ba-7957-8622-eeccb7350e79.jpg
+       */
+      avatarUrl?: string | null;
     });
     HydraCollectionBaseSchema: components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
       /**
@@ -1262,6 +1635,11 @@ export interface components {
        * @example 20
        */
       appliedDiscountPercentage?: number | null;
+      /**
+       * @description Montant total réglé par le voyageur : séjour + frais de service + don solidaire (identique au total de la facture)
+       * @example 460
+       */
+      totalPaid?: number | null;
     });
     "SolidarityProject.jsonld-solidarity_project.list": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -1299,6 +1677,11 @@ export interface components {
        * @example false
        */
       isDefault?: boolean | null;
+      /**
+       * @description Langue dans laquelle le contenu (titre, description, chiffres clés) est servi
+       * @example fr
+       */
+      locale?: string | null;
     });
     "SolidarityProject.jsonld-solidarity_project.read": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -1336,6 +1719,11 @@ export interface components {
        * @example false
        */
       isDefault?: boolean | null;
+      /**
+       * @description Langue dans laquelle le contenu (titre, description, chiffres clés) est servi
+       * @example fr
+       */
+      locale?: string | null;
       /**
        * @description Chiffres clés du projet (valeur + libellé), affichés en tête de la page projet
        * @example [
@@ -1403,6 +1791,13 @@ export interface components {
        */
       createdAt?: string | null;
     });
+    "User.HostAvatarOutput.jsonld": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description URL (relative) de la photo de l'hôte qui vient d'être téléversée
+       * @example /uploads/photos/019cf27a-96ba-7957-8622-eeccb7350e79.jpg
+       */
+      avatarUrl?: string | null;
+    });
     "User.LoginUserInput-user.write": {
       /**
        * @description Adresse email
@@ -1445,40 +1840,12 @@ export interface components {
        * @example marie@example.com
        */
       email?: string;
+      /**
+       * @description Présentation de l'hôte affichée publiquement
+       * @example Passionné de randonnée, je loue mon gîte familial depuis 2015.
+       */
+      bio?: string | null;
     };
-    "User.jsonld-user.read": components["schemas"]["HydraItemBaseSchema"] & ({
-      /**
-       * @description Identifiant UUID de l'utilisateur
-       * @example 019cf27a-96ba-7957-8622-eeccb7350e79
-       */
-      id?: string | null;
-      /**
-       * @description Adresse email
-       * @example host@example.com
-       */
-      email?: string | null;
-      /**
-       * @description Identifiant UUID de l'équipe de l'utilisateur
-       * @example 019cf27a-96ba-7957-8622-eeccb7350e99
-       */
-      teamId?: string | null;
-      /**
-       * @description Prénom
-       * @example Marie
-       */
-      firstName?: string | null;
-      /**
-       * @description Nom
-       * @example Dupont
-       */
-      lastName?: string | null;
-      /**
-       * @description Statut de vérification d'identité
-       * @default not_started
-       * @example verified
-       */
-      verificationStatus?: string;
-    });
     "User.jsonld-user.read_user.token": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
        * @description Identifiant UUID de l'utilisateur
@@ -1505,6 +1872,16 @@ export interface components {
        * @example Dupont
        */
       lastName?: string | null;
+      /**
+       * @description Présentation publique de l'hôte
+       * @example Passionné de randonnée, je loue mon gîte familial depuis 2015.
+       */
+      bio?: string | null;
+      /**
+       * @description URL (relative) de la photo de l'hôte, ou null
+       * @example /uploads/photos/019cf27a-96ba-7957-8622-eeccb7350e79.jpg
+       */
+      avatarUrl?: string | null;
       /**
        * @description Statut de vérification d'identité
        * @default not_started
@@ -2395,11 +2772,19 @@ export interface operations {
    * @description Retourne la liste complète des hébergements de la plateforme (brouillons inclus), triés par titre, avec l'email d'un membre de l'équipe hôte. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
    */
   api_adminaccommodations_get_collection: {
+    parameters: {
+      query?: {
+        /** @description The collection page number */
+        page?: number;
+        /** @description The number of items per page */
+        itemsPerPage?: number;
+      };
+    };
     responses: {
       /** @description AdminAccommodation collection */
       200: {
         content: {
-          "application/ld+json": components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
             member: components["schemas"]["AdminAccommodation.jsonld-admin_accommodation.list"][];
           };
         };
@@ -2415,15 +2800,53 @@ export interface operations {
     };
   };
   /**
+   * Indicateurs financiers du tableau de bord (administration)
+   * @description Retourne un aperçu financier de la plateforme : chiffre d'affaires encaissé, marge (commission), total reversé aux projets solidaires et répartition par projet. Calculé sur les réservations confirmées. Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  api_admindashboard_get: {
+    responses: {
+      /** @description AdminDashboard resource */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["AdminDashboard.jsonld-admin_dashboard.read"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
    * Lister toutes les réservations (administration)
    * @description Retourne la liste complète des réservations de la plateforme, triées par date d'arrivée décroissante, avec le titre de l'hébergement associé. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
    */
   api_adminreservations_get_collection: {
+    parameters: {
+      query?: {
+        /** @description The collection page number */
+        page?: number;
+        /** @description The number of items per page */
+        itemsPerPage?: number;
+      };
+    };
     responses: {
       /** @description AdminReservation collection */
       200: {
         content: {
-          "application/ld+json": components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
             member: components["schemas"]["AdminReservation.jsonld-admin_reservation.list"][];
           };
         };
@@ -2443,11 +2866,19 @@ export interface operations {
    * @description Retourne la liste complète des avis de la plateforme (avis sur hébergements et avis sur voyageurs), du plus récent au plus ancien, avec les noms de l'auteur et du sujet de l'avis. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
    */
   api_adminreviews_get_collection: {
+    parameters: {
+      query?: {
+        /** @description The collection page number */
+        page?: number;
+        /** @description The number of items per page */
+        itemsPerPage?: number;
+      };
+    };
     responses: {
       /** @description AdminReview collection */
       200: {
         content: {
-          "application/ld+json": components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
             member: components["schemas"]["AdminReview.jsonld-admin_review.list"][];
           };
         };
@@ -2463,15 +2894,285 @@ export interface operations {
     };
   };
   /**
+   * Lister tous les projets solidaires (administration)
+   * @description Retourne la liste complète des projets solidaires de la plateforme (actifs et clôturés), le projet coup de cœur en premier puis du plus récent au plus ancien. Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminsolidarity-projects_get_collection": {
+    parameters: {
+      query?: {
+        /** @description The collection page number */
+        page?: number;
+        /** @description The number of items per page */
+        itemsPerPage?: number;
+      };
+    };
+    responses: {
+      /** @description AdminSolidarityProject collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
+            member: components["schemas"]["AdminSolidarityProject.jsonld-admin_solidarity_project.list"][];
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Créer un projet solidaire (administration)
+   * @description Crée un nouveau projet solidaire. Le statut par défaut est "active". Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminsolidarity-projects_post": {
+    /** @description The new AdminSolidarityProject resource */
+    requestBody: {
+      content: {
+        "application/ld+json": components["schemas"]["AdminSolidarityProject.AdminSolidarityProjectInput-admin_solidarity_project.write"];
+      };
+    };
+    responses: {
+      /** @description AdminSolidarityProject resource created */
+      201: {
+        content: {
+          "application/ld+json": components["schemas"]["AdminSolidarityProject.jsonld-admin_solidarity_project.list"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Récupérer un projet solidaire (administration)
+   * @description Retourne le détail complet d'un projet solidaire, quel que soit son statut. Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminsolidarity-projects_id_get": {
+    parameters: {
+      path: {
+        /** @description AdminSolidarityProject identifier */
+        id: string;
+      };
+    };
+    responses: {
+      /** @description AdminSolidarityProject resource */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["AdminSolidarityProject.jsonld-admin_solidarity_project.list"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Modifier un projet solidaire (administration)
+   * @description Met à jour les informations d'un projet solidaire (titre, description, image, statut, chiffres clés). Le coup de cœur de la plateforme et la date de création sont préservés. Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminsolidarity-projects_id_patch": {
+    parameters: {
+      path: {
+        /** @description AdminSolidarityProject identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AdminSolidarityProject resource */
+    requestBody: {
+      content: {
+        "application/merge-patch+json": components["schemas"]["AdminSolidarityProject.AdminSolidarityProjectInput-admin_solidarity_project.write.jsonMergePatch"];
+      };
+    };
+    responses: {
+      /** @description AdminSolidarityProject resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Activer ou désactiver un projet solidaire (administration)
+   * @description Change le statut d'un projet solidaire ("active" pour l'afficher publiquement, "closed" pour le retirer). Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminsolidarity-projects_idstatus_patch": {
+    parameters: {
+      path: {
+        /** @description AdminSolidarityProject identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AdminSolidarityProject resource */
+    requestBody: {
+      content: {
+        "application/merge-patch+json": components["schemas"]["AdminSolidarityProject.AdminSolidarityProjectStatusInput-admin_solidarity_project.status.jsonMergePatch"];
+      };
+    };
+    responses: {
+      /** @description AdminSolidarityProject resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Téléverser une image de projet solidaire (administration)
+   * @description Téléverse une image (JPEG, PNG ou WebP, 10 Mo maximum) et retourne son URL publique, à utiliser comme image d'un projet solidaire. Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminsolidarity-project-images_post": {
+    responses: {
+      /** @description AdminSolidarityProjectImage resource created */
+      201: {
+        content: {
+          "application/ld+json": components["schemas"]["AdminSolidarityProjectImage.jsonld-admin_solidarity_project_image.read"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
    * Lister tous les utilisateurs (administration)
    * @description Retourne la liste complète des utilisateurs de la plateforme, triés par email, avec leurs rôles, leur statut de vérification d'identité et leurs compteurs d'activité (hébergements de leur équipe, réservations effectuées). Le mot de passe haché n'est jamais exposé. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
    */
   api_adminusers_get_collection: {
+    parameters: {
+      query?: {
+        /** @description The collection page number */
+        page?: number;
+        /** @description The number of items per page */
+        itemsPerPage?: number;
+      };
+    };
     responses: {
       /** @description AdminUser collection */
       200: {
         content: {
-          "application/ld+json": components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
             member: components["schemas"]["AdminUser.jsonld-admin_user.list"][];
           };
         };
@@ -2598,6 +3299,34 @@ export interface operations {
           "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
           "application/problem+json": components["schemas"]["ConstraintViolation"];
           "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Profil public de l'hôte d'une équipe
+   * @description Retourne le profil public de l'hôte (prénom, nom, photo, présentation) à partir de l'identifiant de son équipe. Accessible sans authentification : utilisé sur la page publique d'une annonce et dans la messagerie. 404 si l'équipe n'a aucun hôte.
+   */
+  "api_host-profiles_teamId_get": {
+    parameters: {
+      path: {
+        /** @description HostProfile identifier */
+        teamId: string;
+      };
+    };
+    responses: {
+      /** @description HostProfile resource */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HostProfile.jsonld-host_profile.read"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
         };
       };
     };
@@ -3089,7 +3818,7 @@ export interface operations {
   };
   /**
    * Lister les projets solidaires actifs
-   * @description Retourne la liste des projets solidaires actifs, triés par date de création décroissante.
+   * @description Retourne la liste des projets solidaires actifs, triés par date de création décroissante. Le contenu est servi dans la langue négociée via l'en-tête Accept-Language (fr par défaut, en disponible).
    */
   api_solidarity_projects_get_collection: {
     responses: {
@@ -3105,7 +3834,7 @@ export interface operations {
   };
   /**
    * Récupérer un projet solidaire
-   * @description Retourne le détail complet d'un projet solidaire par son identifiant UUID.
+   * @description Retourne le détail complet d'un projet solidaire par son identifiant UUID. Le contenu (titre, description, chiffres clés) est servi dans la langue négociée via l'en-tête Accept-Language (fr par défaut, en disponible).
    */
   api_solidarity_projects_id_get: {
     parameters: {
@@ -3485,7 +4214,7 @@ export interface operations {
   };
   /**
    * Inscription d'un utilisateur
-   * @description Crée un utilisateur et son équipe associée. L'utilisateur est le seul membre de sa team à la création.
+   * @description Crée un utilisateur et son équipe associée. L'utilisateur est le seul membre de sa team à la création. La réponse contient un JWT (champ `token`) afin que l'utilisateur soit connecté immédiatement après l'inscription.
    */
   api_register_post: {
     /** @description The new User resource */
@@ -3498,11 +4227,49 @@ export interface operations {
       /** @description User resource created */
       201: {
         content: {
-          "application/ld+json": components["schemas"]["User.jsonld-user.read"];
+          "application/ld+json": components["schemas"]["User.jsonld-user.read_user.token"];
         };
       };
       /** @description Invalid input */
       400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Téléverser la photo de l'hôte courant
+   * @description Envoie une image (multipart/form-data, champ `file`) qui devient la photo de profil publique de l'utilisateur authentifié. Formats JPEG, PNG ou WebP, 10 Mo maximum. Retourne l'URL de la photo.
+   */
+  api_usersavatar_post: {
+    responses: {
+      /** @description User resource created */
+      201: {
+        content: {
+          "application/ld+json": components["schemas"]["User.HostAvatarOutput.jsonld"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
