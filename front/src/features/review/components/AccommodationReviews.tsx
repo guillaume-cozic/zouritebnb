@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { AccommodationReview, MAX_RATING } from '../ReviewTypes';
+import { Avatar } from '../../../components/ui';
 
 interface StarsProps {
   rating: number;
@@ -29,14 +30,6 @@ const Stars: React.FC<StarsProps> = ({ rating }) => (
   </div>
 );
 
-const initials = (name: string): string =>
-  name
-    .split(' ')
-    .filter(Boolean)
-    .map((p) => p.charAt(0))
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
 
 interface Props {
   reviews: AccommodationReview[];
@@ -70,9 +63,12 @@ const AccommodationReviews: React.FC<Props> = ({ reviews }) => {
         {reviews.map((review) => (
           <article key={review.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <header className="flex items-center gap-3 mb-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-primary-700 font-semibold text-sm">
-                {initials(review.authorName)}
-              </div>
+              <Avatar
+                avatarUrl={review.authorAvatarUrl}
+                name={review.authorName}
+                sizeClassName="h-10 w-10"
+                fallbackClassName="bg-primary-100 text-primary-700"
+              />
               <div>
                 <p className="font-semibold text-gray-900 text-sm">{review.authorName}</p>
                 <p className="text-xs text-gray-400">{formatDate(review.createdAt)}</p>

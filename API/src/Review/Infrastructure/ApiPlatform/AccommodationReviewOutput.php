@@ -44,6 +44,10 @@ class AccommodationReviewOutput
     public ?string $authorName = null;
 
     #[Groups(['accommodation_review:read'])]
+    #[ApiProperty(description: 'URL relative de la photo de l\'auteur (à préfixer par l\'URL de l\'API), ou null', example: '/uploads/photos/avatar.jpg')]
+    public ?string $authorAvatarUrl = null;
+
+    #[Groups(['accommodation_review:read'])]
     #[ApiProperty(description: 'Date de publication de l\'avis (ISO 8601)', example: '2026-05-12T14:30:00+00:00')]
     public ?string $createdAt = null;
 }

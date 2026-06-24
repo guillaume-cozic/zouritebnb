@@ -37,7 +37,8 @@ final readonly class AccommodationReviewCollectionProvider implements ProviderIn
                 r.comment,
                 r.created_at,
                 u.first_name,
-                u.last_name
+                u.last_name,
+                u.avatar_filename
             FROM review r
             LEFT JOIN `user` u ON u.id = r.author_user_id
             WHERE r.type = 'accommodation'
@@ -56,6 +57,9 @@ final readonly class AccommodationReviewCollectionProvider implements ProviderIn
             $output->rating = (int) $row['rating'];
             $output->comment = $row['comment'];
             $output->authorName = $this->displayName($row['first_name'] ?? null, $row['last_name'] ?? null);
+            $output->authorAvatarUrl = null !== ($row['avatar_filename'] ?? null)
+                ? '/uploads/photos/'.$row['avatar_filename']
+                : null;
             $output->createdAt = (new \DateTimeImmutable((string) $row['created_at']))->format(\DateTimeInterface::ATOM);
             $reviews[] = $output;
         }

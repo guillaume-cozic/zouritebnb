@@ -21,6 +21,8 @@ export interface AccommodationReview {
   rating: number;
   comment: string;
   authorName: string;
+  /** Relative URL of the author's photo (prefix with the API base), or null. */
+  authorAvatarUrl?: string | null;
   createdAt: string;
 }
 
