@@ -12,6 +12,7 @@ final readonly class AccommodationPricing
         public float $pricePerNight,
         public ?float $weeklyPromotionPercentage,
         public ?Uuid $teamId = null,
+        public ?string $cancellationPolicy = null,
     ) {
     }
 }

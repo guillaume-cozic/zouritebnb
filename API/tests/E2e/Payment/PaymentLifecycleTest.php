@@ -100,8 +100,9 @@ final class PaymentLifecycleTest extends PaymentApiTestCase
             ->setAccommodationId(Uuid::v7())
             ->setTeamId(Uuid::fromString(self::TEAM_ID))
             ->setGuestUserId(null)
-            ->setCheckIn(new \DateTimeImmutable('2026-05-01T15:00:00+00:00'))
-            ->setCheckOut(new \DateTimeImmutable('2026-05-05T11:00:00+00:00'))
+            // Future dates so a reservation remains cancellable (cancellation is blocked once the stay started).
+            ->setCheckIn(new \DateTimeImmutable('+30 days'))
+            ->setCheckOut(new \DateTimeImmutable('+34 days'))
             ->setGuestName('Jean Dupont')
             ->setStatus($status)
             ->setTotalPrice(400.0)

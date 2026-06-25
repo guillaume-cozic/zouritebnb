@@ -10,6 +10,10 @@ interface Props {
   onRefuse: () => void;
   busy: boolean;
   readOnly?: boolean;
+  /** When set, renders a "cancel reservation" button for the traveler. */
+  onCancel?: () => void;
+  /** Whether the cancel button should be shown (reservation cancellable + traveler). */
+  canCancel?: boolean;
 }
 
 const formatDate = (iso: string, locale: string): string =>
@@ -28,10 +32,13 @@ const statusBadgeClass = (status: ReservationStatus): string => {
   }
 };
 
-const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, busy, readOnly = false }) => {
+const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, busy, readOnly = false, onCancel, canCancel = false }) => {
   const { t } = useTranslation();
   const isPending = reservation.status === 'pending';
   const showActions = isPending && !readOnly;
+  const showCancel = canCancel && !!onCancel;
+  const formatMoney = (amount: number): string =>
+    new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
 
   return (
     <aside className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
@@ -105,6 +112,27 @@ const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, b
               {t('host.panel.refuse')}
             </button>
           </div>
+        </div>
+      )}
+
+      {showCancel && (
+        <div className="px-5 pb-4">
+          {typeof reservation.refundAmount === 'number' && (
+            <div className="rounded-xl bg-gray-50 border border-gray-200 px-3 py-2.5 text-xs text-gray-600 mb-3">
+              {t('conversation.cancel.refundPreview', {
+                amount: formatMoney(reservation.refundAmount),
+                percent: reservation.refundPercentage ?? 0,
+              })}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={busy}
+            className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-semibold text-rose-700 bg-white border border-rose-200 hover:bg-rose-50 disabled:opacity-60 transition-colors"
+          >
+            {t('conversation.cancel.action')}
+          </button>
         </div>
       )}
 

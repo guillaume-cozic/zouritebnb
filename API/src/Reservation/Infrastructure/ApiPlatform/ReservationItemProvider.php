@@ -9,6 +9,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Port\ReservationRepository;
 use App\Reservation\Infrastructure\Security\ReservationAccessGuard;
+use App\Shared\Domain\Port\Clock;
 use App\Shared\Infrastructure\Security\CurrentUser;
 use Symfony\Component\Uid\Uuid;
 
@@ -21,6 +22,7 @@ final readonly class ReservationItemProvider implements ProviderInterface
         private ReservationRepository $repository,
         private CurrentUser $currentUser,
         private ReservationAccessGuard $accessGuard,
+        private Clock $clock,
     ) {
     }
 
@@ -40,6 +42,6 @@ final readonly class ReservationItemProvider implements ProviderInterface
 
         $this->accessGuard->assertHostOrGuest($reservation, $this->currentUser);
 
-        return ReservationOutput::fromEntity($reservation);
+        return ReservationOutput::fromEntity($reservation, $this->clock->now());
     }
 }

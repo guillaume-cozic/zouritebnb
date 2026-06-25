@@ -12,6 +12,7 @@ use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Exception\ReservationNotFoundException;
 use App\Reservation\Domain\Port\ReservationRepository;
 use App\Reservation\Infrastructure\Security\ReservationAccessGuard;
+use App\Shared\Domain\Port\Clock;
 use App\Shared\Infrastructure\Security\CurrentUser;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use Symfony\Component\Uid\Uuid;
@@ -27,6 +28,7 @@ final readonly class CancelReservationProcessor implements ProcessorInterface
         private TransactionalUseCaseHandler $handler,
         private CurrentUser $currentUser,
         private ReservationAccessGuard $accessGuard,
+        private Clock $clock,
     ) {
     }
 
@@ -41,8 +43,11 @@ final readonly class CancelReservationProcessor implements ProcessorInterface
 
         $this->accessGuard->assertHostOrGuest($reservation, $this->currentUser);
 
+        $message = $data instanceof CancelReservationInput ? $data->message : null;
+
         $this->handler->execute(fn () => $this->cancelReservation->handle(new CancelReservationCommand(
             reservationId: $id,
+            message: $message,
         )));
 
         $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));
@@ -50,6 +55,6 @@ final readonly class CancelReservationProcessor implements ProcessorInterface
             throw new \RuntimeException('Reservation could not be reloaded after the operation.');
         }
 
-        return ReservationOutput::fromEntity($reservation);
+        return ReservationOutput::fromEntity($reservation, $this->clock->now());
     }
 }

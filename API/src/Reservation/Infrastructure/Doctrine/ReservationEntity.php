@@ -53,6 +53,9 @@ class ReservationEntity
     #[ORM\Column(options: ['default' => 0])]
     private float $donationAmount = 0.0;
 
+    #[ORM\Column(length: 20, options: ['default' => 'flexible'])]
+    private string $cancellationPolicy = 'flexible';
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -205,6 +208,18 @@ class ReservationEntity
     public function setDonationAmount(float $donationAmount): static
     {
         $this->donationAmount = $donationAmount;
+
+        return $this;
+    }
+
+    public function getCancellationPolicy(): string
+    {
+        return $this->cancellationPolicy;
+    }
+
+    public function setCancellationPolicy(string $cancellationPolicy): static
+    {
+        $this->cancellationPolicy = $cancellationPolicy;
 
         return $this;
     }

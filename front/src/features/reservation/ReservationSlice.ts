@@ -160,11 +160,12 @@ export const fetchReservationById = createAsyncThunk(
 
 export const cancelReservation = createAsyncThunk(
   'reservation/cancel',
-  async (id: string, { rejectWithValue }) => {
+  async ({ id, message }: { id: string; message?: string }, { rejectWithValue }) => {
     try {
+      const note = message?.trim();
       const response = await api.patch(
         `/api/reservations/${id}/cancel`,
-        {},
+        note ? { message: note } : {},
         { headers: { 'Content-Type': 'application/merge-patch+json' } }
       );
       return response.data as Reservation;

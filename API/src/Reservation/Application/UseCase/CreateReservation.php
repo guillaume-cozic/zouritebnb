@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Reservation\Application\UseCase;
 
 use App\Reservation\Domain\Command\CreateReservationCommand;
+use App\Reservation\Domain\Entity\CancellationPolicy;
 use App\Reservation\Domain\Entity\DateRange;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
@@ -55,6 +56,7 @@ final readonly class CreateReservation
             dateRange: $dateRange,
             guestName: new GuestName($command->guestName),
             price: $price,
+            cancellationPolicy: CancellationPolicy::fromString($pricing->cancellationPolicy),
         );
 
         $this->repository->save($reservation);

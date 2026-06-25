@@ -81,7 +81,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         );
         $this->repository->save($reservation);
 
-        $reservation->cancel();
+        $reservation->cancel(new \DateTimeImmutable('2020-01-01'));
         $this->repository->save($reservation);
 
         $found = $this->repository->ofId($id);
@@ -127,7 +127,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
             guestName: new GuestName('Cancelled'),
             price: new ReservationPrice(totalPrice: 100.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
         );
-        $reservation->cancel();
+        $reservation->cancel(new \DateTimeImmutable('2020-01-01'));
         $this->repository->save($reservation);
 
         self::assertFalse($this->repository->hasOverlappingReservation(

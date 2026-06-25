@@ -35,4 +35,14 @@ final class InvalidReservationStateException extends \DomainException
     {
         return new self('Only a pending reservation can be refused.');
     }
+
+    public static function becauseRefusedCannotBeCancelled(): self
+    {
+        return new self('A refused reservation cannot be cancelled.');
+    }
+
+    public static function becauseStayAlreadyStarted(): self
+    {
+        return new self('A reservation whose stay has already started or is past cannot be cancelled.');
+    }
 }

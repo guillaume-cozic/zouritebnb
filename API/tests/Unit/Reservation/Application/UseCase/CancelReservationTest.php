@@ -15,6 +15,7 @@ use App\Reservation\Domain\Entity\ReservationStatus;
 use App\Reservation\Domain\Exception\InvalidReservationStateException;
 use App\Reservation\Domain\Exception\ReservationNotFoundException;
 use App\Shared\Domain\Event\ReservationCancelled;
+use App\Tests\Unit\Conversation\Infrastructure\FixedClock;
 use App\Tests\Unit\Reservation\Infrastructure\InMemoryReservationRepository;
 use App\Tests\Unit\Shared\Infrastructure\InMemoryEventBus;
 use PHPUnit\Framework\Attributes\Before;
@@ -25,6 +26,7 @@ final class CancelReservationTest extends TestCase
 {
     private InMemoryReservationRepository $repository;
     private InMemoryEventBus $eventBus;
+    private FixedClock $clock;
     private CancelReservation $useCase;
 
     #[Before]
@@ -32,7 +34,9 @@ final class CancelReservationTest extends TestCase
     {
         $this->repository = new InMemoryReservationRepository();
         $this->eventBus = new InMemoryEventBus();
-        $this->useCase = new CancelReservation($this->repository, $this->eventBus);
+        // Well before the 2026-05-01 check-in used by the fixtures.
+        $this->clock = new FixedClock(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
+        $this->useCase = new CancelReservation($this->repository, $this->eventBus, $this->clock);
     }
 
     private function givenReservation(Uuid $id, ReservationStatus $status): void
@@ -83,6 +87,42 @@ final class CancelReservationTest extends TestCase
 
         $this->expectException(InvalidReservationStateException::class);
         $this->expectExceptionMessage('Reservation is already cancelled.');
+
+        $this->useCase->handle(new CancelReservationCommand($id->toRfc4122()));
+    }
+
+    public function test_should_carry_the_optional_message_on_the_cancellation_event(): void
+    {
+        $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000010');
+        $this->givenReservation($id, ReservationStatus::Confirmed);
+
+        $this->useCase->handle(new CancelReservationCommand($id->toRfc4122(), message: 'Un imprévu, désolé.'));
+
+        $events = $this->eventBus->getDispatchedEvents();
+        self::assertInstanceOf(ReservationCancelled::class, $events[0]);
+        self::assertSame('Un imprévu, désolé.', $events[0]->message);
+    }
+
+    public function test_should_not_cancel_a_refused_reservation(): void
+    {
+        $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000004');
+        $this->givenReservation($id, ReservationStatus::Refused);
+
+        $this->expectException(InvalidReservationStateException::class);
+        $this->expectExceptionMessage('A refused reservation cannot be cancelled.');
+
+        $this->useCase->handle(new CancelReservationCommand($id->toRfc4122()));
+    }
+
+    public function test_should_not_cancel_when_the_stay_has_already_started(): void
+    {
+        $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000005');
+        $this->givenReservation($id, ReservationStatus::Confirmed);
+        // Now is after the 2026-05-01 check-in: the stay is in progress.
+        $this->clock->setNow(new \DateTimeImmutable('2026-05-02T12:00:00+00:00'));
+
+        $this->expectException(InvalidReservationStateException::class);
+        $this->expectExceptionMessage('A reservation whose stay has already started or is past cannot be cancelled.');
 
         $this->useCase->handle(new CancelReservationCommand($id->toRfc4122()));
     }

@@ -28,7 +28,7 @@ const ReservationEventPopover: React.FC<Props> = ({ reservation, onClose }) => {
     onClose();
   };
   const handleCancel = async () => {
-    await dispatch(cancelReservation(reservation.id));
+    await dispatch(cancelReservation({ id: reservation.id }));
     onClose();
   };
 

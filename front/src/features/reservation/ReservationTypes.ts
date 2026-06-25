@@ -15,6 +15,14 @@ export interface Reservation {
   appliedDiscountPercentage?: number | null;
   /** Grand total paid by the guest (stay + service fee + donation), matching the invoice. */
   totalPaid?: number;
+  /** Cancellation policy snapshotted at booking time. */
+  cancellationPolicy?: 'flexible' | 'moderate';
+  /** Whether the reservation can be cancelled right now (pending/confirmed and stay not started). */
+  cancellable?: boolean;
+  /** Amount refunded if cancelled now, per policy and current date. */
+  refundAmount?: number | null;
+  /** Refunded share if cancelled now (0, 50 or 100). */
+  refundPercentage?: number | null;
 }
 
 export interface CreateReservationPayload {

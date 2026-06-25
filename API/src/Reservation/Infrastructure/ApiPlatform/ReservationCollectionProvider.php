@@ -7,6 +7,7 @@ namespace App\Reservation\Infrastructure\ApiPlatform;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Reservation\Application\UseCase\ListReservations;
+use App\Shared\Domain\Port\Clock;
 use App\Shared\Infrastructure\Security\CurrentUser;
 use Symfony\Component\Uid\Uuid;
 
@@ -18,6 +19,7 @@ final readonly class ReservationCollectionProvider implements ProviderInterface
     public function __construct(
         private ListReservations $listReservations,
         private CurrentUser $currentUser,
+        private Clock $clock,
     ) {
     }
 
@@ -59,8 +61,10 @@ final readonly class ReservationCollectionProvider implements ProviderInterface
             to: $to,
         );
 
+        $now = $this->clock->now();
+
         return array_map(
-            static fn ($reservation) => ReservationOutput::fromEntity($reservation),
+            static fn ($reservation) => ReservationOutput::fromEntity($reservation, $now),
             $reservations,
         );
     }

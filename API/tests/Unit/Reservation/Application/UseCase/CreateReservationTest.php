@@ -200,7 +200,7 @@ final class CreateReservationTest extends TestCase
         // Cancelled stays no longer block the dates.
         $first = $this->repository->ofId(new ReservationId(Uuid::fromString($firstId)));
         self::assertNotNull($first);
-        $first->cancel();
+        $first->cancel(new \DateTimeImmutable('2020-01-01'));
         $this->repository->save($first);
 
         $id = $this->useCase->handle(new CreateReservationCommand(

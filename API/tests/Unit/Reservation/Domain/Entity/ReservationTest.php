@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Reservation\Domain\Entity;
 
+use App\Reservation\Domain\Entity\CancellationPolicy;
 use App\Reservation\Domain\Entity\DateRange;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
@@ -131,7 +132,7 @@ final class ReservationTest extends TestCase
     public function test_should_not_confirm_a_cancelled_reservation(): void
     {
         $reservation = $this->pendingReservation();
-        $reservation->cancel();
+        $reservation->cancel(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
 
         $this->expectException(InvalidReservationStateException::class);
         $this->expectExceptionMessage('A cancelled reservation cannot be confirmed.');
@@ -155,7 +156,7 @@ final class ReservationTest extends TestCase
         $reservation = $this->confirmedReservation();
         $reservation->releaseEvents();
 
-        $reservation->cancel();
+        $reservation->cancel(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
 
         self::assertSame(ReservationStatus::Cancelled, $reservation->getStatus());
         $events = $reservation->releaseEvents();
@@ -167,12 +168,12 @@ final class ReservationTest extends TestCase
     public function test_should_not_cancel_an_already_cancelled_reservation(): void
     {
         $reservation = $this->pendingReservation();
-        $reservation->cancel();
+        $reservation->cancel(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
 
         $this->expectException(InvalidReservationStateException::class);
         $this->expectExceptionMessage('Reservation is already cancelled.');
 
-        $reservation->cancel();
+        $reservation->cancel(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
     }
 
     public function test_should_refuse_a_pending_reservation(): void
@@ -225,12 +226,99 @@ final class ReservationTest extends TestCase
     public function test_should_not_refuse_a_cancelled_reservation(): void
     {
         $reservation = $this->pendingReservation();
-        $reservation->cancel();
+        $reservation->cancel(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
 
         $this->expectException(InvalidReservationStateException::class);
         $this->expectExceptionMessage('Only a pending reservation can be refused.');
 
         $reservation->refuse();
+    }
+
+    public function test_should_default_cancellation_policy_to_flexible(): void
+    {
+        self::assertSame(CancellationPolicy::Flexible, $this->confirmedReservation()->getCancellationPolicy());
+    }
+
+    public function test_should_snapshot_the_cancellation_policy(): void
+    {
+        self::assertSame(CancellationPolicy::Moderate, $this->confirmedReservation(CancellationPolicy::Moderate)->getCancellationPolicy());
+    }
+
+    public function test_should_be_cancellable_before_check_in(): void
+    {
+        $reservation = $this->confirmedReservation();
+
+        self::assertTrue($reservation->isCancellable(new \DateTimeImmutable('2026-04-12T15:00:00+00:00')));
+        self::assertFalse($reservation->isCancellable(new \DateTimeImmutable('2026-04-13T16:00:00+00:00')));
+    }
+
+    public function test_should_not_be_cancellable_once_cancelled(): void
+    {
+        $reservation = $this->confirmedReservation();
+        $reservation->cancel(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
+
+        self::assertFalse($reservation->isCancellable(new \DateTimeImmutable('2026-04-02T12:00:00+00:00')));
+    }
+
+    public function test_should_not_cancel_once_the_stay_started(): void
+    {
+        $reservation = $this->confirmedReservation();
+
+        $this->expectException(InvalidReservationStateException::class);
+        $this->expectExceptionMessage('A reservation whose stay has already started or is past cannot be cancelled.');
+
+        $reservation->cancel(new \DateTimeImmutable('2026-04-13T16:00:00+00:00'));
+    }
+
+    public function test_should_not_cancel_a_refused_reservation(): void
+    {
+        $reservation = $this->pendingReservation();
+        $reservation->refuse();
+
+        $this->expectException(InvalidReservationStateException::class);
+        $this->expectExceptionMessage('A refused reservation cannot be cancelled.');
+
+        $reservation->cancel(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
+    }
+
+    /**
+     * @param non-empty-string $now
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('refundScenarios')]
+    public function test_should_compute_the_refund_breakdown(CancellationPolicy $policy, string $now, int $expectedPercentage, float $expectedAmount): void
+    {
+        $reservation = $this->confirmedReservation($policy);
+
+        $refund = $reservation->refundBreakdown(new \DateTimeImmutable($now));
+
+        self::assertSame($policy, $refund->policy);
+        self::assertSame(250.0, $refund->totalPaid);
+        self::assertSame($expectedPercentage, $refund->refundPercentage);
+        self::assertSame($expectedAmount, $refund->refundAmount);
+    }
+
+    /**
+     * @return \Generator<string, array{CancellationPolicy, string, int, float}>
+     */
+    public static function refundScenarios(): \Generator
+    {
+        // Check-in is 2026-04-13T15:00:00+00:00.
+        yield 'flexible, 48h before → full' => [CancellationPolicy::Flexible, '2026-04-11T15:00:00+00:00', 100, 250.0];
+        yield 'flexible, 12h before → nothing' => [CancellationPolicy::Flexible, '2026-04-13T03:00:00+00:00', 0, 0.0];
+        yield 'moderate, 6 days before → full' => [CancellationPolicy::Moderate, '2026-04-07T15:00:00+00:00', 100, 250.0];
+        yield 'moderate, 2 days before → half' => [CancellationPolicy::Moderate, '2026-04-11T15:00:00+00:00', 50, 125.0];
+    }
+
+    public function test_should_fully_refund_a_pending_request_regardless_of_timing(): void
+    {
+        // A pending request was never captured, so cancelling it always returns everything,
+        // even within 24h of check-in under a flexible policy.
+        $reservation = $this->pendingReservation();
+
+        $refund = $reservation->refundBreakdown(new \DateTimeImmutable('2026-04-13T03:00:00+00:00'));
+
+        self::assertSame(100, $refund->refundPercentage);
+        self::assertSame(250.0, $refund->refundAmount);
     }
 
     private function reservationId(): ReservationId
@@ -255,7 +343,7 @@ final class ReservationTest extends TestCase
         );
     }
 
-    private function confirmedReservation(): Reservation
+    private function confirmedReservation(CancellationPolicy $policy = CancellationPolicy::Flexible): Reservation
     {
         return Reservation::create(
             id: $this->reservationId(),
@@ -264,6 +352,7 @@ final class ReservationTest extends TestCase
             dateRange: $this->dateRange(),
             guestName: new GuestName('Jane Doe'),
             price: $this->price(),
+            cancellationPolicy: $policy,
         );
     }
 

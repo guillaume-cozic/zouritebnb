@@ -23,6 +23,7 @@ final class Reservation extends AggregateRoot
         private ReservationStatus $status,
         private readonly ReservationPrice $price,
         private readonly ?Uuid $guestUserId = null,
+        private readonly CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
     ) {
     }
 
@@ -33,6 +34,7 @@ final class Reservation extends AggregateRoot
         DateRange $dateRange,
         GuestName $guestName,
         ReservationPrice $price,
+        CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
     ): self {
         $reservation = new self(
             id: $id,
@@ -42,6 +44,7 @@ final class Reservation extends AggregateRoot
             guestName: $guestName,
             status: ReservationStatus::Confirmed,
             price: $price,
+            cancellationPolicy: $cancellationPolicy,
         );
         $reservation->recordEvent(new ReservationConfirmed($id->toUuid()));
 
@@ -58,6 +61,7 @@ final class Reservation extends AggregateRoot
         Uuid $guestUserId,
         ?string $note = null,
         ?string $paymentIntentId = null,
+        CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
     ): self {
         $reservation = new self(
             id: $id,
@@ -68,6 +72,7 @@ final class Reservation extends AggregateRoot
             status: ReservationStatus::Pending,
             price: $price,
             guestUserId: $guestUserId,
+            cancellationPolicy: $cancellationPolicy,
         );
         $reservation->recordEvent(new ReservationRequested($id->toUuid(), $guestUserId, $note, $paymentIntentId));
 
@@ -114,6 +119,46 @@ final class Reservation extends AggregateRoot
         return $this->guestUserId;
     }
 
+    public function getCancellationPolicy(): CancellationPolicy
+    {
+        return $this->cancellationPolicy;
+    }
+
+    /**
+     * A reservation can be cancelled only while it is still pending or confirmed
+     * and the stay has not started yet (check-in strictly in the future).
+     */
+    public function isCancellable(\DateTimeImmutable $now): bool
+    {
+        return \in_array($this->status, [ReservationStatus::Pending, ReservationStatus::Confirmed], true)
+            && $now < $this->dateRange->checkIn();
+    }
+
+    /**
+     * What the guest would be refunded if they cancelled at $now. A pending request
+     * was never captured, so cancelling it always returns everything; a confirmed
+     * reservation follows the snapshotted policy based on the time left before check-in.
+     */
+    public function refundBreakdown(\DateTimeImmutable $now): RefundBreakdown
+    {
+        $totalPaid = round($this->price->totalPrice + $this->price->commissionAmount + $this->price->donationAmount, 2);
+
+        $percentage = match ($this->status) {
+            ReservationStatus::Pending => 100,
+            ReservationStatus::Confirmed => $this->cancellationPolicy->refundPercentage(
+                $this->dateRange->checkIn()->getTimestamp() - $now->getTimestamp(),
+            ),
+            default => 0,
+        };
+
+        return new RefundBreakdown(
+            policy: $this->cancellationPolicy,
+            totalPaid: $totalPaid,
+            refundAmount: round($totalPaid * $percentage / 100, 2),
+            refundPercentage: $percentage,
+        );
+    }
+
     public function confirm(): void
     {
         if (ReservationStatus::Confirmed === $this->status) {
@@ -130,14 +175,20 @@ final class Reservation extends AggregateRoot
         $this->recordEvent(new ReservationConfirmed($this->id->toUuid()));
     }
 
-    public function cancel(): void
+    public function cancel(\DateTimeImmutable $now, ?string $message = null): void
     {
         if (ReservationStatus::Cancelled === $this->status) {
             throw InvalidReservationStateException::becauseAlreadyCancelled();
         }
+        if (ReservationStatus::Refused === $this->status) {
+            throw InvalidReservationStateException::becauseRefusedCannotBeCancelled();
+        }
+        if ($now >= $this->dateRange->checkIn()) {
+            throw InvalidReservationStateException::becauseStayAlreadyStarted();
+        }
 
         $this->status = ReservationStatus::Cancelled;
-        $this->recordEvent(new ReservationCancelled($this->id->toUuid()));
+        $this->recordEvent(new ReservationCancelled($this->id->toUuid(), $message));
     }
 
     public function refuse(bool $automatic = false): void

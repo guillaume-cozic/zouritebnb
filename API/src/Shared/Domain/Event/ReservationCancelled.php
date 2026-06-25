@@ -13,7 +13,9 @@ use Symfony\Component\Uid\Uuid;
  */
 final readonly class ReservationCancelled implements DomainEvent
 {
-    public function __construct(public Uuid $reservationId)
-    {
+    public function __construct(
+        public Uuid $reservationId,
+        public ?string $message = null,
+    ) {
     }
 }

@@ -122,14 +122,18 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: "is_granted('IS_AUTHENTICATED_FULLY')",
             openapi: new OpenApiOperation(
                 summary: 'Annuler une réservation',
-                description: 'Passe une réservation au statut "cancelled". Accessible au voyageur de la réservation ou à un membre de l\'équipe loueur (403 sinon). Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée.',
+                description: 'Passe une réservation au statut "cancelled". Accessible au voyageur de la réservation ou à un membre de l\'équipe loueur (403 sinon). Le séjour ne doit pas avoir commencé : une réservation en cours ou passée ne peut pas être annulée. Un message facultatif peut accompagner l\'annulation ; il est publié dans la conversation liée. Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée, refusée, ou si le séjour a déjà commencé. La réponse expose le montant remboursé (refundAmount, refundPercentage) selon la politique figée et la date courante.',
                 requestBody: new RequestBody(
                     content: new \ArrayObject([
                         'application/merge-patch+json' => new MediaType(
                             examples: new \ArrayObject([
-                                'valid' => new Example(
-                                    summary: 'Requête valide',
+                                'without_message' => new Example(
+                                    summary: 'Annulation sans message',
                                     value: new \ArrayObject(),
+                                ),
+                                'with_message' => new Example(
+                                    summary: 'Annulation avec message',
+                                    value: ['message' => 'Un imprévu m\'oblige à annuler, désolé pour le dérangement.'],
                                 ),
                             ]),
                         ),
@@ -138,7 +142,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             ),
             denormalizationContext: ['groups' => ['reservation:write']],
             normalizationContext: ['groups' => ['reservation:read']],
-            input: false,
+            input: CancelReservationInput::class,
             processor: CancelReservationProcessor::class,
         ),
         new Post(
@@ -248,7 +252,23 @@ class ReservationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Montant total réglé par le voyageur : séjour + frais de service + don solidaire (identique au total de la facture)', example: 460.0)]
     public ?float $totalPaid = null;
 
-    public static function fromEntity(object $entity): static
+    #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Politique d\'annulation figée à la réservation : "flexible" ou "moderate"', example: 'flexible')]
+    public ?string $cancellationPolicy = null;
+
+    #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Indique si la réservation peut être annulée maintenant (statut en attente/confirmé et séjour pas encore commencé)', example: true)]
+    public bool $cancellable = false;
+
+    #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Montant qui serait remboursé au voyageur en cas d\'annulation immédiate, selon la politique et la date courante', example: 460.0)]
+    public ?float $refundAmount = null;
+
+    #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Pourcentage remboursé en cas d\'annulation immédiate (0, 50 ou 100)', example: 100)]
+    public ?int $refundPercentage = null;
+
+    public static function fromEntity(object $entity, ?\DateTimeImmutable $now = null): static
     {
         if (!$entity instanceof Reservation) {
             throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', Reservation::class, get_debug_type($entity)));
@@ -269,6 +289,16 @@ class ReservationOutput implements FromEntityInterface
         $output->appliedDiscountPercentage = $price->appliedDiscountPercentage;
         // Grand total actually paid, mirroring the invoice (stay + frozen fee + donation).
         $output->totalPaid = round($price->totalPrice + $price->commissionAmount + $price->donationAmount, 2);
+        $output->cancellationPolicy = $entity->getCancellationPolicy()->value;
+
+        // The refund preview depends on "now", so it is only computed when a clock is
+        // provided (item/collection reads, cancel response); other flows leave it null.
+        if (null !== $now) {
+            $output->cancellable = $entity->isCancellable($now);
+            $refund = $entity->refundBreakdown($now);
+            $output->refundAmount = $refund->refundAmount;
+            $output->refundPercentage = $refund->refundPercentage;
+        }
 
         return $output;
     }

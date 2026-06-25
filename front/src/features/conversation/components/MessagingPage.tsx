@@ -20,11 +20,13 @@ import { selectHasAccommodation } from '../../accommodationManagement/Accommodat
 import { fetchAccommodationSummary } from '../../accommodation/AccommodationSummarySlice';
 import { selectAccommodationSummaries } from '../../accommodation/AccommodationSummarySelectors';
 import {
+  cancelReservation,
   confirmReservation,
   fetchReservationById,
   fetchReservations,
   refuseReservation,
 } from '../../reservation/ReservationSlice';
+import { Button, Modal, Textarea } from '../../../components/ui';
 import {
   selectReservationById,
   selectReservations,
@@ -75,6 +77,8 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
   const [onlyNeedsAction, setOnlyNeedsAction] = useState(false);
   const [busy, setBusy] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState('');
 
   const reservationStatusById = useMemo(() => {
     const map: Record<string, string> = {};
@@ -157,6 +161,19 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
     setBusy(true);
     await dispatch(refuseReservation(reservation.id));
     setBusy(false);
+  };
+
+  // A traveler may cancel their own booking while it is still cancellable (the API
+  // exposes `cancellable`, which already encodes "stay not started" + cancellable status).
+  const canCancelReservation = !isHost && !readOnly && !!reservation?.cancellable;
+
+  const handleConfirmCancel = async () => {
+    if (!reservation) return;
+    setBusy(true);
+    await dispatch(cancelReservation({ id: reservation.id, message: cancelMessage }));
+    setBusy(false);
+    setCancelOpen(false);
+    setCancelMessage('');
   };
 
   const handleDownloadInvoice = async () => {
@@ -396,6 +413,8 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                     onRefuse={handleRefuse}
                     busy={busy}
                     readOnly={readOnly || !isHost}
+                    onCancel={() => setCancelOpen(true)}
+                    canCancel={canCancelReservation}
                   />
                 )}
               </div>
@@ -412,6 +431,54 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
           accommodationId={current.accommodationId}
           onClose={() => setReviewOpen(false)}
         />
+      )}
+
+      {reservation && cancelOpen && (
+        <Modal
+          open={cancelOpen}
+          onClose={() => setCancelOpen(false)}
+          size="sm"
+          title={t('conversation.cancel.modalTitle')}
+          subtitle={t('conversation.cancel.modalSubtitle')}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setCancelOpen(false)} disabled={busy}>
+                {t('conversation.cancel.keep')}
+              </Button>
+              <Button variant="danger" onClick={handleConfirmCancel} loading={busy}>
+                {t('conversation.cancel.confirm')}
+              </Button>
+            </>
+          }
+        >
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-2 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">{t('conversation.cancel.policyLabel')}</span>
+              <span className="font-medium text-gray-900">
+                {t(`cancellationStep.${reservation.cancellationPolicy ?? 'flexible'}.title`)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">{t('conversation.cancel.refundLabel')}</span>
+              <span className="font-bold text-gray-900">
+                {new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(reservation.refundAmount ?? 0)}
+                <span className="ml-1 font-normal text-gray-500">({reservation.refundPercentage ?? 0}%)</span>
+              </span>
+            </div>
+          </div>
+
+          <label className="mt-4 block">
+            <span className="text-sm font-medium text-gray-700">{t('conversation.cancel.messageLabel')}</span>
+            <Textarea
+              value={cancelMessage}
+              onChange={(e) => setCancelMessage(e.target.value)}
+              rows={3}
+              maxLength={5000}
+              placeholder={t('conversation.cancel.messagePlaceholder') as string}
+              className="mt-1.5"
+            />
+          </label>
+        </Modal>
       )}
     </div>
   );

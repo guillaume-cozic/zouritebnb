@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Reservation\Infrastructure\Doctrine;
 
+use App\Reservation\Domain\Entity\CancellationPolicy;
 use App\Reservation\Domain\Entity\DateRange;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation as DomainReservation;
@@ -43,7 +44,8 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             ->setPricePerNight($reservation->getPrice()->pricePerNight)
             ->setAppliedDiscountPercentage($reservation->getPrice()->appliedDiscountPercentage)
             ->setCommissionAmount($reservation->getPrice()->commissionAmount)
-            ->setDonationAmount($reservation->getPrice()->donationAmount);
+            ->setDonationAmount($reservation->getPrice()->donationAmount)
+            ->setCancellationPolicy($reservation->getCancellationPolicy()->value);
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -149,6 +151,7 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
                 donationAmount: $entity->getDonationAmount(),
             ),
             guestUserId: $entity->getGuestUserId(),
+            cancellationPolicy: CancellationPolicy::fromString($entity->getCancellationPolicy()),
         );
     }
 }
