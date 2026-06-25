@@ -39,6 +39,10 @@ final readonly class RequestReservation
             throw InvalidReservationException::becauseAccommodationHasNoTeam();
         }
 
+        if ($this->repository->hasOverlappingReservation($command->accommodationId, $dateRange)) {
+            throw InvalidReservationException::becauseDatesUnavailable();
+        }
+
         $stayPrice = $this->priceCalculator->calculate($pricing, $dateRange->checkIn(), $dateRange->checkOut());
 
         $price = ReservationPrice::fromStay(

@@ -16,6 +16,11 @@ final class InvalidReservationException extends \DomainException
         return new self('Accommodation has no owning team.');
     }
 
+    public static function becauseDatesUnavailable(): self
+    {
+        return new self('These dates are no longer available for this accommodation.');
+    }
+
     public static function becauseNegativeTotalPrice(float $totalPrice): self
     {
         return new self(\sprintf('Total price must be greater than or equal to zero, got %s.', $totalPrice));

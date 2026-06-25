@@ -110,6 +110,35 @@ final class RequestReservationTest extends TestCase
         ));
     }
 
+    public function test_should_throw_when_dates_overlap_a_pending_request(): void
+    {
+        $accommodationId = Uuid::v7();
+        $teamId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0, null, $teamId);
+
+        // A pending request (not yet confirmed) already holds May 1 → May 10.
+        $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-10'),
+            guestName: 'First Guest',
+        ));
+
+        $this->expectException(InvalidReservationException::class);
+        $this->expectExceptionMessage('These dates are no longer available for this accommodation.');
+
+        // A second guest cannot request overlapping dates, even though the first
+        // request is still pending.
+        $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-04'),
+            checkOut: new \DateTimeImmutable('2026-05-06'),
+            guestName: 'Second Guest',
+        ));
+    }
+
     public function test_should_throw_when_accommodation_has_no_team(): void
     {
         $accommodationId = Uuid::v7();

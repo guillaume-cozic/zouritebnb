@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Reservation\Infrastructure;
 
+use App\Reservation\Domain\Entity\DateRange;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Entity\ReservationStatus;
@@ -71,5 +72,23 @@ final class InMemoryReservationRepository implements ReservationRepository
         }
 
         return $result;
+    }
+
+    public function hasOverlappingReservation(Uuid $accommodationId, DateRange $dateRange): bool
+    {
+        foreach ($this->reservations as $reservation) {
+            if (!$reservation->getAccommodationId()->equals($accommodationId)) {
+                continue;
+            }
+            if (!\in_array($reservation->getStatus(), [ReservationStatus::Pending, ReservationStatus::Confirmed], true)) {
+                continue;
+            }
+            $existing = $reservation->getDateRange();
+            if ($existing->checkIn() < $dateRange->checkOut() && $existing->checkOut() > $dateRange->checkIn()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

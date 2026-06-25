@@ -109,6 +109,26 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
         );
     }
 
+    public function hasOverlappingReservation(Uuid $accommodationId, DateRange $dateRange): bool
+    {
+        $count = (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.accommodationId = :accommodationId')
+            ->andWhere('r.status IN (:statuses)')
+            // Strict bounds: an existing stay leaving on the requested check-in day
+            // (or arriving on the requested check-out day) does not overlap.
+            ->andWhere('r.checkIn < :checkOut')
+            ->andWhere('r.checkOut > :checkIn')
+            ->setParameter('accommodationId', $accommodationId, \Symfony\Bridge\Doctrine\Types\UuidType::NAME)
+            ->setParameter('statuses', [ReservationStatus::Pending->value, ReservationStatus::Confirmed->value])
+            ->setParameter('checkIn', $dateRange->checkIn())
+            ->setParameter('checkOut', $dateRange->checkOut())
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $count > 0;
+    }
+
     private function toDomain(ReservationEntity $entity): DomainReservation
     {
         return new DomainReservation(

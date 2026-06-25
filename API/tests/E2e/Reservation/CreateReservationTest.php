@@ -146,6 +146,36 @@ final class CreateReservationTest extends ReservationApiTestCase
         self::assertContains('checkOut', $propertyPaths);
     }
 
+    public function test_should_return422_when_dates_overlap_an_existing_reservation(): void
+    {
+        $accommodationId = $this->insertAccommodation(100.0);
+        $headers = $this->hostAuthHeaders() + ['Content-Type' => 'application/ld+json'];
+
+        self::createClient()->request('POST', '/api/reservations', [
+            'headers' => $headers,
+            'json' => [
+                'accommodationId' => $accommodationId,
+                'checkIn' => '2026-05-01T15:00:00+00:00',
+                'checkOut' => '2026-05-10T11:00:00+00:00',
+                'guestName' => 'Jean Dupont',
+            ],
+        ]);
+        self::assertResponseStatusCodeSame(201);
+
+        // Overlapping range on the same accommodation is rejected.
+        self::createClient()->request('POST', '/api/reservations', [
+            'headers' => $headers,
+            'json' => [
+                'accommodationId' => $accommodationId,
+                'checkIn' => '2026-05-05T15:00:00+00:00',
+                'checkOut' => '2026-05-08T11:00:00+00:00',
+                'guestName' => 'Marie Martin',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
     public function test_should_return422_when_accommodation_does_not_exist(): void
     {
         self::createClient()->request('POST', '/api/reservations', [

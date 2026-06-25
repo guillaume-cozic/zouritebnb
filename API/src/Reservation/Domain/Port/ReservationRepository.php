@@ -25,6 +25,13 @@ interface ReservationRepository
     public function busyRanges(Uuid $accommodationId, \DateTimeImmutable $from): array;
 
     /**
+     * Tells whether the accommodation already has a "pending" or "confirmed"
+     * reservation overlapping the given date range. The departure day of an
+     * existing stay does not count as an overlap (same-day turnover is allowed).
+     */
+    public function hasOverlappingReservation(Uuid $accommodationId, DateRange $dateRange): bool;
+
+    /**
      * Lists the reservations visible to a user: those belonging to the user's team
      * (as host) or those where the user is the guest.
      *

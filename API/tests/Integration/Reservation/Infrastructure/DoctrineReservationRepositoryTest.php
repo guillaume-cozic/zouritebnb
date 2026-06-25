@@ -89,6 +89,53 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         self::assertSame(ReservationStatus::Cancelled, $found->getStatus());
     }
 
+    public function test_should_detect_overlapping_reservation(): void
+    {
+        $accommodationId = Uuid::v4();
+        $this->saveReservation(Uuid::v4(), $accommodationId, '2026-08-01', '2026-08-10', 'Existing');
+
+        // Overlapping range → blocked.
+        self::assertTrue($this->repository->hasOverlappingReservation(
+            $accommodationId,
+            new DateRange(new \DateTimeImmutable('2026-08-05'), new \DateTimeImmutable('2026-08-08')),
+        ));
+        // Same-day turnover on the departure day → allowed.
+        self::assertFalse($this->repository->hasOverlappingReservation(
+            $accommodationId,
+            new DateRange(new \DateTimeImmutable('2026-08-10'), new \DateTimeImmutable('2026-08-12')),
+        ));
+        // Disjoint range → allowed.
+        self::assertFalse($this->repository->hasOverlappingReservation(
+            $accommodationId,
+            new DateRange(new \DateTimeImmutable('2026-09-01'), new \DateTimeImmutable('2026-09-05')),
+        ));
+        // Another accommodation → not affected.
+        self::assertFalse($this->repository->hasOverlappingReservation(
+            Uuid::v4(),
+            new DateRange(new \DateTimeImmutable('2026-08-05'), new \DateTimeImmutable('2026-08-08')),
+        ));
+    }
+
+    public function test_should_not_count_cancelled_reservation_as_overlap(): void
+    {
+        $accommodationId = Uuid::v4();
+        $reservation = Reservation::create(
+            id: new ReservationId(Uuid::v4()),
+            accommodationId: $accommodationId,
+            teamId: Uuid::v4(),
+            dateRange: new DateRange(new \DateTimeImmutable('2026-08-01'), new \DateTimeImmutable('2026-08-10')),
+            guestName: new GuestName('Cancelled'),
+            price: new ReservationPrice(totalPrice: 100.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
+        );
+        $reservation->cancel();
+        $this->repository->save($reservation);
+
+        self::assertFalse($this->repository->hasOverlappingReservation(
+            $accommodationId,
+            new DateRange(new \DateTimeImmutable('2026-08-05'), new \DateTimeImmutable('2026-08-08')),
+        ));
+    }
+
     public function test_should_list_filters_by_team_id(): void
     {
         $teamA = Uuid::v4();

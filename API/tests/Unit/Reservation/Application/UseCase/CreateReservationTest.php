@@ -131,6 +131,89 @@ final class CreateReservationTest extends TestCase
         self::assertNull($reservation->getPrice()->appliedDiscountPercentage);
     }
 
+    public function test_should_throw_when_dates_overlap_an_existing_reservation(): void
+    {
+        $accommodationId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0);
+
+        // An existing stay from May 1 to May 10.
+        $this->useCase->handle(new CreateReservationCommand(
+            accommodationId: $accommodationId,
+            teamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-10'),
+            guestName: 'First Guest',
+        ));
+
+        $this->expectException(InvalidReservationException::class);
+        $this->expectExceptionMessage('These dates are no longer available for this accommodation.');
+
+        // Overlapping request (May 5 → May 8 falls inside the existing stay).
+        $this->useCase->handle(new CreateReservationCommand(
+            accommodationId: $accommodationId,
+            teamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-05'),
+            checkOut: new \DateTimeImmutable('2026-05-08'),
+            guestName: 'Second Guest',
+        ));
+    }
+
+    public function test_should_allow_same_day_turnover_on_the_departure_date(): void
+    {
+        $accommodationId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0);
+
+        // Existing stay leaves on May 10.
+        $this->useCase->handle(new CreateReservationCommand(
+            accommodationId: $accommodationId,
+            teamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-10'),
+            guestName: 'First Guest',
+        ));
+
+        // A new arrival on the very same departure day is allowed.
+        $id = $this->useCase->handle(new CreateReservationCommand(
+            accommodationId: $accommodationId,
+            teamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-10'),
+            checkOut: new \DateTimeImmutable('2026-05-12'),
+            guestName: 'Second Guest',
+        ));
+
+        self::assertNotNull($this->repository->ofId(new ReservationId(Uuid::fromString($id))));
+    }
+
+    public function test_should_allow_booking_dates_freed_by_a_cancelled_reservation(): void
+    {
+        $accommodationId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0);
+
+        $firstId = $this->useCase->handle(new CreateReservationCommand(
+            accommodationId: $accommodationId,
+            teamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-10'),
+            guestName: 'First Guest',
+        ));
+
+        // Cancelled stays no longer block the dates.
+        $first = $this->repository->ofId(new ReservationId(Uuid::fromString($firstId)));
+        self::assertNotNull($first);
+        $first->cancel();
+        $this->repository->save($first);
+
+        $id = $this->useCase->handle(new CreateReservationCommand(
+            accommodationId: $accommodationId,
+            teamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-05'),
+            checkOut: new \DateTimeImmutable('2026-05-08'),
+            guestName: 'Second Guest',
+        ));
+
+        self::assertNotNull($this->repository->ofId(new ReservationId(Uuid::fromString($id))));
+    }
+
     public function test_should_throw_when_accommodation_not_found(): void
     {
         $this->expectException(InvalidReservationException::class);
