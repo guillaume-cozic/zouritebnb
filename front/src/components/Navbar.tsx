@@ -8,6 +8,7 @@ import { fetchConversationsForUser } from '../features/conversation/Conversation
 import { selectUnreadCount } from '../features/conversation/ConversationSelectors';
 import { fetchOwnsAccommodation } from '../features/accommodationManagement/AccommodationManagementSlice';
 import { selectHasAccommodation } from '../features/accommodationManagement/AccommodationManagementSelectors';
+import { selectWishlistCount } from '../features/wishlist/WishlistSelectors';
 import VerificationBadge from '../features/userProfile/components/VerificationBadge';
 import { VerificationStatus } from '../features/userProfile/UserProfileTypes';
 import { Avatar, UnreadBadge } from './ui';
@@ -20,6 +21,7 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const unreadCount = useAppSelector(selectUnreadCount);
   const hasAccommodation = useAppSelector(selectHasAccommodation);
+  const wishlistCount = useAppSelector(selectWishlistCount);
   // A traveler with no listing can still land on /admin (e.g. the default
   // post-login redirect). Treat confirmed non-owners as travelers so menu links
   // (conversations, settings) point to their /account space, not the host backoffice.
@@ -102,6 +104,23 @@ const Navbar: React.FC = () => {
               EN
             </button>
           </div>
+
+          {/* Wishlist (works for anonymous visitors too) */}
+          <Link
+            to="/wishlist"
+            aria-label={t('wishlist.title') as string}
+            title={t('wishlist.title') as string}
+            className="relative hidden sm:inline-flex items-center justify-center h-9 w-9 rounded-md border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-rose-600 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill={wishlistCount > 0 ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={wishlistCount > 0 ? 'text-rose-600' : ''}>
+              <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+            </svg>
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-semibold flex items-center justify-center">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
 
           {/* Create button (host mode only) */}
           {isHostMode && (

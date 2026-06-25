@@ -74,6 +74,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Notification/Infrastructure/Doctrine'
                 prefix: 'App\Notification\Infrastructure\Doctrine'
                 alias: Notification
+            Wishlist:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Wishlist/Infrastructure/Doctrine'
+                prefix: 'App\Wishlist\Infrastructure\Doctrine'
+                alias: Wishlist
         controller_resolver:
             auto_mapping: false
 

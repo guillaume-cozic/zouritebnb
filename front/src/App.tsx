@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAppDispatch } from './store/hooks';
+import { fetchWishlist } from './features/wishlist/WishlistSlice';
+import WishlistPage from './features/wishlist/components/WishlistPage';
 import Navbar from './components/Navbar';
 import DocumentTitle from './components/DocumentTitle';
 import HomePage from './features/homepage/components/HomePage';
@@ -28,6 +31,14 @@ import ReservationSuccessPage from './features/reservation/components/Reservatio
 import IdentityVerificationPage from './features/userProfile/components/IdentityVerificationPage';
 
 function App() {
+  const dispatch = useAppDispatch();
+
+  // Load the wishlist once on boot (anonymous via cookie, or the account's) so
+  // the heart toggles reflect saved state across the app.
+  useEffect(() => {
+    dispatch(fetchWishlist());
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
       <DocumentTitle />
@@ -35,6 +46,7 @@ function App() {
       <div className="pt-16 min-h-screen">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/solidarity-projects" element={<SolidarityProjectsPage />} />
           <Route path="/solidarity-projects/:id" element={<SolidarityProjectDetailPage />} />
           <Route path="/accommodations" element={<AccommodationsListingPage />} />

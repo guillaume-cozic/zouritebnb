@@ -164,6 +164,14 @@
       "verification": "Vérification d'identité"
     }
   },
+  "wishlist": {
+    "title": "Ma wishlist",
+    "empty": "Vous n'avez pas encore d'hébergement sauvegardé. Cliquez sur le cœur d'une annonce pour la retrouver ici.",
+    "browse": "Parcourir les hébergements",
+    "add": "Ajouter à ma wishlist",
+    "remove": "Retirer de ma wishlist",
+    "saved": "Sauvegardé"
+  },
   "auth": {
     "loginTitle": "Bon retour parmi nous",
     "loginSubtitle": "Connectez-vous pour gérer votre gîte et vos réservations.",

@@ -4,3 +4,4 @@ import '../features/team/TeamListeners';
 import '../features/reservation/ReservationListeners';
 import '../features/homepage/HomepageListeners';
 import '../features/review/ReviewListeners';
+import '../features/wishlist/WishlistListeners';

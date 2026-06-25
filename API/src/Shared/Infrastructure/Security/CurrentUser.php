@@ -43,6 +43,17 @@ final readonly class CurrentUser
     }
 
     /**
+     * Domain identifier (UUID) of the authenticated user, or null when the request
+     * is anonymous. Use this in operations that are open to anonymous visitors.
+     */
+    public function idOrNull(): ?Uuid
+    {
+        $user = $this->security->getUser();
+
+        return $user instanceof UserEntity ? $user->getId() : null;
+    }
+
+    /**
      * Team identifier (UUID) of the authenticated user.
      *
      * @throws UnauthorizedHttpException when no user is authenticated

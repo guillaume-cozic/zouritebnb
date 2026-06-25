@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AccommodationListItem } from '../HomepageTypes';
 import RatingBadge from '../../review/components/RatingBadge';
+import WishlistButton from '../../wishlist/components/WishlistButton';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const PHOTO_CYCLE_MS = 1200;
@@ -49,10 +50,12 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
 
   return (
     <div
-      className="flex flex-col h-full rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1"
+      className="relative flex flex-col h-full rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1"
       onMouseEnter={() => { setIsHovering(true); onHoverChange?.(true); }}
       onMouseLeave={() => { setIsHovering(false); onHoverChange?.(false); }}
     >
+      {/* Wishlist heart (over the photo, above the card-wide link) */}
+      <WishlistButton accommodationId={accommodation.id} className="absolute top-3 right-3 z-10" />
       {/* Image */}
       <Link to={`/accommodations/${accommodation.id}`} className="block aspect-video relative overflow-hidden cursor-pointer">
         {absolutePhotos.length > 0 ? (
@@ -99,9 +102,9 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
           </div>
         )}
 
-        {/* Guest count badge */}
+        {/* Guest count badge (bottom-right to leave the top-right for the wishlist heart) */}
         {accommodation.maxGuests != null && (
-          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg px-2.5 py-1.5 shadow-sm flex items-center gap-1">
+          <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg px-2.5 py-1.5 shadow-sm flex items-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />

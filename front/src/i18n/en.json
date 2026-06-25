@@ -164,6 +164,14 @@
       "verification": "Identity verification"
     }
   },
+  "wishlist": {
+    "title": "My wishlist",
+    "empty": "You haven't saved any accommodation yet. Tap the heart on a listing to find it here.",
+    "browse": "Browse accommodations",
+    "add": "Add to my wishlist",
+    "remove": "Remove from my wishlist",
+    "saved": "Saved"
+  },
   "auth": {
     "loginTitle": "Welcome back",
     "loginSubtitle": "Sign in to manage your gîte and reservations.",

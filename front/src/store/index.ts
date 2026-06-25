@@ -14,6 +14,7 @@ import paymentReducer from '../features/payment/PaymentSlice';
 import reviewReducer from '../features/review/ReviewSlice';
 import userProfileReducer from '../features/userProfile/UserProfileSlice';
 import hostProfileReducer from '../features/hostProfile/HostProfileSlice';
+import wishlistReducer from '../features/wishlist/WishlistSlice';
 import { listenerMiddleware } from './listenerMiddleware';
 import './registerListeners';
 
@@ -34,6 +35,7 @@ export const store = configureStore({
     review: reviewReducer,
     userProfile: userProfileReducer,
     hostProfile: hostProfileReducer,
+    wishlist: wishlistReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),

@@ -196,6 +196,38 @@ return static function (Config $config): void {
         ->should(new NotDependsOnTheseNamespaces(['App\Shared\Infrastructure']))
         ->because('domain and application layers must not depend on shared infrastructure');
 
+    // --- Wishlist module (hexagonal architecture) ---
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Wishlist\Domain'))
+        ->should(new NotDependsOnTheseNamespaces([
+            'App\Wishlist\Application',
+            'App\Wishlist\Infrastructure',
+        ]))
+        ->because('the domain layer must not depend on application or infrastructure (hexagonal architecture)');
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Wishlist\Application'))
+        ->should(new NotDependsOnTheseNamespaces(['App\Wishlist\Infrastructure']))
+        ->because('the application layer must not depend on infrastructure (hexagonal architecture)');
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Wishlist\Domain', 'App\Wishlist\Application'))
+        ->should(new NotDependsOnTheseNamespaces([
+            'Doctrine',
+            'ApiPlatform',
+            'Symfony\Bundle',
+            'Symfony\Component\HttpFoundation',
+            'Symfony\Component\HttpKernel',
+            'Symfony\Component\DependencyInjection',
+        ]))
+        ->because('domain and application layers must be framework-agnostic');
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Wishlist\Domain', 'App\Wishlist\Application'))
+        ->should(new NotDependsOnTheseNamespaces(['App\Shared\Infrastructure']))
+        ->because('domain and application layers must not depend on shared infrastructure');
+
     // --- Payment module (hexagonal architecture) ---
 
     $rules[] = Rule::allClasses()
