@@ -34,9 +34,9 @@ const sameDay = (a: string, b: string): boolean =>
 
 const SystemBubble: React.FC<{ message: ConversationMessage; locale: string }> = ({ message, locale }) => (
   <div className="flex justify-center my-4">
-    <div className="max-w-xl rounded-full bg-gray-100/80 text-gray-600 px-4 py-2 text-xs text-center whitespace-pre-line italic">
+    <div className="max-w-xl rounded-2xl bg-gray-100 border border-gray-200 text-gray-700 px-4 py-2.5 text-sm text-center whitespace-pre-line shadow-sm">
       {message.body}
-      <span className="ml-2 text-[10px] not-italic text-gray-400">
+      <span className="ml-2 text-[11px] text-gray-500">
         {formatTime(message.sentAt, locale)}
       </span>
     </div>

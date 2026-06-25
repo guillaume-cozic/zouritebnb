@@ -128,6 +128,9 @@ services:
     App\Conversation\Application\Listener\PostRefusalSystemMessageOnReservationRefused:
         tags: [messenger.message_handler]
 
+    App\Conversation\Application\Listener\PostConfirmationSystemMessageOnReservationConfirmed:
+        tags: [messenger.message_handler]
+
     App\Reservation\Infrastructure\Messenger\ScheduleReservationExpiry:
         tags: [messenger.message_handler]
 
