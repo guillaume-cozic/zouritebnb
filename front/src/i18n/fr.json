@@ -484,6 +484,7 @@
     "defaultProjectBadge": "Projet solidaire soutenu",
     "favoriteProjectDiscover": "Découvrir le projet",
     "noCharge": "Aucun montant ne vous sera débité pour le moment",
+    "ownAccommodationNotice": "Vous ne pouvez pas réserver un hébergement appartenant à votre équipe.",
     "backToHome": "Retour à l'accueil",
     "loading": "Chargement...",
     "error": "Impossible de charger cet hébergement."

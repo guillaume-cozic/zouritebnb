@@ -50,12 +50,14 @@ final class RequestReservationTest extends TestCase
         $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000a1');
         $teamId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000b1');
         $guestUserId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000c1');
+        $guestTeamId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000d1');
         UuidGenerator::freeze($reservationId);
         $this->pricingProvider->set($accommodationId, 100.0, null, $teamId);
 
         $id = $this->useCase->handle(new RequestReservationCommand(
             accommodationId: $accommodationId,
             guestUserId: $guestUserId,
+            guestTeamId: $guestTeamId,
             checkIn: new \DateTimeImmutable('2026-05-01'),
             checkOut: new \DateTimeImmutable('2026-05-05'),
             guestName: 'John Doe',
@@ -85,6 +87,7 @@ final class RequestReservationTest extends TestCase
         $id = $this->useCase->handle(new RequestReservationCommand(
             accommodationId: $accommodationId,
             guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
             checkIn: new \DateTimeImmutable('2026-05-01'),
             checkOut: new \DateTimeImmutable('2026-05-08'),
             guestName: 'John Doe',
@@ -104,6 +107,27 @@ final class RequestReservationTest extends TestCase
         $this->useCase->handle(new RequestReservationCommand(
             accommodationId: Uuid::v7(),
             guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-05'),
+            guestName: 'John Doe',
+        ));
+    }
+
+    public function test_should_throw_when_host_books_own_team_accommodation(): void
+    {
+        $accommodationId = Uuid::v7();
+        $teamId = Uuid::v7();
+        // The accommodation belongs to the very team the requesting user is part of.
+        $this->pricingProvider->set($accommodationId, 100.0, null, $teamId);
+
+        $this->expectException(InvalidReservationException::class);
+        $this->expectExceptionMessage('A host cannot book an accommodation owned by their own team.');
+
+        $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            guestTeamId: $teamId,
             checkIn: new \DateTimeImmutable('2026-05-01'),
             checkOut: new \DateTimeImmutable('2026-05-05'),
             guestName: 'John Doe',
@@ -120,6 +144,7 @@ final class RequestReservationTest extends TestCase
         $this->useCase->handle(new RequestReservationCommand(
             accommodationId: $accommodationId,
             guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
             checkIn: new \DateTimeImmutable('2026-05-01'),
             checkOut: new \DateTimeImmutable('2026-05-10'),
             guestName: 'First Guest',
@@ -133,6 +158,7 @@ final class RequestReservationTest extends TestCase
         $this->useCase->handle(new RequestReservationCommand(
             accommodationId: $accommodationId,
             guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
             checkIn: new \DateTimeImmutable('2026-05-04'),
             checkOut: new \DateTimeImmutable('2026-05-06'),
             guestName: 'Second Guest',
@@ -150,6 +176,7 @@ final class RequestReservationTest extends TestCase
         $this->useCase->handle(new RequestReservationCommand(
             accommodationId: $accommodationId,
             guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
             checkIn: new \DateTimeImmutable('2026-05-01'),
             checkOut: new \DateTimeImmutable('2026-05-05'),
             guestName: 'John Doe',
@@ -166,6 +193,7 @@ final class RequestReservationTest extends TestCase
         $this->useCase->handle(new RequestReservationCommand(
             accommodationId: $accommodationId,
             guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
             checkIn: new \DateTimeImmutable('2026-05-05'),
             checkOut: new \DateTimeImmutable('2026-05-05'),
             guestName: 'John Doe',
@@ -182,6 +210,7 @@ final class RequestReservationTest extends TestCase
         $this->useCase->handle(new RequestReservationCommand(
             accommodationId: $accommodationId,
             guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
             checkIn: new \DateTimeImmutable('2026-05-01'),
             checkOut: new \DateTimeImmutable('2026-05-05'),
             guestName: '   ',

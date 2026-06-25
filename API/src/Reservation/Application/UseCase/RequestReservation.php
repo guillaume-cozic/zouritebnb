@@ -39,6 +39,10 @@ final readonly class RequestReservation
             throw InvalidReservationException::becauseAccommodationHasNoTeam();
         }
 
+        if ($pricing->teamId->equals($command->guestTeamId)) {
+            throw InvalidReservationException::becauseHostCannotBookOwnAccommodation();
+        }
+
         if ($this->repository->hasOverlappingReservation($command->accommodationId, $dateRange)) {
             throw InvalidReservationException::becauseDatesUnavailable();
         }

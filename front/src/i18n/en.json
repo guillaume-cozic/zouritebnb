@@ -484,6 +484,7 @@
     "defaultProjectBadge": "Supported solidarity project",
     "favoriteProjectDiscover": "Discover the project",
     "noCharge": "You won't be charged yet",
+    "ownAccommodationNotice": "You can't book an accommodation owned by your team.",
     "backToHome": "Back to home",
     "loading": "Loading...",
     "error": "Unable to load this accommodation."

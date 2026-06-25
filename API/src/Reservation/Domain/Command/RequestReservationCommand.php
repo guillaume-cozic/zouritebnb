@@ -11,6 +11,7 @@ final readonly class RequestReservationCommand
     public function __construct(
         public Uuid $accommodationId,
         public Uuid $guestUserId,
+        public Uuid $guestTeamId,
         public \DateTimeImmutable $checkIn,
         public \DateTimeImmutable $checkOut,
         public string $guestName,

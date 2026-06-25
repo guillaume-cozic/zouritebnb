@@ -37,6 +37,7 @@ final readonly class RequestReservationProcessor implements ProcessorInterface
         $id = $this->handler->execute(fn () => $this->requestReservation->handle(new RequestReservationCommand(
             accommodationId: Uuid::fromString($data->accommodationId),
             guestUserId: $this->currentUser->id(),
+            guestTeamId: $this->currentUser->teamId(),
             checkIn: new \DateTimeImmutable($data->checkIn),
             checkOut: new \DateTimeImmutable($data->checkOut),
             guestName: $data->guestName,

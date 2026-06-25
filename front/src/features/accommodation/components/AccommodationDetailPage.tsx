@@ -172,6 +172,8 @@ const AccommodationDetailPage: React.FC = () => {
   const photos = (accommodation.photos ?? []).map((p) => `${API_BASE}${p.url}`);
   // Only members of the accommodation's owning team may edit it.
   const canEditAccommodation = !!(user && accommodation.teamId && user.teamId === accommodation.teamId);
+  // A host cannot book an accommodation owned by their own team (mirrors the API guard).
+  const isOwnAccommodation = canEditAccommodation;
 
   return (
     <>
@@ -561,29 +563,37 @@ const AccommodationDetailPage: React.FC = () => {
                   </div>
                 )}
 
-                {/* Reserve button */}
-                <button
-                  type="button"
-                  disabled={!startDate || !endDate || !accommodation}
-                  onClick={() => {
-                    if (!startDate || !endDate || !accommodation) return;
-                    const params = new URLSearchParams({
-                      checkIn: filters.checkIn,
-                      checkOut: filters.checkOut,
-                      guests: String(guests),
-                    });
-                    const target = `/accommodations/${accommodation.id}/book?${params.toString()}`;
-                    if (!user) {
-                      navigate(`/login?returnTo=${encodeURIComponent(target)}`);
-                      return;
-                    }
-                    navigate(target);
-                  }}
-                  className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:from-primary-600 disabled:hover:to-primary-700"
-                >
-                  {t('detail.reserve')}
-                </button>
-                <p className="text-center text-sm text-gray-500">{t('detail.noCharge')}</p>
+                {/* Reserve button — hidden for the owning team (a host cannot book their own place) */}
+                {isOwnAccommodation ? (
+                  <p className="rounded-xl bg-gray-50 border border-gray-200 px-4 py-3 text-center text-sm text-gray-500">
+                    {t('detail.ownAccommodationNotice')}
+                  </p>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      disabled={!startDate || !endDate || !accommodation}
+                      onClick={() => {
+                        if (!startDate || !endDate || !accommodation) return;
+                        const params = new URLSearchParams({
+                          checkIn: filters.checkIn,
+                          checkOut: filters.checkOut,
+                          guests: String(guests),
+                        });
+                        const target = `/accommodations/${accommodation.id}/book?${params.toString()}`;
+                        if (!user) {
+                          navigate(`/login?returnTo=${encodeURIComponent(target)}`);
+                          return;
+                        }
+                        navigate(target);
+                      }}
+                      className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:from-primary-600 disabled:hover:to-primary-700"
+                    >
+                      {t('detail.reserve')}
+                    </button>
+                    <p className="text-center text-sm text-gray-500">{t('detail.noCharge')}</p>
+                  </>
+                )}
               </div>
             </div>
           </div>

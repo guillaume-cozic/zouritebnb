@@ -58,6 +58,26 @@ final class RequestReservationTest extends ReservationApiTestCase
         ]);
     }
 
+    public function test_should_return422_when_host_books_own_team_accommodation(): void
+    {
+        $teamId = Uuid::v7();
+        $accommodationId = $this->insertAccommodation($teamId, 100.0);
+        // The authenticated user belongs to the team that owns the accommodation.
+        $this->createAuthUser(email: 'host@example.com', teamId: $teamId->toRfc4122());
+
+        self::createClient()->request('POST', '/api/reservations/request', [
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'accommodationId' => $accommodationId,
+                'checkIn' => '2026-05-01T15:00:00+00:00',
+                'checkOut' => '2026-05-05T11:00:00+00:00',
+                'guestName' => 'Jean Dupont',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
     public function test_should_return401_when_not_authenticated(): void
     {
         $accommodationId = $this->insertAccommodation();
