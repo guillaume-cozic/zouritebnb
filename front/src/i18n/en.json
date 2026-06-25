@@ -147,7 +147,19 @@
     "guest": "Guest",
     "downloadInvoice": "Download invoice",
     "accommodation": "Accommodation",
-    "reviewable": "To review"
+    "reviewable": "To review",
+    "cancel": {
+      "action": "Cancel reservation",
+      "refundLabel": "Refund",
+      "refundPreview": "{{amount}} ({{percent}}%) would be refunded if you cancel now.",
+      "modalTitle": "Cancel reservation",
+      "modalSubtitle": "Based on the cancellation policy and today's date, here is what you would be refunded.",
+      "policyLabel": "Cancellation policy",
+      "messageLabel": "Message (optional)",
+      "messagePlaceholder": "Add a note for the host or guest — it will be posted in the conversation.",
+      "keep": "Keep reservation",
+      "confirm": "Confirm cancellation"
+    }
   },
   "navbar": {
     "home": "Home",
@@ -456,6 +468,7 @@
       "amenities": "Amenities",
       "location": "Location",
       "checkinout": "Check-in / Check-out",
+      "cancellation": "Cancellation",
       "photos": "Photos"
     }
   },
@@ -474,6 +487,7 @@
     "checkIn": "Check-in",
     "checkOut": "Check-out",
     "amenitiesTitle": "Amenities",
+    "cancellationTitle": "Cancellation policy",
     "locationTitle": "Location",
     "datesLabel": "Dates",
     "selectDates": "Select dates",
@@ -544,6 +558,17 @@
     "descriptionMinLength": "Description must be at least 10 characters",
     "priceRequired": "Price is required",
     "pricePositive": "Price must be greater than 0"
+  },
+  "cancellationStep": {
+    "intro": "Choose the terms that apply when a guest cancels their booking.",
+    "flexible": {
+      "title": "Flexible",
+      "description": "Full refund if the guest cancels at least 24 hours before check-in."
+    },
+    "moderate": {
+      "title": "Moderate",
+      "description": "Full refund up to 5 days before check-in, then 50% afterwards."
+    }
   },
   "capacityStep": {
     "intro": "Specify the capacity of your accommodation to help travellers find the ideal place.",

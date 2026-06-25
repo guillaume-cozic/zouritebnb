@@ -16,7 +16,7 @@ import {
   selectAccommodationError,
   selectEditSaveStatus,
 } from '../AccommodationSelectors';
-import { Accommodation } from '../AccommodationTypes';
+import { Accommodation, CancellationPolicy } from '../AccommodationTypes';
 import { AMENITY_CATEGORIES } from '../AmenityData';
 import MapSelector from '../../../components/MapSelector';
 import { Card, Field, Input, SaveIndicator, Textarea } from '../../../components/ui';
@@ -75,6 +75,9 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
     checkIn: accommodation.checkIn ?? '16:00',
     checkOut: accommodation.checkOut ?? '12:00',
   });
+  const [cancellationPolicy, setCancellationPolicy] = useState<CancellationPolicy>(
+    accommodation.cancellationPolicy ?? 'flexible'
+  );
 
   const locationForm = useForm({
     resolver: zodResolver(getLocationSchema(t)),
@@ -146,6 +149,11 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
       dispatch(accommodationFieldEdited({ field: 'checkInOut', id, ...next }));
       return next;
     });
+  };
+
+  const handleCancellationPolicyChange = (policy: CancellationPolicy) => {
+    setCancellationPolicy(policy);
+    dispatch(accommodationFieldEdited({ field: 'cancellationPolicy', id, cancellationPolicy: policy }));
   };
 
   const dispatchLocationEdited = () => {
@@ -437,6 +445,46 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
           </Card>
         </div>
 
+        {/* Cancellation policy */}
+        <div ref={(el) => { sectionRefs.current.cancellation = el; }}>
+          <Card
+            title={t('edit.section.cancellation')}
+            icon={SECTIONS[6].icon}
+            iconClassName="bg-amber-50 text-amber-600"
+            action={<SaveIndicator status={sectionStatus.cancellation ?? 'idle'} />}
+            className={SECTION_CARD_CLASS}
+          >
+            <p className="text-sm text-surface-500 mb-4">{t('cancellationStep.intro')}</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {(['flexible', 'moderate'] as const).map((policy) => {
+                const selected = cancellationPolicy === policy;
+                return (
+                  <button
+                    key={policy}
+                    type="button"
+                    onClick={() => handleCancellationPolicyChange(policy)}
+                    className={`text-left p-4 rounded-xl border transition-all ${
+                      selected
+                        ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-500'
+                        : 'border-surface-200 bg-white hover:border-primary-300 hover:bg-primary-50/40'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold text-surface-800">{t(`cancellationStep.${policy}.title`)}</span>
+                      <span className={`flex items-center justify-center w-5 h-5 rounded-full border-2 flex-shrink-0 ${selected ? 'border-primary-600 bg-primary-600 text-white' : 'border-surface-300'}`}>
+                        {selected && (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                        )}
+                      </span>
+                    </div>
+                    <p className="text-sm text-surface-500 mt-1.5">{t(`cancellationStep.${policy}.description`)}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+
         {/* Photos — clickable card linking to dedicated page */}
         <Link
           to={`/accommodations/${id}/photos`}
@@ -446,7 +494,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600">
-                {SECTIONS[6].icon}
+                {SECTIONS[7].icon}
               </div>
               <h2 className="text-lg font-semibold">{t('edit.section.photos')}</h2>
             </div>

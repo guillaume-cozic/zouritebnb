@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-export type EditSection = 'description' | 'price' | 'capacity' | 'amenities' | 'location' | 'checkinout' | 'photos';
+export type EditSection = 'description' | 'price' | 'capacity' | 'amenities' | 'location' | 'checkinout' | 'cancellation' | 'photos';
 
 export const SECTIONS: { key: EditSection; icon: React.ReactNode }[] = [
   {
@@ -30,13 +30,17 @@ export const SECTIONS: { key: EditSection; icon: React.ReactNode }[] = [
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>,
   },
   {
+    key: 'cancellation',
+    icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12h6" /><path d="M3 7V5a2 2 0 0 1 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" /><path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" /></svg>,
+  },
+  {
     key: 'photos',
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 00-2.828 0L6 21" /></svg>,
   },
 ];
 
 // Sections that live on the edit page (scrollable)
-const EDIT_PAGE_SECTIONS: EditSection[] = ['description', 'price', 'capacity', 'amenities', 'location', 'checkinout'];
+const EDIT_PAGE_SECTIONS: EditSection[] = ['description', 'price', 'capacity', 'amenities', 'location', 'checkinout', 'cancellation'];
 
 interface EditLayoutProps {
   accommodationId: string;

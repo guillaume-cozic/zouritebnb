@@ -6,6 +6,7 @@ namespace App\Accommodation\Domain\Entity;
 
 use App\Accommodation\Domain\Event\AccommodationAddressUpdated;
 use App\Accommodation\Domain\Event\AccommodationAmenitiesUpdated;
+use App\Accommodation\Domain\Event\AccommodationCancellationPolicyUpdated;
 use App\Accommodation\Domain\Event\AccommodationCapacityUpdated;
 use App\Accommodation\Domain\Event\AccommodationCheckInOutUpdated;
 use App\Accommodation\Domain\Event\AccommodationDescriptionUpdated;
@@ -35,6 +36,7 @@ final class Accommodation extends AggregateRoot
         private ?Uuid $teamId = null,
         private ?float $weeklyPromotionPercentage = null,
         private ?Uuid $regionId = null,
+        private CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
@@ -173,5 +175,16 @@ final class Accommodation extends AggregateRoot
 
         $this->weeklyPromotionPercentage = $percentage;
         $this->recordEvent(new AccommodationWeeklyPromotionUpdated($this->id, $percentage));
+    }
+
+    public function getCancellationPolicy(): CancellationPolicy
+    {
+        return $this->cancellationPolicy;
+    }
+
+    public function updateCancellationPolicy(CancellationPolicy $cancellationPolicy): void
+    {
+        $this->cancellationPolicy = $cancellationPolicy;
+        $this->recordEvent(new AccommodationCancellationPolicyUpdated($this->id));
     }
 }

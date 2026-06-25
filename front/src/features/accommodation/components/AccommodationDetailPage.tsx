@@ -324,6 +324,18 @@ const AccommodationDetailPage: React.FC = () => {
               <p className="text-lg whitespace-pre-line">{accommodation.description}</p>
             </div>
 
+            {/* Cancellation policy */}
+            <div className="border-b pb-8 mb-8">
+              <h2 className="text-2xl font-semibold mb-4">{t('detail.cancellationTitle')}</h2>
+              <div className="flex items-start gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10" /><path d="M12 8v4" /><path d="M12 16h.01" /></svg>
+                <div>
+                  <p className="font-medium">{t(`cancellationStep.${accommodation.cancellationPolicy ?? 'flexible'}.title`)}</p>
+                  <p className="text-gray-500">{t(`cancellationStep.${accommodation.cancellationPolicy ?? 'flexible'}.description`)}</p>
+                </div>
+              </div>
+            </div>
+
             {/* Amenities */}
             {accommodation.amenities && accommodation.amenities.length > 0 && (
               <div className="border-b pb-8 mb-8">

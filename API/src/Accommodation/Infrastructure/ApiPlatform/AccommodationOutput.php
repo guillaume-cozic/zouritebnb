@@ -141,6 +141,40 @@ use Symfony\Component\Serializer\Attribute\Groups;
             output: false,
             processor: UpdateAccommodationWeeklyPromotionProcessor::class,
         ),
+        new Patch(
+            uriTemplate: '/accommodations/{id}/cancellation-policy',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Modifier la politique d\'annulation d\'un hébergement',
+                description: 'Met à jour la politique d\'annulation choisie par l\'hôte. Valeurs autorisées : "flexible" (remboursement intégral jusqu\'à 24h avant l\'arrivée) ou "moderate" (remboursement intégral jusqu\'à 5 jours avant, puis 50%).',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/merge-patch+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'flexible' => new Example(
+                                    summary: 'Politique flexible',
+                                    value: ['cancellationPolicy' => 'flexible'],
+                                ),
+                                'moderate' => new Example(
+                                    summary: 'Politique modérée',
+                                    value: ['cancellationPolicy' => 'moderate'],
+                                ),
+                                'invalid' => new Example(
+                                    summary: 'Invalide : valeur inconnue',
+                                    description: 'Retourne une erreur 422 car la valeur doit être "flexible" ou "moderate".',
+                                    value: ['cancellationPolicy' => 'strict'],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationCancellationPolicyInput::class,
+            output: false,
+            processor: UpdateAccommodationCancellationPolicyProcessor::class,
+        ),
         new Put(
             uriTemplate: '/accommodations/{id}/address',
             status: 204,
@@ -421,6 +455,10 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Pourcentage de réduction appliqué aux séjours d\'au moins 7 nuits', example: 10.0)]
     public ?float $weeklyPromotionPercentage = null;
 
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Politique d\'annulation choisie par l\'hôte : "flexible" ou "moderate"', example: 'flexible')]
+    public ?string $cancellationPolicy = null;
+
     #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Statut de publication', example: 'draft')]
     public ?string $status = null;
@@ -528,6 +566,7 @@ class AccommodationOutput implements FromEntityInterface
         $output->checkOut = $entity->getCheckOut();
         $output->teamId = $entity->getTeamId()?->toRfc4122();
         $output->weeklyPromotionPercentage = $entity->getWeeklyPromotionPercentage();
+        $output->cancellationPolicy = $entity->getCancellationPolicy();
 
         return $output;
     }

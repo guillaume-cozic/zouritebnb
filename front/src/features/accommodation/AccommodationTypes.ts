@@ -1,3 +1,6 @@
+/** Host-selectable cancellation policy for an accommodation. */
+export type CancellationPolicy = 'flexible' | 'moderate';
+
 export interface Accommodation {
   '@id'?: string;
   id?: string;
@@ -5,6 +8,7 @@ export interface Accommodation {
   description?: string;
   price?: number;
   weeklyPromotionPercentage?: number | null;
+  cancellationPolicy?: CancellationPolicy;
   status?: 'draft' | 'published';
   street?: string;
   city?: string;
@@ -87,6 +91,11 @@ export interface UpdatePricePayload {
 export interface UpdateWeeklyPromotionPayload {
   id: string;
   weeklyPromotionPercentage: number | null;
+}
+
+export interface UpdateCancellationPolicyPayload {
+  id: string;
+  cancellationPolicy: CancellationPolicy;
 }
 
 export interface SetCheckInOutPayload {

@@ -147,7 +147,19 @@
     "guest": "Voyageur",
     "downloadInvoice": "Télécharger la facture",
     "accommodation": "Logement",
-    "reviewable": "À noter"
+    "reviewable": "À noter",
+    "cancel": {
+      "action": "Annuler la réservation",
+      "refundLabel": "Remboursement",
+      "refundPreview": "{{amount}} ({{percent}} %) vous seraient remboursés si vous annulez maintenant.",
+      "modalTitle": "Annuler la réservation",
+      "modalSubtitle": "Selon la politique d'annulation et la date du jour, voici ce qui vous sera remboursé.",
+      "policyLabel": "Politique d'annulation",
+      "messageLabel": "Message (facultatif)",
+      "messagePlaceholder": "Ajoutez un mot pour l'hôte ou le voyageur, il sera publié dans la conversation.",
+      "keep": "Conserver la réservation",
+      "confirm": "Confirmer l'annulation"
+    }
   },
   "navbar": {
     "home": "Accueil",
@@ -456,6 +468,7 @@
       "amenities": "Équipements",
       "location": "Localisation",
       "checkinout": "Arrivée / Départ",
+      "cancellation": "Annulation",
       "photos": "Photos"
     }
   },
@@ -474,6 +487,7 @@
     "checkIn": "Arrivée",
     "checkOut": "Départ",
     "amenitiesTitle": "Équipements",
+    "cancellationTitle": "Conditions d'annulation",
     "locationTitle": "Localisation",
     "datesLabel": "Dates",
     "selectDates": "Sélectionner les dates",
@@ -544,6 +558,17 @@
     "descriptionMinLength": "La description doit contenir au moins 10 caractères",
     "priceRequired": "Le prix est requis",
     "pricePositive": "Le prix doit être supérieur à 0"
+  },
+  "cancellationStep": {
+    "intro": "Choisissez les conditions appliquées lorsqu'un voyageur annule sa réservation.",
+    "flexible": {
+      "title": "Flexible",
+      "description": "Remboursement intégral si le voyageur annule au plus tard 24 h avant l'arrivée."
+    },
+    "moderate": {
+      "title": "Modérée",
+      "description": "Remboursement intégral jusqu'à 5 jours avant l'arrivée, puis 50 % au-delà."
+    }
   },
   "capacityStep": {
     "intro": "Indiquez la capacité de votre hébergement pour aider les voyageurs à trouver le logement idéal.",

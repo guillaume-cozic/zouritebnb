@@ -80,6 +80,9 @@ class AccommodationEntity
     #[ORM\Column(type: UuidType::NAME, nullable: true)]
     private ?Uuid $regionId = null;
 
+    #[ORM\Column(length: 20, options: ['default' => 'flexible'])]
+    private string $cancellationPolicy = 'flexible';
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -340,6 +343,18 @@ class AccommodationEntity
     public function setRegionId(?Uuid $regionId): static
     {
         $this->regionId = $regionId;
+
+        return $this;
+    }
+
+    public function getCancellationPolicy(): string
+    {
+        return $this->cancellationPolicy;
+    }
+
+    public function setCancellationPolicy(string $cancellationPolicy): static
+    {
+        $this->cancellationPolicy = $cancellationPolicy;
 
         return $this;
     }

@@ -11,6 +11,8 @@ import {
   DeletePhotoPayload,
   UpdatePricePayload,
   UpdateWeeklyPromotionPayload,
+  UpdateCancellationPolicyPayload,
+  CancellationPolicy,
   SetCheckInOutPayload,
   ReorderPhotosPayload,
   UpdateDescriptionPayload,
@@ -22,7 +24,7 @@ import {
 export type AutoSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 /** Sections of the edit page, used to display a per-section auto-save badge. */
-export type EditSection = 'description' | 'price' | 'capacity' | 'amenities' | 'location' | 'checkinout';
+export type EditSection = 'description' | 'price' | 'capacity' | 'amenities' | 'location' | 'checkinout' | 'cancellation';
 
 /**
  * Single business intent dispatched by the edit page when the user modifies a
@@ -33,6 +35,7 @@ export type AccommodationFieldEditedPayload =
   | { field: 'description'; id: string; title: string; description: string }
   | { field: 'price'; id: string; price: number }
   | { field: 'weeklyPromotion'; id: string; weeklyPromotionPercentage: number | null }
+  | { field: 'cancellationPolicy'; id: string; cancellationPolicy: CancellationPolicy }
   | { field: 'capacity'; id: string; bedrooms: number; bathrooms: number; maxGuests: number; singleBeds: number; doubleBeds: number }
   | { field: 'amenities'; id: string; codes: string[] }
   | { field: 'checkInOut'; id: string; checkIn: string; checkOut: string }
@@ -54,6 +57,8 @@ export const editSectionForField = (field: AccommodationEditField): EditSection 
       return 'price';
     case 'checkInOut':
       return 'checkinout';
+    case 'cancellationPolicy':
+      return 'cancellation';
     default:
       return field;
   }
@@ -255,6 +260,24 @@ export const updateWeeklyPromotion = createAsyncThunk(
   }
 );
 
+export const updateCancellationPolicy = createAsyncThunk(
+  'accommodation/updateCancellationPolicy',
+  async ({ id, cancellationPolicy }: UpdateCancellationPolicyPayload, { rejectWithValue }) => {
+    try {
+      await api.patch(
+        `/api/accommodations/${id}/cancellation-policy`,
+        { cancellationPolicy },
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return { cancellationPolicy };
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, "Erreur lors de la mise à jour de la politique d'annulation")
+      );
+    }
+  }
+);
+
 export const setCheckInOut = createAsyncThunk(
   'accommodation/setCheckInOut',
   async ({ id, checkIn, checkOut }: SetCheckInOutPayload, { rejectWithValue }) => {
@@ -325,6 +348,7 @@ const EDIT_SECTION_BY_THUNK_PREFIX: Record<string, EditSection> = {
   [updateDescription.typePrefix]: 'description',
   [updatePrice.typePrefix]: 'price',
   [updateWeeklyPromotion.typePrefix]: 'price',
+  [updateCancellationPolicy.typePrefix]: 'cancellation',
   [setCapacity.typePrefix]: 'capacity',
   [setAmenities.typePrefix]: 'amenities',
   [setCheckInOut.typePrefix]: 'checkinout',
@@ -335,6 +359,7 @@ const EDIT_THUNKS = [
   updateDescription,
   updatePrice,
   updateWeeklyPromotion,
+  updateCancellationPolicy,
   setCapacity,
   setAmenities,
   setCheckInOut,
@@ -504,6 +529,21 @@ const accommodationSlice = createSlice({
         }
       })
       .addCase(updateWeeklyPromotion.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update cancellation policy
+      .addCase(updateCancellationPolicy.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updateCancellationPolicy.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.cancellationPolicy = action.payload.cancellationPolicy;
+        }
+      })
+      .addCase(updateCancellationPolicy.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })

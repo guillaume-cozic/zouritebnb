@@ -163,6 +163,31 @@ describe('accommodationFieldEdited', () => {
     }
   });
 
+  test('saves the cancellation policy under the cancellation badge section', async () => {
+    vi.useFakeTimers();
+    try {
+      mockedApi.patch.mockResolvedValue({ data: {} });
+      const store = buildStore();
+
+      store.dispatch(accommodationFieldEdited({
+        field: 'cancellationPolicy',
+        id: 'a-1',
+        cancellationPolicy: 'moderate',
+      }));
+      vi.advanceTimersByTime(1201);
+      await flush();
+
+      expect(mockedApi.patch).toHaveBeenCalledWith(
+        '/api/accommodations/a-1/cancellation-policy',
+        { cancellationPolicy: 'moderate' },
+        expect.anything()
+      );
+      expect(store.getState().accommodation.editSaveStatus.cancellation).toBe('saved');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   test('saves the weekly promotion under the price badge section', async () => {
     vi.useFakeTimers();
     try {

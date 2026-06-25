@@ -13,6 +13,7 @@ import {
   setCapacity,
   setCheckInOut,
   setLocation,
+  updateCancellationPolicy,
   updateDescription,
   updatePrice,
   updateWeeklyPromotion,
@@ -50,6 +51,8 @@ const isSavable = (p: AccommodationFieldEditedPayload): boolean => {
           p.weeklyPromotionPercentage > 0 &&
           p.weeklyPromotionPercentage <= 100)
       );
+    case 'cancellationPolicy':
+      return p.cancellationPolicy === 'flexible' || p.cancellationPolicy === 'moderate';
     case 'location':
       return (
         p.street.trim() !== '' &&
@@ -71,6 +74,8 @@ const dispatchSave = (p: AccommodationFieldEditedPayload, dispatch: AppDispatch)
       return dispatch(updatePrice({ id: p.id, price: p.price }));
     case 'weeklyPromotion':
       return dispatch(updateWeeklyPromotion({ id: p.id, weeklyPromotionPercentage: p.weeklyPromotionPercentage }));
+    case 'cancellationPolicy':
+      return dispatch(updateCancellationPolicy({ id: p.id, cancellationPolicy: p.cancellationPolicy }));
     case 'capacity':
       return dispatch(setCapacity({
         id: p.id,
@@ -103,6 +108,7 @@ const EDIT_FIELDS: AccommodationEditField[] = [
   'description',
   'price',
   'weeklyPromotion',
+  'cancellationPolicy',
   'capacity',
   'amenities',
   'checkInOut',
