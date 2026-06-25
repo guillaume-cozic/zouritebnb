@@ -116,6 +116,11 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
   const myName = authUser?.firstName || authUser?.email.split('@')[0] || t('conversation.guest');
   const hostName =
     [host?.firstName, host?.lastName].filter(Boolean).join(' ').trim() || t('conversation.host');
+  // The guest's identity (name + avatar) comes from the conversation itself, so the host
+  // sees who they are talking to. On the traveler side these resolve to the guest's own
+  // messages (handled via `mine`), so the fallback to a generic label is never reached.
+  const guestDisplayName = conversation.guestName?.trim() || t('conversation.guest');
+  const guestAvatarUrl = conversation.guestAvatarUrl ?? null;
 
   const [body, setBody] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -156,10 +161,10 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
           const isGuest = m.authorUserId === conversation.guestUserId;
           const isHost = !m.isSystem && !isGuest;
           const mine = m.authorUserId === currentUserId;
-          // My own photo for my messages; the host's photo for host-side messages.
-          // The other party's guest photo isn't exposed by the API, so it falls back to an initial.
-          const avatarUrl = mine ? authUser?.avatarUrl : isHost ? host?.avatarUrl : null;
-          const avatarName = mine ? myName : isHost ? hostName : t('conversation.guest');
+          // My own photo for my messages; the host's photo for host-side messages;
+          // the guest's photo (from the conversation) for guest-side messages.
+          const avatarUrl = mine ? authUser?.avatarUrl : isHost ? host?.avatarUrl : guestAvatarUrl;
+          const avatarName = mine ? myName : isHost ? hostName : guestDisplayName;
           return (
             <React.Fragment key={m.id}>
               {showDivider && <DayDivider iso={m.sentAt} locale={locale} />}

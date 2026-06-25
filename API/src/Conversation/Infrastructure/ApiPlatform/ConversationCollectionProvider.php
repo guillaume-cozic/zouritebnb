@@ -7,6 +7,7 @@ namespace App\Conversation\Infrastructure\ApiPlatform;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Conversation\Application\UseCase\ListConversations;
+use App\Shared\Domain\Port\UserContactProvider;
 use App\Shared\Infrastructure\Security\CurrentUser;
 
 /**
@@ -17,6 +18,7 @@ final readonly class ConversationCollectionProvider implements ProviderInterface
     public function __construct(
         private ListConversations $listConversations,
         private CurrentUser $currentUser,
+        private UserContactProvider $userContactProvider,
     ) {
     }
 
@@ -27,6 +29,11 @@ final readonly class ConversationCollectionProvider implements ProviderInterface
         // the user is either the guest or a member of the host team.
         $conversations = $this->listConversations->forUser($this->currentUser->id());
 
-        return array_map(static fn ($c) => ConversationOutput::fromEntity($c), $conversations);
+        return array_map(function ($c) {
+            $output = ConversationOutput::fromEntity($c);
+            $output->applyGuestContact($this->userContactProvider->contactOf($c->getGuestUserId()));
+
+            return $output;
+        }, $conversations);
     }
 }

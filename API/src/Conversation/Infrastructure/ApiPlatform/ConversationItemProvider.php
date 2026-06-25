@@ -10,6 +10,7 @@ use App\Conversation\Domain\Entity\Conversation;
 use App\Conversation\Domain\Entity\ConversationId;
 use App\Conversation\Domain\Port\ConversationRepository;
 use App\Shared\Domain\Port\TeamMembershipChecker;
+use App\Shared\Domain\Port\UserContactProvider;
 use App\Shared\Infrastructure\Security\CurrentUser;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Uid\Uuid;
@@ -23,6 +24,7 @@ final readonly class ConversationItemProvider implements ProviderInterface
         private ConversationRepository $repository,
         private CurrentUser $currentUser,
         private TeamMembershipChecker $teamMembershipChecker,
+        private UserContactProvider $userContactProvider,
     ) {
     }
 
@@ -37,7 +39,10 @@ final readonly class ConversationItemProvider implements ProviderInterface
 
         $this->assertParticipant($conversation);
 
-        return ConversationOutput::fromEntity($conversation);
+        $output = ConversationOutput::fromEntity($conversation);
+        $output->applyGuestContact($this->userContactProvider->contactOf($conversation->getGuestUserId()));
+
+        return $output;
     }
 
     /**

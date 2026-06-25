@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Conversation, ConversationMessage } from '../ConversationTypes';
 import { UnreadBadge } from '../../../components/ui';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 interface Props {
   conversation: Conversation;
   to: string;
@@ -20,6 +22,8 @@ interface Props {
   accommodationCity?: string | null;
   /** Host inbox: the guest's name shown as the item title (and avatar initials). */
   guestName?: string | null;
+  /** Host inbox: the guest's photo, shown in place of the initials when available. */
+  guestAvatarUrl?: string | null;
 }
 
 const lastMessage = (conversation: Conversation): ConversationMessage | null => {
@@ -66,6 +70,7 @@ const ConversationListItem: React.FC<Props> = ({
   accommodationTitle = null,
   accommodationCity = null,
   guestName = null,
+  guestAvatarUrl = null,
 }) => {
   const { t } = useTranslation();
   const last = lastMessage(conversation);
@@ -94,12 +99,20 @@ const ConversationListItem: React.FC<Props> = ({
     >
       <div className="flex items-start gap-3">
         <div className="relative flex-shrink-0">
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold"
-            style={{ background: `linear-gradient(135deg, hsl(${hue}, 65%, 55%), hsl(${(hue + 30) % 360}, 65%, 45%))` }}
-          >
-            {avatar}
-          </div>
+          {guestAvatarUrl ? (
+            <img
+              src={`${API_BASE}${guestAvatarUrl}`}
+              alt={title}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          ) : (
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold"
+              style={{ background: `linear-gradient(135deg, hsl(${hue}, 65%, 55%), hsl(${(hue + 30) % 360}, 65%, 45%))` }}
+            >
+              {avatar}
+            </div>
+          )}
           {needsAction && (
             <span
               aria-hidden="true"

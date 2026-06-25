@@ -1396,6 +1396,10 @@ export interface components {
       teamId?: string | null;
       /** @description Identifiant UUID du loueur (guest) */
       guestUserId?: string | null;
+      /** @description Nom complet du loueur (prénom + nom), pour identifier l'interlocuteur côté hôte */
+      guestName?: string | null;
+      /** @description URL relative de la photo du loueur (null s'il n'en a pas) */
+      guestAvatarUrl?: string | null;
       /** @description Date et heure de création (ISO 8601) */
       createdAt?: string | null;
       messages?: components["schemas"]["MessageOutput.jsonld-conversation.read"][];

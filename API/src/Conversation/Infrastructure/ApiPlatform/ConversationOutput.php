@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use App\Conversation\Domain\Entity\Conversation;
 use App\Shared\ApiPlatform\State\FromEntityInterface;
+use App\Shared\Domain\Port\UserContact;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
@@ -77,6 +78,14 @@ class ConversationOutput implements FromEntityInterface
     public ?string $guestUserId = null;
 
     #[Groups(['conversation:read'])]
+    #[ApiProperty(description: 'Nom complet du loueur (prénom + nom), pour identifier l\'interlocuteur côté hôte')]
+    public ?string $guestName = null;
+
+    #[Groups(['conversation:read'])]
+    #[ApiProperty(description: 'URL relative de la photo du loueur (null s\'il n\'en a pas)')]
+    public ?string $guestAvatarUrl = null;
+
+    #[Groups(['conversation:read'])]
     #[ApiProperty(description: 'Date et heure de création (ISO 8601)')]
     public ?string $createdAt = null;
 
@@ -104,5 +113,19 @@ class ConversationOutput implements FromEntityInterface
         );
 
         return $output;
+    }
+
+    /**
+     * Enriches the output with the guest's identity (full name + avatar) so the host can
+     * see who they are talking to. No-op when the contact can't be resolved.
+     */
+    public function applyGuestContact(?UserContact $contact): void
+    {
+        if (null === $contact) {
+            return;
+        }
+
+        $this->guestName = $contact->displayName();
+        $this->guestAvatarUrl = $contact->avatarUrl;
     }
 }

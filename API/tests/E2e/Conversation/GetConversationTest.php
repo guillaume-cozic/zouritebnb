@@ -38,6 +38,29 @@ final class GetConversationTest extends ConversationApiTestCase
         self::assertJsonContains(['id' => $conversationId]);
     }
 
+    public function test_exposes_the_guest_identity_to_the_host(): void
+    {
+        // The host needs the guest's full name (and avatar) to know who they are talking to.
+        $guestUserId = $this->createAuthUser(
+            email: 'guest@example.com',
+            teamId: Uuid::v7()->toRfc4122(),
+            firstName: 'Guillaume',
+            lastName: 'Cozic',
+        );
+        $this->createAuthUser(email: 'host@example.com', teamId: self::DEFAULT_TEAM_UUID);
+        $conversationId = $this->seedConversation(guestUserId: $guestUserId, teamId: self::DEFAULT_TEAM_UUID);
+
+        self::createClient()->request('GET', '/api/conversations/'.$conversationId, [
+            'headers' => $this->authHeaders('host@example.com'),
+        ]);
+
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            'guestUserId' => $guestUserId,
+            'guestName' => 'Guillaume Cozic',
+        ]);
+    }
+
     public function test_requires_authentication(): void
     {
         $guestUserId = $this->createAuthUser(email: 'guest@example.com', teamId: Uuid::v7()->toRfc4122());

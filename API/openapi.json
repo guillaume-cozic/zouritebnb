@@ -7669,6 +7669,20 @@
                                     "null"
                                 ]
                             },
+                            "guestName": {
+                                "description": "Nom complet du loueur (pr\u00e9nom + nom), pour identifier l'interlocuteur c\u00f4t\u00e9 h\u00f4te",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "guestAvatarUrl": {
+                                "description": "URL relative de la photo du loueur (null s'il n'en a pas)",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
                             "createdAt": {
                                 "description": "Date et heure de cr\u00e9ation (ISO 8601)",
                                 "type": [

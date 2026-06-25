@@ -23,11 +23,15 @@ final readonly class DoctrineUserContactProvider implements UserContactProvider
             return null;
         }
 
+        $avatarFilename = $user->getAvatarFilename();
+
         return new UserContact(
             userId: $userId,
             email: $user->getEmail(),
             firstName: $user->getFirstName(),
             phoneNumber: $user->getPhoneNumber(),
+            lastName: $user->getLastName(),
+            avatarUrl: null !== $avatarFilename ? '/uploads/photos/'.$avatarFilename : null,
         );
     }
 }

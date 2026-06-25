@@ -13,12 +13,25 @@ final readonly class UserContact
         public string $email,
         public ?string $firstName,
         public ?string $phoneNumber = null,
+        public ?string $lastName = null,
+        public ?string $avatarUrl = null,
     ) {
     }
 
     public function hasPhone(): bool
     {
         return null !== $this->phoneNumber && '' !== trim($this->phoneNumber);
+    }
+
+    /**
+     * Full display name (first + last), falling back to {@see greetingName()} when no
+     * name has been filled in yet. Used to identify a participant in a conversation.
+     */
+    public function displayName(): string
+    {
+        $full = trim(implode(' ', array_filter([$this->firstName, $this->lastName])));
+
+        return '' !== $full ? $full : $this->greetingName();
     }
 
     /**
