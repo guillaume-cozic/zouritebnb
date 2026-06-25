@@ -42,7 +42,7 @@ const ReservationSuccessPage: React.FC = () => {
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gradient-to-b from-primary-50/30 via-white to-white">
       <div className="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center">
+        <div className="flex flex-col items-center text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-200 mb-6">
             <svg
               width="30"
