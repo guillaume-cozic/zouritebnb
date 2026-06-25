@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import { extractErrorMessage } from '../../services/errors';
 import {
+  BusyRange,
   CreateReservationPayload,
   FetchReservationsParams,
   Reservation,
@@ -20,6 +21,9 @@ interface ReservationState {
   error: string | null;
   mutationStatus: Status;
   mutationError: string | null;
+  /** Unavailable date ranges for the accommodation currently viewed (public detail page). */
+  availability: BusyRange[];
+  availabilityStatus: Status;
 }
 
 const initialState: ReservationState = {
@@ -28,6 +32,8 @@ const initialState: ReservationState = {
   error: null,
   mutationStatus: 'idle',
   mutationError: null,
+  availability: [],
+  availabilityStatus: 'idle',
 };
 
 export const fetchReservations = createAsyncThunk(
@@ -44,6 +50,27 @@ export const fetchReservations = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         extractErrorMessage(err, 'Erreur lors du chargement des réservations')
+      );
+    }
+  }
+);
+
+/**
+ * Loads the booked date ranges of an accommodation from the public availability
+ * endpoint, so the detail page can strike through unavailable dates. Returns only
+ * busy spans — no guest or pricing data.
+ */
+export const fetchAccommodationAvailability = createAsyncThunk(
+  'reservation/fetchAvailability',
+  async (accommodationId: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get(
+        `/api/accommodations/${accommodationId}/availability`
+      );
+      return (response.data.busyRanges ?? []) as BusyRange[];
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, 'Erreur lors du chargement des disponibilités')
       );
     }
   }
@@ -171,6 +198,17 @@ const reservationSlice = createSlice({
       .addCase(fetchReservations.rejected, (state, action) => {
         state.status = 'failed';
         state.error = (action.payload as string) || action.error.message || null;
+      })
+      .addCase(fetchAccommodationAvailability.pending, (state) => {
+        state.availabilityStatus = 'loading';
+      })
+      .addCase(fetchAccommodationAvailability.fulfilled, (state, action) => {
+        state.availabilityStatus = 'succeeded';
+        state.availability = action.payload;
+      })
+      .addCase(fetchAccommodationAvailability.rejected, (state) => {
+        state.availabilityStatus = 'failed';
+        state.availability = [];
       })
       .addCase(createReservation.pending, (state) => {
         state.mutationStatus = 'loading';

@@ -5,7 +5,11 @@ vi.mock('../../services/api', async (importOriginal) => ({
 }));
 
 import { configureStore } from '@reduxjs/toolkit';
-import reservationReducer, { reservationModalOpened, createReservation } from './ReservationSlice';
+import reservationReducer, {
+  reservationModalOpened,
+  createReservation,
+  fetchAccommodationAvailability,
+} from './ReservationSlice';
 import accommodationManagementReducer from '../accommodationManagement/AccommodationManagementSlice';
 import { listenerMiddleware } from '../../store/listenerMiddleware';
 import '../../store/registerListeners';
@@ -66,5 +70,29 @@ describe('reservationModalOpened', () => {
     await flush();
 
     expect(mockedApi.get).not.toHaveBeenCalled();
+  });
+});
+
+describe('fetchAccommodationAvailability', () => {
+  test('le store mémorise les plages réservées renvoyées par l’API', async () => {
+    const busyRanges = [{ checkIn: '2026-05-01', checkOut: '2026-05-05' }];
+    mockedApi.get.mockResolvedValue({ data: { accommodationId: 'a-1', busyRanges } });
+    const store = buildStore();
+
+    await store.dispatch(fetchAccommodationAvailability('a-1'));
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations/a-1/availability');
+    expect(store.getState().reservation.availability).toEqual(busyRanges);
+    expect(store.getState().reservation.availabilityStatus).toBe('succeeded');
+  });
+
+  test('le store vide les plages en cas d’erreur', async () => {
+    mockedApi.get.mockRejectedValue({ response: { data: { detail: 'boom' } } });
+    const store = buildStore();
+
+    await store.dispatch(fetchAccommodationAvailability('a-1'));
+
+    expect(store.getState().reservation.availability).toEqual([]);
+    expect(store.getState().reservation.availabilityStatus).toBe('failed');
   });
 });

@@ -469,6 +469,7 @@
     "locationTitle": "Location",
     "datesLabel": "Dates",
     "selectDates": "Select dates",
+    "bookedDatesHint": "Struck-through dates are already booked",
     "guestsLabel": "Guests",
     "reserve": "Reserve",
     "nights_one": "{{count}} night",

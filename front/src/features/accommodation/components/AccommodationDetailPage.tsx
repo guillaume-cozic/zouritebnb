@@ -17,6 +17,8 @@ import { selectAuthUser } from '../../auth/AuthSelectors';
 import LocationMap from '../../../components/LocationMap';
 import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
+import { fetchAccommodationAvailability } from '../../reservation/ReservationSlice';
+import { selectAccommodationAvailability } from '../../reservation/ReservationSelectors';
 import RatingBadge from '../../review/components/RatingBadge';
 import HostProfileCard from '../../hostProfile/components/HostProfileCard';
 import AccommodationReviews from '../../review/components/AccommodationReviews';
@@ -28,6 +30,11 @@ registerLocale('fr', fr);
 registerLocale('en', enGB);
 
 const toDate = (s: string): Date | null => (s ? new Date(s) : null);
+/** Parses an ISO YYYY-MM-DD string as a local-midnight Date (timezone-safe). */
+const parseLocalDate = (s: string): Date => {
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
 const toStr = (d: Date | null): string => {
   if (!d) return '';
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -52,7 +59,23 @@ const AccommodationDetailPage: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const user = useAppSelector(selectAuthUser);
   const reviews = useAppSelector(selectAccommodationReviews);
+  const availability = useAppSelector(selectAccommodationAvailability);
   const navigate = useNavigate();
+
+  // Booked nights → date intervals the picker disables and strikes through.
+  // A range covers checkIn..(checkOut - 1): the departure day stays bookable for a new arrival.
+  const excludeDateIntervals = React.useMemo(
+    () =>
+      availability
+        .map(({ checkIn, checkOut }) => {
+          const start = parseLocalDate(checkIn);
+          const end = parseLocalDate(checkOut);
+          end.setDate(end.getDate() - 1);
+          return { start, end };
+        })
+        .filter(({ start, end }) => end >= start),
+    [availability]
+  );
 
   const startDate = toDate(filters.checkIn);
   const endDate = toDate(filters.checkOut);
@@ -83,6 +106,7 @@ const AccommodationDetailPage: React.FC = () => {
     if (id) {
       dispatch(fetchAccommodation(id));
       dispatch(fetchAccommodationReviews(id));
+      dispatch(fetchAccommodationAvailability(id));
     }
   }, [dispatch, id]);
 
@@ -402,12 +426,18 @@ const AccommodationDetailPage: React.FC = () => {
                     onChange={handleDateChange}
                     locale={i18n.language}
                     minDate={new Date()}
+                    excludeDateIntervals={excludeDateIntervals}
                     monthsShown={2}
                     placeholderText={t('detail.selectDates')}
                     dateFormat="dd/MM/yyyy"
                     className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
                     isClearable
                   />
+                  {excludeDateIntervals.length > 0 && (
+                    <p className="mt-2 text-xs text-gray-500">
+                      {t('detail.bookedDatesHint')}
+                    </p>
+                  )}
                 </div>
 
                 {/* Guests */}

@@ -87,6 +87,28 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
         return array_map($this->toDomain(...), $entities);
     }
 
+    public function busyRanges(Uuid $accommodationId, \DateTimeImmutable $from): array
+    {
+        $entities = $this->createQueryBuilder('r')
+            ->andWhere('r.accommodationId = :accommodationId')
+            ->andWhere('r.status IN (:statuses)')
+            ->andWhere('r.checkOut > :from')
+            ->setParameter('accommodationId', $accommodationId, \Symfony\Bridge\Doctrine\Types\UuidType::NAME)
+            ->setParameter('statuses', [ReservationStatus::Pending->value, ReservationStatus::Confirmed->value])
+            ->setParameter('from', $from)
+            ->orderBy('r.checkIn', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(
+            static fn (ReservationEntity $entity): DateRange => new DateRange(
+                checkIn: $entity->getCheckIn(),
+                checkOut: $entity->getCheckOut(),
+            ),
+            $entities,
+        );
+    }
+
     private function toDomain(ReservationEntity $entity): DomainReservation
     {
         return new DomainReservation(

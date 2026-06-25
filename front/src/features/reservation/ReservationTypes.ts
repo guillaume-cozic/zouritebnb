@@ -38,3 +38,11 @@ export interface FetchReservationsParams {
   from?: string;
   to?: string;
 }
+
+/** An unavailable date span for an accommodation (dates in ISO YYYY-MM-DD). */
+export interface BusyRange {
+  /** First occupied night. */
+  checkIn: string;
+  /** Departure day, excluded from the booked nights. */
+  checkOut: string;
+}

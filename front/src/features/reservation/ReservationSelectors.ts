@@ -9,6 +9,9 @@ export const selectReservationMutationStatus = (state: RootState) =>
 export const selectReservationMutationError = (state: RootState) =>
   state.reservation.mutationError;
 
+export const selectAccommodationAvailability = (state: RootState) =>
+  state.reservation.availability;
+
 export const selectReservationsForAccommodation = (accommodationId: string) =>
   createSelector(selectReservations, (items) =>
     items.filter((r) => r.accommodationId === accommodationId)

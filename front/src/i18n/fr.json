@@ -469,6 +469,7 @@
     "locationTitle": "Localisation",
     "datesLabel": "Dates",
     "selectDates": "Sélectionner les dates",
+    "bookedDatesHint": "Les dates barrées sont déjà réservées",
     "guestsLabel": "Voyageurs",
     "reserve": "Réserver",
     "nights_one": "{{count}} nuit",

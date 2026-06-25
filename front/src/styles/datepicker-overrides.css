@@ -167,6 +167,19 @@
   color: #cbd5e1;
 }
 
+/* ── Already-booked days: struck through and not selectable ── */
+.react-datepicker__day--excluded {
+  color: #cbd5e1 !important;
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  cursor: not-allowed;
+}
+
+.react-datepicker__day--excluded:hover {
+  background-color: transparent;
+  color: #cbd5e1;
+}
+
 /* ── Two-month layout side by side ── */
 .react-datepicker {
   display: inline-flex !important;
