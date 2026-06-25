@@ -80,13 +80,21 @@ const AllAccommodationsCalendarPage: React.FC = () => {
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
   const { rangeStart, rangeEnd, title } = useMemo(() => {
+    // Format the label with Intl rather than moment: moment's locale files don't
+    // register under Vite (the directly-imported moment instance only knows 'en'),
+    // so moment.format('MMMM') would always render English here. Intl follows the
+    // active i18n language and matches the calendar's own French headers.
+    const lng = i18n.language;
+    const dayMonth = new Intl.DateTimeFormat(lng, { day: 'numeric', month: 'short' });
+    const dayMonthYear = new Intl.DateTimeFormat(lng, { day: 'numeric', month: 'short', year: 'numeric' });
+    const monthYear = new Intl.DateTimeFormat(lng, { month: 'long', year: 'numeric' });
     if (view === 'week') {
       const ws = moment(visibleDate).startOf('week');
       const we = moment(visibleDate).endOf('week');
       return {
         rangeStart: ws,
         rangeEnd: we,
-        title: `${ws.format('D MMM')} – ${we.format('D MMM YYYY')}`,
+        title: `${dayMonth.format(ws.toDate())} – ${dayMonthYear.format(we.toDate())}`,
       };
     }
     const ms = moment(visibleDate).startOf('month');
@@ -94,9 +102,9 @@ const AllAccommodationsCalendarPage: React.FC = () => {
     return {
       rangeStart: ms,
       rangeEnd: me,
-      title: ms.format('MMMM YYYY'),
+      title: monthYear.format(ms.toDate()),
     };
-  }, [visibleDate, view, isFr]);
+  }, [visibleDate, view, i18n.language]);
 
   useEffect(() => {
     dispatch(fetchAllAccommodations('all'));

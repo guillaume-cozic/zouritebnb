@@ -267,6 +267,10 @@
       "published": "Published",
       "draft": "Drafts"
     },
+    "status": {
+      "published": "Published",
+      "draft": "Draft"
+    },
     "col": {
       "title": "Title",
       "city": "City",
@@ -300,7 +304,7 @@
     "current": {
       "title": "Staying with us today",
       "subtitle": "Guests currently in your accommodations.",
-      "empty": "No upcoming trips.",
+      "empty": "No guests are staying with you today.",
       "dayCount": "Day {{day}} / {{total}}",
       "leavingTomorrow": "Leaving tomorrow"
     },

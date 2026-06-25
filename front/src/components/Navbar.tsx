@@ -23,7 +23,13 @@ const Navbar: React.FC = () => {
   // A traveler with no listing can still land on /admin (e.g. the default
   // post-login redirect). Treat confirmed non-owners as travelers so menu links
   // (conversations, settings) point to their /account space, not the host backoffice.
-  const isHostMode = location.pathname.startsWith('/admin') && hasAccommodation !== false;
+  // Host-only management routes live outside /admin (/create, listing edit/photos):
+  // keep the mode switch consistent there instead of flipping back to "host mode".
+  const onHostRoute =
+    location.pathname.startsWith('/admin') ||
+    location.pathname === '/create' ||
+    /^\/accommodations\/[^/]+\/(edit|photos)$/.test(location.pathname);
+  const isHostMode = onHostRoute && hasAccommodation !== false;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 

@@ -267,6 +267,10 @@
       "published": "Publiés",
       "draft": "Brouillons"
     },
+    "status": {
+      "published": "Publié",
+      "draft": "Brouillon"
+    },
     "col": {
       "title": "Titre",
       "city": "Ville",
@@ -300,7 +304,7 @@
     "current": {
       "title": "Chez nous aujourd'hui",
       "subtitle": "Les voyageurs qui séjournent en ce moment.",
-      "empty": "Pas de voyages prochainement.",
+      "empty": "Aucun voyageur ne séjourne chez vous aujourd'hui.",
       "dayCount": "Jour {{day}} / {{total}}",
       "leavingTomorrow": "Part demain"
     },

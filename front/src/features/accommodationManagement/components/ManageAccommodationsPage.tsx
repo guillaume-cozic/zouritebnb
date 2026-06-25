@@ -20,13 +20,14 @@ import EmptyState, { HomeIcon } from '../../../components/EmptyState';
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const { t } = useTranslation();
   const classes =
     status === 'published'
       ? 'bg-green-50 text-green-700 border-green-200'
       : 'bg-amber-50 text-amber-700 border-amber-200';
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${classes}`}>
-      {status}
+      {t(`backoffice.status.${status}`, status)}
     </span>
   );
 };
