@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import {
@@ -15,6 +15,7 @@ import {
   selectUnreadCountByConversation,
 } from '../ConversationSelectors';
 import { selectAuthUser } from '../../auth/AuthSelectors';
+import { fetchOwnsAccommodation } from '../../accommodationManagement/AccommodationManagementSlice';
 import { selectHasAccommodation } from '../../accommodationManagement/AccommodationManagementSelectors';
 import { fetchAccommodationSummary } from '../../accommodation/AccommodationSummarySlice';
 import { selectAccommodationSummaries } from '../../accommodation/AccommodationSummarySelectors';
@@ -80,6 +81,11 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
     for (const r of reservations) map[r.id] = r.status;
     return map;
   }, [reservations]);
+
+  // Resolve host ownership so the traveler inbox can redirect hosts to their admin inbox.
+  useEffect(() => {
+    dispatch(fetchOwnsAccommodation());
+  }, [dispatch]);
 
   useEffect(() => {
     if (isHost) {
@@ -162,6 +168,13 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
       setBusy(false);
     }
   };
+
+  // A host's messaging is always the admin inbox: send them there even if they reach the
+  // traveler route (e.g. while browsing in traveler mode). Their host inbox already lists
+  // every conversation, so nothing is lost. Wait for ownership to resolve before redirecting.
+  if (!isHost && hasAccommodation === true) {
+    return <Navigate to={id ? `/admin/conversations/${id}` : '/admin/conversations'} replace />;
+  }
 
   return (
     <div className="h-[calc(100vh-4rem)] flex bg-white">

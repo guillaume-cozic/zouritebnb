@@ -196,7 +196,7 @@ const Navbar: React.FC = () => {
                       </>
                     )}
                     <Link
-                      to={isHostMode ? '/admin/conversations' : '/account/conversations'}
+                      to={hasAccommodation ? '/admin/conversations' : '/account/conversations'}
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-3 px-5 py-3 text-gray-700 hover:bg-gray-50"
                     >
