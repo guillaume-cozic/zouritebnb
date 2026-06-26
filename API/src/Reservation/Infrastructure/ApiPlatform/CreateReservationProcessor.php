@@ -40,6 +40,7 @@ final readonly class CreateReservationProcessor implements ProcessorInterface
             checkIn: new \DateTimeImmutable($data->checkIn),
             checkOut: new \DateTimeImmutable($data->checkOut),
             guestName: $data->guestName,
+            guestCount: $data->guestCount,
         )));
 
         $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));

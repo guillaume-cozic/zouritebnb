@@ -28,6 +28,7 @@ final readonly class DoctrineAccommodationPricingProvider implements Accommodati
             weeklyPromotionPercentage: $entity->getWeeklyPromotionPercentage(),
             teamId: $entity->getTeamId(),
             cancellationPolicy: $entity->getCancellationPolicy(),
+            maxGuests: $entity->getMaxGuests(),
         );
     }
 }

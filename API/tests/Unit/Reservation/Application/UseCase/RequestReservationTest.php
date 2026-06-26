@@ -200,6 +200,47 @@ final class RequestReservationTest extends TestCase
         ));
     }
 
+    public function test_should_throw_when_guest_count_exceeds_capacity(): void
+    {
+        $accommodationId = Uuid::v7();
+        $teamId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0, null, $teamId, maxGuests: 2);
+
+        $this->expectException(InvalidReservationException::class);
+        $this->expectExceptionMessage('Guest count 5 exceeds the accommodation capacity of 2.');
+
+        $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-05'),
+            guestName: 'John Doe',
+            guestCount: 5,
+        ));
+    }
+
+    public function test_should_store_the_guest_count(): void
+    {
+        $accommodationId = Uuid::v7();
+        $teamId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0, null, $teamId, maxGuests: 6);
+
+        $id = $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-05'),
+            guestName: 'John Doe',
+            guestCount: 4,
+        ));
+
+        $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));
+        self::assertNotNull($reservation);
+        self::assertSame(4, $reservation->getGuestCount()->value());
+    }
+
     public function test_should_reject_empty_guest_name(): void
     {
         $accommodationId = Uuid::v7();

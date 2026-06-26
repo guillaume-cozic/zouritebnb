@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Reservation\Infrastructure;
 
 use App\Reservation\Domain\Entity\DateRange;
+use App\Reservation\Domain\Entity\GuestCount;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
@@ -39,6 +40,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
                 checkOut: new \DateTimeImmutable('2026-05-05'),
             ),
             guestName: new GuestName('John Doe'),
+            guestCount: new GuestCount(4),
             price: new ReservationPrice(totalPrice: 320.0, pricePerNight: 80.0, appliedDiscountPercentage: null),
         );
 
@@ -50,6 +52,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         self::assertEquals($accommodationId->toRfc4122(), $found->getAccommodationId()->toRfc4122());
         self::assertEquals($teamId->toRfc4122(), $found->getTeamId()->toRfc4122());
         self::assertSame('John Doe', $found->getGuestName()->toString());
+        self::assertSame(4, $found->getGuestCount()->value());
         self::assertSame(ReservationStatus::Confirmed, $found->getStatus());
         self::assertSame(320.0, $found->getPrice()->totalPrice);
         self::assertSame(80.0, $found->getPrice()->pricePerNight);
@@ -77,6 +80,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
                 checkOut: new \DateTimeImmutable('2026-06-03'),
             ),
             guestName: new GuestName('Jane'),
+            guestCount: new GuestCount(2),
             price: new ReservationPrice(totalPrice: 200.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
         );
         $this->repository->save($reservation);
@@ -125,6 +129,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
             teamId: Uuid::v4(),
             dateRange: new DateRange(new \DateTimeImmutable('2026-08-01'), new \DateTimeImmutable('2026-08-10')),
             guestName: new GuestName('Cancelled'),
+            guestCount: new GuestCount(2),
             price: new ReservationPrice(totalPrice: 100.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
         );
         $reservation->cancel(new \DateTimeImmutable('2020-01-01'));
@@ -236,6 +241,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
                     checkOut: new \DateTimeImmutable($checkOut),
                 ),
                 guestName: new GuestName($guestName),
+                guestCount: new GuestCount(2),
                 price: new ReservationPrice(totalPrice: 100.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
             );
         } else {
@@ -248,6 +254,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
                     checkOut: new \DateTimeImmutable($checkOut),
                 ),
                 guestName: new GuestName($guestName),
+                guestCount: new GuestCount(2),
                 price: new ReservationPrice(totalPrice: 100.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
                 guestUserId: $guestUserId,
             );

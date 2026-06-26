@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Reservation\Domain\Entity;
 
 use App\Reservation\Domain\Entity\CancellationPolicy;
 use App\Reservation\Domain\Entity\DateRange;
+use App\Reservation\Domain\Entity\GuestCount;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
@@ -33,6 +34,7 @@ final class ReservationTest extends TestCase
         $teamId = Uuid::fromString(self::TEAM_UUID);
         $dateRange = $this->dateRange();
         $guestName = new GuestName('Jane Doe');
+        $guestCount = new GuestCount(3);
         $price = $this->price();
 
         $reservation = Reservation::create(
@@ -41,6 +43,7 @@ final class ReservationTest extends TestCase
             teamId: $teamId,
             dateRange: $dateRange,
             guestName: $guestName,
+            guestCount: $guestCount,
             price: $price,
         );
 
@@ -49,6 +52,7 @@ final class ReservationTest extends TestCase
         self::assertSame($teamId, $reservation->getTeamId());
         self::assertSame($dateRange, $reservation->getDateRange());
         self::assertSame($guestName, $reservation->getGuestName());
+        self::assertSame($guestCount, $reservation->getGuestCount());
         self::assertSame($price, $reservation->getPrice());
         self::assertSame(ReservationStatus::Confirmed, $reservation->getStatus());
         self::assertNull($reservation->getGuestUserId());
@@ -70,6 +74,7 @@ final class ReservationTest extends TestCase
             teamId: Uuid::fromString(self::TEAM_UUID),
             dateRange: $this->dateRange(),
             guestName: new GuestName('Jane Doe'),
+            guestCount: new GuestCount(2),
             price: $this->price(),
             guestUserId: $guestUserId,
             note: 'Please allow early check-in',
@@ -96,6 +101,7 @@ final class ReservationTest extends TestCase
             teamId: Uuid::fromString(self::TEAM_UUID),
             dateRange: $this->dateRange(),
             guestName: new GuestName('Jane Doe'),
+            guestCount: new GuestCount(2),
             price: $this->price(),
             guestUserId: Uuid::fromString(self::GUEST_UUID),
         );
@@ -351,6 +357,7 @@ final class ReservationTest extends TestCase
             teamId: Uuid::fromString(self::TEAM_UUID),
             dateRange: $this->dateRange(),
             guestName: new GuestName('Jane Doe'),
+            guestCount: new GuestCount(2),
             price: $this->price(),
             cancellationPolicy: $policy,
         );
@@ -364,6 +371,7 @@ final class ReservationTest extends TestCase
             teamId: Uuid::fromString(self::TEAM_UUID),
             dateRange: $this->dateRange(),
             guestName: new GuestName('Jane Doe'),
+            guestCount: new GuestCount(2),
             price: $this->price(),
             guestUserId: Uuid::fromString(self::GUEST_UUID),
         );

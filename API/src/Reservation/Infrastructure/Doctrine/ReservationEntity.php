@@ -35,6 +35,9 @@ class ReservationEntity
     #[ORM\Column(length: 255)]
     private ?string $guestName = null;
 
+    #[ORM\Column(options: ['default' => 1])]
+    private int $guestCount = 1;
+
     #[ORM\Column(length: 20)]
     private ?string $status = null;
 
@@ -136,6 +139,18 @@ class ReservationEntity
     public function setGuestName(string $guestName): static
     {
         $this->guestName = $guestName;
+
+        return $this;
+    }
+
+    public function getGuestCount(): int
+    {
+        return $this->guestCount;
+    }
+
+    public function setGuestCount(int $guestCount): static
+    {
+        $this->guestCount = $guestCount;
 
         return $this;
     }

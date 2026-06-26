@@ -14,6 +14,7 @@ final readonly class CreateReservationCommand
         public \DateTimeImmutable $checkIn,
         public \DateTimeImmutable $checkOut,
         public string $guestName,
+        public int $guestCount = 1,
     ) {
     }
 }

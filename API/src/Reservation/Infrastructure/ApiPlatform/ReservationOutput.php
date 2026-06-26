@@ -233,6 +233,10 @@ class ReservationOutput implements FromEntityInterface
     public ?string $guestName = null;
 
     #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Nombre de voyageurs de la réservation', example: 2)]
+    public ?int $guestCount = null;
+
+    #[Groups(['reservation:read'])]
     #[ApiProperty(description: 'Statut de la réservation (pending, confirmed, cancelled, refused)', example: 'pending')]
     public ?string $status = null;
 
@@ -282,6 +286,7 @@ class ReservationOutput implements FromEntityInterface
         $output->checkIn = $entity->getDateRange()->checkIn()->format(\DateTimeInterface::ATOM);
         $output->checkOut = $entity->getDateRange()->checkOut()->format(\DateTimeInterface::ATOM);
         $output->guestName = $entity->getGuestName()->toString();
+        $output->guestCount = $entity->getGuestCount()->value();
         $output->status = $entity->getStatus()->value;
         $price = $entity->getPrice();
         $output->totalPrice = $price->totalPrice;

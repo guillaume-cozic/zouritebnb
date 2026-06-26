@@ -20,6 +20,7 @@ final class Reservation extends AggregateRoot
         private readonly Uuid $teamId,
         private readonly DateRange $dateRange,
         private readonly GuestName $guestName,
+        private readonly GuestCount $guestCount,
         private ReservationStatus $status,
         private readonly ReservationPrice $price,
         private readonly ?Uuid $guestUserId = null,
@@ -33,6 +34,7 @@ final class Reservation extends AggregateRoot
         Uuid $teamId,
         DateRange $dateRange,
         GuestName $guestName,
+        GuestCount $guestCount,
         ReservationPrice $price,
         CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
     ): self {
@@ -42,6 +44,7 @@ final class Reservation extends AggregateRoot
             teamId: $teamId,
             dateRange: $dateRange,
             guestName: $guestName,
+            guestCount: $guestCount,
             status: ReservationStatus::Confirmed,
             price: $price,
             cancellationPolicy: $cancellationPolicy,
@@ -57,6 +60,7 @@ final class Reservation extends AggregateRoot
         Uuid $teamId,
         DateRange $dateRange,
         GuestName $guestName,
+        GuestCount $guestCount,
         ReservationPrice $price,
         Uuid $guestUserId,
         ?string $note = null,
@@ -69,6 +73,7 @@ final class Reservation extends AggregateRoot
             teamId: $teamId,
             dateRange: $dateRange,
             guestName: $guestName,
+            guestCount: $guestCount,
             status: ReservationStatus::Pending,
             price: $price,
             guestUserId: $guestUserId,
@@ -102,6 +107,11 @@ final class Reservation extends AggregateRoot
     public function getGuestName(): GuestName
     {
         return $this->guestName;
+    }
+
+    public function getGuestCount(): GuestCount
+    {
+        return $this->guestCount;
     }
 
     public function getStatus(): ReservationStatus

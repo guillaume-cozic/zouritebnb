@@ -228,6 +228,43 @@ final class CreateReservationTest extends TestCase
         ));
     }
 
+    public function test_should_throw_when_guest_count_exceeds_capacity(): void
+    {
+        $accommodationId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0, maxGuests: 2);
+
+        $this->expectException(InvalidReservationException::class);
+        $this->expectExceptionMessage('Guest count 3 exceeds the accommodation capacity of 2.');
+
+        $this->useCase->handle(new CreateReservationCommand(
+            accommodationId: $accommodationId,
+            teamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-05'),
+            guestName: 'John Doe',
+            guestCount: 3,
+        ));
+    }
+
+    public function test_should_store_the_guest_count(): void
+    {
+        $accommodationId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0, maxGuests: 4);
+
+        $id = $this->useCase->handle(new CreateReservationCommand(
+            accommodationId: $accommodationId,
+            teamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-05'),
+            guestName: 'John Doe',
+            guestCount: 4,
+        ));
+
+        $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));
+        self::assertNotNull($reservation);
+        self::assertSame(4, $reservation->getGuestCount()->value());
+    }
+
     public function test_should_not_create_reservation_with_invalid_date_range(): void
     {
         $this->expectException(InvalidDateRangeException::class);

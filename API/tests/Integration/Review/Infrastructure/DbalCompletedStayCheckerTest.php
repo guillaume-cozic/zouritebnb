@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Review\Infrastructure;
 
 use App\Reservation\Domain\Entity\DateRange;
+use App\Reservation\Domain\Entity\GuestCount;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
@@ -76,6 +77,7 @@ final class DbalCompletedStayCheckerTest extends RepositoryTestCase
                 checkOut: new \DateTimeImmutable('2026-05-05'),
             ),
             guestName: new GuestName('Pending Guest'),
+            guestCount: new GuestCount(2),
             price: new ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
             guestUserId: $guestUserId,
         );
@@ -111,6 +113,7 @@ final class DbalCompletedStayCheckerTest extends RepositoryTestCase
                 checkOut: new \DateTimeImmutable($checkOut),
             ),
             guestName: new GuestName('Completed Guest'),
+            guestCount: new GuestCount(2),
             price: new ReservationPrice(totalPrice: 500.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
             guestUserId: $guestUserId,
         );

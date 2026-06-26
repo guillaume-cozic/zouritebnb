@@ -32,6 +32,11 @@ final readonly class ReservationInput
         #[Assert\NotBlank(normalizer: 'trim')]
         #[Assert\Length(max: 255)]
         public string $guestName = '',
+
+        #[Groups(['reservation:write'])]
+        #[ApiProperty(description: 'Nombre de voyageurs. Doit être au moins 1 et ne pas dépasser la capacité d\'accueil de l\'hébergement (422 sinon).', example: 2)]
+        #[Assert\Positive]
+        public int $guestCount = 1,
     ) {
     }
 }

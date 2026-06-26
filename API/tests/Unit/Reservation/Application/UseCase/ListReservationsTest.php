@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Reservation\Application\UseCase;
 
 use App\Reservation\Application\UseCase\ListReservations;
 use App\Reservation\Domain\Entity\DateRange;
+use App\Reservation\Domain\Entity\GuestCount;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
@@ -55,6 +56,7 @@ final class ListReservationsTest extends TestCase
                 teamId: $teamId,
                 dateRange: new DateRange(new \DateTimeImmutable($in), new \DateTimeImmutable($out)),
                 guestName: new GuestName('Guest'),
+                guestCount: new GuestCount(2),
                 price: new \App\Reservation\Domain\Entity\ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
             );
         } else {
@@ -64,6 +66,7 @@ final class ListReservationsTest extends TestCase
                 teamId: $teamId,
                 dateRange: new DateRange(new \DateTimeImmutable($in), new \DateTimeImmutable($out)),
                 guestName: new GuestName('Guest'),
+                guestCount: new GuestCount(2),
                 price: new \App\Reservation\Domain\Entity\ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
                 guestUserId: $guestUserId,
             );

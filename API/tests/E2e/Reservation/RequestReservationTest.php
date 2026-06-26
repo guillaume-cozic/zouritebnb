@@ -10,7 +10,7 @@ use Symfony\Component\Uid\Uuid;
 
 final class RequestReservationTest extends ReservationApiTestCase
 {
-    private function insertAccommodation(?Uuid $teamId = null, float $pricePerNight = 100.0): string
+    private function insertAccommodation(?Uuid $teamId = null, float $pricePerNight = 100.0, ?int $maxGuests = null): string
     {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine.orm.entity_manager');
@@ -22,6 +22,7 @@ final class RequestReservationTest extends ReservationApiTestCase
             ->setDescription('Test description')
             ->setPrice($pricePerNight)
             ->setStatus('published')
+            ->setMaxGuests($maxGuests)
             ->setTeamId($teamId ?? Uuid::fromString(self::DEFAULT_TEAM_UUID));
 
         $em->persist($entity);
@@ -44,18 +45,40 @@ final class RequestReservationTest extends ReservationApiTestCase
                 'checkIn' => '2026-05-01T15:00:00+00:00',
                 'checkOut' => '2026-05-05T11:00:00+00:00',
                 'guestName' => 'Jean Dupont',
+                'guestCount' => 2,
             ],
         ]);
 
         self::assertResponseStatusCodeSame(201);
         self::assertJsonContains([
             'guestName' => 'Jean Dupont',
+            'guestCount' => 2,
             'guestUserId' => $guestUserId,
             'status' => 'pending',
             'totalPrice' => 400,
             'pricePerNight' => 100,
             'teamId' => $teamId->toRfc4122(),
         ]);
+    }
+
+    public function test_should_return422_when_guest_count_exceeds_capacity(): void
+    {
+        $teamId = Uuid::fromString(self::DEFAULT_TEAM_UUID);
+        $accommodationId = $this->insertAccommodation($teamId, 100.0, maxGuests: 2);
+        $this->createAuthUser(email: 'guest@example.com', teamId: Uuid::v7()->toRfc4122());
+
+        self::createClient()->request('POST', '/api/reservations/request', [
+            'headers' => $this->authHeaders('guest@example.com') + ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'accommodationId' => $accommodationId,
+                'checkIn' => '2026-05-01T15:00:00+00:00',
+                'checkOut' => '2026-05-05T11:00:00+00:00',
+                'guestName' => 'Jean Dupont',
+                'guestCount' => 5,
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
     }
 
     public function test_should_return422_when_host_books_own_team_accommodation(): void

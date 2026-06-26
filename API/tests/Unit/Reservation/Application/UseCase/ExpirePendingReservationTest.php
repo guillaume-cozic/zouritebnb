@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Reservation\Application\UseCase;
 use App\Reservation\Application\UseCase\ExpirePendingReservation;
 use App\Reservation\Domain\Command\ExpirePendingReservationCommand;
 use App\Reservation\Domain\Entity\DateRange;
+use App\Reservation\Domain\Entity\GuestCount;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
@@ -44,6 +45,7 @@ final class ExpirePendingReservationTest extends TestCase
             teamId: Uuid::v7(),
             dateRange: new DateRange(new \DateTimeImmutable('2026-06-01'), new \DateTimeImmutable('2026-06-05')),
             guestName: new GuestName('John'),
+            guestCount: new GuestCount(2),
             status: $status,
             price: new ReservationPrice(totalPrice: 400.0, pricePerNight: 100.0, appliedDiscountPercentage: null),
             guestUserId: Uuid::v7(),

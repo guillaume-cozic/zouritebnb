@@ -7,6 +7,7 @@ namespace App\Reservation\Application\UseCase;
 use App\Reservation\Domain\Command\CreateReservationCommand;
 use App\Reservation\Domain\Entity\CancellationPolicy;
 use App\Reservation\Domain\Entity\DateRange;
+use App\Reservation\Domain\Entity\GuestCount;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
@@ -41,6 +42,11 @@ final readonly class CreateReservation
             throw InvalidReservationException::becauseDatesUnavailable();
         }
 
+        $guestCount = new GuestCount($command->guestCount);
+        if (null !== $pricing->maxGuests && $guestCount->value() > $pricing->maxGuests) {
+            throw InvalidReservationException::becauseGuestCountExceedsCapacity($guestCount->value(), $pricing->maxGuests);
+        }
+
         $stayPrice = $this->priceCalculator->calculate($pricing, $dateRange->checkIn(), $dateRange->checkOut());
 
         $price = ReservationPrice::fromStay(
@@ -55,6 +61,7 @@ final readonly class CreateReservation
             teamId: $command->teamId,
             dateRange: $dateRange,
             guestName: new GuestName($command->guestName),
+            guestCount: $guestCount,
             price: $price,
             cancellationPolicy: CancellationPolicy::fromString($pricing->cancellationPolicy),
         );

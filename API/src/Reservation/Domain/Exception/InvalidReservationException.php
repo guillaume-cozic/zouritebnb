@@ -26,6 +26,11 @@ final class InvalidReservationException extends \DomainException
         return new self('A host cannot book an accommodation owned by their own team.');
     }
 
+    public static function becauseGuestCountExceedsCapacity(int $guestCount, int $maxGuests): self
+    {
+        return new self(\sprintf('Guest count %d exceeds the accommodation capacity of %d.', $guestCount, $maxGuests));
+    }
+
     public static function becauseNegativeTotalPrice(float $totalPrice): self
     {
         return new self(\sprintf('Total price must be greater than or equal to zero, got %s.', $totalPrice));

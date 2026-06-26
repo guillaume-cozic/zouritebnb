@@ -34,6 +34,11 @@ final readonly class RequestReservationInput
         public string $guestName = '',
 
         #[Groups(['reservation:write'])]
+        #[ApiProperty(description: 'Nombre de voyageurs. Doit être au moins 1 et ne pas dépasser la capacité d\'accueil de l\'hébergement (422 sinon).', example: 2)]
+        #[Assert\Positive]
+        public int $guestCount = 1,
+
+        #[Groups(['reservation:write'])]
         #[ApiProperty(description: 'Message libre envoyé à l\'hôte (optionnel). Sera ajouté au premier message de la conversation.', example: 'Bonjour, nous voyageons avec un bébé de 6 mois.')]
         public ?string $note = null,
 

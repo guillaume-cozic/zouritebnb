@@ -41,6 +41,7 @@ final readonly class RequestReservationProcessor implements ProcessorInterface
             checkIn: new \DateTimeImmutable($data->checkIn),
             checkOut: new \DateTimeImmutable($data->checkOut),
             guestName: $data->guestName,
+            guestCount: $data->guestCount,
             note: $data->note,
             paymentIntentId: $data->paymentIntentId,
         )));

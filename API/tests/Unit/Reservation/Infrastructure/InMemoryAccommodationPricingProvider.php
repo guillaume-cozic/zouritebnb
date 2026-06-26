@@ -13,9 +13,9 @@ final class InMemoryAccommodationPricingProvider implements AccommodationPricing
     /** @var array<string, AccommodationPricing> */
     private array $pricings = [];
 
-    public function set(Uuid $id, float $pricePerNight, ?float $weeklyPromotionPercentage = null, ?Uuid $teamId = null): void
+    public function set(Uuid $id, float $pricePerNight, ?float $weeklyPromotionPercentage = null, ?Uuid $teamId = null, ?int $maxGuests = null): void
     {
-        $this->pricings[$id->toRfc4122()] = new AccommodationPricing($pricePerNight, $weeklyPromotionPercentage, $teamId);
+        $this->pricings[$id->toRfc4122()] = new AccommodationPricing($pricePerNight, $weeklyPromotionPercentage, $teamId, maxGuests: $maxGuests);
     }
 
     public function findByAccommodationId(Uuid $id): ?AccommodationPricing

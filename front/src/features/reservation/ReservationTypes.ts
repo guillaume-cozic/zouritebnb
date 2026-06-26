@@ -9,6 +9,8 @@ export interface Reservation {
   checkIn: string;
   checkOut: string;
   guestName: string;
+  /** Number of travellers, validated against the accommodation capacity at booking time. */
+  guestCount?: number;
   status: ReservationStatus;
   totalPrice?: number;
   pricePerNight?: number;
@@ -37,6 +39,7 @@ export interface RequestReservationPayload {
   checkIn: string;
   checkOut: string;
   guestName: string;
+  guestCount: number;
   note?: string;
   paymentIntentId?: string;
 }

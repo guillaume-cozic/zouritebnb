@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Reservation\Application\UseCase;
 use App\Reservation\Application\UseCase\GenerateInvoice;
 use App\Reservation\Domain\Command\GenerateInvoiceCommand;
 use App\Reservation\Domain\Entity\DateRange;
+use App\Reservation\Domain\Entity\GuestCount;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation;
 use App\Reservation\Domain\Entity\ReservationId;
@@ -105,6 +106,7 @@ final class GenerateInvoiceTest extends TestCase
             teamId: Uuid::fromString(self::TEAM_ID),
             dateRange: new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-05')),
             guestName: new GuestName('John Doe'),
+            guestCount: new GuestCount(2),
             price: ReservationPrice::fromStay($totalPrice, $pricePerNight, null),
         ));
     }
@@ -117,6 +119,7 @@ final class GenerateInvoiceTest extends TestCase
             teamId: Uuid::fromString(self::TEAM_ID),
             dateRange: new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-05')),
             guestName: new GuestName('John Doe'),
+            guestCount: new GuestCount(2),
             price: ReservationPrice::fromStay(400.0, 100.0, null),
             guestUserId: Uuid::fromString('01961e2f-dead-7000-beef-0000000000c1'),
         ));

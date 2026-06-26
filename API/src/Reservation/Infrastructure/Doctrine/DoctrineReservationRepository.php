@@ -6,6 +6,7 @@ namespace App\Reservation\Infrastructure\Doctrine;
 
 use App\Reservation\Domain\Entity\CancellationPolicy;
 use App\Reservation\Domain\Entity\DateRange;
+use App\Reservation\Domain\Entity\GuestCount;
 use App\Reservation\Domain\Entity\GuestName;
 use App\Reservation\Domain\Entity\Reservation as DomainReservation;
 use App\Reservation\Domain\Entity\ReservationId;
@@ -39,6 +40,7 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             ->setCheckIn($reservation->getDateRange()->checkIn())
             ->setCheckOut($reservation->getDateRange()->checkOut())
             ->setGuestName($reservation->getGuestName()->toString())
+            ->setGuestCount($reservation->getGuestCount()->value())
             ->setStatus($reservation->getStatus()->value)
             ->setTotalPrice($reservation->getPrice()->totalPrice)
             ->setPricePerNight($reservation->getPrice()->pricePerNight)
@@ -142,6 +144,7 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
                 checkOut: $entity->getCheckOut(),
             ),
             guestName: new GuestName($entity->getGuestName()),
+            guestCount: new GuestCount($entity->getGuestCount()),
             status: ReservationStatus::from($entity->getStatus()),
             price: new ReservationPrice(
                 totalPrice: $entity->getTotalPrice(),

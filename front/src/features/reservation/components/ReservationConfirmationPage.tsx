@@ -90,6 +90,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         checkIn: toApiDateTime(checkInDate, checkInTime),
         checkOut: toApiDateTime(checkOutDate, checkOutTime),
         guestName: guestName.trim(),
+        guestCount: guestsCount,
         note: note.trim() || undefined,
         paymentIntentId,
       })
