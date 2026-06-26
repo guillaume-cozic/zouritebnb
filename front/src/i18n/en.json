@@ -414,8 +414,7 @@
       "rating": "Top rated"
     },
     "instantBooking": {
-      "label": "Instant booking",
-      "hint": "Only show places bookable without host approval"
+      "label": "Instant booking"
     },
     "advanced": {
       "toggle": "Advanced filters",

@@ -414,8 +414,7 @@
       "rating": "Mieux notés"
     },
     "instantBooking": {
-      "label": "Réservation instantanée",
-      "hint": "N'afficher que les logements réservables sans validation de l'hôte"
+      "label": "Réservation instantanée"
     },
     "advanced": {
       "toggle": "Filtres avancés",

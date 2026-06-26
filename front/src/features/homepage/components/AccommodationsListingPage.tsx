@@ -309,30 +309,22 @@ const AccommodationsListingPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-600">
-                    {t('listing.instantBooking.label')}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">{t('listing.instantBooking.hint')}</p>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={filters.instantBooking}
-                  aria-label={t('listing.instantBooking.label')}
-                  onClick={() => dispatch(setFilters({ instantBooking: !filters.instantBooking }))}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${
-                    filters.instantBooking ? 'bg-primary-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
-                      filters.instantBooking ? 'translate-x-5' : 'translate-x-0.5'
-                    }`}
-                  />
-                </button>
-              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={filters.instantBooking}
+                onClick={() => dispatch(setFilters({ instantBooking: !filters.instantBooking }))}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-medium border transition-all ${
+                  filters.instantBooking
+                    ? 'bg-primary-600 text-white border-primary-600 shadow-sm shadow-primary-200'
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-primary-400 hover:bg-primary-50/40'
+                }`}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+                {t('listing.instantBooking.label')}
+              </button>
             </div>
           )}
         </div>
