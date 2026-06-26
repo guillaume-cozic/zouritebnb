@@ -9,6 +9,7 @@ export interface AccommodationListItem {
   longitude: number | null;
   maxGuests: number | null;
   status: string;
+  instantBooking: boolean;
   thumbnailUrl: string | null;
   photoUrls: string[];
   amenities: string[] | null;
@@ -31,4 +32,5 @@ export interface SearchFilters {
   priceMin: number | null;
   priceMax: number | null;
   sort: SortOption;
+  instantBooking: boolean;
 }

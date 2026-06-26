@@ -12,6 +12,63 @@
         }
     ],
     "paths": {
+        "/api/accommodations/{accommodationId}/availability": {
+            "get": {
+                "operationId": "api_accommodations_accommodationIdavailability_get",
+                "tags": [
+                    "AccommodationAvailability"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AccommodationAvailability resource",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AccommodationAvailability.jsonld-accommodation_availability.read"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Disponibilit\u00e9s d'un h\u00e9bergement",
+                "description": "Retourne les plages de dates d\u00e9j\u00e0 r\u00e9serv\u00e9es (r\u00e9servations en statut \"pending\" ou \"confirmed\" dont le s\u00e9jour n'est pas termin\u00e9) pour un h\u00e9bergement. Endpoint public, exposant uniquement les dates occup\u00e9es \u2014 aucune donn\u00e9e voyageur ni tarif. Utilis\u00e9 par la page de d\u00e9tail pour barrer les dates indisponibles. Une plage couvre les nuits occup\u00e9es : checkIn inclus, checkOut exclu (jour de d\u00e9part libre pour une nouvelle arriv\u00e9e). Un identifiant invalide ou inconnu retourne une liste vide.",
+                "parameters": [
+                    {
+                        "name": "accommodationId",
+                        "in": "path",
+                        "description": "AccommodationAvailability identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ]
+            }
+        },
         "/api/accommodations": {
             "get": {
                 "operationId": "api_accommodations_get_collection",
@@ -513,6 +570,149 @@
                                             "wifi",
                                             "parking"
                                         ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
+        "/api/accommodations/{id}/cancellation-policy": {
+            "patch": {
+                "operationId": "api_accommodations_idcancellation-policy_patch",
+                "tags": [
+                    "AccommodationEntity"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AccommodationEntity resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Modifier la politique d'annulation d'un h\u00e9bergement",
+                "description": "Met \u00e0 jour la politique d'annulation choisie par l'h\u00f4te. Valeurs autoris\u00e9es : \"flexible\" (remboursement int\u00e9gral jusqu'\u00e0 24h avant l'arriv\u00e9e) ou \"moderate\" (remboursement int\u00e9gral jusqu'\u00e0 5 jours avant, puis 50%).",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AccommodationEntity identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AccommodationEntity resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "examples": {
+                                "flexible": {
+                                    "summary": "Politique flexible",
+                                    "value": {
+                                        "cancellationPolicy": "flexible"
+                                    }
+                                },
+                                "moderate": {
+                                    "summary": "Politique mod\u00e9r\u00e9e",
+                                    "value": {
+                                        "cancellationPolicy": "moderate"
+                                    }
+                                },
+                                "invalid": {
+                                    "summary": "Invalide : valeur inconnue",
+                                    "description": "Retourne une erreur 422 car la valeur doit \u00eatre \"flexible\" ou \"moderate\".",
+                                    "value": {
+                                        "cancellationPolicy": "strict"
                                     }
                                 }
                             }
@@ -1051,6 +1251,142 @@
                                     "value": {
                                         "latitude": 48.8566,
                                         "longitude": 2.3522
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
+        "/api/accommodations/{id}/instant-booking": {
+            "patch": {
+                "operationId": "api_accommodations_idinstant-booking_patch",
+                "tags": [
+                    "AccommodationEntity"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AccommodationEntity resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Activer ou d\u00e9sactiver la r\u00e9servation instantan\u00e9e",
+                "description": "Active ou d\u00e9sactive la r\u00e9servation instantan\u00e9e pour un h\u00e9bergement. Quand elle est active, les demandes des voyageurs sont confirm\u00e9es automatiquement (et le paiement captur\u00e9) sans validation de l'h\u00f4te.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AccommodationEntity identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AccommodationEntity resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "examples": {
+                                "enable": {
+                                    "summary": "Activer la r\u00e9servation instantan\u00e9e",
+                                    "value": {
+                                        "instantBooking": true
+                                    }
+                                },
+                                "disable": {
+                                    "summary": "D\u00e9sactiver la r\u00e9servation instantan\u00e9e",
+                                    "value": {
+                                        "instantBooking": false
                                     }
                                 }
                             }
@@ -4062,7 +4398,7 @@
                     }
                 },
                 "summary": "Annuler une r\u00e9servation",
-                "description": "Passe une r\u00e9servation au statut \"cancelled\". Accessible au voyageur de la r\u00e9servation ou \u00e0 un membre de l'\u00e9quipe loueur (403 sinon). Retourne 404 si la r\u00e9servation est introuvable, 422 si elle est d\u00e9j\u00e0 annul\u00e9e.",
+                "description": "Passe une r\u00e9servation au statut \"cancelled\". Accessible au voyageur de la r\u00e9servation ou \u00e0 un membre de l'\u00e9quipe loueur (403 sinon). Le s\u00e9jour ne doit pas avoir commenc\u00e9 : une r\u00e9servation en cours ou pass\u00e9e ne peut pas \u00eatre annul\u00e9e. Un message facultatif peut accompagner l'annulation ; il est publi\u00e9 dans la conversation li\u00e9e. Retourne 404 si la r\u00e9servation est introuvable, 422 si elle est d\u00e9j\u00e0 annul\u00e9e, refus\u00e9e, ou si le s\u00e9jour a d\u00e9j\u00e0 commenc\u00e9. La r\u00e9ponse expose le montant rembours\u00e9 (refundAmount, refundPercentage) selon la politique fig\u00e9e et la date courante.",
                 "parameters": [
                     {
                         "name": "id",
@@ -4078,12 +4414,19 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "The updated Reservation resource",
                     "content": {
                         "application/merge-patch+json": {
                             "examples": {
-                                "valid": {
-                                    "summary": "Requ\u00eate valide",
+                                "without_message": {
+                                    "summary": "Annulation sans message",
                                     "value": {}
+                                },
+                                "with_message": {
+                                    "summary": "Annulation avec message",
+                                    "value": {
+                                        "message": "Un impr\u00e9vu m'oblige \u00e0 annuler, d\u00e9sol\u00e9 pour le d\u00e9rangement."
+                                    }
                                 }
                             }
                         }
@@ -5462,6 +5805,76 @@
                 }
             }
         },
+        "/api/forgot-password": {
+            "post": {
+                "operationId": "api_forgot-password_post",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "User resource created",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Demander la r\u00e9initialisation du mot de passe",
+                "description": "Envoie un email contenant un lien de r\u00e9initialisation si un compte existe pour cette adresse. R\u00e9pond toujours 202, que le compte existe ou non, pour ne pas r\u00e9v\u00e9ler quelles adresses sont enregistr\u00e9es.",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new User resource",
+                    "content": {
+                        "application/ld+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User.ForgotPasswordInput-user.write"
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
         "/api/login": {
             "post": {
                 "operationId": "api_login_post",
@@ -5609,6 +6022,76 @@
                         "application/ld+json": {
                             "schema": {
                                 "$ref": "#/components/schemas/User.RegisterUserInput-user.write"
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/api/reset-password": {
+            "post": {
+                "operationId": "api_reset-password_post",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User resource created",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "R\u00e9initialiser le mot de passe",
+                "description": "D\u00e9finit un nouveau mot de passe \u00e0 partir du jeton re\u00e7u par email. Le jeton est \u00e0 usage unique et expire au bout d'une heure.",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new User resource",
+                    "content": {
+                        "application/ld+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User.ResetPasswordInput-user.write"
                             }
                         }
                     },
@@ -5794,6 +6277,156 @@
                 }
             }
         },
+        "/api/users/resend-verification-email": {
+            "post": {
+                "operationId": "api_usersresend-verification-email_post",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "User resource created",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Renvoyer l'email de v\u00e9rification",
+                "description": "Renvoie un email de v\u00e9rification \u00e0 l'utilisateur authentifi\u00e9 (par ex. si le lien pr\u00e9c\u00e9dent a expir\u00e9). Sans effet si l'email est d\u00e9j\u00e0 v\u00e9rifi\u00e9.",
+                "parameters": []
+            }
+        },
+        "/api/verify-email": {
+            "post": {
+                "operationId": "api_verify-email_post",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User resource created",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "V\u00e9rifier l'adresse email",
+                "description": "Marque l'adresse email comme v\u00e9rifi\u00e9e \u00e0 partir du jeton re\u00e7u par email. Le jeton est \u00e0 usage unique et expire au bout de 24 heures.",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new User resource",
+                    "content": {
+                        "application/ld+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User.VerifyEmailInput-user.write"
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
         "/api/users/{id}/identity-verification": {
             "get": {
                 "operationId": "api_users_ididentity-verification_get",
@@ -5927,10 +6560,306 @@
                     }
                 ]
             }
+        },
+        "/api/wishlist": {
+            "get": {
+                "operationId": "api_wishlist_get_collection",
+                "tags": [
+                    "WishlistItem"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "WishlistItem collection",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "WishlistItem.jsonld-wishlist.read collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchema"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/WishlistItem.jsonld-wishlist.read"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Lister la wishlist",
+                "description": "Retourne les h\u00e9bergements sauvegard\u00e9s par le propri\u00e9taire courant. Pour un utilisateur authentifi\u00e9, sa wishlist de compte ; sinon celle associ\u00e9e \u00e0 l'identifiant de corr\u00e9lation envoy\u00e9 dans l'en-t\u00eate X-Wishlist-Id (cookie c\u00f4t\u00e9 client). Liste vide si visiteur anonyme sans identifiant.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The collection page number",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "style": "form",
+                        "explode": false
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "api_wishlist_post",
+                "tags": [
+                    "WishlistItem"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "WishlistItem resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WishlistItem.jsonld-wishlist.read"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Ajouter un h\u00e9bergement \u00e0 la wishlist",
+                "description": "Ajoute un h\u00e9bergement \u00e0 la wishlist du propri\u00e9taire courant (utilisateur authentifi\u00e9, ou visiteur anonyme via l'en-t\u00eate X-Wishlist-Id). Op\u00e9ration idempotente : ajouter un h\u00e9bergement d\u00e9j\u00e0 pr\u00e9sent ne cr\u00e9e pas de doublon. Retourne 422 si l'h\u00e9bergement est introuvable, 400 si aucun propri\u00e9taire ne peut \u00eatre d\u00e9termin\u00e9.",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new WishlistItem resource",
+                    "content": {
+                        "application/ld+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WishlistItem.AddWishlistItemInput-wishlist.write"
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/api/wishlist/merge": {
+            "post": {
+                "operationId": "api_wishlistmerge_post",
+                "tags": [
+                    "WishlistItem"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "WishlistItem resource created",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Fusionner la wishlist anonyme dans le compte",
+                "description": "Rattache les h\u00e9bergements de la wishlist anonyme (identifiant de corr\u00e9lation envoy\u00e9 dans l'en-t\u00eate X-Wishlist-Id) au compte de l'utilisateur authentifi\u00e9, en supprimant les doublons. Appel\u00e9 apr\u00e8s la connexion, puis le cookie de corr\u00e9lation est nettoy\u00e9 c\u00f4t\u00e9 client.",
+                "parameters": []
+            }
+        },
+        "/api/wishlist/{accommodationId}": {
+            "delete": {
+                "operationId": "api_wishlist_accommodationId_delete",
+                "tags": [
+                    "WishlistItem"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "WishlistItem resource deleted"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Retirer un h\u00e9bergement de la wishlist",
+                "description": "Retire un h\u00e9bergement de la wishlist du propri\u00e9taire courant. Op\u00e9ration idempotente : retirer un h\u00e9bergement absent ne renvoie pas d'erreur.",
+                "parameters": [
+                    {
+                        "name": "accommodationId",
+                        "in": "path",
+                        "description": "WishlistItem identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
+            "AccommodationAvailability.jsonld-accommodation_availability.read": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "accommodationId": {
+                                "description": "Identifiant UUID de l'h\u00e9bergement",
+                                "default": "",
+                                "example": "01961e2f-dead-7000-beef-000000000002",
+                                "type": "string"
+                            },
+                            "busyRanges": {
+                                "description": "Plages de dates indisponibles (format ISO AAAA-MM-JJ). checkIn correspond \u00e0 la premi\u00e8re nuit occup\u00e9e, checkOut au jour de d\u00e9part (exclu des nuits r\u00e9serv\u00e9es).",
+                                "example": [
+                                    {
+                                        "checkIn": "2026-05-01",
+                                        "checkOut": "2026-05-05"
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
             "AccommodationEntity.jsonld": {
                 "allOf": [
                     {
@@ -5992,6 +6921,20 @@
                                     "number",
                                     "null"
                                 ]
+                            },
+                            "cancellationPolicy": {
+                                "description": "Politique d'annulation choisie par l'h\u00f4te : \"flexible\" ou \"moderate\"",
+                                "example": "flexible",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "instantBooking": {
+                                "description": "R\u00e9servation instantan\u00e9e activ\u00e9e : les demandes sont confirm\u00e9es automatiquement sans validation de l'h\u00f4te",
+                                "default": false,
+                                "example": false,
+                                "type": "boolean"
                             },
                             "status": {
                                 "description": "Statut de publication",
@@ -6229,6 +7172,12 @@
                                 "example": 12,
                                 "type": "integer"
                             },
+                            "instantBooking": {
+                                "description": "R\u00e9servation instantan\u00e9e activ\u00e9e : les demandes sont confirm\u00e9es automatiquement sans validation de l'h\u00f4te",
+                                "default": false,
+                                "example": false,
+                                "type": "boolean"
+                            },
                             "status": {
                                 "description": "Statut de publication",
                                 "example": "draft",
@@ -6387,6 +7336,20 @@
                                     "number",
                                     "null"
                                 ]
+                            },
+                            "cancellationPolicy": {
+                                "description": "Politique d'annulation choisie par l'h\u00f4te : \"flexible\" ou \"moderate\"",
+                                "example": "flexible",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "instantBooking": {
+                                "description": "R\u00e9servation instantan\u00e9e activ\u00e9e : les demandes sont confirm\u00e9es automatiquement sans validation de l'h\u00f4te",
+                                "default": false,
+                                "example": false,
+                                "type": "boolean"
                             },
                             "status": {
                                 "description": "Statut de publication",
@@ -8221,6 +9184,14 @@
                                     "null"
                                 ]
                             },
+                            "guestCount": {
+                                "description": "Nombre de voyageurs de la r\u00e9servation",
+                                "example": 2,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
                             "status": {
                                 "description": "Statut de la r\u00e9servation (pending, confirmed, cancelled, refused)",
                                 "example": "pending",
@@ -8258,6 +9229,36 @@
                                 "example": 460,
                                 "type": [
                                     "number",
+                                    "null"
+                                ]
+                            },
+                            "cancellationPolicy": {
+                                "description": "Politique d'annulation fig\u00e9e \u00e0 la r\u00e9servation : \"flexible\" ou \"moderate\"",
+                                "example": "flexible",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "cancellable": {
+                                "description": "Indique si la r\u00e9servation peut \u00eatre annul\u00e9e maintenant (statut en attente/confirm\u00e9 et s\u00e9jour pas encore commenc\u00e9)",
+                                "default": false,
+                                "example": true,
+                                "type": "boolean"
+                            },
+                            "refundAmount": {
+                                "description": "Montant qui serait rembours\u00e9 au voyageur en cas d'annulation imm\u00e9diate, selon la politique et la date courante",
+                                "example": 460,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "refundPercentage": {
+                                "description": "Pourcentage rembours\u00e9 en cas d'annulation imm\u00e9diate (0, 50 ou 100)",
+                                "example": 100,
+                                "type": [
+                                    "integer",
                                     "null"
                                 ]
                             }
@@ -8542,6 +9543,23 @@
                     }
                 ]
             },
+            "User.ForgotPasswordInput-user.write": {
+                "type": "object",
+                "required": [
+                    "email"
+                ],
+                "properties": {
+                    "email": {
+                        "format": "email",
+                        "description": "Adresse email du compte dont le mot de passe doit \u00eatre r\u00e9initialis\u00e9",
+                        "externalDocs": {
+                            "url": "https://schema.org/email"
+                        },
+                        "example": "host@example.com",
+                        "type": "string"
+                    }
+                }
+            },
             "User.HostAvatarOutput.jsonld": {
                 "allOf": [
                     {
@@ -8606,6 +9624,25 @@
                     }
                 }
             },
+            "User.ResetPasswordInput-user.write": {
+                "type": "object",
+                "required": [
+                    "token",
+                    "password"
+                ],
+                "properties": {
+                    "token": {
+                        "description": "Jeton re\u00e7u par email dans le lien de r\u00e9initialisation",
+                        "type": "string"
+                    },
+                    "password": {
+                        "minLength": 8,
+                        "description": "Nouveau mot de passe (8 caract\u00e8res minimum)",
+                        "example": "supersecret",
+                        "type": "string"
+                    }
+                }
+            },
             "User.UpdateUserProfileInput-user.write.jsonMergePatch": {
                 "type": "object",
                 "properties": {
@@ -8645,6 +9682,18 @@
                             "string",
                             "null"
                         ]
+                    }
+                }
+            },
+            "User.VerifyEmailInput-user.write": {
+                "type": "object",
+                "required": [
+                    "token"
+                ],
+                "properties": {
+                    "token": {
+                        "description": "Jeton re\u00e7u par email dans le lien de v\u00e9rification",
+                        "type": "string"
                     }
                 }
             },
@@ -8718,6 +9767,12 @@
                                 "example": "verified",
                                 "type": "string"
                             },
+                            "emailVerified": {
+                                "description": "Indique si l'adresse email a \u00e9t\u00e9 v\u00e9rifi\u00e9e",
+                                "default": false,
+                                "example": true,
+                                "type": "boolean"
+                            },
                             "token": {
                                 "description": "JWT Bearer \u00e0 placer dans l'en-t\u00eate Authorization pour les requ\u00eates authentifi\u00e9es",
                                 "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...",
@@ -8771,6 +9826,83 @@
                         }
                     }
                 ]
+            },
+            "WishlistItem.AddWishlistItemInput-wishlist.write": {
+                "type": "object",
+                "required": [
+                    "accommodationId"
+                ],
+                "properties": {
+                    "accommodationId": {
+                        "format": "uuid",
+                        "description": "Identifiant UUID de l'h\u00e9bergement \u00e0 ajouter \u00e0 la wishlist",
+                        "externalDocs": {
+                            "url": "https://schema.org/identifier"
+                        },
+                        "example": "01961e2f-dead-7000-beef-000000000001",
+                        "type": "string"
+                    }
+                }
+            },
+            "WishlistItem.jsonld-wishlist.read": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "accommodationId": {
+                                "description": "Identifiant UUID de l'h\u00e9bergement sauvegard\u00e9",
+                                "example": "01961e2f-dead-7000-beef-000000000001",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "title": {
+                                "description": "Titre de l'h\u00e9bergement",
+                                "example": "Loft lumineux au c\u0153ur de Saint-Denis",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "city": {
+                                "description": "Ville de l'h\u00e9bergement",
+                                "example": "Saint-Denis",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "country": {
+                                "description": "Pays de l'h\u00e9bergement",
+                                "example": "La R\u00e9union",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "price": {
+                                "description": "Prix par nuit, en euros",
+                                "example": 120,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "photoUrl": {
+                                "description": "URL relative d'une photo de l'h\u00e9bergement (null si aucune)",
+                                "example": "/uploads/photos/abc.jpg",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
             }
         },
         "responses": {},
@@ -8805,6 +9937,10 @@
         {
             "name": "PaymentIntent",
             "description": "Resource 'PaymentIntent' operations."
+        },
+        {
+            "name": "AccommodationAvailability",
+            "description": "Resource 'AccommodationAvailability' operations."
         },
         {
             "name": "AdminDashboard",
@@ -8865,6 +10001,10 @@
         {
             "name": "UserVerification",
             "description": "Resource 'UserVerification' operations."
+        },
+        {
+            "name": "WishlistItem",
+            "description": "Resource 'WishlistItem' operations."
         }
     ],
     "webhooks": {}

@@ -19,7 +19,8 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   défaut, prix croissant/décroissant, mieux notés). Sélecteur dans la barre de résultats.
 - **Réservation instantanée** : toggle par logement (côté hôte). Quand il est actif, les
   demandes des voyageurs sont confirmées automatiquement et le paiement capturé, sans
-  validation de l'hôte. Badge + CTA dédiés sur la page détail.
+  validation de l'hôte. Badge + CTA dédiés sur la page détail, filtre de recherche
+  `instantBooking` + badge sur les cartes. Seeder `app:seed:instant-booking` pour tester.
 
 ## 🔴 Manques importants (impact direct conversion/usage)
 

@@ -413,6 +413,10 @@
       "priceDesc": "Prix décroissant",
       "rating": "Mieux notés"
     },
+    "instantBooking": {
+      "label": "Réservation instantanée",
+      "hint": "N'afficher que les logements réservables sans validation de l'hôte"
+    },
     "advanced": {
       "toggle": "Filtres avancés",
       "priceRange": "Prix par nuit",
@@ -431,7 +435,8 @@
     "featuredTitle": "Hébergements en vedette",
     "featuredSubtitle": "Découvrez nos logements les mieux notés par nos voyageurs",
     "viewAll": "Voir tous les hébergements",
-    "viewDetails": "Voir les détails"
+    "viewDetails": "Voir les détails",
+    "instantBookingBadge": "Réservation instantanée"
   },
   "activities": {
     "title": "Activités populaires",

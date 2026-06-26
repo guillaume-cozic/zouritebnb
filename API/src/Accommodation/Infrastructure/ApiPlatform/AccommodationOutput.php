@@ -488,7 +488,7 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Politique d\'annulation choisie par l\'hôte : "flexible" ou "moderate"', example: 'flexible')]
     public ?string $cancellationPolicy = null;
 
-    #[Groups(['accommodation:read'])]
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Réservation instantanée activée : les demandes sont confirmées automatiquement sans validation de l\'hôte', example: false)]
     public bool $instantBooking = false;
 

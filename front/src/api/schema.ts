@@ -10,6 +10,13 @@ type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> &
 type OneOf<T extends any[]> = T extends [infer Only] ? Only : T extends [infer A, infer B, ...infer Rest] ? OneOf<[XOR<A, B>, ...Rest]> : never;
 
 export interface paths {
+  "/api/accommodations/{accommodationId}/availability": {
+    /**
+     * Disponibilités d'un hébergement
+     * @description Retourne les plages de dates déjà réservées (réservations en statut "pending" ou "confirmed" dont le séjour n'est pas terminé) pour un hébergement. Endpoint public, exposant uniquement les dates occupées — aucune donnée voyageur ni tarif. Utilisé par la page de détail pour barrer les dates indisponibles. Une plage couvre les nuits occupées : checkIn inclus, checkOut exclu (jour de départ libre pour une nouvelle arrivée). Un identifiant invalide ou inconnu retourne une liste vide.
+     */
+    get: operations["api_accommodations_accommodationIdavailability_get"];
+  };
   "/api/accommodations": {
     /**
      * Lister les hébergements publiés
@@ -43,6 +50,13 @@ export interface paths {
      */
     put: operations["api_accommodations_idamenities_put"];
   };
+  "/api/accommodations/{id}/cancellation-policy": {
+    /**
+     * Modifier la politique d'annulation d'un hébergement
+     * @description Met à jour la politique d'annulation choisie par l'hôte. Valeurs autorisées : "flexible" (remboursement intégral jusqu'à 24h avant l'arrivée) ou "moderate" (remboursement intégral jusqu'à 5 jours avant, puis 50%).
+     */
+    patch: operations["api_accommodations_idcancellation-policy_patch"];
+  };
   "/api/accommodations/{id}/capacity": {
     /**
      * Définir la capacité d'un hébergement
@@ -70,6 +84,13 @@ export interface paths {
      * @description Définit ou remplace les coordonnées GPS d'un hébergement.
      */
     put: operations["api_accommodations_idgeolocation_put"];
+  };
+  "/api/accommodations/{id}/instant-booking": {
+    /**
+     * Activer ou désactiver la réservation instantanée
+     * @description Active ou désactive la réservation instantanée pour un hébergement. Quand elle est active, les demandes des voyageurs sont confirmées automatiquement (et le paiement capturé) sans validation de l'hôte.
+     */
+    patch: operations["api_accommodations_idinstant-booking_patch"];
   };
   "/api/accommodations/{id}/photos": {
     /**
@@ -285,7 +306,7 @@ export interface paths {
   "/api/reservations/{id}/cancel": {
     /**
      * Annuler une réservation
-     * @description Passe une réservation au statut "cancelled". Accessible au voyageur de la réservation ou à un membre de l'équipe loueur (403 sinon). Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée.
+     * @description Passe une réservation au statut "cancelled". Accessible au voyageur de la réservation ou à un membre de l'équipe loueur (403 sinon). Le séjour ne doit pas avoir commencé : une réservation en cours ou passée ne peut pas être annulée. Un message facultatif peut accompagner l'annulation ; il est publié dans la conversation liée. Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée, refusée, ou si le séjour a déjà commencé. La réponse expose le montant remboursé (refundAmount, refundPercentage) selon la politique figée et la date courante.
      */
     patch: operations["api_reservations_idcancel_patch"];
   };
@@ -378,6 +399,13 @@ export interface paths {
      */
     post: operations["api_teams_idinvitations_post"];
   };
+  "/api/forgot-password": {
+    /**
+     * Demander la réinitialisation du mot de passe
+     * @description Envoie un email contenant un lien de réinitialisation si un compte existe pour cette adresse. Répond toujours 202, que le compte existe ou non, pour ne pas révéler quelles adresses sont enregistrées.
+     */
+    post: operations["api_forgot-password_post"];
+  };
   "/api/login": {
     /**
      * Authentification d'un utilisateur
@@ -391,6 +419,13 @@ export interface paths {
      * @description Crée un utilisateur et son équipe associée. L'utilisateur est le seul membre de sa team à la création. La réponse contient un JWT (champ `token`) afin que l'utilisateur soit connecté immédiatement après l'inscription.
      */
     post: operations["api_register_post"];
+  };
+  "/api/reset-password": {
+    /**
+     * Réinitialiser le mot de passe
+     * @description Définit un nouveau mot de passe à partir du jeton reçu par email. Le jeton est à usage unique et expire au bout d'une heure.
+     */
+    post: operations["api_reset-password_post"];
   };
   "/api/users/avatar": {
     /**
@@ -406,6 +441,20 @@ export interface paths {
      */
     patch: operations["api_usersprofile_patch"];
   };
+  "/api/users/resend-verification-email": {
+    /**
+     * Renvoyer l'email de vérification
+     * @description Renvoie un email de vérification à l'utilisateur authentifié (par ex. si le lien précédent a expiré). Sans effet si l'email est déjà vérifié.
+     */
+    post: operations["api_usersresend-verification-email_post"];
+  };
+  "/api/verify-email": {
+    /**
+     * Vérifier l'adresse email
+     * @description Marque l'adresse email comme vérifiée à partir du jeton reçu par email. Le jeton est à usage unique et expire au bout de 24 heures.
+     */
+    post: operations["api_verify-email_post"];
+  };
   "/api/users/{id}/identity-verification": {
     /**
      * Statut de vérification d'identité d'un utilisateur
@@ -418,12 +467,58 @@ export interface paths {
      */
     post: operations["api_users_ididentity-verification_post"];
   };
+  "/api/wishlist": {
+    /**
+     * Lister la wishlist
+     * @description Retourne les hébergements sauvegardés par le propriétaire courant. Pour un utilisateur authentifié, sa wishlist de compte ; sinon celle associée à l'identifiant de corrélation envoyé dans l'en-tête X-Wishlist-Id (cookie côté client). Liste vide si visiteur anonyme sans identifiant.
+     */
+    get: operations["api_wishlist_get_collection"];
+    /**
+     * Ajouter un hébergement à la wishlist
+     * @description Ajoute un hébergement à la wishlist du propriétaire courant (utilisateur authentifié, ou visiteur anonyme via l'en-tête X-Wishlist-Id). Opération idempotente : ajouter un hébergement déjà présent ne crée pas de doublon. Retourne 422 si l'hébergement est introuvable, 400 si aucun propriétaire ne peut être déterminé.
+     */
+    post: operations["api_wishlist_post"];
+  };
+  "/api/wishlist/merge": {
+    /**
+     * Fusionner la wishlist anonyme dans le compte
+     * @description Rattache les hébergements de la wishlist anonyme (identifiant de corrélation envoyé dans l'en-tête X-Wishlist-Id) au compte de l'utilisateur authentifié, en supprimant les doublons. Appelé après la connexion, puis le cookie de corrélation est nettoyé côté client.
+     */
+    post: operations["api_wishlistmerge_post"];
+  };
+  "/api/wishlist/{accommodationId}": {
+    /**
+     * Retirer un hébergement de la wishlist
+     * @description Retire un hébergement de la wishlist du propriétaire courant. Opération idempotente : retirer un hébergement absent ne renvoie pas d'erreur.
+     */
+    delete: operations["api_wishlist_accommodationId_delete"];
+  };
 }
 
 export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
+    "AccommodationAvailability.jsonld-accommodation_availability.read": components["schemas"]["HydraItemBaseSchema"] & {
+      /**
+       * @description Identifiant UUID de l'hébergement
+       * @default
+       * @example 01961e2f-dead-7000-beef-000000000002
+       */
+      accommodationId?: string;
+      /**
+       * @description Plages de dates indisponibles (format ISO AAAA-MM-JJ). checkIn correspond à la première nuit occupée, checkOut au jour de départ (exclu des nuits réservées).
+       * @example [
+       *   {
+       *     "checkIn": "2026-05-01",
+       *     "checkOut": "2026-05-05"
+       *   }
+       * ]
+       */
+      busyRanges?: {
+          [key: string]: string;
+        }[];
+    };
     "AccommodationEntity.jsonld": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
        * @description Identifiant unique (UUID)
@@ -461,6 +556,17 @@ export interface components {
        * @example 10
        */
       weeklyPromotionPercentage?: number | null;
+      /**
+       * @description Politique d'annulation choisie par l'hôte : "flexible" ou "moderate"
+       * @example flexible
+       */
+      cancellationPolicy?: string | null;
+      /**
+       * @description Réservation instantanée activée : les demandes sont confirmées automatiquement sans validation de l'hôte
+       * @default false
+       * @example false
+       */
+      instantBooking?: boolean;
       /**
        * @description Statut de publication
        * @example draft
@@ -601,6 +707,12 @@ export interface components {
        */
       reviewCount?: number;
       /**
+       * @description Réservation instantanée activée : les demandes sont confirmées automatiquement sans validation de l'hôte
+       * @default false
+       * @example false
+       */
+      instantBooking?: boolean;
+      /**
        * @description Statut de publication
        * @example draft
        */
@@ -695,6 +807,17 @@ export interface components {
        * @example 10
        */
       weeklyPromotionPercentage?: number | null;
+      /**
+       * @description Politique d'annulation choisie par l'hôte : "flexible" ou "moderate"
+       * @example flexible
+       */
+      cancellationPolicy?: string | null;
+      /**
+       * @description Réservation instantanée activée : les demandes sont confirmées automatiquement sans validation de l'hôte
+       * @default false
+       * @example false
+       */
+      instantBooking?: boolean;
       /**
        * @description Statut de publication
        * @example draft
@@ -1620,6 +1743,11 @@ export interface components {
        */
       guestName?: string | null;
       /**
+       * @description Nombre de voyageurs de la réservation
+       * @example 2
+       */
+      guestCount?: number | null;
+      /**
        * @description Statut de la réservation (pending, confirmed, cancelled, refused)
        * @example pending
        */
@@ -1644,6 +1772,27 @@ export interface components {
        * @example 460
        */
       totalPaid?: number | null;
+      /**
+       * @description Politique d'annulation figée à la réservation : "flexible" ou "moderate"
+       * @example flexible
+       */
+      cancellationPolicy?: string | null;
+      /**
+       * @description Indique si la réservation peut être annulée maintenant (statut en attente/confirmé et séjour pas encore commencé)
+       * @default false
+       * @example true
+       */
+      cancellable?: boolean;
+      /**
+       * @description Montant qui serait remboursé au voyageur en cas d'annulation immédiate, selon la politique et la date courante
+       * @example 460
+       */
+      refundAmount?: number | null;
+      /**
+       * @description Pourcentage remboursé en cas d'annulation immédiate (0, 50 ou 100)
+       * @example 100
+       */
+      refundPercentage?: number | null;
     });
     "SolidarityProject.jsonld-solidarity_project.list": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -1795,6 +1944,14 @@ export interface components {
        */
       createdAt?: string | null;
     });
+    "User.ForgotPasswordInput-user.write": {
+      /**
+       * Format: email
+       * @description Adresse email du compte dont le mot de passe doit être réinitialisé
+       * @example host@example.com
+       */
+      email: string;
+    };
     "User.HostAvatarOutput.jsonld": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
        * @description URL (relative) de la photo de l'hôte qui vient d'être téléversée
@@ -1827,6 +1984,15 @@ export interface components {
        */
       password: string;
     };
+    "User.ResetPasswordInput-user.write": {
+      /** @description Jeton reçu par email dans le lien de réinitialisation */
+      token: string;
+      /**
+       * @description Nouveau mot de passe (8 caractères minimum)
+       * @example supersecret
+       */
+      password: string;
+    };
     "User.UpdateUserProfileInput-user.write.jsonMergePatch": {
       /**
        * @description Prénom
@@ -1849,6 +2015,10 @@ export interface components {
        * @example Passionné de randonnée, je loue mon gîte familial depuis 2015.
        */
       bio?: string | null;
+    };
+    "User.VerifyEmailInput-user.write": {
+      /** @description Jeton reçu par email dans le lien de vérification */
+      token: string;
     };
     "User.jsonld-user.read_user.token": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -1893,6 +2063,12 @@ export interface components {
        */
       verificationStatus?: string;
       /**
+       * @description Indique si l'adresse email a été vérifiée
+       * @default false
+       * @example true
+       */
+      emailVerified?: boolean;
+      /**
        * @description JWT Bearer à placer dans l'en-tête Authorization pour les requêtes authentifiées
        * @example eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...
        */
@@ -1921,6 +2097,46 @@ export interface components {
        */
       verifiedAt?: string | null;
     });
+    "WishlistItem.AddWishlistItemInput-wishlist.write": {
+      /**
+       * Format: uuid
+       * @description Identifiant UUID de l'hébergement à ajouter à la wishlist
+       * @example 01961e2f-dead-7000-beef-000000000001
+       */
+      accommodationId: string;
+    };
+    "WishlistItem.jsonld-wishlist.read": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant UUID de l'hébergement sauvegardé
+       * @example 01961e2f-dead-7000-beef-000000000001
+       */
+      accommodationId?: string | null;
+      /**
+       * @description Titre de l'hébergement
+       * @example Loft lumineux au cœur de Saint-Denis
+       */
+      title?: string | null;
+      /**
+       * @description Ville de l'hébergement
+       * @example Saint-Denis
+       */
+      city?: string | null;
+      /**
+       * @description Pays de l'hébergement
+       * @example La Réunion
+       */
+      country?: string | null;
+      /**
+       * @description Prix par nuit, en euros
+       * @example 120
+       */
+      price?: number | null;
+      /**
+       * @description URL relative d'une photo de l'hébergement (null si aucune)
+       * @example /uploads/photos/abc.jpg
+       */
+      photoUrl?: string | null;
+    });
   };
   responses: {
   };
@@ -1939,6 +2155,34 @@ export type external = Record<string, never>;
 
 export interface operations {
 
+  /**
+   * Disponibilités d'un hébergement
+   * @description Retourne les plages de dates déjà réservées (réservations en statut "pending" ou "confirmed" dont le séjour n'est pas terminé) pour un hébergement. Endpoint public, exposant uniquement les dates occupées — aucune donnée voyageur ni tarif. Utilisé par la page de détail pour barrer les dates indisponibles. Une plage couvre les nuits occupées : checkIn inclus, checkOut exclu (jour de départ libre pour une nouvelle arrivée). Un identifiant invalide ou inconnu retourne une liste vide.
+   */
+  api_accommodations_accommodationIdavailability_get: {
+    parameters: {
+      path: {
+        /** @description AccommodationAvailability identifier */
+        accommodationId: string;
+      };
+    };
+    responses: {
+      /** @description AccommodationAvailability resource */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["AccommodationAvailability.jsonld-accommodation_availability.read"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   /**
    * Lister les hébergements publiés
    * @description Retourne la liste paginée des hébergements publiés avec leur photo principale.
@@ -2104,6 +2348,62 @@ export interface operations {
     requestBody?: {
       content: {
         "application/ld+json": unknown;
+      };
+    };
+    responses: {
+      /** @description AccommodationEntity resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Modifier la politique d'annulation d'un hébergement
+   * @description Met à jour la politique d'annulation choisie par l'hôte. Valeurs autorisées : "flexible" (remboursement intégral jusqu'à 24h avant l'arrivée) ou "moderate" (remboursement intégral jusqu'à 5 jours avant, puis 50%).
+   */
+  "api_accommodations_idcancellation-policy_patch": {
+    parameters: {
+      path: {
+        /** @description AccommodationEntity identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AccommodationEntity resource */
+    requestBody?: {
+      content: {
+        "application/merge-patch+json": unknown;
       };
     };
     responses: {
@@ -2328,6 +2628,62 @@ export interface operations {
     requestBody?: {
       content: {
         "application/ld+json": unknown;
+      };
+    };
+    responses: {
+      /** @description AccommodationEntity resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Activer ou désactiver la réservation instantanée
+   * @description Active ou désactive la réservation instantanée pour un hébergement. Quand elle est active, les demandes des voyageurs sont confirmées automatiquement (et le paiement capturé) sans validation de l'hôte.
+   */
+  "api_accommodations_idinstant-booking_patch": {
+    parameters: {
+      path: {
+        /** @description AccommodationEntity identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AccommodationEntity resource */
+    requestBody?: {
+      content: {
+        "application/merge-patch+json": unknown;
       };
     };
     responses: {
@@ -3567,7 +3923,7 @@ export interface operations {
   };
   /**
    * Annuler une réservation
-   * @description Passe une réservation au statut "cancelled". Accessible au voyageur de la réservation ou à un membre de l'équipe loueur (403 sinon). Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée.
+   * @description Passe une réservation au statut "cancelled". Accessible au voyageur de la réservation ou à un membre de l'équipe loueur (403 sinon). Le séjour ne doit pas avoir commencé : une réservation en cours ou passée ne peut pas être annulée. Un message facultatif peut accompagner l'annulation ; il est publié dans la conversation liée. Retourne 404 si la réservation est introuvable, 422 si elle est déjà annulée, refusée, ou si le séjour a déjà commencé. La réponse expose le montant remboursé (refundAmount, refundPercentage) selon la politique figée et la date courante.
    */
   api_reservations_idcancel_patch: {
     parameters: {
@@ -3576,6 +3932,7 @@ export interface operations {
         id: string;
       };
     };
+    /** @description The updated Reservation resource */
     requestBody?: {
       content: {
         "application/merge-patch+json": unknown;
@@ -4181,6 +4538,40 @@ export interface operations {
     };
   };
   /**
+   * Demander la réinitialisation du mot de passe
+   * @description Envoie un email contenant un lien de réinitialisation si un compte existe pour cette adresse. Répond toujours 202, que le compte existe ou non, pour ne pas révéler quelles adresses sont enregistrées.
+   */
+  "api_forgot-password_post": {
+    /** @description The new User resource */
+    requestBody: {
+      content: {
+        "application/ld+json": components["schemas"]["User.ForgotPasswordInput-user.write"];
+      };
+    };
+    responses: {
+      /** @description User resource created */
+      202: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
    * Authentification d'un utilisateur
    * @description Vérifie email + mot de passe et retourne l'utilisateur ainsi qu'un JWT (champ `token`) à utiliser comme Bearer.
    */
@@ -4233,6 +4624,40 @@ export interface operations {
         content: {
           "application/ld+json": components["schemas"]["User.jsonld-user.read_user.token"];
         };
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Réinitialiser le mot de passe
+   * @description Définit un nouveau mot de passe à partir du jeton reçu par email. Le jeton est à usage unique et expire au bout d'une heure.
+   */
+  "api_reset-password_post": {
+    /** @description The new User resource */
+    requestBody: {
+      content: {
+        "application/ld+json": components["schemas"]["User.ResetPasswordInput-user.write"];
+      };
+    };
+    responses: {
+      /** @description User resource created */
+      204: {
+        content: never;
       };
       /** @description Invalid input */
       400: {
@@ -4333,6 +4758,76 @@ export interface operations {
     };
   };
   /**
+   * Renvoyer l'email de vérification
+   * @description Renvoie un email de vérification à l'utilisateur authentifié (par ex. si le lien précédent a expiré). Sans effet si l'email est déjà vérifié.
+   */
+  "api_usersresend-verification-email_post": {
+    responses: {
+      /** @description User resource created */
+      202: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Vérifier l'adresse email
+   * @description Marque l'adresse email comme vérifiée à partir du jeton reçu par email. Le jeton est à usage unique et expire au bout de 24 heures.
+   */
+  "api_verify-email_post": {
+    /** @description The new User resource */
+    requestBody: {
+      content: {
+        "application/ld+json": components["schemas"]["User.VerifyEmailInput-user.write"];
+      };
+    };
+    responses: {
+      /** @description User resource created */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
    * Statut de vérification d'identité d'un utilisateur
    * @description Retourne le statut de vérification courant de l'utilisateur.
    */
@@ -4392,6 +4887,126 @@ export interface operations {
           "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
           "application/problem+json": components["schemas"]["ConstraintViolation"];
           "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Lister la wishlist
+   * @description Retourne les hébergements sauvegardés par le propriétaire courant. Pour un utilisateur authentifié, sa wishlist de compte ; sinon celle associée à l'identifiant de corrélation envoyé dans l'en-tête X-Wishlist-Id (cookie côté client). Liste vide si visiteur anonyme sans identifiant.
+   */
+  api_wishlist_get_collection: {
+    parameters: {
+      query?: {
+        /** @description The collection page number */
+        page?: number;
+      };
+    };
+    responses: {
+      /** @description WishlistItem collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
+            member: components["schemas"]["WishlistItem.jsonld-wishlist.read"][];
+          };
+        };
+      };
+    };
+  };
+  /**
+   * Ajouter un hébergement à la wishlist
+   * @description Ajoute un hébergement à la wishlist du propriétaire courant (utilisateur authentifié, ou visiteur anonyme via l'en-tête X-Wishlist-Id). Opération idempotente : ajouter un hébergement déjà présent ne crée pas de doublon. Retourne 422 si l'hébergement est introuvable, 400 si aucun propriétaire ne peut être déterminé.
+   */
+  api_wishlist_post: {
+    /** @description The new WishlistItem resource */
+    requestBody: {
+      content: {
+        "application/ld+json": components["schemas"]["WishlistItem.AddWishlistItemInput-wishlist.write"];
+      };
+    };
+    responses: {
+      /** @description WishlistItem resource created */
+      201: {
+        content: {
+          "application/ld+json": components["schemas"]["WishlistItem.jsonld-wishlist.read"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Fusionner la wishlist anonyme dans le compte
+   * @description Rattache les hébergements de la wishlist anonyme (identifiant de corrélation envoyé dans l'en-tête X-Wishlist-Id) au compte de l'utilisateur authentifié, en supprimant les doublons. Appelé après la connexion, puis le cookie de corrélation est nettoyé côté client.
+   */
+  api_wishlistmerge_post: {
+    responses: {
+      /** @description WishlistItem resource created */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Retirer un hébergement de la wishlist
+   * @description Retire un hébergement de la wishlist du propriétaire courant. Opération idempotente : retirer un hébergement absent ne renvoie pas d'erreur.
+   */
+  api_wishlist_accommodationId_delete: {
+    parameters: {
+      path: {
+        /** @description WishlistItem identifier */
+        accommodationId: string;
+      };
+    };
+    responses: {
+      /** @description WishlistItem resource deleted */
+      204: {
+        content: never;
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
         };
       };
     };

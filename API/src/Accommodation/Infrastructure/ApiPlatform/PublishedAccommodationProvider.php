@@ -66,6 +66,12 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $params['priceMax'] = (float) $priceMaxRaw;
         }
 
+        // Instant booking: keep only accommodations that auto-confirm bookings.
+        $instantBookingRaw = $query?->get('instantBooking');
+        if (\in_array($instantBookingRaw, ['1', 'true', true], true)) {
+            $clauses[] = 'a.instant_booking = 1';
+        }
+
         // Availability window: keep only accommodations free for the whole range.
         // Day-granular comparison so a same-day turnover stays available (a stay
         // leaving on the requested check-in day, or arriving on the requested

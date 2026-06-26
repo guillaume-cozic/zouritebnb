@@ -151,6 +151,31 @@ final class GetPublishedAccommodationCollectionFiltersTest extends Accommodation
         self::assertSame('Full Set', $members[0]['title']);
     }
 
+    public function test_should_filter_by_instant_booking(): void
+    {
+        $this->insertRichAccommodation('Instant One', status: 'published', instantBooking: true);
+        $this->insertRichAccommodation('On Request', status: 'published', instantBooking: false);
+
+        $response = self::createClient()->request('GET', '/api/accommodations?instantBooking=true');
+
+        self::assertResponseIsSuccessful();
+        $members = $response->toArray()['member'];
+        self::assertCount(1, $members);
+        self::assertSame('Instant One', $members[0]['title']);
+        self::assertTrue($members[0]['instantBooking']);
+    }
+
+    public function test_should_ignore_instant_booking_filter_when_not_truthy(): void
+    {
+        $this->insertRichAccommodation('Instant One', status: 'published', instantBooking: true);
+        $this->insertRichAccommodation('On Request', status: 'published', instantBooking: false);
+
+        $response = self::createClient()->request('GET', '/api/accommodations?instantBooking=false');
+
+        self::assertResponseIsSuccessful();
+        self::assertCount(2, $response->toArray()['member']);
+    }
+
     public function test_should_paginate_and_clamp_items_per_page(): void
     {
         for ($i = 1; $i <= 3; ++$i) {
@@ -204,6 +229,7 @@ final class GetPublishedAccommodationCollectionFiltersTest extends Accommodation
         ?string $city = 'Paris',
         ?int $maxGuests = 2,
         ?array $amenities = null,
+        bool $instantBooking = false,
     ): string {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine.orm.entity_manager');
@@ -219,7 +245,8 @@ final class GetPublishedAccommodationCollectionFiltersTest extends Accommodation
             ->setLatitude(48.85)
             ->setLongitude(2.35)
             ->setMaxGuests($maxGuests)
-            ->setAmenities($amenities);
+            ->setAmenities($amenities)
+            ->setInstantBooking($instantBooking);
 
         $em->persist($entity);
         $em->flush();

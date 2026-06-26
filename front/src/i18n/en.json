@@ -413,6 +413,10 @@
       "priceDesc": "Price: high to low",
       "rating": "Top rated"
     },
+    "instantBooking": {
+      "label": "Instant booking",
+      "hint": "Only show places bookable without host approval"
+    },
     "advanced": {
       "toggle": "Advanced filters",
       "priceRange": "Price per night",
@@ -431,7 +435,8 @@
     "featuredTitle": "Featured accommodations",
     "featuredSubtitle": "Discover our top-rated properties selected by travellers",
     "viewAll": "View all accommodations",
-    "viewDetails": "View details"
+    "viewDetails": "View details",
+    "instantBookingBadge": "Instant booking"
   },
   "activities": {
     "title": "Popular activities",

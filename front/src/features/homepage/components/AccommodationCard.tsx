@@ -138,6 +138,15 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
           {[accommodation.city, accommodation.country].filter(Boolean).join(', ') || '\u2014'}
         </div>
 
+        {accommodation.instantBooking && (
+          <div className="mb-3 inline-flex items-center gap-1 self-start rounded-full bg-primary-50 border border-primary-200 px-2.5 py-1 text-xs font-semibold text-primary-700">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+            {t('homepage.instantBookingBadge')}
+          </div>
+        )}
+
         {accommodation.description && (
           <p className="text-sm text-gray-500 mb-4 line-clamp-2 leading-relaxed">
             {accommodation.description}

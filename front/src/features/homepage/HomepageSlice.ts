@@ -18,7 +18,7 @@ interface HomepageState {
 
 const initialState: HomepageState = {
   accommodations: [],
-  filters: { city: '', checkIn: '', checkOut: '', guests: 1, amenities: [], priceMin: null, priceMax: null, sort: '' },
+  filters: { city: '', checkIn: '', checkOut: '', guests: 1, amenities: [], priceMin: null, priceMax: null, sort: '', instantBooking: false },
   page: 1,
   totalItems: 0,
   status: 'idle',
@@ -35,6 +35,7 @@ interface FetchPublishedParams {
   priceMax?: number | null;
   amenities?: string[];
   sort?: string;
+  instantBooking?: boolean;
   page?: number;
 }
 
@@ -76,6 +77,7 @@ export const fetchPublishedAccommodations = createAsyncThunk<
         queryParams['amenities[]'] = params.amenities;
       }
       if (params?.sort) queryParams.sort = params.sort;
+      if (params?.instantBooking) queryParams.instantBooking = 'true';
       const response = await api.get('/api/accommodations', { params: queryParams });
       const data = response.data;
       const items = (data['hydra:member'] ?? data['member'] ?? []) as AccommodationListItem[];

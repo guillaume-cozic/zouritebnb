@@ -68,9 +68,10 @@ const AccommodationsListingPage: React.FC = () => {
       priceMax: filters.priceMax,
       amenities: filters.amenities,
       sort: filters.sort,
+      instantBooking: filters.instantBooking,
       page: 1,
     }));
-  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, filters.sort, amenitiesKey]);
+  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, filters.sort, filters.instantBooking, amenitiesKey]);
 
   // Infinite scroll: ask for the next page when the sentinel enters the viewport.
   // The component only declares the intent; the listener decides what to fetch.
@@ -101,15 +102,17 @@ const AccommodationsListingPage: React.FC = () => {
     (filters.guests !== null && filters.guests > 1 ? 1 : 0) +
     filters.amenities.length +
     (filters.priceMin !== null ? 1 : 0) +
-    (filters.priceMax !== null ? 1 : 0);
+    (filters.priceMax !== null ? 1 : 0) +
+    (filters.instantBooking ? 1 : 0);
 
   const advancedCount =
     filters.amenities.length +
     (filters.priceMin !== null ? 1 : 0) +
-    (filters.priceMax !== null ? 1 : 0);
+    (filters.priceMax !== null ? 1 : 0) +
+    (filters.instantBooking ? 1 : 0);
 
   const resetAll = () => {
-    dispatch(setFilters({ city: '', guests: 1, amenities: [], priceMin: null, priceMax: null }));
+    dispatch(setFilters({ city: '', guests: 1, amenities: [], priceMin: null, priceMax: null, instantBooking: false }));
   };
 
   const priceChipLabel = (() => {
@@ -305,6 +308,31 @@ const AccommodationsListingPage: React.FC = () => {
                   })}
                 </div>
               </div>
+
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-600">
+                    {t('listing.instantBooking.label')}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">{t('listing.instantBooking.hint')}</p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={filters.instantBooking}
+                  aria-label={t('listing.instantBooking.label')}
+                  onClick={() => dispatch(setFilters({ instantBooking: !filters.instantBooking }))}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${
+                    filters.instantBooking ? 'bg-primary-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                      filters.instantBooking ? 'translate-x-5' : 'translate-x-0.5'
+                    }`}
+                  />
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -336,6 +364,12 @@ const AccommodationsListingPage: React.FC = () => {
                 onRemove={() => toggleAmenity(code)}
               />
             ))}
+            {filters.instantBooking && (
+              <Chip
+                label={t('listing.instantBooking.label')}
+                onRemove={() => dispatch(setFilters({ instantBooking: false }))}
+              />
+            )}
             <button
               type="button"
               onClick={resetAll}

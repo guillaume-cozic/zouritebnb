@@ -21,6 +21,7 @@ startAppListening({
         priceMax: filters.priceMax,
         amenities: filters.amenities,
         sort: filters.sort,
+        instantBooking: filters.instantBooking,
         page: page + 1,
       })
     );

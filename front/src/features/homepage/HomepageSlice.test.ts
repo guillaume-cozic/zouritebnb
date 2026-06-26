@@ -78,6 +78,33 @@ describe('fetchPublishedAccommodations', () => {
     });
   });
 
+  test('le filtre réservation instantanée envoie instantBooking=true', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [], 'hydra:totalItems': 0 } });
+    const store = buildStore();
+
+    await store.dispatch(fetchPublishedAccommodations({ instantBooking: true, sort: 'price_asc' }));
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations', {
+      params: {
+        page: '1',
+        itemsPerPage: String(ITEMS_PER_PAGE),
+        sort: 'price_asc',
+        instantBooking: 'true',
+      },
+    });
+  });
+
+  test('instantBooking=false n\'ajoute pas le paramètre', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [], 'hydra:totalItems': 0 } });
+    const store = buildStore();
+
+    await store.dispatch(fetchPublishedAccommodations({ instantBooking: false }));
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations', {
+      params: { page: '1', itemsPerPage: String(ITEMS_PER_PAGE) },
+    });
+  });
+
   test('une page suivante est ajoutée (append) aux résultats existants', async () => {
     mockedApi.get
       .mockResolvedValueOnce({ data: { member: [{ id: 'a-1' }, { id: 'a-2' }], totalItems: 5 } })
