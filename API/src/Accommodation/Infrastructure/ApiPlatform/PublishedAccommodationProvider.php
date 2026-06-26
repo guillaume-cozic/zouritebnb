@@ -66,6 +66,27 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $params['priceMax'] = (float) $priceMaxRaw;
         }
 
+        // Availability window: keep only accommodations free for the whole range.
+        // Day-granular comparison so a same-day turnover stays available (a stay
+        // leaving on the requested check-in day, or arriving on the requested
+        // check-out day, does not block it) — mirroring the booking-time overlap
+        // rule in DoctrineReservationRepository::hasOverlappingReservation().
+        $checkIn = self::parseDate($query?->get('checkIn'));
+        $checkOut = self::parseDate($query?->get('checkOut'));
+        if (null !== $checkIn && null !== $checkOut && $checkIn < $checkOut) {
+            $clauses[] = <<<SQL
+                NOT EXISTS (
+                    SELECT 1 FROM reservation res
+                    WHERE res.accommodation_id = a.id
+                      AND res.status IN ('pending', 'confirmed')
+                      AND DATE(res.check_in) < :checkOut
+                      AND DATE(res.check_out) > :checkIn
+                )
+                SQL;
+            $params['checkIn'] = $checkIn;
+            $params['checkOut'] = $checkOut;
+        }
+
         // amenities[] (or comma-separated) — accommodation must contain ALL of them
         $amenitiesRaw = $query?->all()['amenities'] ?? [];
         if (\is_string($amenitiesRaw)) {
@@ -82,5 +103,23 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
         }
 
         return $this->listingQuery->paginate($clauses, $params, $types, $page, $itemsPerPage, withReviewStats: true);
+    }
+
+    /**
+     * Validates a `YYYY-MM-DD` query value, returning it untouched when valid
+     * and null otherwise (malformed dates are ignored, like the other filters).
+     */
+    private static function parseDate(mixed $raw): ?string
+    {
+        if (!\is_string($raw)) {
+            return null;
+        }
+
+        $value = trim($raw);
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+
+        return $date instanceof \DateTimeImmutable && $date->format('Y-m-d') === $value
+            ? $value
+            : null;
     }
 }
