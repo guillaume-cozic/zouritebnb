@@ -86,14 +86,15 @@ const CreateReservationModal: React.FC<Props> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const targetId = accommodationId ?? chosenAccommodation;
-    if (!targetId || !guestName || !startDate || !endDate) return;
+    if (!targetId || !startDate || !endDate) return;
     setSubmitting(true);
     const result = await dispatch(
       createReservation({
         accommodationId: targetId,
         checkIn: toApiDateTime(startDate, checkInTime),
         checkOut: toApiDateTime(endDate, checkOutTime),
-        guestName,
+        // Manual blocks need no guest; default to a visible "Blocked" label.
+        guestName: guestName.trim() || t('calendar.blockedDefault'),
       })
     );
     setSubmitting(false);
@@ -140,12 +141,12 @@ const CreateReservationModal: React.FC<Props> = ({
             </Select>
           </Field>
         )}
-        <Field label={t('calendar.guestName')}>
+        <Field label={t('calendar.blockLabel')}>
           <Input
             type="text"
             value={guestName}
             onChange={(e) => setGuestName(e.target.value)}
-            required
+            placeholder={t('calendar.blockLabelPlaceholder')}
           />
         </Field>
         <div>

@@ -21,6 +21,10 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   demandes des voyageurs sont confirmées automatiquement et le paiement capturé, sans
   validation de l'hôte. Badge + CTA dédiés sur la page détail, filtre de recherche
   `instantBooking` + badge sur les cartes. Seeder `app:seed:instant-booking` pour tester.
+- **Blocage de dates par l'hôte** : depuis le calendrier du backoffice, l'hôte sélectionne
+  une plage pour la bloquer (vacances, maintenance, indispo externe). Motif optionnel,
+  libellé « Bloqué » par défaut. Les dates bloquées rendent le logement indisponible à la
+  réservation comme une réservation classique.
 
 ## 🔴 Manques importants (impact direct conversion/usage)
 
@@ -29,8 +33,6 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 - **Remboursement réel au voyageur** : l'annulation calcule le montant et annule le
   PaymentIntent Stripe, mais **aucun vrai remboursement carte** n'est émis. Le breakdown
   existe mais l'argent n'est pas rendu.
-- **Blocage de dates par l'hôte** : impossible de bloquer manuellement des dates (vacances,
-  maintenance, indispo externe). Le calendrier ne reflète que les réservations.
 
 ## 🟠 Manques structurants
 
