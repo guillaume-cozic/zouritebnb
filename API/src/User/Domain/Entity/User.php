@@ -15,7 +15,7 @@ final class User extends AggregateRoot
     public function __construct(
         private readonly Uuid $id,
         private string $email,
-        private readonly string $hashedPassword,
+        private string $hashedPassword,
         private readonly Uuid $teamId,
         private ?string $firstName = null,
         private ?string $lastName = null,
@@ -26,6 +26,8 @@ final class User extends AggregateRoot
         private ?Uuid $selfieId = null,
         private ?IdentityDocumentType $documentType = null,
         private ?\DateTimeImmutable $verifiedAt = null,
+        private bool $emailVerified = false,
+        private ?\DateTimeImmutable $emailVerifiedAt = null,
     ) {
     }
 
@@ -50,6 +52,27 @@ final class User extends AggregateRoot
     public function getHashedPassword(): string
     {
         return $this->hashedPassword;
+    }
+
+    public function changePassword(string $hashedPassword): void
+    {
+        $this->hashedPassword = $hashedPassword;
+    }
+
+    public function isEmailVerified(): bool
+    {
+        return $this->emailVerified;
+    }
+
+    public function getEmailVerifiedAt(): ?\DateTimeImmutable
+    {
+        return $this->emailVerifiedAt;
+    }
+
+    public function markEmailVerified(\DateTimeImmutable $verifiedAt): void
+    {
+        $this->emailVerified = true;
+        $this->emailVerifiedAt = $verifiedAt;
     }
 
     public function getTeamId(): Uuid

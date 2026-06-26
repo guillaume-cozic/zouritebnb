@@ -21,6 +21,9 @@ import authReducer, {
   loginUser,
   registerUser,
   updateUserProfile,
+  requestPasswordReset,
+  resetPassword,
+  verifyEmail,
 } from './AuthSlice';
 import api from '../../services/api';
 
@@ -101,6 +104,45 @@ describe('updateUserProfile', () => {
     expect(updated?.lastName).toBe('Doe');
     expect(updated?.email).toBe('jane@doe.fr');
     expect(updated?.bio).toBe('Bonjour');
+  });
+});
+
+describe('requestPasswordReset', () => {
+  test('appelle l\'endpoint forgot-password et résout sans erreur', async () => {
+    mockedApi.post.mockResolvedValue({ data: '' });
+    const store = buildStore();
+
+    const result = await store.dispatch(requestPasswordReset({ email: 'a@b.fr' }));
+
+    expect(requestPasswordReset.fulfilled.match(result)).toBe(true);
+    expect(mockedApi.post).toHaveBeenCalledWith('/api/forgot-password', { email: 'a@b.fr' }, expect.anything());
+  });
+});
+
+describe('resetPassword', () => {
+  test('rejette avec un message quand le jeton est invalide', async () => {
+    mockedApi.post.mockRejectedValue({ response: { data: { detail: 'Lien invalide' } } });
+    const store = buildStore();
+
+    const result = await store.dispatch(resetPassword({ token: 'bad', password: 'newsecret' }));
+
+    expect(resetPassword.rejected.match(result)).toBe(true);
+    expect(result.payload).toBe('Lien invalide');
+  });
+});
+
+describe('verifyEmail', () => {
+  test('bascule emailVerified à true sur l\'utilisateur connecté après fulfilled', async () => {
+    mockedApi.post.mockResolvedValue({ data: { ...user, emailVerified: false } });
+    const store = buildStore();
+    await store.dispatch(loginUser({ email: 'a@b.fr', password: 'secret' }));
+    expect(store.getState().auth.user?.emailVerified).toBe(false);
+
+    mockedApi.post.mockResolvedValue({ data: '' });
+    await store.dispatch(verifyEmail({ token: 'tok' }));
+
+    expect(store.getState().auth.user?.emailVerified).toBe(true);
+    expect(JSON.parse(localStorage.getItem('auth.user')!).emailVerified).toBe(true);
   });
 });
 

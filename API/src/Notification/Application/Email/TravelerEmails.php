@@ -20,6 +20,24 @@ final readonly class TravelerEmails
         );
     }
 
+    public function verifyEmail(string $greetingName, string $verificationUrl): EmailView
+    {
+        return new EmailView(
+            template: 'emails/traveler/verify_email.html.twig',
+            subject: 'Confirmez votre adresse email ✉️',
+            variables: ['greetingName' => $greetingName, 'verificationUrl' => $verificationUrl],
+        );
+    }
+
+    public function passwordReset(string $greetingName, string $resetUrl): EmailView
+    {
+        return new EmailView(
+            template: 'emails/traveler/password_reset.html.twig',
+            subject: 'Réinitialisation de votre mot de passe 🔑',
+            variables: ['greetingName' => $greetingName, 'resetUrl' => $resetUrl],
+        );
+    }
+
     public function reservationRequested(
         string $greetingName,
         string $accommodationTitle,

@@ -55,6 +55,15 @@ services:
     App\User\Domain\Port\PasswordHasher:
         alias: App\User\Infrastructure\PasswordHasher\BcryptPasswordHasher
 
+    App\User\Domain\Port\UserTokenRepository:
+        alias: App\User\Infrastructure\Doctrine\DoctrineUserTokenRepository
+
+    App\User\Domain\Port\TokenGenerator:
+        alias: App\User\Infrastructure\Security\RandomTokenGenerator
+
+    App\User\Application\Listener\RequestEmailVerificationOnUserRegistered:
+        tags: [messenger.message_handler]
+
     App\User\Domain\Port\IdentityDocumentStorage:
         alias: App\User\Infrastructure\Filesystem\LocalIdentityDocumentStorage
 
@@ -209,6 +218,16 @@ services:
             $fromName: '%env(MAILER_FROM_NAME)%'
 
     App\Notification\Application\Listener\SendWelcomeEmailOnUserRegistered:
+        tags: [messenger.message_handler]
+
+    App\Notification\Application\Listener\SendVerificationEmailOnEmailVerificationRequested:
+        arguments:
+            $frontendUrl: '%env(FRONTEND_URL)%'
+        tags: [messenger.message_handler]
+
+    App\Notification\Application\Listener\SendPasswordResetEmailOnPasswordResetRequested:
+        arguments:
+            $frontendUrl: '%env(FRONTEND_URL)%'
         tags: [messenger.message_handler]
 
     App\Notification\Application\Listener\SendRequestedEmailOnReservationRequested:

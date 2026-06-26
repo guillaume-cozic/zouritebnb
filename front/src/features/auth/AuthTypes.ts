@@ -10,6 +10,8 @@ export interface AuthUser {
   avatarUrl?: string | null;
   /** Identity verification status: not_started | pending | verified | rejected. */
   verificationStatus?: string | null;
+  /** Whether the account's email address has been confirmed via the emailed link. */
+  emailVerified?: boolean;
   /** JWT Bearer returned by /api/login, attached to authenticated requests. */
   token?: string | null;
 }

@@ -59,6 +59,7 @@ final readonly class LoginUserProcessor implements ProcessorInterface
         $output->bio = $user->getBio();
         $output->avatarUrl = null !== $user->getAvatarFilename() ? '/uploads/photos/'.$user->getAvatarFilename() : null;
         $output->verificationStatus = $user->getVerificationStatus()->value;
+        $output->emailVerified = $user->isEmailVerified();
         $output->token = $this->tokenManager->create($securityUser);
 
         return $output;

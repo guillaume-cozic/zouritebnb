@@ -19,6 +19,10 @@ import RequireAccommodation from './features/accommodationManagement/components/
 import TeamSettingsPage from './features/team/components/TeamSettingsPage';
 import LoginPage from './features/auth/components/LoginPage';
 import RegisterPage from './features/auth/components/RegisterPage';
+import ForgotPasswordPage from './features/auth/components/ForgotPasswordPage';
+import ResetPasswordPage from './features/auth/components/ResetPasswordPage';
+import VerifyEmailPage from './features/auth/components/VerifyEmailPage';
+import EmailVerificationBanner from './features/auth/components/EmailVerificationBanner';
 import SolidarityProjectsPage from './features/solidarityProject/components/SolidarityProjectsPage';
 import SolidarityProjectDetailPage from './features/solidarityProject/components/SolidarityProjectDetailPage';
 import AccommodationCalendarPage from './features/reservation/components/AccommodationCalendarPage';
@@ -43,6 +47,7 @@ function App() {
     <BrowserRouter>
       <DocumentTitle />
       <Navbar />
+      <EmailVerificationBanner />
       <div className="pt-16 min-h-screen">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -57,6 +62,9 @@ function App() {
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/conversations" element={<Navigate to="/account/conversations" replace />} />
           <Route path="/conversations/:id" element={<Navigate to="/account/conversations" replace />} />
           <Route element={<ProtectedRoute />}>

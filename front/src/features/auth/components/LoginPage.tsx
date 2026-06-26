@@ -19,6 +19,7 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
 
   const returnTo = searchParams.get('returnTo');
+  const resetSuccess = searchParams.get('reset') === 'success';
   const redirectTo = returnTo ? decodeURIComponent(returnTo) : '/account';
   const registerTo = returnTo ? `/register?returnTo=${encodeURIComponent(returnTo)}` : '/register';
   const isBookingContext = redirectTo.includes('/book');
@@ -52,6 +53,12 @@ const LoginPage: React.FC = () => {
       </div>
 
       {isBookingContext && <BookingAuthNotice mode="login" />}
+
+      {resetSuccess && (
+        <p className="mb-5 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2.5 text-center">
+          {t('auth.resetPassword.success')}
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-7 sm:p-8 space-y-5">
         <div>
@@ -88,6 +95,11 @@ const LoginPage: React.FC = () => {
               autoComplete="current-password"
               className="w-full h-12 pl-10 pr-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-colors"
             />
+          </div>
+          <div className="text-right mt-2">
+            <Link to="/forgot-password" className="text-xs text-primary-700 font-medium hover:underline">
+              {t('auth.forgotPassword.link')}
+            </Link>
           </div>
         </div>
         {error && (

@@ -1,0 +1,15 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block heading %}Confirmez votre adresse email ✉️{% endblock %}
+
+{% block content %}
+  {% set p = 'margin:0 0 16px;line-height:1.6;color:#374151;' %}
+  <p style="{{ p }}">Bonjour {{ greetingName }},</p>
+  <p style="{{ p }}">Merci de votre inscription sur <strong>BnB Rodrigues</strong> ! Il ne reste plus qu'à confirmer votre adresse email pour sécuriser votre compte.</p>
+  <p style="margin:24px 0;">
+    <a href="{{ verificationUrl }}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:bold;padding:14px 28px;border-radius:10px;">Confirmer mon adresse email</a>
+  </p>
+  <p style="{{ p }}">Ce lien est valable <strong>24 heures</strong>. Si le bouton ne fonctionne pas, copiez-collez cette adresse dans votre navigateur :</p>
+  <p style="margin:0 0 16px;line-height:1.6;color:#6b7280;word-break:break-all;">{{ verificationUrl }}</p>
+  <p style="{{ p }}">Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet email.</p>
+{% endblock %}

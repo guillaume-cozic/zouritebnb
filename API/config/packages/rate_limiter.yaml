@@ -10,6 +10,17 @@ framework:
             policy: 'sliding_window'
             limit: 5
             interval: '1 minute'
+        # Password reset requests + reset attempts (per client IP): blocks mail-bombing
+        # and brute-forcing of reset tokens.
+        password_reset:
+            policy: 'sliding_window'
+            limit: 5
+            interval: '1 minute'
+        # Email verification requests + verify attempts (per client IP).
+        verify_email:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '1 minute'
 
 # In tests many requests share the same client IP within one run; raise the
 # limits high enough that throttling never interferes with functional tests.
@@ -19,4 +30,8 @@ when@test:
             login:
                 limit: 100000
             register:
+                limit: 100000
+            password_reset:
+                limit: 100000
+            verify_email:
                 limit: 100000

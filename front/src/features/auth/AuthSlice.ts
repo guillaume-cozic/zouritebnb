@@ -110,6 +110,67 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+/** Ask the API to email a password reset link. Always resolves (the API answers 202
+ *  whether or not the address has an account) so the UI cannot be used to probe emails. */
+export const requestPasswordReset = createAsyncThunk(
+  'auth/requestPasswordReset',
+  async (payload: { email: string }, { rejectWithValue }) => {
+    try {
+      await api.post('/api/forgot-password', payload, {
+        headers: { 'Content-Type': 'application/ld+json' },
+      });
+      return true;
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Impossible d\'envoyer l\'email de réinitialisation'));
+    }
+  }
+);
+
+/** Set a new password from the token received by email. */
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async (payload: { token: string; password: string }, { rejectWithValue }) => {
+    try {
+      await api.post('/api/reset-password', payload, {
+        headers: { 'Content-Type': 'application/ld+json' },
+      });
+      return true;
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Lien de réinitialisation invalide ou expiré'));
+    }
+  }
+);
+
+/** Confirm the account email from the token received by email. */
+export const verifyEmail = createAsyncThunk(
+  'auth/verifyEmail',
+  async (payload: { token: string }, { rejectWithValue }) => {
+    try {
+      await api.post('/api/verify-email', payload, {
+        headers: { 'Content-Type': 'application/ld+json' },
+      });
+      return true;
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Lien de vérification invalide ou expiré'));
+    }
+  }
+);
+
+/** Re-send the verification email to the authenticated user. */
+export const resendVerificationEmail = createAsyncThunk(
+  'auth/resendVerificationEmail',
+  async (_: void, { rejectWithValue }) => {
+    try {
+      await api.post('/api/users/resend-verification-email', null, {
+        headers: { 'Content-Type': 'application/ld+json' },
+      });
+      return true;
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Impossible de renvoyer l\'email de vérification'));
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -182,6 +243,14 @@ const authSlice = createSlice({
     builder
       .addCase(submitIdentityVerification.fulfilled, syncVerificationStatus)
       .addCase(fetchVerificationStatus.fulfilled, syncVerificationStatus);
+
+    // Reflect a successful email confirmation in the stored user, so the
+    // verification banner disappears immediately when the user is logged in.
+    builder.addCase(verifyEmail.fulfilled, (state) => {
+      if (!state.user) return;
+      state.user.emailVerified = true;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
+    });
   },
 });
 

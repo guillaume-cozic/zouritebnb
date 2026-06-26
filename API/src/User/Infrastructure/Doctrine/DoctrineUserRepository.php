@@ -60,7 +60,9 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
             ->setIdentityDocumentId($user->getIdentityDocumentId())
             ->setSelfieId($user->getSelfieId())
             ->setDocumentType($user->getDocumentType()?->value)
-            ->setVerifiedAt($user->getVerifiedAt());
+            ->setVerifiedAt($user->getVerifiedAt())
+            ->setEmailVerified($user->isEmailVerified())
+            ->setEmailVerifiedAt($user->getEmailVerifiedAt());
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -85,6 +87,8 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
             selfieId: $entity->getSelfieId(),
             documentType: null !== $documentType ? IdentityDocumentType::from($documentType) : null,
             verifiedAt: $entity->getVerifiedAt(),
+            emailVerified: $entity->isEmailVerified(),
+            emailVerifiedAt: $entity->getEmailVerifiedAt(),
         );
         $user->releaseEvents();
 

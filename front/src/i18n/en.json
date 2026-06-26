@@ -200,6 +200,39 @@
     "hasAccount": "Already registered?",
     "bookingLoginSubtitle": "Sign in to complete your booking.",
     "bookingRegisterSubtitle": "Create your account to confirm your booking.",
+    "backToLogin": "Back to sign in",
+    "forgotPassword": {
+      "link": "Forgot password?",
+      "title": "Forgot password",
+      "subtitle": "Enter your email and we'll send you a link to choose a new one.",
+      "submit": "Send the link",
+      "sent": "If an account exists for this address, an email with a reset link has just been sent. Remember to check your spam folder."
+    },
+    "resetPassword": {
+      "title": "New password",
+      "subtitle": "Choose a new password for your account.",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Reset password",
+      "tooShort": "The password must be at least 8 characters long.",
+      "mismatch": "The two passwords do not match.",
+      "error": "Reset link is invalid or has expired. Please request a new one.",
+      "missingToken": "Invalid reset link. Please request a new one.",
+      "success": "Your password has been reset. You can now sign in."
+    },
+    "verifyEmail": {
+      "verifying": "Verifying…",
+      "successTitle": "Email confirmed ✅",
+      "successText": "Thank you! Your email address has been verified.",
+      "goToAccount": "Go to my account",
+      "errorTitle": "Invalid link",
+      "errorText": "This verification link is invalid or has expired. Sign in to request a new one."
+    },
+    "emailVerification": {
+      "bannerText": "Confirm your email address to secure your account.",
+      "resend": "Resend email",
+      "resent": "Email sent! Check your inbox."
+    },
     "bookingContext": {
       "title": "One last step before your booking",
       "login": "Sign in to confirm your booking request and proceed to secure payment.",

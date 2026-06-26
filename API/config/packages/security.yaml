@@ -35,6 +35,12 @@ security:
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api/register$, roles: PUBLIC_ACCESS }
 
+        # Password reset and email verification: reached from an emailed link, so the
+        # visitor is not (yet) authenticated. The token itself is the credential.
+        - { path: ^/api/forgot-password$, methods: [POST], roles: PUBLIC_ACCESS }
+        - { path: ^/api/reset-password$, methods: [POST], roles: PUBLIC_ACCESS }
+        - { path: ^/api/verify-email$, methods: [POST], roles: PUBLIC_ACCESS }
+
         # Stripe webhook is authenticated by HMAC signature verification (Stripe-Signature
         # header), not by a JWT. It must stay public so Stripe's servers can reach it.
         - { path: ^/api/stripe/webhook$, methods: [POST], roles: PUBLIC_ACCESS }

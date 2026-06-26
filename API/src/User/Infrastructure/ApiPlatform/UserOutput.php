@@ -51,6 +51,58 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: UpdateUserProfileProcessor::class,
         ),
         new Post(
+            uriTemplate: '/forgot-password',
+            status: 202,
+            openapi: new OpenApiOperation(
+                summary: 'Demander la réinitialisation du mot de passe',
+                description: 'Envoie un email contenant un lien de réinitialisation si un compte existe pour cette adresse. Répond toujours 202, que le compte existe ou non, pour ne pas révéler quelles adresses sont enregistrées.',
+            ),
+            denormalizationContext: ['groups' => ['user:write']],
+            read: false,
+            input: ForgotPasswordInput::class,
+            output: false,
+            processor: ForgotPasswordProcessor::class,
+        ),
+        new Post(
+            uriTemplate: '/reset-password',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Réinitialiser le mot de passe',
+                description: 'Définit un nouveau mot de passe à partir du jeton reçu par email. Le jeton est à usage unique et expire au bout d\'une heure.',
+            ),
+            denormalizationContext: ['groups' => ['user:write']],
+            read: false,
+            input: ResetPasswordInput::class,
+            output: false,
+            processor: ResetPasswordProcessor::class,
+        ),
+        new Post(
+            uriTemplate: '/verify-email',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Vérifier l\'adresse email',
+                description: 'Marque l\'adresse email comme vérifiée à partir du jeton reçu par email. Le jeton est à usage unique et expire au bout de 24 heures.',
+            ),
+            denormalizationContext: ['groups' => ['user:write']],
+            read: false,
+            input: VerifyEmailInput::class,
+            output: false,
+            processor: VerifyEmailProcessor::class,
+        ),
+        new Post(
+            uriTemplate: '/users/resend-verification-email',
+            status: 202,
+            openapi: new OpenApiOperation(
+                summary: 'Renvoyer l\'email de vérification',
+                description: 'Renvoie un email de vérification à l\'utilisateur authentifié (par ex. si le lien précédent a expiré). Sans effet si l\'email est déjà vérifié.',
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            read: false,
+            input: false,
+            output: false,
+            processor: ResendVerificationEmailProcessor::class,
+        ),
+        new Post(
             uriTemplate: '/users/avatar',
             status: 201,
             openapi: new OpenApiOperation(
@@ -100,6 +152,10 @@ class UserOutput
     #[Groups(['user:read'])]
     #[ApiProperty(description: 'Statut de vérification d\'identité', example: 'verified')]
     public string $verificationStatus = 'not_started';
+
+    #[Groups(['user:read'])]
+    #[ApiProperty(description: 'Indique si l\'adresse email a été vérifiée', example: true)]
+    public bool $emailVerified = false;
 
     #[Groups(['user:token'])]
     #[ApiProperty(description: 'JWT Bearer à placer dans l\'en-tête Authorization pour les requêtes authentifiées', example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...')]
