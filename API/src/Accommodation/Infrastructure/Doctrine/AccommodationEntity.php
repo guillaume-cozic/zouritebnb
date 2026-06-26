@@ -86,6 +86,15 @@ class AccommodationEntity
     #[ORM\Column(options: ['default' => false])]
     private bool $instantBooking = false;
 
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $type = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $minNights = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $maxNights = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -370,6 +379,42 @@ class AccommodationEntity
     public function setInstantBooking(bool $instantBooking): static
     {
         $this->instantBooking = $instantBooking;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getMinNights(): ?int
+    {
+        return $this->minNights;
+    }
+
+    public function setMinNights(?int $minNights): static
+    {
+        $this->minNights = $minNights;
+
+        return $this;
+    }
+
+    public function getMaxNights(): ?int
+    {
+        return $this->maxNights;
+    }
+
+    public function setMaxNights(?int $maxNights): static
+    {
+        $this->maxNights = $maxNights;
 
         return $this;
     }

@@ -14,9 +14,12 @@ use App\Accommodation\Domain\Event\AccommodationGeolocationUpdated;
 use App\Accommodation\Domain\Event\AccommodationInstantBookingUpdated;
 use App\Accommodation\Domain\Event\AccommodationPriceUpdated;
 use App\Accommodation\Domain\Event\AccommodationPublished;
+use App\Accommodation\Domain\Event\AccommodationStayConstraintsUpdated;
+use App\Accommodation\Domain\Event\AccommodationTypeUpdated;
 use App\Accommodation\Domain\Event\AccommodationUnpublished;
 use App\Accommodation\Domain\Event\AccommodationWeeklyPromotionUpdated;
 use App\Accommodation\Domain\Exception\InvalidPriceException;
+use App\Accommodation\Domain\Exception\InvalidStayConstraintsException;
 use App\Accommodation\Domain\Exception\InvalidWeeklyPromotionException;
 use App\Shared\Domain\Entity\AggregateRoot;
 use Symfony\Component\Uid\Uuid;
@@ -39,6 +42,9 @@ final class Accommodation extends AggregateRoot
         private ?Uuid $regionId = null,
         private CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
         private bool $instantBooking = false,
+        private ?AccommodationType $type = null,
+        private ?int $minNights = null,
+        private ?int $maxNights = null,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
@@ -199,5 +205,50 @@ final class Accommodation extends AggregateRoot
     {
         $this->instantBooking = $instantBooking;
         $this->recordEvent(new AccommodationInstantBookingUpdated($this->id));
+    }
+
+    public function getType(): ?AccommodationType
+    {
+        return $this->type;
+    }
+
+    public function updateType(?AccommodationType $type): void
+    {
+        $this->type = $type;
+        $this->recordEvent(new AccommodationTypeUpdated($this->id));
+    }
+
+    public function getMinNights(): ?int
+    {
+        return $this->minNights;
+    }
+
+    public function getMaxNights(): ?int
+    {
+        return $this->maxNights;
+    }
+
+    public function updateStayConstraints(?int $minNights, ?int $maxNights): void
+    {
+        if (self::hasNonPositiveNights($minNights, $maxNights)) {
+            throw InvalidStayConstraintsException::becauseNotPositive();
+        }
+        if (self::isMinGreaterThanMax($minNights, $maxNights)) {
+            throw InvalidStayConstraintsException::becauseMinGreaterThanMax($minNights, $maxNights);
+        }
+
+        $this->minNights = $minNights;
+        $this->maxNights = $maxNights;
+        $this->recordEvent(new AccommodationStayConstraintsUpdated($this->id));
+    }
+
+    private static function hasNonPositiveNights(?int $minNights, ?int $maxNights): bool
+    {
+        return (null !== $minNights && $minNights < 1) || (null !== $maxNights && $maxNights < 1);
+    }
+
+    private static function isMinGreaterThanMax(?int $minNights, ?int $maxNights): bool
+    {
+        return null !== $minNights && null !== $maxNights && $minNights > $maxNights;
     }
 }

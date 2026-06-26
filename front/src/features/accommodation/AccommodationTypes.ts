@@ -1,6 +1,12 @@
 /** Host-selectable cancellation policy for an accommodation. */
 export type CancellationPolicy = 'flexible' | 'moderate';
 
+/** Host-selectable accommodation category. */
+export type AccommodationType = 'apartment' | 'house' | 'villa' | 'studio' | 'room' | 'bungalow';
+
+/** All accommodation types, in display order. */
+export const ACCOMMODATION_TYPES: AccommodationType[] = ['apartment', 'house', 'villa', 'studio', 'room', 'bungalow'];
+
 export interface Accommodation {
   '@id'?: string;
   id?: string;
@@ -11,6 +17,9 @@ export interface Accommodation {
   cancellationPolicy?: CancellationPolicy;
   /** When true, guest requests are auto-confirmed without host approval. */
   instantBooking?: boolean;
+  type?: AccommodationType | null;
+  minNights?: number | null;
+  maxNights?: number | null;
   status?: 'draft' | 'published';
   street?: string;
   city?: string;
@@ -103,6 +112,17 @@ export interface UpdateCancellationPolicyPayload {
 export interface UpdateInstantBookingPayload {
   id: string;
   instantBooking: boolean;
+}
+
+export interface UpdateTypePayload {
+  id: string;
+  type: AccommodationType | null;
+}
+
+export interface UpdateStayConstraintsPayload {
+  id: string;
+  minNights: number | null;
+  maxNights: number | null;
 }
 
 export interface SetCheckInOutPayload {

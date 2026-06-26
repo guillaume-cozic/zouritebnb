@@ -171,6 +171,74 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: UpdateAccommodationInstantBookingProcessor::class,
         ),
         new Patch(
+            uriTemplate: '/accommodations/{id}/type',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Modifier le type de logement',
+                description: 'Met à jour la catégorie d\'un hébergement. Valeurs autorisées : apartment, house, villa, studio, room, bungalow. Envoyer null pour ne pas spécifier.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/merge-patch+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'villa' => new Example(
+                                    summary: 'Définir le type',
+                                    value: ['type' => 'villa'],
+                                ),
+                                'unset' => new Example(
+                                    summary: 'Retirer le type',
+                                    value: ['type' => null],
+                                ),
+                                'invalid' => new Example(
+                                    summary: 'Invalide : valeur inconnue',
+                                    description: 'Retourne une erreur 422 car la valeur n\'est pas autorisée.',
+                                    value: ['type' => 'castle'],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationTypeInput::class,
+            output: false,
+            processor: UpdateAccommodationTypeProcessor::class,
+        ),
+        new Patch(
+            uriTemplate: '/accommodations/{id}/stay-constraints',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Modifier les contraintes de durée de séjour',
+                description: 'Définit le nombre minimum et/ou maximum de nuits par séjour. Chaque valeur doit être strictement positive ; minNights ne peut pas dépasser maxNights. Envoyer null pour retirer une contrainte.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/merge-patch+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: ['minNights' => 2, 'maxNights' => 30],
+                                ),
+                                'min_only' => new Example(
+                                    summary: 'Minimum seul',
+                                    value: ['minNights' => 3, 'maxNights' => null],
+                                ),
+                                'invalid' => new Example(
+                                    summary: 'Invalide : min > max',
+                                    description: 'Retourne une erreur 422.',
+                                    value: ['minNights' => 10, 'maxNights' => 5],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationStayConstraintsInput::class,
+            output: false,
+            processor: UpdateAccommodationStayConstraintsProcessor::class,
+        ),
+        new Patch(
             uriTemplate: '/accommodations/{id}/cancellation-policy',
             status: 204,
             openapi: new OpenApiOperation(
@@ -493,6 +561,18 @@ class AccommodationOutput implements FromEntityInterface
     public bool $instantBooking = false;
 
     #[Groups(['accommodation:read', 'accommodation:list'])]
+    #[ApiProperty(description: 'Type de logement : apartment, house, villa, studio, room, bungalow, ou null', example: 'villa')]
+    public ?string $type = null;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Nombre minimum de nuits par séjour, ou null', example: 2)]
+    public ?int $minNights = null;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Nombre maximum de nuits par séjour, ou null', example: 30)]
+    public ?int $maxNights = null;
+
+    #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Statut de publication', example: 'draft')]
     public ?string $status = null;
 
@@ -601,6 +681,9 @@ class AccommodationOutput implements FromEntityInterface
         $output->weeklyPromotionPercentage = $entity->getWeeklyPromotionPercentage();
         $output->cancellationPolicy = $entity->getCancellationPolicy();
         $output->instantBooking = $entity->isInstantBooking();
+        $output->type = $entity->getType();
+        $output->minNights = $entity->getMinNights();
+        $output->maxNights = $entity->getMaxNights();
 
         return $output;
     }

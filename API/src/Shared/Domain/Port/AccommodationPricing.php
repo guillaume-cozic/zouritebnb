@@ -15,6 +15,8 @@ final readonly class AccommodationPricing
         public ?string $cancellationPolicy = null,
         public ?int $maxGuests = null,
         public bool $instantBooking = false,
+        public ?int $minNights = null,
+        public ?int $maxNights = null,
     ) {
     }
 }

@@ -54,6 +54,14 @@ final readonly class RequestReservation
             throw InvalidReservationException::becauseGuestCountExceedsCapacity($guestCount->value(), $pricing->maxGuests);
         }
 
+        $nights = $dateRange->nights();
+        if (null !== $pricing->minNights && $nights < $pricing->minNights) {
+            throw InvalidReservationException::becauseStayTooShort($nights, $pricing->minNights);
+        }
+        if (null !== $pricing->maxNights && $nights > $pricing->maxNights) {
+            throw InvalidReservationException::becauseStayTooLong($nights, $pricing->maxNights);
+        }
+
         $stayPrice = $this->priceCalculator->calculate($pricing, $dateRange->checkIn(), $dateRange->checkOut());
 
         $price = ReservationPrice::fromStay(

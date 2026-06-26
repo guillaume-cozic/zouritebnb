@@ -107,6 +107,7 @@ final readonly class AccommodationListingQuery
                 a.status,
                 a.amenities,
                 a.instant_booking,
+                a.type,
                 (
                     SELECT p.filename
                     FROM accommodation_photo p
@@ -166,6 +167,7 @@ final readonly class AccommodationListingQuery
         $output->maxGuests = null !== $row['max_guests'] ? (int) $row['max_guests'] : null;
         $output->status = $row['status'];
         $output->instantBooking = (bool) $row['instant_booking'];
+        $output->type = $row['type'];
         $output->amenities = null !== $row['amenities']
             ? (\is_array($decoded = json_decode((string) $row['amenities'], true)) ? $decoded : null)
             : null;

@@ -233,6 +233,60 @@ final class RequestReservationTest extends TestCase
         ));
     }
 
+    public function test_should_throw_when_stay_shorter_than_minimum_nights(): void
+    {
+        $accommodationId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0, null, Uuid::v7(), minNights: 3);
+
+        $this->expectException(InvalidReservationException::class);
+        $this->expectExceptionMessage('shorter than the minimum');
+
+        $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-03'), // 2 nights < 3
+            guestName: 'John Doe',
+        ));
+    }
+
+    public function test_should_throw_when_stay_longer_than_maximum_nights(): void
+    {
+        $accommodationId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0, null, Uuid::v7(), maxNights: 5);
+
+        $this->expectException(InvalidReservationException::class);
+        $this->expectExceptionMessage('longer than the maximum');
+
+        $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-10'), // 9 nights > 5
+            guestName: 'John Doe',
+        ));
+    }
+
+    public function test_should_accept_stay_within_min_and_max_nights(): void
+    {
+        $accommodationId = Uuid::v7();
+        $this->pricingProvider->set($accommodationId, 100.0, null, Uuid::v7(), minNights: 2, maxNights: 7);
+
+        $id = $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-05'), // 4 nights
+            guestName: 'John Doe',
+        ));
+
+        $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));
+        self::assertNotNull($reservation);
+    }
+
     public function test_should_throw_when_guest_count_exceeds_capacity(): void
     {
         $accommodationId = Uuid::v7();

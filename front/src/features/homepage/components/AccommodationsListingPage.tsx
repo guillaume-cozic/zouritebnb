@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchPublishedAccommodations, nextPageRequested, setFilters } from '../HomepageSlice';
 import type { SortOption } from '../HomepageTypes';
+import { ACCOMMODATION_TYPES } from '../../accommodation/AccommodationTypes';
 import {
   selectFilteredAccommodations,
   selectHomepageStatus,
@@ -69,9 +70,10 @@ const AccommodationsListingPage: React.FC = () => {
       amenities: filters.amenities,
       sort: filters.sort,
       instantBooking: filters.instantBooking,
+      type: filters.type,
       page: 1,
     }));
-  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, filters.sort, filters.instantBooking, amenitiesKey]);
+  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, filters.sort, filters.instantBooking, filters.type, amenitiesKey]);
 
   // Infinite scroll: ask for the next page when the sentinel enters the viewport.
   // The component only declares the intent; the listener decides what to fetch.
@@ -103,16 +105,18 @@ const AccommodationsListingPage: React.FC = () => {
     filters.amenities.length +
     (filters.priceMin !== null ? 1 : 0) +
     (filters.priceMax !== null ? 1 : 0) +
-    (filters.instantBooking ? 1 : 0);
+    (filters.instantBooking ? 1 : 0) +
+    (filters.type ? 1 : 0);
 
   const advancedCount =
     filters.amenities.length +
     (filters.priceMin !== null ? 1 : 0) +
     (filters.priceMax !== null ? 1 : 0) +
-    (filters.instantBooking ? 1 : 0);
+    (filters.instantBooking ? 1 : 0) +
+    (filters.type ? 1 : 0);
 
   const resetAll = () => {
-    dispatch(setFilters({ city: '', guests: 1, amenities: [], priceMin: null, priceMax: null, instantBooking: false }));
+    dispatch(setFilters({ city: '', guests: 1, amenities: [], priceMin: null, priceMax: null, instantBooking: false, type: '' }));
   };
 
   const priceChipLabel = (() => {
@@ -249,6 +253,23 @@ const AccommodationsListingPage: React.FC = () => {
             <div className="border-t border-gray-100 bg-gradient-to-b from-primary-50/40 to-white px-5 sm:px-6 py-5 space-y-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-gray-600 mb-3">
+                  {t('accommodationType.label')}
+                </p>
+                <select
+                  value={filters.type}
+                  onChange={(e) => dispatch(setFilters({ type: e.target.value }))}
+                  className="h-11 rounded-xl border border-gray-200 bg-white pl-3 pr-8 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-colors"
+                >
+                  <option value="">{t('accommodationType.all')}</option>
+                  {ACCOMMODATION_TYPES.map((code) => (
+                    <option key={code} value={code}>
+                      {t(`accommodationType.${code}`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-600 mb-3">
                   {t('listing.advanced.priceRange')}
                 </p>
                 <div className="flex items-center gap-3 max-w-md">
@@ -360,6 +381,12 @@ const AccommodationsListingPage: React.FC = () => {
               <Chip
                 label={t('listing.instantBooking.label')}
                 onRemove={() => dispatch(setFilters({ instantBooking: false }))}
+              />
+            )}
+            {filters.type && (
+              <Chip
+                label={t(`accommodationType.${filters.type}`)}
+                onRemove={() => dispatch(setFilters({ type: '' }))}
               />
             )}
             <button

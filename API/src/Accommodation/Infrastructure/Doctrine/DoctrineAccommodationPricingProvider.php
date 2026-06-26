@@ -30,6 +30,8 @@ final readonly class DoctrineAccommodationPricingProvider implements Accommodati
             cancellationPolicy: $entity->getCancellationPolicy(),
             maxGuests: $entity->getMaxGuests(),
             instantBooking: $entity->isInstantBooking(),
+            minNights: $entity->getMinNights(),
+            maxNights: $entity->getMaxNights(),
         );
     }
 }

@@ -81,6 +81,7 @@ final class PublishedAccommodationProviderTest extends TestCase
             'max_guests' => '5',
             'status' => 'published',
             'instant_booking' => 1,
+            'type' => 'villa',
             'amenities' => '["wifi","pool"]',
             'thumbnail_filename' => 'thumb.jpg',
         ];
@@ -108,6 +109,7 @@ final class PublishedAccommodationProviderTest extends TestCase
         self::assertSame(7.26, $output->longitude);
         self::assertSame(5, $output->maxGuests);
         self::assertTrue($output->instantBooking);
+        self::assertSame('villa', $output->type);
         self::assertSame(['wifi', 'pool'], $output->amenities);
         self::assertSame('/uploads/photos/thumb.jpg', $output->thumbnailUrl);
         self::assertSame(['/uploads/photos/a.jpg', '/uploads/photos/b.jpg'], $output->photoUrls);
@@ -129,6 +131,7 @@ final class PublishedAccommodationProviderTest extends TestCase
             'max_guests' => null,
             'status' => 'published',
             'instant_booking' => 0,
+            'type' => null,
             'amenities' => null,
             'thumbnail_filename' => null,
         ];
@@ -203,6 +206,7 @@ final class PublishedAccommodationProviderTest extends TestCase
             'max_guests' => '2',
             'status' => 'published',
             'instant_booking' => 0,
+            'type' => null,
             'amenities' => null,
             'thumbnail_filename' => null,
         ];

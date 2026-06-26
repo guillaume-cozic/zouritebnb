@@ -10,6 +10,7 @@ export interface AccommodationListItem {
   maxGuests: number | null;
   status: string;
   instantBooking: boolean;
+  type: string | null;
   thumbnailUrl: string | null;
   photoUrls: string[];
   amenities: string[] | null;
@@ -33,4 +34,5 @@ export interface SearchFilters {
   priceMax: number | null;
   sort: SortOption;
   instantBooking: boolean;
+  type: string;
 }

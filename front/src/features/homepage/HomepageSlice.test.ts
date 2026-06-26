@@ -94,6 +94,17 @@ describe('fetchPublishedAccommodations', () => {
     });
   });
 
+  test('le filtre type envoie le paramètre type', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [], 'hydra:totalItems': 0 } });
+    const store = buildStore();
+
+    await store.dispatch(fetchPublishedAccommodations({ type: 'villa' }));
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations', {
+      params: { page: '1', itemsPerPage: String(ITEMS_PER_PAGE), type: 'villa' },
+    });
+  });
+
   test('instantBooking=false n\'ajoute pas le paramètre', async () => {
     mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [], 'hydra:totalItems': 0 } });
     const store = buildStore();

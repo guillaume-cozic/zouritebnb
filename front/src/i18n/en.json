@@ -538,6 +538,10 @@
     "bookedDatesHint": "Struck-through dates are already booked",
     "guestsLabel": "Guests",
     "reserve": "Reserve",
+    "minNights_one": "Minimum stay: {{count}} night",
+    "minNights_other": "Minimum stay: {{count}} nights",
+    "maxNights_one": "Maximum stay: {{count}} night",
+    "maxNights_other": "Maximum stay: {{count}} nights",
     "reserveInstant": "Book instantly",
     "instantConfirmNote": "Instant confirmation — no need to wait for host approval",
     "instantBookingBadge": "Instant booking",
@@ -620,6 +624,24 @@
   "instantBooking": {
     "title": "Instant booking",
     "description": "Guest requests are confirmed automatically, without your approval. Payment is captured immediately."
+  },
+  "accommodationType": {
+    "label": "Accommodation type",
+    "unspecified": "Unspecified",
+    "all": "All types",
+    "apartment": "Apartment",
+    "house": "House",
+    "villa": "Villa",
+    "studio": "Studio",
+    "room": "Room",
+    "bungalow": "Bungalow"
+  },
+  "stayConstraints": {
+    "title": "Stay length",
+    "description": "Limit the number of nights per booking. Leave empty for no limit.",
+    "minNights": "Minimum nights",
+    "maxNights": "Maximum nights",
+    "noLimit": "No limit"
   },
   "capacityStep": {
     "intro": "Specify the capacity of your accommodation to help travellers find the ideal place.",

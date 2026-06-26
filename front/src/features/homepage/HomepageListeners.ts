@@ -22,6 +22,7 @@ startAppListening({
         amenities: filters.amenities,
         sort: filters.sort,
         instantBooking: filters.instantBooking,
+        type: filters.type,
         page: page + 1,
       })
     );

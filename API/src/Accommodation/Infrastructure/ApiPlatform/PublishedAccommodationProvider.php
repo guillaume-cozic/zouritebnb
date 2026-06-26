@@ -66,6 +66,13 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $params['priceMax'] = (float) $priceMaxRaw;
         }
 
+        // Accommodation type (category).
+        $typeRaw = $query?->get('type');
+        if (\is_string($typeRaw) && '' !== trim($typeRaw)) {
+            $clauses[] = 'a.type = :type';
+            $params['type'] = trim($typeRaw);
+        }
+
         // Instant booking: keep only accommodations that auto-confirm bookings.
         $instantBookingRaw = $query?->get('instantBooking');
         if (\in_array($instantBookingRaw, ['1', 'true', true], true)) {

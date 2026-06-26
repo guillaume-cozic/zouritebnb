@@ -538,6 +538,10 @@
     "bookedDatesHint": "Les dates barrées sont déjà réservées",
     "guestsLabel": "Voyageurs",
     "reserve": "Réserver",
+    "minNights_one": "Séjour minimum : {{count}} nuit",
+    "minNights_other": "Séjour minimum : {{count}} nuits",
+    "maxNights_one": "Séjour maximum : {{count}} nuit",
+    "maxNights_other": "Séjour maximum : {{count}} nuits",
     "reserveInstant": "Réserver instantanément",
     "instantConfirmNote": "Confirmation immédiate, sans attendre la validation de l'hôte",
     "instantBookingBadge": "Réservation instantanée",
@@ -620,6 +624,24 @@
   "instantBooking": {
     "title": "Réservation instantanée",
     "description": "Les demandes des voyageurs sont confirmées automatiquement, sans validation de votre part. Le paiement est capturé immédiatement."
+  },
+  "accommodationType": {
+    "label": "Type de logement",
+    "unspecified": "Non spécifié",
+    "all": "Tous les types",
+    "apartment": "Appartement",
+    "house": "Maison",
+    "villa": "Villa",
+    "studio": "Studio",
+    "room": "Chambre",
+    "bungalow": "Bungalow"
+  },
+  "stayConstraints": {
+    "title": "Durée de séjour",
+    "description": "Limitez le nombre de nuits par réservation. Laissez vide pour ne pas imposer de limite.",
+    "minNights": "Nuits minimum",
+    "maxNights": "Nuits maximum",
+    "noLimit": "Aucune limite"
   },
   "capacityStep": {
     "intro": "Indiquez la capacité de votre hébergement pour aider les voyageurs à trouver le logement idéal.",

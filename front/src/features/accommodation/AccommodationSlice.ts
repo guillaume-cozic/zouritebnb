@@ -13,7 +13,10 @@ import {
   UpdateWeeklyPromotionPayload,
   UpdateCancellationPolicyPayload,
   UpdateInstantBookingPayload,
+  UpdateTypePayload,
+  UpdateStayConstraintsPayload,
   CancellationPolicy,
+  AccommodationType,
   SetCheckInOutPayload,
   ReorderPhotosPayload,
   UpdateDescriptionPayload,
@@ -38,6 +41,8 @@ export type AccommodationFieldEditedPayload =
   | { field: 'weeklyPromotion'; id: string; weeklyPromotionPercentage: number | null }
   | { field: 'cancellationPolicy'; id: string; cancellationPolicy: CancellationPolicy }
   | { field: 'instantBooking'; id: string; instantBooking: boolean }
+  | { field: 'type'; id: string; type: AccommodationType | null }
+  | { field: 'stayConstraints'; id: string; minNights: number | null; maxNights: number | null }
   | { field: 'capacity'; id: string; bedrooms: number; bathrooms: number; maxGuests: number; singleBeds: number; doubleBeds: number }
   | { field: 'amenities'; id: string; codes: string[] }
   | { field: 'checkInOut'; id: string; checkIn: string; checkOut: string }
@@ -61,7 +66,10 @@ export const editSectionForField = (field: AccommodationEditField): EditSection 
       return 'checkinout';
     case 'cancellationPolicy':
     case 'instantBooking':
+    case 'stayConstraints':
       return 'cancellation';
+    case 'type':
+      return 'description';
     default:
       return field;
   }
@@ -299,6 +307,42 @@ export const updateInstantBooking = createAsyncThunk(
   }
 );
 
+export const updateType = createAsyncThunk(
+  'accommodation/updateType',
+  async ({ id, type }: UpdateTypePayload, { rejectWithValue }) => {
+    try {
+      await api.patch(
+        `/api/accommodations/${id}/type`,
+        { type },
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return { type };
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, 'Erreur lors de la mise à jour du type de logement')
+      );
+    }
+  }
+);
+
+export const updateStayConstraints = createAsyncThunk(
+  'accommodation/updateStayConstraints',
+  async ({ id, minNights, maxNights }: UpdateStayConstraintsPayload, { rejectWithValue }) => {
+    try {
+      await api.patch(
+        `/api/accommodations/${id}/stay-constraints`,
+        { minNights, maxNights },
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return { minNights, maxNights };
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, 'Erreur lors de la mise à jour des contraintes de séjour')
+      );
+    }
+  }
+);
+
 export const setCheckInOut = createAsyncThunk(
   'accommodation/setCheckInOut',
   async ({ id, checkIn, checkOut }: SetCheckInOutPayload, { rejectWithValue }) => {
@@ -371,6 +415,8 @@ const EDIT_SECTION_BY_THUNK_PREFIX: Record<string, EditSection> = {
   [updateWeeklyPromotion.typePrefix]: 'price',
   [updateCancellationPolicy.typePrefix]: 'cancellation',
   [updateInstantBooking.typePrefix]: 'cancellation',
+  [updateStayConstraints.typePrefix]: 'cancellation',
+  [updateType.typePrefix]: 'description',
   [setCapacity.typePrefix]: 'capacity',
   [setAmenities.typePrefix]: 'amenities',
   [setCheckInOut.typePrefix]: 'checkinout',
@@ -383,6 +429,8 @@ const EDIT_THUNKS = [
   updateWeeklyPromotion,
   updateCancellationPolicy,
   updateInstantBooking,
+  updateType,
+  updateStayConstraints,
   setCapacity,
   setAmenities,
   setCheckInOut,
@@ -582,6 +630,29 @@ const accommodationSlice = createSlice({
         }
       })
       .addCase(updateInstantBooking.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update type
+      .addCase(updateType.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.type = action.payload.type;
+        }
+      })
+      .addCase(updateType.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update stay constraints
+      .addCase(updateStayConstraints.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.minNights = action.payload.minNights;
+          state.current.maxNights = action.payload.maxNights;
+        }
+      })
+      .addCase(updateStayConstraints.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })

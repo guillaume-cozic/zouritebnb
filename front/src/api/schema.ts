@@ -127,6 +127,20 @@ export interface paths {
      */
     patch: operations["api_accommodations_idpublish_patch"];
   };
+  "/api/accommodations/{id}/stay-constraints": {
+    /**
+     * Modifier les contraintes de durée de séjour
+     * @description Définit le nombre minimum et/ou maximum de nuits par séjour. Chaque valeur doit être strictement positive ; minNights ne peut pas dépasser maxNights. Envoyer null pour retirer une contrainte.
+     */
+    patch: operations["api_accommodations_idstay-constraints_patch"];
+  };
+  "/api/accommodations/{id}/type": {
+    /**
+     * Modifier le type de logement
+     * @description Met à jour la catégorie d'un hébergement. Valeurs autorisées : apartment, house, villa, studio, room, bungalow. Envoyer null pour ne pas spécifier.
+     */
+    patch: operations["api_accommodations_idtype_patch"];
+  };
   "/api/accommodations/{id}/unpublish": {
     /**
      * Dépublier un hébergement
@@ -568,6 +582,21 @@ export interface components {
        */
       instantBooking?: boolean;
       /**
+       * @description Type de logement : apartment, house, villa, studio, room, bungalow, ou null
+       * @example villa
+       */
+      type?: string | null;
+      /**
+       * @description Nombre minimum de nuits par séjour, ou null
+       * @example 2
+       */
+      minNights?: number | null;
+      /**
+       * @description Nombre maximum de nuits par séjour, ou null
+       * @example 30
+       */
+      maxNights?: number | null;
+      /**
        * @description Statut de publication
        * @example draft
        */
@@ -713,6 +742,11 @@ export interface components {
        */
       instantBooking?: boolean;
       /**
+       * @description Type de logement : apartment, house, villa, studio, room, bungalow, ou null
+       * @example villa
+       */
+      type?: string | null;
+      /**
        * @description Statut de publication
        * @example draft
        */
@@ -818,6 +852,21 @@ export interface components {
        * @example false
        */
       instantBooking?: boolean;
+      /**
+       * @description Type de logement : apartment, house, villa, studio, room, bungalow, ou null
+       * @example villa
+       */
+      type?: string | null;
+      /**
+       * @description Nombre minimum de nuits par séjour, ou null
+       * @example 2
+       */
+      minNights?: number | null;
+      /**
+       * @description Nombre maximum de nuits par séjour, ou null
+       * @example 30
+       */
+      maxNights?: number | null;
       /**
        * @description Statut de publication
        * @example draft
@@ -2924,6 +2973,118 @@ export interface operations {
       path: {
         /** @description AccommodationEntity identifier */
         id: string;
+      };
+    };
+    responses: {
+      /** @description AccommodationEntity resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Modifier les contraintes de durée de séjour
+   * @description Définit le nombre minimum et/ou maximum de nuits par séjour. Chaque valeur doit être strictement positive ; minNights ne peut pas dépasser maxNights. Envoyer null pour retirer une contrainte.
+   */
+  "api_accommodations_idstay-constraints_patch": {
+    parameters: {
+      path: {
+        /** @description AccommodationEntity identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AccommodationEntity resource */
+    requestBody?: {
+      content: {
+        "application/merge-patch+json": unknown;
+      };
+    };
+    responses: {
+      /** @description AccommodationEntity resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Modifier le type de logement
+   * @description Met à jour la catégorie d'un hébergement. Valeurs autorisées : apartment, house, villa, studio, room, bungalow. Envoyer null pour ne pas spécifier.
+   */
+  api_accommodations_idtype_patch: {
+    parameters: {
+      path: {
+        /** @description AccommodationEntity identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AccommodationEntity resource */
+    requestBody?: {
+      content: {
+        "application/merge-patch+json": unknown;
       };
     };
     responses: {

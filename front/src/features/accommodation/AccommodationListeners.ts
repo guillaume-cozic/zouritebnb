@@ -16,6 +16,8 @@ import {
   updateCancellationPolicy,
   updateDescription,
   updateInstantBooking,
+  updateStayConstraints,
+  updateType,
   updatePrice,
   updateWeeklyPromotion,
 } from './AccommodationSlice';
@@ -38,6 +40,14 @@ startAppListening({
   },
 });
 
+/** Both null is valid; each set bound must be a positive integer and min ≤ max. */
+const isValidStayConstraints = (minNights: number | null, maxNights: number | null): boolean => {
+  const valid = (n: number | null) => n === null || (Number.isInteger(n) && n >= 1);
+  if (!valid(minNights) || !valid(maxNights)) return false;
+  if (minNights !== null && maxNights !== null && minNights > maxNights) return false;
+  return true;
+};
+
 /** A payload is saved only when it satisfies the same business rules the forms enforce. */
 const isSavable = (p: AccommodationFieldEditedPayload): boolean => {
   switch (p.field) {
@@ -56,6 +66,10 @@ const isSavable = (p: AccommodationFieldEditedPayload): boolean => {
       return p.cancellationPolicy === 'flexible' || p.cancellationPolicy === 'moderate';
     case 'instantBooking':
       return typeof p.instantBooking === 'boolean';
+    case 'type':
+      return true;
+    case 'stayConstraints':
+      return isValidStayConstraints(p.minNights, p.maxNights);
     case 'location':
       return (
         p.street.trim() !== '' &&
@@ -81,6 +95,10 @@ const dispatchSave = (p: AccommodationFieldEditedPayload, dispatch: AppDispatch)
       return dispatch(updateCancellationPolicy({ id: p.id, cancellationPolicy: p.cancellationPolicy }));
     case 'instantBooking':
       return dispatch(updateInstantBooking({ id: p.id, instantBooking: p.instantBooking }));
+    case 'type':
+      return dispatch(updateType({ id: p.id, type: p.type }));
+    case 'stayConstraints':
+      return dispatch(updateStayConstraints({ id: p.id, minNights: p.minNights, maxNights: p.maxNights }));
     case 'capacity':
       return dispatch(setCapacity({
         id: p.id,
@@ -115,6 +133,8 @@ const EDIT_FIELDS: AccommodationEditField[] = [
   'weeklyPromotion',
   'cancellationPolicy',
   'instantBooking',
+  'type',
+  'stayConstraints',
   'capacity',
   'amenities',
   'checkInOut',

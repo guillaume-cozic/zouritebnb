@@ -123,7 +123,10 @@ final class SeedInstantBookingCommand extends Command
             ->setBedrooms(1)
             ->setBathrooms(1)
             ->setMaxGuests(2)
-            ->setInstantBooking($instantBooking);
+            ->setInstantBooking($instantBooking)
+            ->setType('studio')
+            ->setMinNights(2)
+            ->setMaxNights(14);
         $this->em->persist($accommodation);
 
         $io->writeln(\sprintf(

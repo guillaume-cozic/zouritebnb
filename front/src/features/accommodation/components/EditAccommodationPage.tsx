@@ -16,10 +16,10 @@ import {
   selectAccommodationError,
   selectEditSaveStatus,
 } from '../AccommodationSelectors';
-import { Accommodation, CancellationPolicy } from '../AccommodationTypes';
+import { Accommodation, CancellationPolicy, AccommodationType, ACCOMMODATION_TYPES } from '../AccommodationTypes';
 import { AMENITY_CATEGORIES } from '../AmenityData';
 import MapSelector from '../../../components/MapSelector';
-import { Card, Field, Input, SaveIndicator, Textarea } from '../../../components/ui';
+import { Card, Field, Input, SaveIndicator, Select, Textarea } from '../../../components/ui';
 import EditLayout, { SECTIONS, EditSection } from './EditLayout';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -80,6 +80,13 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
   );
   const [instantBooking, setInstantBooking] = useState<boolean>(
     accommodation.instantBooking ?? false
+  );
+  const [type, setType] = useState<AccommodationType | ''>(accommodation.type ?? '');
+  const [minNights, setMinNights] = useState<string>(
+    accommodation.minNights != null ? String(accommodation.minNights) : ''
+  );
+  const [maxNights, setMaxNights] = useState<string>(
+    accommodation.maxNights != null ? String(accommodation.maxNights) : ''
   );
 
   const locationForm = useForm({
@@ -164,6 +171,23 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
     dispatch(accommodationFieldEdited({ field: 'instantBooking', id, instantBooking: value }));
   };
 
+  const handleTypeChange = (value: string) => {
+    const next = (value || null) as AccommodationType | null;
+    setType(next ?? '');
+    dispatch(accommodationFieldEdited({ field: 'type', id, type: next }));
+  };
+
+  const handleStayConstraintsChange = (nextMin: string, nextMax: string) => {
+    setMinNights(nextMin);
+    setMaxNights(nextMax);
+    dispatch(accommodationFieldEdited({
+      field: 'stayConstraints',
+      id,
+      minNights: nextMin === '' ? null : Number(nextMin),
+      maxNights: nextMax === '' ? null : Number(nextMax),
+    }));
+  };
+
   const dispatchLocationEdited = () => {
     const v = locationForm.getValues();
     const num = (x: unknown): number | undefined =>
@@ -224,6 +248,16 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
               </Field>
               <Field label={t('descriptionStep.descriptionLabel')}>
                 <Textarea value={description} onChange={handleDescriptionChange} rows={5} />
+              </Field>
+              <Field label={t('accommodationType.label')}>
+                <Select value={type} onChange={(e) => handleTypeChange(e.target.value)}>
+                  <option value="">{t('accommodationType.unspecified')}</option>
+                  {ACCOMMODATION_TYPES.map((code) => (
+                    <option key={code} value={code}>
+                      {t(`accommodationType.${code}`)}
+                    </option>
+                  ))}
+                </Select>
               </Field>
             </div>
           </Card>
@@ -512,6 +546,31 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
                   }`}
                 />
               </button>
+            </div>
+
+            <div className="mt-5 pt-5 border-t border-surface-200">
+              <p className="font-semibold text-surface-800">{t('stayConstraints.title')}</p>
+              <p className="text-sm text-surface-500 mt-1 mb-4">{t('stayConstraints.description')}</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field label={t('stayConstraints.minNights')}>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={minNights}
+                    onChange={(e) => handleStayConstraintsChange(e.target.value, maxNights)}
+                    placeholder={t('stayConstraints.noLimit')}
+                  />
+                </Field>
+                <Field label={t('stayConstraints.maxNights')}>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={maxNights}
+                    onChange={(e) => handleStayConstraintsChange(minNights, e.target.value)}
+                    placeholder={t('stayConstraints.noLimit')}
+                  />
+                </Field>
+              </div>
             </div>
           </Card>
         </div>

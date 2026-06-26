@@ -31,6 +31,16 @@ final class InvalidReservationException extends \DomainException
         return new self(\sprintf('Guest count %d exceeds the accommodation capacity of %d.', $guestCount, $maxGuests));
     }
 
+    public static function becauseStayTooShort(int $nights, int $minNights): self
+    {
+        return new self(\sprintf('Stay of %d night(s) is shorter than the minimum of %d night(s) for this accommodation.', $nights, $minNights));
+    }
+
+    public static function becauseStayTooLong(int $nights, int $maxNights): self
+    {
+        return new self(\sprintf('Stay of %d night(s) is longer than the maximum of %d night(s) for this accommodation.', $nights, $maxNights));
+    }
+
     public static function becauseNegativeTotalPrice(float $totalPrice): self
     {
         return new self(\sprintf('Total price must be greater than or equal to zero, got %s.', $totalPrice));

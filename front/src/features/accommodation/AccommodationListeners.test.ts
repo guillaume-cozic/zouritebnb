@@ -213,6 +213,63 @@ describe('accommodationFieldEdited', () => {
     }
   });
 
+  test('saves the type under the description badge section', async () => {
+    vi.useFakeTimers();
+    try {
+      mockedApi.patch.mockResolvedValue({ data: {} });
+      const store = buildStore();
+
+      store.dispatch(accommodationFieldEdited({ field: 'type', id: 'a-1', type: 'villa' }));
+      vi.advanceTimersByTime(1201);
+      await flush();
+
+      expect(mockedApi.patch).toHaveBeenCalledWith(
+        '/api/accommodations/a-1/type',
+        { type: 'villa' },
+        expect.anything()
+      );
+      expect(store.getState().accommodation.editSaveStatus.description).toBe('saved');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('saves stay constraints under the cancellation badge section', async () => {
+    vi.useFakeTimers();
+    try {
+      mockedApi.patch.mockResolvedValue({ data: {} });
+      const store = buildStore();
+
+      store.dispatch(accommodationFieldEdited({ field: 'stayConstraints', id: 'a-1', minNights: 2, maxNights: 30 }));
+      vi.advanceTimersByTime(1201);
+      await flush();
+
+      expect(mockedApi.patch).toHaveBeenCalledWith(
+        '/api/accommodations/a-1/stay-constraints',
+        { minNights: 2, maxNights: 30 },
+        expect.anything()
+      );
+      expect(store.getState().accommodation.editSaveStatus.cancellation).toBe('saved');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('skips saving stay constraints when min is greater than max', async () => {
+    vi.useFakeTimers();
+    try {
+      const store = buildStore();
+
+      store.dispatch(accommodationFieldEdited({ field: 'stayConstraints', id: 'a-1', minNights: 10, maxNights: 5 }));
+      vi.advanceTimersByTime(1201);
+      await flush();
+
+      expect(mockedApi.patch).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   test('saves the weekly promotion under the price badge section', async () => {
     vi.useFakeTimers();
     try {

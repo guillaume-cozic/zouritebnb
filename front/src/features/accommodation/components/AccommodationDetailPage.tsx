@@ -185,6 +185,11 @@ const AccommodationDetailPage: React.FC = () => {
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-3xl font-bold">{accommodation.title}</h1>
+              {accommodation.type && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-gray-50 text-gray-700 border-gray-200">
+                  {t(`accommodationType.${accommodation.type}`)}
+                </span>
+              )}
               {accommodation.status && accommodation.status !== 'published' && (
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-amber-50 text-amber-700 border-amber-200">
                   {accommodation.status}
@@ -457,6 +462,13 @@ const AccommodationDetailPage: React.FC = () => {
                   {excludeDateIntervals.length > 0 && (
                     <p className="mt-2 text-xs text-gray-500">
                       {t('detail.bookedDatesHint')}
+                    </p>
+                  )}
+                  {(accommodation.minNights != null || accommodation.maxNights != null) && (
+                    <p className="mt-2 text-xs text-gray-500">
+                      {accommodation.minNights != null && t('detail.minNights', { count: accommodation.minNights })}
+                      {accommodation.minNights != null && accommodation.maxNights != null && ' · '}
+                      {accommodation.maxNights != null && t('detail.maxNights', { count: accommodation.maxNights })}
                     </p>
                   )}
                 </div>

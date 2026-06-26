@@ -176,6 +176,20 @@ final class GetPublishedAccommodationCollectionFiltersTest extends Accommodation
         self::assertCount(2, $response->toArray()['member']);
     }
 
+    public function test_should_filter_by_type(): void
+    {
+        $this->insertRichAccommodation('A Villa', status: 'published', type: 'villa');
+        $this->insertRichAccommodation('A Studio', status: 'published', type: 'studio');
+
+        $response = self::createClient()->request('GET', '/api/accommodations?type=villa');
+
+        self::assertResponseIsSuccessful();
+        $members = $response->toArray()['member'];
+        self::assertCount(1, $members);
+        self::assertSame('A Villa', $members[0]['title']);
+        self::assertSame('villa', $members[0]['type']);
+    }
+
     public function test_should_paginate_and_clamp_items_per_page(): void
     {
         for ($i = 1; $i <= 3; ++$i) {
@@ -230,6 +244,7 @@ final class GetPublishedAccommodationCollectionFiltersTest extends Accommodation
         ?int $maxGuests = 2,
         ?array $amenities = null,
         bool $instantBooking = false,
+        ?string $type = null,
     ): string {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine.orm.entity_manager');
@@ -246,7 +261,8 @@ final class GetPublishedAccommodationCollectionFiltersTest extends Accommodation
             ->setLongitude(2.35)
             ->setMaxGuests($maxGuests)
             ->setAmenities($amenities)
-            ->setInstantBooking($instantBooking);
+            ->setInstantBooking($instantBooking)
+            ->setType($type);
 
         $em->persist($entity);
         $em->flush();

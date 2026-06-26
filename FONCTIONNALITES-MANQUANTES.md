@@ -21,6 +21,10 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   demandes des voyageurs sont confirmées automatiquement et le paiement capturé, sans
   validation de l'hôte. Badge + CTA dédiés sur la page détail, filtre de recherche
   `instantBooking` + badge sur les cartes. Seeder `app:seed:instant-booking` pour tester.
+- **Type de logement** : catégorie par logement (appartement, maison, villa, studio, chambre,
+  bungalow) éditable par l'hôte, affichée sur la fiche/les cartes, + filtre de recherche `type`.
+- **Séjour min/max** : l'hôte définit un nombre de nuits min et/ou max par logement ; une
+  demande de réservation hors bornes est refusée (422). Affiché sur la fiche.
 - **Blocage de dates par l'hôte** : depuis le calendrier du backoffice, l'hôte sélectionne
   une plage pour la bloquer (vacances, maintenance, indispo externe). Motif optionnel,
   libellé « Bloqué » par défaut. Les dates bloquées rendent le logement indisponible à la
@@ -39,8 +43,6 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 - **Tarification dynamique** : prix fixe par nuit + promo hebdo uniquement. Pas de tarifs
   saisonniers, prix par date, week-end, last-minute.
 - **Codes promo / coupons** : aucun.
-- **Type de logement** : pas de catégorie (appartement, villa, chambre…), pas de filtre par type.
-- **Séjour min/max** : aucune contrainte de durée minimale.
 - **Modification de réservation** : impossible de changer dates/voyageurs après création.
 - **Réponses de l'hôte aux avis** : les avis sont à sens unique, l'hôte ne peut pas répliquer.
 - **Annulation par l'hôte** : seul le voyageur peut annuler ; pas de flux d'annulation hôte

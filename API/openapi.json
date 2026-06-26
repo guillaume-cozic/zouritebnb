@@ -1957,6 +1957,295 @@
                 ]
             }
         },
+        "/api/accommodations/{id}/stay-constraints": {
+            "patch": {
+                "operationId": "api_accommodations_idstay-constraints_patch",
+                "tags": [
+                    "AccommodationEntity"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AccommodationEntity resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Modifier les contraintes de dur\u00e9e de s\u00e9jour",
+                "description": "D\u00e9finit le nombre minimum et/ou maximum de nuits par s\u00e9jour. Chaque valeur doit \u00eatre strictement positive ; minNights ne peut pas d\u00e9passer maxNights. Envoyer null pour retirer une contrainte.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AccommodationEntity identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AccommodationEntity resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Requ\u00eate valide",
+                                    "value": {
+                                        "minNights": 2,
+                                        "maxNights": 30
+                                    }
+                                },
+                                "min_only": {
+                                    "summary": "Minimum seul",
+                                    "value": {
+                                        "minNights": 3,
+                                        "maxNights": null
+                                    }
+                                },
+                                "invalid": {
+                                    "summary": "Invalide : min > max",
+                                    "description": "Retourne une erreur 422.",
+                                    "value": {
+                                        "minNights": 10,
+                                        "maxNights": 5
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
+        "/api/accommodations/{id}/type": {
+            "patch": {
+                "operationId": "api_accommodations_idtype_patch",
+                "tags": [
+                    "AccommodationEntity"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AccommodationEntity resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Modifier le type de logement",
+                "description": "Met \u00e0 jour la cat\u00e9gorie d'un h\u00e9bergement. Valeurs autoris\u00e9es : apartment, house, villa, studio, room, bungalow. Envoyer null pour ne pas sp\u00e9cifier.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AccommodationEntity identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AccommodationEntity resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "examples": {
+                                "villa": {
+                                    "summary": "D\u00e9finir le type",
+                                    "value": {
+                                        "type": "villa"
+                                    }
+                                },
+                                "unset": {
+                                    "summary": "Retirer le type",
+                                    "value": {
+                                        "type": null
+                                    }
+                                },
+                                "invalid": {
+                                    "summary": "Invalide : valeur inconnue",
+                                    "description": "Retourne une erreur 422 car la valeur n'est pas autoris\u00e9e.",
+                                    "value": {
+                                        "type": "castle"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
         "/api/accommodations/{id}/unpublish": {
             "patch": {
                 "operationId": "api_accommodations_idunpublish_patch",
@@ -6936,6 +7225,30 @@
                                 "example": false,
                                 "type": "boolean"
                             },
+                            "type": {
+                                "description": "Type de logement : apartment, house, villa, studio, room, bungalow, ou null",
+                                "example": "villa",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "minNights": {
+                                "description": "Nombre minimum de nuits par s\u00e9jour, ou null",
+                                "example": 2,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "maxNights": {
+                                "description": "Nombre maximum de nuits par s\u00e9jour, ou null",
+                                "example": 30,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
                             "status": {
                                 "description": "Statut de publication",
                                 "example": "draft",
@@ -7178,6 +7491,14 @@
                                 "example": false,
                                 "type": "boolean"
                             },
+                            "type": {
+                                "description": "Type de logement : apartment, house, villa, studio, room, bungalow, ou null",
+                                "example": "villa",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
                             "status": {
                                 "description": "Statut de publication",
                                 "example": "draft",
@@ -7350,6 +7671,30 @@
                                 "default": false,
                                 "example": false,
                                 "type": "boolean"
+                            },
+                            "type": {
+                                "description": "Type de logement : apartment, house, villa, studio, room, bungalow, ou null",
+                                "example": "villa",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "minNights": {
+                                "description": "Nombre minimum de nuits par s\u00e9jour, ou null",
+                                "example": 2,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "maxNights": {
+                                "description": "Nombre maximum de nuits par s\u00e9jour, ou null",
+                                "example": 30,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
                             },
                             "status": {
                                 "description": "Statut de publication",
