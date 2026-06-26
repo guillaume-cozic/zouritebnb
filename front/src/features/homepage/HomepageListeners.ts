@@ -20,6 +20,7 @@ startAppListening({
         priceMin: filters.priceMin,
         priceMax: filters.priceMax,
         amenities: filters.amenities,
+        sort: filters.sort,
         page: page + 1,
       })
     );

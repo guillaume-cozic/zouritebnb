@@ -406,6 +406,13 @@
     "showMap": "Afficher la carte",
     "hideMap": "Masquer la carte",
     "mapEmpty": "Aucun hébergement géolocalisé à afficher.",
+    "sort": {
+      "label": "Trier par",
+      "relevance": "Recommandé",
+      "priceAsc": "Prix croissant",
+      "priceDesc": "Prix décroissant",
+      "rating": "Mieux notés"
+    },
     "advanced": {
       "toggle": "Filtres avancés",
       "priceRange": "Prix par nuit",

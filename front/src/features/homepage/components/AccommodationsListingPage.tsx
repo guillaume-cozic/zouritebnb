@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchPublishedAccommodations, nextPageRequested, setFilters } from '../HomepageSlice';
+import type { SortOption } from '../HomepageTypes';
 import {
   selectFilteredAccommodations,
   selectHomepageStatus,
@@ -66,9 +67,10 @@ const AccommodationsListingPage: React.FC = () => {
       priceMin: filters.priceMin,
       priceMax: filters.priceMax,
       amenities: filters.amenities,
+      sort: filters.sort,
       page: 1,
     }));
-  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, amenitiesKey]);
+  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, filters.sort, amenitiesKey]);
 
   // Infinite scroll: ask for the next page when the sentinel enters the viewport.
   // The component only declares the intent; the listener decides what to fetch.
@@ -360,7 +362,22 @@ const AccommodationsListingPage: React.FC = () => {
             <p className="text-sm text-gray-500">
               {t('listing.resultCount', { count: accommodations.length })}
             </p>
-            <button
+            <div className="flex items-center gap-3">
+              <label className="inline-flex items-center gap-2">
+                <span className="hidden sm:inline text-sm text-gray-500">{t('listing.sort.label')}</span>
+                <select
+                  value={filters.sort}
+                  onChange={(e) => dispatch(setFilters({ sort: e.target.value as SortOption }))}
+                  aria-label={t('listing.sort.label')}
+                  className="h-10 rounded-xl border border-gray-200 bg-white pl-3 pr-8 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-colors"
+                >
+                  <option value="">{t('listing.sort.relevance')}</option>
+                  <option value="price_asc">{t('listing.sort.priceAsc')}</option>
+                  <option value="price_desc">{t('listing.sort.priceDesc')}</option>
+                  <option value="rating">{t('listing.sort.rating')}</option>
+                </select>
+              </label>
+              <button
               type="button"
               onClick={() => setMapOpen((v) => !v)}
               aria-pressed={mapOpen}
@@ -375,6 +392,7 @@ const AccommodationsListingPage: React.FC = () => {
               </svg>
               {mapOpen ? t('listing.hideMap') : t('listing.showMap')}
             </button>
+            </div>
           </div>
 
           {mapOpen ? (

@@ -406,6 +406,13 @@
     "showMap": "Show map",
     "hideMap": "Hide map",
     "mapEmpty": "No geolocated accommodations to display.",
+    "sort": {
+      "label": "Sort by",
+      "relevance": "Recommended",
+      "priceAsc": "Price: low to high",
+      "priceDesc": "Price: high to low",
+      "rating": "Top rated"
+    },
     "advanced": {
       "toggle": "Advanced filters",
       "priceRange": "Price per night",

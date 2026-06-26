@@ -102,7 +102,9 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $params[$paramName] = $code;
         }
 
-        return $this->listingQuery->paginate($clauses, $params, $types, $page, $itemsPerPage, withReviewStats: true);
+        $orderBy = $this->listingQuery->orderByFromQuery($query, withReviewStats: true);
+
+        return $this->listingQuery->paginate($clauses, $params, $types, $page, $itemsPerPage, withReviewStats: true, orderBy: $orderBy);
     }
 
     /**

@@ -15,12 +15,13 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   paramètres `checkIn`/`checkOut` (déjà envoyés par le front) excluent les logements ayant
   une réservation `pending`/`confirmed` qui chevauche la période (comparaison au jour, le
   turnover même jour reste disponible).
+- **Tri des résultats** : le catalogue se trie via le paramètre `sort` (Recommandé par
+  défaut, prix croissant/décroissant, mieux notés). Sélecteur dans la barre de résultats.
 
 ## 🔴 Manques importants (impact direct conversion/usage)
 
 - **Recherche full-text** : pas de recherche par mot-clé (titre/description). Uniquement
   ville + capacité + prix + équipements.
-- **Tri des résultats** : aucun tri (prix, note, pertinence) — seulement alphabétique.
 - **Remboursement réel au voyageur** : l'annulation calcule le montant et annule le
   PaymentIntent Stripe, mais **aucun vrai remboursement carte** n'est émis. Le breakdown
   existe mais l'argent n'est pas rendu.

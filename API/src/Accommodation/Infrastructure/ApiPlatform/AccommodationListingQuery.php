@@ -44,6 +44,26 @@ final readonly class AccommodationListingQuery
     }
 
     /**
+     * Maps the `sort` query value to a safe ORDER BY fragment (whitelisted, so
+     * never interpolates user input). Unknown/absent values fall back to the
+     * default alphabetical order. Rating sort needs the review-stats columns,
+     * so it degrades to the default when they are not selected.
+     *
+     * NULL prices/ratings are always pushed last, whatever the direction.
+     */
+    public function orderByFromQuery(?InputBag $query, bool $withReviewStats): string
+    {
+        return match ($query?->get('sort')) {
+            'price_asc' => 'a.price IS NULL, a.price ASC, a.title ASC',
+            'price_desc' => 'a.price IS NULL, a.price DESC, a.title ASC',
+            'rating' => $withReviewStats
+                ? 'average_rating IS NULL, average_rating DESC, review_count DESC, a.title ASC'
+                : 'a.title ASC',
+            default => 'a.title ASC',
+        };
+    }
+
+    /**
      * @param string[]             $clauses
      * @param array<string, mixed> $params
      * @param array<string, mixed> $types
@@ -55,6 +75,7 @@ final readonly class AccommodationListingQuery
         int $page,
         int $itemsPerPage,
         bool $withReviewStats,
+        string $orderBy = 'a.title ASC',
     ): TraversablePaginator {
         $whereSql = [] === $clauses ? '1=1' : implode(' AND ', $clauses);
 
@@ -93,7 +114,7 @@ final readonly class AccommodationListingQuery
                 ) AS thumbnail_filename{$reviewColumns}
             FROM accommodation a
             WHERE {$whereSql}
-            ORDER BY a.title ASC
+            ORDER BY {$orderBy}
             LIMIT :limit OFFSET :offset
             SQL;
 

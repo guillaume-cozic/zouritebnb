@@ -16,6 +16,12 @@ export interface AccommodationListItem {
   reviewCount: number;
 }
 
+/**
+ * Sort order for the catalog. Empty string = the API's default ("Recommandé",
+ * alphabetical). The other values map 1:1 to the `sort` query parameter.
+ */
+export type SortOption = '' | 'price_asc' | 'price_desc' | 'rating';
+
 export interface SearchFilters {
   city: string;
   checkIn: string;
@@ -24,4 +30,5 @@ export interface SearchFilters {
   amenities: string[];
   priceMin: number | null;
   priceMax: number | null;
+  sort: SortOption;
 }
