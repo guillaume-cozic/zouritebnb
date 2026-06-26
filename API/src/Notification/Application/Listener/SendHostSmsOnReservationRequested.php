@@ -24,6 +24,11 @@ final readonly class SendHostSmsOnReservationRequested
 
     public function __invoke(ReservationRequested $event): void
     {
+        // Instant booking auto-confirms the stay: no decision to await, no SMS alert.
+        if ($event->instantBooking) {
+            return;
+        }
+
         $context = $this->resolver->resolve($event->reservationId);
 
         if (null === $context) {

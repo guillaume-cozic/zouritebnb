@@ -427,6 +427,15 @@ const AccommodationDetailPage: React.FC = () => {
                 </div>
               </div>
 
+              {accommodation.instantBooking && (
+                <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-primary-50 border border-primary-200 px-3 py-1.5 text-xs font-semibold text-primary-700">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+                  </svg>
+                  {t('detail.instantBookingBadge')}
+                </div>
+              )}
+
               {/* Dates */}
               <div className="space-y-4">
                 <div>
@@ -599,9 +608,11 @@ const AccommodationDetailPage: React.FC = () => {
                       }}
                       className="w-full inline-flex items-center justify-center h-11 rounded-xl px-8 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:from-primary-600 disabled:hover:to-primary-700"
                     >
-                      {t('detail.reserve')}
+                      {accommodation.instantBooking ? t('detail.reserveInstant') : t('detail.reserve')}
                     </button>
-                    <p className="text-center text-sm text-gray-500">{t('detail.noCharge')}</p>
+                    <p className="text-center text-sm text-gray-500">
+                      {accommodation.instantBooking ? t('detail.instantConfirmNote') : t('detail.noCharge')}
+                    </p>
                   </>
                 )}
               </div>

@@ -17,6 +17,9 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   turnover même jour reste disponible).
 - **Tri des résultats** : le catalogue se trie via le paramètre `sort` (Recommandé par
   défaut, prix croissant/décroissant, mieux notés). Sélecteur dans la barre de résultats.
+- **Réservation instantanée** : toggle par logement (côté hôte). Quand il est actif, les
+  demandes des voyageurs sont confirmées automatiquement et le paiement capturé, sans
+  validation de l'hôte. Badge + CTA dédiés sur la page détail.
 
 ## 🔴 Manques importants (impact direct conversion/usage)
 
@@ -25,8 +28,6 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 - **Remboursement réel au voyageur** : l'annulation calcule le montant et annule le
   PaymentIntent Stripe, mais **aucun vrai remboursement carte** n'est émis. Le breakdown
   existe mais l'argent n'est pas rendu.
-- **Réservation instantanée** : tout passe par demande → validation hôte. Pas de toggle
-  « instant book », pourtant central chez Airbnb.
 - **Blocage de dates par l'hôte** : impossible de bloquer manuellement des dates (vacances,
   maintenance, indispo externe). Le calendrier ne reflète que les réservations.
 

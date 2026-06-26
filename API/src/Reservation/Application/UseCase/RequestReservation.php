@@ -74,6 +74,7 @@ final readonly class RequestReservation
             note: $command->note,
             paymentIntentId: $command->paymentIntentId,
             cancellationPolicy: CancellationPolicy::fromString($pricing->cancellationPolicy),
+            instantBooking: $pricing->instantBooking,
         );
 
         $this->repository->save($reservation);

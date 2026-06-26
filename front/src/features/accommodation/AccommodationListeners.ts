@@ -15,6 +15,7 @@ import {
   setLocation,
   updateCancellationPolicy,
   updateDescription,
+  updateInstantBooking,
   updatePrice,
   updateWeeklyPromotion,
 } from './AccommodationSlice';
@@ -53,6 +54,8 @@ const isSavable = (p: AccommodationFieldEditedPayload): boolean => {
       );
     case 'cancellationPolicy':
       return p.cancellationPolicy === 'flexible' || p.cancellationPolicy === 'moderate';
+    case 'instantBooking':
+      return typeof p.instantBooking === 'boolean';
     case 'location':
       return (
         p.street.trim() !== '' &&
@@ -76,6 +79,8 @@ const dispatchSave = (p: AccommodationFieldEditedPayload, dispatch: AppDispatch)
       return dispatch(updateWeeklyPromotion({ id: p.id, weeklyPromotionPercentage: p.weeklyPromotionPercentage }));
     case 'cancellationPolicy':
       return dispatch(updateCancellationPolicy({ id: p.id, cancellationPolicy: p.cancellationPolicy }));
+    case 'instantBooking':
+      return dispatch(updateInstantBooking({ id: p.id, instantBooking: p.instantBooking }));
     case 'capacity':
       return dispatch(setCapacity({
         id: p.id,
@@ -109,6 +114,7 @@ const EDIT_FIELDS: AccommodationEditField[] = [
   'price',
   'weeklyPromotion',
   'cancellationPolicy',
+  'instantBooking',
   'capacity',
   'amenities',
   'checkInOut',

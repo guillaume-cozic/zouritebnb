@@ -66,6 +66,7 @@ final class Reservation extends AggregateRoot
         ?string $note = null,
         ?string $paymentIntentId = null,
         CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
+        bool $instantBooking = false,
     ): self {
         $reservation = new self(
             id: $id,
@@ -79,7 +80,15 @@ final class Reservation extends AggregateRoot
             guestUserId: $guestUserId,
             cancellationPolicy: $cancellationPolicy,
         );
-        $reservation->recordEvent(new ReservationRequested($id->toUuid(), $guestUserId, $note, $paymentIntentId));
+        $reservation->recordEvent(new ReservationRequested($id->toUuid(), $guestUserId, $note, $paymentIntentId, $instantBooking));
+
+        // Instant booking: the request is auto-confirmed in the same transaction.
+        // Releasing ReservationRequested first keeps payment linking (which keys off
+        // the payment intent id on that event) ordered before the capture triggered
+        // by ReservationConfirmed.
+        if ($instantBooking) {
+            $reservation->confirm();
+        }
 
         return $reservation;
     }

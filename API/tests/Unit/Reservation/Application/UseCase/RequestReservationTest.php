@@ -11,6 +11,7 @@ use App\Reservation\Domain\Entity\ReservationStatus;
 use App\Reservation\Domain\Exception\InvalidDateRangeException;
 use App\Reservation\Domain\Exception\InvalidGuestNameException;
 use App\Reservation\Domain\Exception\InvalidReservationException;
+use App\Shared\Domain\Event\ReservationConfirmed;
 use App\Shared\Domain\Event\ReservationRequested;
 use App\Shared\Domain\Port\UuidGenerator;
 use App\Shared\Domain\Service\StayPriceCalculator;
@@ -76,6 +77,38 @@ final class RequestReservationTest extends TestCase
         self::assertInstanceOf(ReservationRequested::class, $events[0]);
         self::assertTrue($reservationId->equals($events[0]->reservationId));
         self::assertTrue($guestUserId->equals($events[0]->guestUserId));
+    }
+
+    public function test_should_auto_confirm_when_instant_booking_is_enabled(): void
+    {
+        $reservationId = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
+        $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000a1');
+        $teamId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000b1');
+        UuidGenerator::freeze($reservationId);
+        $this->pricingProvider->set($accommodationId, 100.0, null, $teamId, instantBooking: true);
+
+        $id = $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-05'),
+            guestName: 'John Doe',
+            paymentIntentId: 'pi_123',
+        ));
+
+        $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));
+        self::assertNotNull($reservation);
+        self::assertSame(ReservationStatus::Confirmed, $reservation->getStatus());
+
+        // ReservationRequested (carries the instant flag, used by payment linking and
+        // notification suppression) must precede ReservationConfirmed (triggers capture).
+        $events = $this->eventBus->getDispatchedEvents();
+        self::assertCount(2, $events);
+        self::assertInstanceOf(ReservationRequested::class, $events[0]);
+        self::assertTrue($events[0]->instantBooking);
+        self::assertSame('pi_123', $events[0]->paymentIntentId);
+        self::assertInstanceOf(ReservationConfirmed::class, $events[1]);
     }
 
     public function test_should_compute_total_price_and_apply_weekly_promotion(): void

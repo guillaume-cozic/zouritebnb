@@ -534,6 +534,9 @@
     "bookedDatesHint": "Struck-through dates are already booked",
     "guestsLabel": "Guests",
     "reserve": "Reserve",
+    "reserveInstant": "Book instantly",
+    "instantConfirmNote": "Instant confirmation — no need to wait for host approval",
+    "instantBookingBadge": "Instant booking",
     "nights_one": "{{count}} night",
     "nights_other": "{{count}} nights",
     "platformFee": "Platform fee ({{rate}}%)",
@@ -609,6 +612,10 @@
       "title": "Moderate",
       "description": "Full refund up to 5 days before check-in, then 50% afterwards."
     }
+  },
+  "instantBooking": {
+    "title": "Instant booking",
+    "description": "Guest requests are confirmed automatically, without your approval. Payment is captured immediately."
   },
   "capacityStep": {
     "intro": "Specify the capacity of your accommodation to help travellers find the ideal place.",

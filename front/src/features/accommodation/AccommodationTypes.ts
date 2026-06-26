@@ -9,6 +9,8 @@ export interface Accommodation {
   price?: number;
   weeklyPromotionPercentage?: number | null;
   cancellationPolicy?: CancellationPolicy;
+  /** When true, guest requests are auto-confirmed without host approval. */
+  instantBooking?: boolean;
   status?: 'draft' | 'published';
   street?: string;
   city?: string;
@@ -96,6 +98,11 @@ export interface UpdateWeeklyPromotionPayload {
 export interface UpdateCancellationPolicyPayload {
   id: string;
   cancellationPolicy: CancellationPolicy;
+}
+
+export interface UpdateInstantBookingPayload {
+  id: string;
+  instantBooking: boolean;
 }
 
 export interface SetCheckInOutPayload {

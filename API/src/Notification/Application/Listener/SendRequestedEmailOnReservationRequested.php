@@ -20,6 +20,12 @@ final readonly class SendRequestedEmailOnReservationRequested
 
     public function __invoke(ReservationRequested $event): void
     {
+        // Instant booking auto-confirms the stay: the guest receives the confirmation
+        // email (on ReservationConfirmed), not a "request received" one.
+        if ($event->instantBooking) {
+            return;
+        }
+
         $context = $this->resolver->resolve($event->reservationId);
 
         if (null === $context) {

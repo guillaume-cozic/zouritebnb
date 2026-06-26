@@ -23,6 +23,12 @@ final readonly class SendHostRequestEmailOnReservationRequested
 
     public function __invoke(ReservationRequested $event): void
     {
+        // Instant booking auto-confirms the stay, so there is no decision to await:
+        // the guest gets a confirmation email instead and the host is not asked to act.
+        if ($event->instantBooking) {
+            return;
+        }
+
         $context = $this->resolver->resolve($event->reservationId);
 
         if (null === $context) {

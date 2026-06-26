@@ -11,6 +11,7 @@ use App\Accommodation\Domain\Event\AccommodationCapacityUpdated;
 use App\Accommodation\Domain\Event\AccommodationCheckInOutUpdated;
 use App\Accommodation\Domain\Event\AccommodationDescriptionUpdated;
 use App\Accommodation\Domain\Event\AccommodationGeolocationUpdated;
+use App\Accommodation\Domain\Event\AccommodationInstantBookingUpdated;
 use App\Accommodation\Domain\Event\AccommodationPriceUpdated;
 use App\Accommodation\Domain\Event\AccommodationPublished;
 use App\Accommodation\Domain\Event\AccommodationUnpublished;
@@ -37,6 +38,7 @@ final class Accommodation extends AggregateRoot
         private ?float $weeklyPromotionPercentage = null,
         private ?Uuid $regionId = null,
         private CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
+        private bool $instantBooking = false,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
@@ -186,5 +188,16 @@ final class Accommodation extends AggregateRoot
     {
         $this->cancellationPolicy = $cancellationPolicy;
         $this->recordEvent(new AccommodationCancellationPolicyUpdated($this->id));
+    }
+
+    public function isInstantBooking(): bool
+    {
+        return $this->instantBooking;
+    }
+
+    public function updateInstantBooking(bool $instantBooking): void
+    {
+        $this->instantBooking = $instantBooking;
+        $this->recordEvent(new AccommodationInstantBookingUpdated($this->id));
     }
 }

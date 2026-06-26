@@ -18,6 +18,7 @@ final readonly class ReservationRequested implements DomainEvent
         public Uuid $guestUserId,
         public ?string $note = null,
         public ?string $paymentIntentId = null,
+        public bool $instantBooking = false,
     ) {
     }
 }

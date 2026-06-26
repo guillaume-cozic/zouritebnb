@@ -78,6 +78,9 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
   const [cancellationPolicy, setCancellationPolicy] = useState<CancellationPolicy>(
     accommodation.cancellationPolicy ?? 'flexible'
   );
+  const [instantBooking, setInstantBooking] = useState<boolean>(
+    accommodation.instantBooking ?? false
+  );
 
   const locationForm = useForm({
     resolver: zodResolver(getLocationSchema(t)),
@@ -154,6 +157,11 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
   const handleCancellationPolicyChange = (policy: CancellationPolicy) => {
     setCancellationPolicy(policy);
     dispatch(accommodationFieldEdited({ field: 'cancellationPolicy', id, cancellationPolicy: policy }));
+  };
+
+  const handleInstantBookingChange = (value: boolean) => {
+    setInstantBooking(value);
+    dispatch(accommodationFieldEdited({ field: 'instantBooking', id, instantBooking: value }));
   };
 
   const dispatchLocationEdited = () => {
@@ -481,6 +489,29 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
                   </button>
                 );
               })}
+            </div>
+
+            <div className="mt-5 pt-5 border-t border-surface-200 flex items-start justify-between gap-4">
+              <div>
+                <p className="font-semibold text-surface-800">{t('instantBooking.title')}</p>
+                <p className="text-sm text-surface-500 mt-1">{t('instantBooking.description')}</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={instantBooking}
+                aria-label={t('instantBooking.title')}
+                onClick={() => handleInstantBookingChange(!instantBooking)}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${
+                  instantBooking ? 'bg-primary-600' : 'bg-surface-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                    instantBooking ? 'translate-x-5' : 'translate-x-0.5'
+                  }`}
+                />
+              </button>
             </div>
           </Card>
         </div>

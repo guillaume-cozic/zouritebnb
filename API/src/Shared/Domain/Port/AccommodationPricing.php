@@ -14,6 +14,7 @@ final readonly class AccommodationPricing
         public ?Uuid $teamId = null,
         public ?string $cancellationPolicy = null,
         public ?int $maxGuests = null,
+        public bool $instantBooking = false,
     ) {
     }
 }

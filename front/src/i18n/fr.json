@@ -534,6 +534,9 @@
     "bookedDatesHint": "Les dates barrées sont déjà réservées",
     "guestsLabel": "Voyageurs",
     "reserve": "Réserver",
+    "reserveInstant": "Réserver instantanément",
+    "instantConfirmNote": "Confirmation immédiate, sans attendre la validation de l'hôte",
+    "instantBookingBadge": "Réservation instantanée",
     "nights_one": "{{count}} nuit",
     "nights_other": "{{count}} nuits",
     "platformFee": "Commission plateforme ({{rate}} %)",
@@ -609,6 +612,10 @@
       "title": "Modérée",
       "description": "Remboursement intégral jusqu'à 5 jours avant l'arrivée, puis 50 % au-delà."
     }
+  },
+  "instantBooking": {
+    "title": "Réservation instantanée",
+    "description": "Les demandes des voyageurs sont confirmées automatiquement, sans validation de votre part. Le paiement est capturé immédiatement."
   },
   "capacityStep": {
     "intro": "Indiquez la capacité de votre hébergement pour aider les voyageurs à trouver le logement idéal.",

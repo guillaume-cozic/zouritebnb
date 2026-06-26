@@ -12,6 +12,7 @@ import {
   UpdatePricePayload,
   UpdateWeeklyPromotionPayload,
   UpdateCancellationPolicyPayload,
+  UpdateInstantBookingPayload,
   CancellationPolicy,
   SetCheckInOutPayload,
   ReorderPhotosPayload,
@@ -36,6 +37,7 @@ export type AccommodationFieldEditedPayload =
   | { field: 'price'; id: string; price: number }
   | { field: 'weeklyPromotion'; id: string; weeklyPromotionPercentage: number | null }
   | { field: 'cancellationPolicy'; id: string; cancellationPolicy: CancellationPolicy }
+  | { field: 'instantBooking'; id: string; instantBooking: boolean }
   | { field: 'capacity'; id: string; bedrooms: number; bathrooms: number; maxGuests: number; singleBeds: number; doubleBeds: number }
   | { field: 'amenities'; id: string; codes: string[] }
   | { field: 'checkInOut'; id: string; checkIn: string; checkOut: string }
@@ -58,6 +60,7 @@ export const editSectionForField = (field: AccommodationEditField): EditSection 
     case 'checkInOut':
       return 'checkinout';
     case 'cancellationPolicy':
+    case 'instantBooking':
       return 'cancellation';
     default:
       return field;
@@ -278,6 +281,24 @@ export const updateCancellationPolicy = createAsyncThunk(
   }
 );
 
+export const updateInstantBooking = createAsyncThunk(
+  'accommodation/updateInstantBooking',
+  async ({ id, instantBooking }: UpdateInstantBookingPayload, { rejectWithValue }) => {
+    try {
+      await api.patch(
+        `/api/accommodations/${id}/instant-booking`,
+        { instantBooking },
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return { instantBooking };
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, 'Erreur lors de la mise à jour de la réservation instantanée')
+      );
+    }
+  }
+);
+
 export const setCheckInOut = createAsyncThunk(
   'accommodation/setCheckInOut',
   async ({ id, checkIn, checkOut }: SetCheckInOutPayload, { rejectWithValue }) => {
@@ -349,6 +370,7 @@ const EDIT_SECTION_BY_THUNK_PREFIX: Record<string, EditSection> = {
   [updatePrice.typePrefix]: 'price',
   [updateWeeklyPromotion.typePrefix]: 'price',
   [updateCancellationPolicy.typePrefix]: 'cancellation',
+  [updateInstantBooking.typePrefix]: 'cancellation',
   [setCapacity.typePrefix]: 'capacity',
   [setAmenities.typePrefix]: 'amenities',
   [setCheckInOut.typePrefix]: 'checkinout',
@@ -360,6 +382,7 @@ const EDIT_THUNKS = [
   updatePrice,
   updateWeeklyPromotion,
   updateCancellationPolicy,
+  updateInstantBooking,
   setCapacity,
   setAmenities,
   setCheckInOut,
@@ -544,6 +567,21 @@ const accommodationSlice = createSlice({
         }
       })
       .addCase(updateCancellationPolicy.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update instant booking
+      .addCase(updateInstantBooking.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updateInstantBooking.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.instantBooking = action.payload.instantBooking;
+        }
+      })
+      .addCase(updateInstantBooking.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })

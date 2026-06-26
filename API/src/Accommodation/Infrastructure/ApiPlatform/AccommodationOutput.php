@@ -142,6 +142,35 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: UpdateAccommodationWeeklyPromotionProcessor::class,
         ),
         new Patch(
+            uriTemplate: '/accommodations/{id}/instant-booking',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Activer ou désactiver la réservation instantanée',
+                description: 'Active ou désactive la réservation instantanée pour un hébergement. Quand elle est active, les demandes des voyageurs sont confirmées automatiquement (et le paiement capturé) sans validation de l\'hôte.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/merge-patch+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'enable' => new Example(
+                                    summary: 'Activer la réservation instantanée',
+                                    value: ['instantBooking' => true],
+                                ),
+                                'disable' => new Example(
+                                    summary: 'Désactiver la réservation instantanée',
+                                    value: ['instantBooking' => false],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationInstantBookingInput::class,
+            output: false,
+            processor: UpdateAccommodationInstantBookingProcessor::class,
+        ),
+        new Patch(
             uriTemplate: '/accommodations/{id}/cancellation-policy',
             status: 204,
             openapi: new OpenApiOperation(
@@ -459,6 +488,10 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Politique d\'annulation choisie par l\'hôte : "flexible" ou "moderate"', example: 'flexible')]
     public ?string $cancellationPolicy = null;
 
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Réservation instantanée activée : les demandes sont confirmées automatiquement sans validation de l\'hôte', example: false)]
+    public bool $instantBooking = false;
+
     #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Statut de publication', example: 'draft')]
     public ?string $status = null;
@@ -567,6 +600,7 @@ class AccommodationOutput implements FromEntityInterface
         $output->teamId = $entity->getTeamId()?->toRfc4122();
         $output->weeklyPromotionPercentage = $entity->getWeeklyPromotionPercentage();
         $output->cancellationPolicy = $entity->getCancellationPolicy();
+        $output->instantBooking = $entity->isInstantBooking();
 
         return $output;
     }

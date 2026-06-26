@@ -83,6 +83,9 @@ class AccommodationEntity
     #[ORM\Column(length: 20, options: ['default' => 'flexible'])]
     private string $cancellationPolicy = 'flexible';
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $instantBooking = false;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -355,6 +358,18 @@ class AccommodationEntity
     public function setCancellationPolicy(string $cancellationPolicy): static
     {
         $this->cancellationPolicy = $cancellationPolicy;
+
+        return $this;
+    }
+
+    public function isInstantBooking(): bool
+    {
+        return $this->instantBooking;
+    }
+
+    public function setInstantBooking(bool $instantBooking): static
+    {
+        $this->instantBooking = $instantBooking;
 
         return $this;
     }
