@@ -98,6 +98,14 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
                 SQL;
             $params['checkIn'] = $checkIn;
             $params['checkOut'] = $checkOut;
+
+            // A dated search also honours the stay-length constraints: keep only
+            // accommodations whose min/max nights fit the requested number of nights.
+            $nights = (int) (new \DateTimeImmutable($checkIn))->diff(new \DateTimeImmutable($checkOut))->days;
+            $clauses[] = '(a.min_nights IS NULL OR a.min_nights <= :nights)';
+            $clauses[] = '(a.max_nights IS NULL OR a.max_nights >= :nights)';
+            $params['nights'] = $nights;
+            $types['nights'] = ParameterType::INTEGER;
         }
 
         // amenities[] (or comma-separated) — accommodation must contain ALL of them

@@ -27,6 +27,40 @@ final class GetPublishedAccommodationCollectionDateFilterTest extends Accommodat
         self::assertSame(['Free Villa'], array_column($response->toArray()['member'], 'title'));
     }
 
+    public function test_should_exclude_accommodations_whose_min_nights_exceed_the_requested_stay(): void
+    {
+        // Requested range is 2 nights (08-10 → 08-12).
+        $this->insertPublished('Fits', minNights: 2);
+        $this->insertPublished('Needs Three', minNights: 3);
+
+        $response = self::createClient()->request('GET', '/api/accommodations?checkIn=2026-08-10&checkOut=2026-08-12');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(['Fits'], array_column($response->toArray()['member'], 'title'));
+    }
+
+    public function test_should_exclude_accommodations_whose_max_nights_below_the_requested_stay(): void
+    {
+        // Requested range is 5 nights (08-10 → 08-15).
+        $this->insertPublished('Fits', maxNights: 7);
+        $this->insertPublished('Caps At Three', maxNights: 3);
+
+        $response = self::createClient()->request('GET', '/api/accommodations?checkIn=2026-08-10&checkOut=2026-08-15');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(['Fits'], array_column($response->toArray()['member'], 'title'));
+    }
+
+    public function test_should_ignore_stay_length_constraints_without_dates(): void
+    {
+        $this->insertPublished('Needs Three', minNights: 3);
+
+        $response = self::createClient()->request('GET', '/api/accommodations');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(['Needs Three'], array_column($response->toArray()['member'], 'title'));
+    }
+
     public function test_should_keep_accommodations_available_on_same_day_turnover(): void
     {
         $turnover = $this->insertPublished('Turnover Villa');
@@ -86,7 +120,7 @@ final class GetPublishedAccommodationCollectionDateFilterTest extends Accommodat
         self::assertSame(['Bad Dates'], array_column($response->toArray()['member'], 'title'));
     }
 
-    private function insertPublished(string $title): string
+    private function insertPublished(string $title, ?int $minNights = null, ?int $maxNights = null): string
     {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine.orm.entity_manager');
@@ -99,7 +133,9 @@ final class GetPublishedAccommodationCollectionDateFilterTest extends Accommodat
             ->setStatus('published')
             ->setCity('Paris')
             ->setCountry('France')
-            ->setMaxGuests(2);
+            ->setMaxGuests(2)
+            ->setMinNights($minNights)
+            ->setMaxNights($maxNights);
 
         $em->persist($entity);
         $em->flush();
