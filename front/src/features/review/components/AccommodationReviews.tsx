@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AccommodationReview, MAX_RATING } from '../ReviewTypes';
-import { Avatar } from '../../../components/ui';
+import { replyToReview } from '../ReviewSlice';
+import { useAppDispatch } from '../../../store/hooks';
+import { Avatar, Button, Textarea } from '../../../components/ui';
 
 interface StarsProps {
   rating: number;
@@ -30,12 +32,91 @@ const Stars: React.FC<StarsProps> = ({ rating }) => (
   </div>
 );
 
+interface HostReplyBlockProps {
+  review: AccommodationReview;
+  accommodationId: string;
+  canReply: boolean;
+}
+
+/** Shows the host reply (to everyone) and, for the host, an inline form to add/edit it. */
+const HostReplyBlock: React.FC<HostReplyBlockProps> = ({ review, accommodationId, canReply }) => {
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const [editing, setEditing] = useState(false);
+  const [reply, setReply] = useState(review.hostReply ?? '');
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    if (reply.trim() === '') return;
+    setBusy(true);
+    await dispatch(replyToReview({ reviewId: review.id, accommodationId, reply }));
+    setBusy(false);
+    setEditing(false);
+  };
+
+  if (review.hostReply && !editing) {
+    return (
+      <div className="mt-3 rounded-xl bg-gray-50 border border-gray-100 p-3">
+        <p className="text-xs font-semibold text-gray-700 mb-1">{t('review.hostReply.title')}</p>
+        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{review.hostReply}</p>
+        {canReply && (
+          <button
+            type="button"
+            onClick={() => { setReply(review.hostReply ?? ''); setEditing(true); }}
+            className="mt-2 text-xs font-semibold text-primary-600 hover:text-primary-700"
+          >
+            {t('review.hostReply.edit')}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (!canReply) {
+    return null;
+  }
+
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => setEditing(true)}
+        className="mt-3 text-sm font-semibold text-primary-600 hover:text-primary-700"
+      >
+        {t('review.hostReply.action')}
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-3 space-y-2">
+      <Textarea
+        value={reply}
+        onChange={(e) => setReply(e.target.value)}
+        rows={3}
+        maxLength={2000}
+        placeholder={t('review.hostReply.placeholder') as string}
+      />
+      <div className="flex justify-end gap-2">
+        <Button variant="ghost" size="sm" onClick={() => setEditing(false)} disabled={busy}>
+          {t('review.hostReply.cancel')}
+        </Button>
+        <Button size="sm" onClick={submit} loading={busy} disabled={reply.trim() === ''}>
+          {t('review.hostReply.submit')}
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 interface Props {
   reviews: AccommodationReview[];
+  accommodationId: string;
+  /** When true, the current user is a member of the owning team and may reply. */
+  canReply?: boolean;
 }
 
-const AccommodationReviews: React.FC<Props> = ({ reviews }) => {
+const AccommodationReviews: React.FC<Props> = ({ reviews, accommodationId, canReply = false }) => {
   const { t, i18n } = useTranslation();
 
   if (reviews.length === 0) {
@@ -76,6 +157,7 @@ const AccommodationReviews: React.FC<Props> = ({ reviews }) => {
             </header>
             <Stars rating={review.rating} />
             <p className="mt-3 text-sm text-gray-600 leading-relaxed">{review.comment}</p>
+            <HostReplyBlock review={review} accommodationId={accommodationId} canReply={canReply} />
           </article>
         ))}
       </div>

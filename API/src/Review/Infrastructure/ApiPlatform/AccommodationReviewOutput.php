@@ -50,4 +50,12 @@ class AccommodationReviewOutput
     #[Groups(['accommodation_review:read'])]
     #[ApiProperty(description: 'Date de publication de l\'avis (ISO 8601)', example: '2026-05-12T14:30:00+00:00')]
     public ?string $createdAt = null;
+
+    #[Groups(['accommodation_review:read'])]
+    #[ApiProperty(description: 'Réponse publique de l\'hôte à l\'avis, ou null', example: 'Merci pour votre séjour, au plaisir de vous revoir !')]
+    public ?string $hostReply = null;
+
+    #[Groups(['accommodation_review:read'])]
+    #[ApiProperty(description: 'Date de publication de la réponse de l\'hôte (ISO 8601), ou null', example: '2026-05-13T09:00:00+00:00')]
+    public ?string $hostReplyAt = null;
 }

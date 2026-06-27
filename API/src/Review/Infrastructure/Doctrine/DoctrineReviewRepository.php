@@ -38,7 +38,9 @@ class DoctrineReviewRepository extends ServiceEntityRepository implements Review
             ->setSubjectUserId($review->getSubjectUserId())
             ->setRating($review->getRating()->toInt())
             ->setComment($review->getComment()->toString())
-            ->setCreatedAt($review->getCreatedAt());
+            ->setCreatedAt($review->getCreatedAt())
+            ->setHostReply($review->getHostReply())
+            ->setHostReplyAt($review->getHostReplyAt());
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -74,7 +76,7 @@ class DoctrineReviewRepository extends ServiceEntityRepository implements Review
         $rating = new Rating($entity->getRating());
         $comment = new ReviewComment($entity->getComment());
 
-        return match ($type) {
+        $review = match ($type) {
             ReviewType::Accommodation => DomainReview::onAccommodation(
                 id: $entity->getId(),
                 reservationId: $entity->getReservationId(),
@@ -83,6 +85,8 @@ class DoctrineReviewRepository extends ServiceEntityRepository implements Review
                 rating: $rating,
                 comment: $comment,
                 createdAt: $entity->getCreatedAt(),
+                hostReply: $entity->getHostReply(),
+                hostReplyAt: $entity->getHostReplyAt(),
             ),
             ReviewType::Guest => DomainReview::onGuest(
                 id: $entity->getId(),
@@ -94,5 +98,10 @@ class DoctrineReviewRepository extends ServiceEntityRepository implements Review
                 createdAt: $entity->getCreatedAt(),
             ),
         };
+
+        // Discard the reconstitution event recorded by the factory (read path).
+        $review->releaseEvents();
+
+        return $review;
     }
 }

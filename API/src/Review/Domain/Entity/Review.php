@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Review\Domain\Entity;
 
 use App\Review\Domain\Event\ReviewSubmitted;
+use App\Review\Domain\Exception\InvalidHostReplyException;
+use App\Review\Domain\Exception\ReviewNotAllowedException;
 use App\Shared\Domain\Entity\AggregateRoot;
 use Symfony\Component\Uid\Uuid;
 
@@ -20,8 +22,12 @@ final class Review extends AggregateRoot
         private readonly Rating $rating,
         private readonly ReviewComment $comment,
         private readonly \DateTimeImmutable $createdAt,
+        private ?string $hostReply = null,
+        private ?\DateTimeImmutable $hostReplyAt = null,
     ) {
     }
+
+    private const int HOST_REPLY_MAX_LENGTH = 2000;
 
     /**
      * A guest (authorUserId) reviews the accommodation (subjectAccommodationId).
@@ -34,6 +40,8 @@ final class Review extends AggregateRoot
         Rating $rating,
         ReviewComment $comment,
         \DateTimeImmutable $createdAt,
+        ?string $hostReply = null,
+        ?\DateTimeImmutable $hostReplyAt = null,
     ): self {
         $review = new self(
             id: $id,
@@ -45,6 +53,8 @@ final class Review extends AggregateRoot
             rating: $rating,
             comment: $comment,
             createdAt: $createdAt,
+            hostReply: $hostReply,
+            hostReplyAt: $hostReplyAt,
         );
         $review->recordEvent(new ReviewSubmitted(
             reviewId: $id,
@@ -134,5 +144,37 @@ final class Review extends AggregateRoot
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getHostReply(): ?string
+    {
+        return $this->hostReply;
+    }
+
+    public function getHostReplyAt(): ?\DateTimeImmutable
+    {
+        return $this->hostReplyAt;
+    }
+
+    /**
+     * The host of the reviewed accommodation publishes (or updates) a public reply
+     * to a guest's accommodation review. Only accommodation reviews can be replied to.
+     */
+    public function replyFromHost(string $reply, \DateTimeImmutable $now): void
+    {
+        if (ReviewType::Accommodation !== $this->type) {
+            throw ReviewNotAllowedException::becauseOnlyAccommodationReviewsCanBeReplied();
+        }
+
+        $trimmed = trim($reply);
+        if ('' === $trimmed) {
+            throw InvalidHostReplyException::becauseEmpty();
+        }
+        if (mb_strlen($trimmed) > self::HOST_REPLY_MAX_LENGTH) {
+            throw InvalidHostReplyException::becauseTooLong(mb_strlen($trimmed), self::HOST_REPLY_MAX_LENGTH);
+        }
+
+        $this->hostReply = $trimmed;
+        $this->hostReplyAt = $now;
     }
 }

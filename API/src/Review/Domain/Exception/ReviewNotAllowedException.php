@@ -15,4 +15,9 @@ final class ReviewNotAllowedException extends \DomainException
     {
         return new self('A review has already been submitted for this stay.');
     }
+
+    public static function becauseOnlyAccommodationReviewsCanBeReplied(): self
+    {
+        return new self('Only an accommodation review can receive a host reply.');
+    }
 }

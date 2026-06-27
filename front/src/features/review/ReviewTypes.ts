@@ -24,6 +24,9 @@ export interface AccommodationReview {
   /** Relative URL of the author's photo (prefix with the API base), or null. */
   authorAvatarUrl?: string | null;
   createdAt: string;
+  /** Public reply from the host, or null. */
+  hostReply?: string | null;
+  hostReplyAt?: string | null;
 }
 
 /** A submitted review, tracked locally so the UI can hide the "rate" button. */

@@ -98,6 +98,27 @@ export const fetchAccommodationReviews = createAsyncThunk<AccommodationReview[],
   }
 );
 
+/** Host publishes (or updates) a public reply to a guest's accommodation review. */
+export const replyToReview = createAsyncThunk<
+  void,
+  { reviewId: string; accommodationId: string; reply: string }
+>(
+  'review/replyToReview',
+  async ({ reviewId, accommodationId, reply }, { dispatch, rejectWithValue }) => {
+    try {
+      await api.patch(
+        `/api/reviews/${reviewId}/reply`,
+        { reply },
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      // Refresh the list so the new reply shows up immediately.
+      await dispatch(fetchAccommodationReviews(accommodationId));
+    } catch (err) {
+      return rejectWithValue(extractError(err));
+    }
+  }
+);
+
 const markSubmitted = (state: ReviewState, target: ReviewTarget, reservationId: string) => {
   state.status = 'succeeded';
   state.error = null;

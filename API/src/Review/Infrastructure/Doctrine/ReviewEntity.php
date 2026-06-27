@@ -42,6 +42,12 @@ class ReviewEntity
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $hostReply = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $hostReplyAt = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -146,6 +152,30 @@ class ReviewEntity
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getHostReply(): ?string
+    {
+        return $this->hostReply;
+    }
+
+    public function setHostReply(?string $hostReply): static
+    {
+        $this->hostReply = $hostReply;
+
+        return $this;
+    }
+
+    public function getHostReplyAt(): ?\DateTimeImmutable
+    {
+        return $this->hostReplyAt;
+    }
+
+    public function setHostReplyAt(?\DateTimeImmutable $hostReplyAt): static
+    {
+        $this->hostReplyAt = $hostReplyAt;
 
         return $this;
     }

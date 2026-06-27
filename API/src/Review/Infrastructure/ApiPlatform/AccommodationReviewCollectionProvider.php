@@ -36,6 +36,8 @@ final readonly class AccommodationReviewCollectionProvider implements ProviderIn
                 r.rating,
                 r.comment,
                 r.created_at,
+                r.host_reply,
+                r.host_reply_at,
                 u.first_name,
                 u.last_name,
                 u.avatar_filename
@@ -61,6 +63,10 @@ final readonly class AccommodationReviewCollectionProvider implements ProviderIn
                 ? '/uploads/photos/'.$row['avatar_filename']
                 : null;
             $output->createdAt = (new \DateTimeImmutable((string) $row['created_at']))->format(\DateTimeInterface::ATOM);
+            $output->hostReply = $row['host_reply'] ?? null;
+            $output->hostReplyAt = null !== ($row['host_reply_at'] ?? null)
+                ? (new \DateTimeImmutable((string) $row['host_reply_at']))->format(\DateTimeInterface::ATOM)
+                : null;
             $reviews[] = $output;
         }
 
