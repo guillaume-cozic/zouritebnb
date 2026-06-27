@@ -9,6 +9,7 @@ final readonly class CancelReservationCommand
     public function __construct(
         public string $reservationId,
         public ?string $message = null,
+        public bool $byHost = false,
     ) {
     }
 }

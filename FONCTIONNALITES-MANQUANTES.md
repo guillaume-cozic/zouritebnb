@@ -25,6 +25,9 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   bungalow) éditable par l'hôte, affichée sur la fiche/les cartes, + filtre de recherche `type`.
 - **Séjour min/max** : l'hôte définit un nombre de nuits min et/ou max par logement ; une
   demande de réservation hors bornes est refusée (422). Affiché sur la fiche.
+- **Annulation par l'hôte** : l'hôte peut annuler une réservation confirmée depuis la
+  messagerie. Le voyageur est alors **intégralement remboursé** (compensation, quelle que
+  soit la politique). Un message d'explication au voyageur est **obligatoire**.
 - **Blocage de dates par l'hôte** : depuis le calendrier du backoffice, l'hôte sélectionne
   une plage pour la bloquer (vacances, maintenance, indispo externe). Motif optionnel,
   libellé « Bloqué » par défaut. Les dates bloquées rendent le logement indisponible à la
@@ -45,8 +48,6 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 - **Codes promo / coupons** : aucun.
 - **Modification de réservation** : impossible de changer dates/voyageurs après création.
 - **Réponses de l'hôte aux avis** : les avis sont à sens unique, l'hôte ne peut pas répliquer.
-- **Annulation par l'hôte** : seul le voyageur peut annuler ; pas de flux d'annulation hôte
-  (avec pénalité/compensation).
 - **Multi-langue front** : le back gère FR/EN mais le front est FR uniquement.
 
 ## 🟡 Manques « expérience » / confiance

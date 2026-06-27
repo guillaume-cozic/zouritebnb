@@ -30,7 +30,7 @@ final readonly class CancelReservation
             throw ReservationNotFoundException::becauseId($command->reservationId);
         }
 
-        $reservation->cancel($this->clock->now(), $command->message);
+        $reservation->cancel($this->clock->now(), $command->message, $command->byHost);
 
         $this->repository->save($reservation);
         $this->eventBus->dispatch($reservation->releaseEvents());

@@ -42,6 +42,8 @@ final readonly class ReservationItemProvider implements ProviderInterface
 
         $this->accessGuard->assertHostOrGuest($reservation, $this->currentUser);
 
-        return ReservationOutput::fromEntity($reservation, $this->clock->now());
+        $byHost = $this->accessGuard->isHost($reservation, $this->currentUser);
+
+        return ReservationOutput::fromEntity($reservation, $this->clock->now(), $byHost);
     }
 }

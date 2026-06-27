@@ -155,7 +155,10 @@
       "modalTitle": "Annuler la réservation",
       "modalSubtitle": "Selon la politique d'annulation et la date du jour, voici ce qui vous sera remboursé.",
       "policyLabel": "Politique d'annulation",
+      "guestRefundLabel": "Remboursement voyageur",
+      "hostNotice": "En tant qu'hôte, le voyageur sera intégralement remboursé. Un message expliquant la raison est obligatoire.",
       "messageLabel": "Message (facultatif)",
+      "messageLabelRequired": "Message au voyageur (obligatoire)",
       "messagePlaceholder": "Ajoutez un mot pour l'hôte ou le voyageur, il sera publié dans la conversation.",
       "keep": "Conserver la réservation",
       "confirm": "Confirmer l'annulation"

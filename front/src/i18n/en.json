@@ -155,7 +155,10 @@
       "modalTitle": "Cancel reservation",
       "modalSubtitle": "Based on the cancellation policy and today's date, here is what you would be refunded.",
       "policyLabel": "Cancellation policy",
+      "guestRefundLabel": "Guest refund",
+      "hostNotice": "As the host, the guest will be fully refunded. A message explaining the reason is required.",
       "messageLabel": "Message (optional)",
+      "messageLabelRequired": "Message to the guest (required)",
       "messagePlaceholder": "Add a note for the host or guest — it will be posted in the conversation.",
       "keep": "Keep reservation",
       "confirm": "Confirm cancellation"

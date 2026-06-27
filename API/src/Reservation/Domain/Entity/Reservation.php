@@ -25,6 +25,7 @@ final class Reservation extends AggregateRoot
         private readonly ReservationPrice $price,
         private readonly ?Uuid $guestUserId = null,
         private readonly CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
+        private bool $cancelledByHost = false,
     ) {
     }
 
@@ -158,13 +159,25 @@ final class Reservation extends AggregateRoot
      * was never captured, so cancelling it always returns everything; a confirmed
      * reservation follows the snapshotted policy based on the time left before check-in.
      */
-    public function refundBreakdown(\DateTimeImmutable $now): RefundBreakdown
+    /**
+     * What the guest is refunded if the reservation is cancelled at $now.
+     *
+     * A host-initiated cancellation always fully refunds the guest (full
+     * compensation), whatever the policy — both as a live preview ($byHost) and
+     * once it has actually been cancelled by the host. A guest cancellation
+     * follows the snapshotted policy based on the time left before check-in.
+     */
+    public function refundBreakdown(\DateTimeImmutable $now, bool $byHost = false): RefundBreakdown
     {
         $totalPaid = round($this->price->totalPrice + $this->price->commissionAmount + $this->price->donationAmount, 2);
 
-        $percentage = match ($this->status) {
-            ReservationStatus::Pending => 100,
-            ReservationStatus::Confirmed => $this->cancellationPolicy->refundPercentage(
+        $hostFullRefund = ($byHost && ReservationStatus::Confirmed === $this->status)
+            || (ReservationStatus::Cancelled === $this->status && $this->cancelledByHost);
+
+        $percentage = match (true) {
+            ReservationStatus::Pending === $this->status => 100,
+            $hostFullRefund => 100,
+            ReservationStatus::Confirmed === $this->status => $this->cancellationPolicy->refundPercentage(
                 $this->dateRange->checkIn()->getTimestamp() - $now->getTimestamp(),
             ),
             default => 0,
@@ -194,7 +207,7 @@ final class Reservation extends AggregateRoot
         $this->recordEvent(new ReservationConfirmed($this->id->toUuid()));
     }
 
-    public function cancel(\DateTimeImmutable $now, ?string $message = null): void
+    public function cancel(\DateTimeImmutable $now, ?string $message = null, bool $byHost = false): void
     {
         if (ReservationStatus::Cancelled === $this->status) {
             throw InvalidReservationStateException::becauseAlreadyCancelled();
@@ -205,9 +218,18 @@ final class Reservation extends AggregateRoot
         if ($now >= $this->dateRange->checkIn()) {
             throw InvalidReservationStateException::becauseStayAlreadyStarted();
         }
+        if ($byHost && (null === $message || '' === trim($message))) {
+            throw InvalidReservationStateException::becauseHostCancellationRequiresMessage();
+        }
 
         $this->status = ReservationStatus::Cancelled;
+        $this->cancelledByHost = $byHost;
         $this->recordEvent(new ReservationCancelled($this->id->toUuid(), $message));
+    }
+
+    public function isCancelledByHost(): bool
+    {
+        return $this->cancelledByHost;
     }
 
     public function refuse(bool $automatic = false): void

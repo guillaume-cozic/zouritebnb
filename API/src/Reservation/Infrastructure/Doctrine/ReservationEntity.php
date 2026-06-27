@@ -59,6 +59,9 @@ class ReservationEntity
     #[ORM\Column(length: 20, options: ['default' => 'flexible'])]
     private string $cancellationPolicy = 'flexible';
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $cancelledByHost = false;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -235,6 +238,18 @@ class ReservationEntity
     public function setCancellationPolicy(string $cancellationPolicy): static
     {
         $this->cancellationPolicy = $cancellationPolicy;
+
+        return $this;
+    }
+
+    public function isCancelledByHost(): bool
+    {
+        return $this->cancelledByHost;
+    }
+
+    public function setCancelledByHost(bool $cancelledByHost): static
+    {
+        $this->cancelledByHost = $cancelledByHost;
 
         return $this;
     }

@@ -163,9 +163,15 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
     setBusy(false);
   };
 
-  // A traveler may cancel their own booking while it is still cancellable (the API
-  // exposes `cancellable`, which already encodes "stay not started" + cancellable status).
-  const canCancelReservation = !isHost && !readOnly && !!reservation?.cancellable;
+  // A traveler may cancel a still-cancellable booking (`cancellable` already encodes
+  // "stay not started" + cancellable status). A host may cancel a confirmed booking
+  // (a pending one is refused instead); the guest is then fully refunded.
+  const canCancelReservation = !readOnly && !!reservation?.cancellable
+    && (isHost ? reservation?.status === 'confirmed' : true);
+
+  // A host must justify the cancellation to the guest; for a traveler it stays optional.
+  const cancelMessageRequired = isHost;
+  const cancelDisabled = busy || (cancelMessageRequired && cancelMessage.trim() === '');
 
   const handleConfirmCancel = async () => {
     if (!reservation) return;
@@ -445,21 +451,29 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
               <Button variant="ghost" onClick={() => setCancelOpen(false)} disabled={busy}>
                 {t('conversation.cancel.keep')}
               </Button>
-              <Button variant="danger" onClick={handleConfirmCancel} loading={busy}>
+              <Button variant="danger" onClick={handleConfirmCancel} loading={busy} disabled={cancelDisabled}>
                 {t('conversation.cancel.confirm')}
               </Button>
             </>
           }
         >
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-2 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">{t('conversation.cancel.policyLabel')}</span>
-              <span className="font-medium text-gray-900">
-                {t(`cancellationStep.${reservation.cancellationPolicy ?? 'flexible'}.title`)}
-              </span>
+          {isHost && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800 mb-3">
+              {t('conversation.cancel.hostNotice')}
             </div>
+          )}
+
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-2 text-sm">
+            {!isHost && (
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500">{t('conversation.cancel.policyLabel')}</span>
+                <span className="font-medium text-gray-900">
+                  {t(`cancellationStep.${reservation.cancellationPolicy ?? 'flexible'}.title`)}
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between">
-              <span className="text-gray-500">{t('conversation.cancel.refundLabel')}</span>
+              <span className="text-gray-500">{isHost ? t('conversation.cancel.guestRefundLabel') : t('conversation.cancel.refundLabel')}</span>
               <span className="font-bold text-gray-900">
                 {new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(reservation.refundAmount ?? 0)}
                 <span className="ml-1 font-normal text-gray-500">({reservation.refundPercentage ?? 0}%)</span>
@@ -468,12 +482,15 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
           </div>
 
           <label className="mt-4 block">
-            <span className="text-sm font-medium text-gray-700">{t('conversation.cancel.messageLabel')}</span>
+            <span className="text-sm font-medium text-gray-700">
+              {cancelMessageRequired ? t('conversation.cancel.messageLabelRequired') : t('conversation.cancel.messageLabel')}
+            </span>
             <Textarea
               value={cancelMessage}
               onChange={(e) => setCancelMessage(e.target.value)}
               rows={3}
               maxLength={5000}
+              required={cancelMessageRequired}
               placeholder={t('conversation.cancel.messagePlaceholder') as string}
               className="mt-1.5"
             />

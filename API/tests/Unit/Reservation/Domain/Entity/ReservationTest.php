@@ -327,6 +327,41 @@ final class ReservationTest extends TestCase
         self::assertSame(250.0, $refund->refundAmount);
     }
 
+    public function test_should_require_a_message_when_cancelling_as_host(): void
+    {
+        $reservation = $this->confirmedReservation();
+
+        $this->expectException(InvalidReservationStateException::class);
+        $this->expectExceptionMessage('A host cancellation requires a message');
+
+        $reservation->cancel(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'), null, byHost: true);
+    }
+
+    public function test_should_record_a_host_cancellation_and_fully_refund_the_guest(): void
+    {
+        // Flexible, 12h before check-in: a guest cancellation refunds 0%, but a host
+        // cancellation fully compensates the guest.
+        $reservation = $this->confirmedReservation();
+        $within24h = new \DateTimeImmutable('2026-04-13T03:00:00+00:00');
+
+        $reservation->cancel($within24h, 'Imprévu de notre côté', byHost: true);
+
+        self::assertTrue($reservation->isCancelledByHost());
+        $refund = $reservation->refundBreakdown($within24h);
+        self::assertSame(100, $refund->refundPercentage);
+        self::assertSame(250.0, $refund->refundAmount);
+    }
+
+    public function test_should_preview_full_refund_for_a_host_while_the_reservation_is_active(): void
+    {
+        $reservation = $this->confirmedReservation();
+
+        // byHost preview within 24h → 100% (vs 0% for the guest).
+        $refund = $reservation->refundBreakdown(new \DateTimeImmutable('2026-04-13T03:00:00+00:00'), byHost: true);
+
+        self::assertSame(100, $refund->refundPercentage);
+    }
+
     private function reservationId(): ReservationId
     {
         return new ReservationId(Uuid::fromString(self::RESERVATION_UUID));

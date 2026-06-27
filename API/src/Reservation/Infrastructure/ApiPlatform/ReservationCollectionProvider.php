@@ -62,9 +62,14 @@ final readonly class ReservationCollectionProvider implements ProviderInterface
         );
 
         $now = $this->clock->now();
+        $myTeamId = $this->currentUser->teamId();
 
         return array_map(
-            static fn ($reservation) => ReservationOutput::fromEntity($reservation, $now),
+            static fn ($reservation) => ReservationOutput::fromEntity(
+                $reservation,
+                $now,
+                byHost: $reservation->getTeamId()->equals($myTeamId),
+            ),
             $reservations,
         );
     }

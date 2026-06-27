@@ -45,4 +45,9 @@ final class InvalidReservationStateException extends \DomainException
     {
         return new self('A reservation whose stay has already started or is past cannot be cancelled.');
     }
+
+    public static function becauseHostCancellationRequiresMessage(): self
+    {
+        return new self('A host cancellation requires a message explaining the reason to the guest.');
+    }
 }

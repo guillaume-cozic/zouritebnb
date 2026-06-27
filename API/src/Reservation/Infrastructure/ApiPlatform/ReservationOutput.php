@@ -272,7 +272,7 @@ class ReservationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Pourcentage remboursé en cas d\'annulation immédiate (0, 50 ou 100)', example: 100)]
     public ?int $refundPercentage = null;
 
-    public static function fromEntity(object $entity, ?\DateTimeImmutable $now = null): static
+    public static function fromEntity(object $entity, ?\DateTimeImmutable $now = null, bool $byHost = false): static
     {
         if (!$entity instanceof Reservation) {
             throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', Reservation::class, get_debug_type($entity)));
@@ -300,7 +300,9 @@ class ReservationOutput implements FromEntityInterface
         // provided (item/collection reads, cancel response); other flows leave it null.
         if (null !== $now) {
             $output->cancellable = $entity->isCancellable($now);
-            $refund = $entity->refundBreakdown($now);
+            // A host viewing the reservation sees the full-refund preview that
+            // would apply if THEY cancelled; the guest sees the policy refund.
+            $refund = $entity->refundBreakdown($now, $byHost);
             $output->refundAmount = $refund->refundAmount;
             $output->refundPercentage = $refund->refundPercentage;
         }

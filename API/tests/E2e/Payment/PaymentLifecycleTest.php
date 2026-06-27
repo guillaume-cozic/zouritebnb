@@ -74,7 +74,7 @@ final class PaymentLifecycleTest extends PaymentApiTestCase
 
         $client->request('PATCH', '/api/reservations/'.$reservationId.'/cancel', [
             'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'],
-            'json' => [],
+            'json' => ['message' => 'Annulation par l\'hôte.'],
         ]);
 
         self::assertResponseIsSuccessful();

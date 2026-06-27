@@ -43,11 +43,16 @@ final readonly class CancelReservationProcessor implements ProcessorInterface
 
         $this->accessGuard->assertHostOrGuest($reservation, $this->currentUser);
 
+        // A cancellation by the host fully refunds the guest (full compensation),
+        // whereas a guest cancellation follows the snapshotted policy.
+        $byHost = $this->accessGuard->isHost($reservation, $this->currentUser);
+
         $message = $data instanceof CancelReservationInput ? $data->message : null;
 
         $this->handler->execute(fn () => $this->cancelReservation->handle(new CancelReservationCommand(
             reservationId: $id,
             message: $message,
+            byHost: $byHost,
         )));
 
         $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));
@@ -55,6 +60,6 @@ final readonly class CancelReservationProcessor implements ProcessorInterface
             throw new \RuntimeException('Reservation could not be reloaded after the operation.');
         }
 
-        return ReservationOutput::fromEntity($reservation, $this->clock->now());
+        return ReservationOutput::fromEntity($reservation, $this->clock->now(), $byHost);
     }
 }

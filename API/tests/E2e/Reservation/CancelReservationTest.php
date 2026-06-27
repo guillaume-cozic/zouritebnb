@@ -25,13 +25,47 @@ final class CancelReservationTest extends ReservationApiTestCase
 
         self::createClient()->request('PATCH', '/api/reservations/'.$id.'/cancel', [
             'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/merge-patch+json'],
-            'json' => [],
+            'json' => ['message' => 'Désolé, un imprévu nous oblige à annuler.'],
         ]);
 
         self::assertResponseIsSuccessful();
         self::assertJsonContains([
             'id' => $id,
             'status' => 'cancelled',
+        ]);
+    }
+
+    public function test_should_require_a_message_when_host_cancels(): void
+    {
+        $id = $this->insertReservation(checkIn: $this->futureCheckIn(), checkOut: $this->futureCheckOut());
+
+        self::createClient()->request('PATCH', '/api/reservations/'.$id.'/cancel', [
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [],
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
+    public function test_should_fully_refund_the_guest_when_host_cancels_within_the_policy_window(): void
+    {
+        // Flexible policy, check-in in 12h: a guest cancellation would refund 0%,
+        // but a host cancellation fully compensates the guest (100%).
+        $id = $this->insertReservation(
+            checkIn: (new \DateTimeImmutable('+12 hours'))->format(\DateTimeInterface::ATOM),
+            checkOut: (new \DateTimeImmutable('+4 days'))->format(\DateTimeInterface::ATOM),
+            status: 'confirmed',
+        );
+
+        self::createClient()->request('PATCH', '/api/reservations/'.$id.'/cancel', [
+            'headers' => $this->hostAuthHeaders() + ['Content-Type' => 'application/merge-patch+json'],
+            'json' => ['message' => 'Annulation exceptionnelle de notre part.'],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            'status' => 'cancelled',
+            'refundPercentage' => 100,
         ]);
     }
 
@@ -70,17 +104,21 @@ final class CancelReservationTest extends ReservationApiTestCase
         ]);
     }
 
-    public function test_should_preview_zero_refund_within_24h_under_flexible_policy(): void
+    public function test_should_preview_zero_refund_within_24h_under_flexible_policy_for_the_guest(): void
     {
-        // Confirmed + flexible + check-in in 12h → nothing refundable, but still cancellable.
+        // Confirmed + flexible + check-in in 12h → the guest's policy preview is 0%,
+        // still cancellable. (A host viewing the same reservation would see 100%.)
+        $guestUserId = $this->createAuthUser(email: 'guest-preview@example.com', teamId: Uuid::v7()->toRfc4122());
         $id = $this->insertReservation(
+            teamId: Uuid::v7()->toRfc4122(),
+            guestUserId: $guestUserId,
             checkIn: (new \DateTimeImmutable('+12 hours'))->format(\DateTimeInterface::ATOM),
             checkOut: (new \DateTimeImmutable('+4 days'))->format(\DateTimeInterface::ATOM),
             status: 'confirmed',
         );
 
         self::createClient()->request('GET', '/api/reservations/'.$id, [
-            'headers' => $this->hostAuthHeaders(),
+            'headers' => $this->authHeaders('guest-preview@example.com'),
         ]);
 
         self::assertResponseIsSuccessful();
