@@ -25,6 +25,17 @@ export interface Reservation {
   refundAmount?: number | null;
   /** Refunded share if cancelled now (0, 50 or 100). */
   refundPercentage?: number | null;
+  /** Guest-requested date change awaiting host approval, or null. */
+  pendingModification?: PendingModification | null;
+}
+
+export interface PendingModification {
+  checkIn: string;
+  checkOut: string;
+  totalPrice: number;
+  totalPaid: number;
+  /** Difference in total paid vs the current reservation (positive = extra to pay). */
+  priceDifference: number;
 }
 
 export interface CreateReservationPayload {

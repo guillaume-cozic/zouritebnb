@@ -46,6 +46,21 @@ final class InvalidReservationStateException extends \DomainException
         return new self('A reservation whose stay has already started or is past cannot be cancelled.');
     }
 
+    public static function becauseOnlyConfirmedCanBeModified(): self
+    {
+        return new self('Only a confirmed reservation can be modified.');
+    }
+
+    public static function becauseStayAlreadyStartedForModification(): self
+    {
+        return new self('A reservation whose stay has already started or is past cannot be modified.');
+    }
+
+    public static function becauseNoPendingModification(): self
+    {
+        return new self('There is no pending modification to act on for this reservation.');
+    }
+
     public static function becauseHostCancellationRequiresMessage(): self
     {
         return new self('A host cancellation requires a message explaining the reason to the guest.');

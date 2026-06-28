@@ -14,6 +14,14 @@ interface Props {
   onCancel?: () => void;
   /** Whether the cancel button should be shown (reservation cancellable + traveler). */
   canCancel?: boolean;
+  /** Traveler: open the date-modification dialog. */
+  onRequestModification?: () => void;
+  /** Whether the traveler may request a date change (confirmed, not started, no pending change). */
+  canRequestModification?: boolean;
+  /** Host: approve the pending date change. */
+  onApproveModification?: () => void;
+  /** Host: reject the pending date change. */
+  onRejectModification?: () => void;
 }
 
 const formatDate = (iso: string, locale: string): string =>
@@ -32,7 +40,7 @@ const statusBadgeClass = (status: ReservationStatus): string => {
   }
 };
 
-const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, busy, readOnly = false, onCancel, canCancel = false }) => {
+const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, busy, readOnly = false, onCancel, canCancel = false, onRequestModification, canRequestModification = false, onApproveModification, onRejectModification }) => {
   const { t } = useTranslation();
   const isPending = reservation.status === 'pending';
   const showActions = isPending && !readOnly;
@@ -81,6 +89,57 @@ const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, b
           </div>
         )}
       </div>
+
+      {reservation.pendingModification && (
+        <div className="px-5 pb-4">
+          <div className="rounded-xl bg-sky-50 border border-sky-200 px-3 py-2.5 text-xs text-sky-900 space-y-1">
+            <p className="font-semibold">{t('modification.pendingTitle')}</p>
+            <p>{formatDate(reservation.pendingModification.checkIn, locale)} → {formatDate(reservation.pendingModification.checkOut, locale)}</p>
+            <p>
+              {t('modification.priceDifference')} :{' '}
+              <span className="font-semibold">
+                {reservation.pendingModification.priceDifference >= 0 ? '+' : ''}
+                {formatMoney(reservation.pendingModification.priceDifference)}
+              </span>
+            </p>
+          </div>
+          {onApproveModification && onRejectModification ? (
+            <div className="flex flex-col gap-2 mt-3">
+              <button
+                type="button"
+                onClick={onApproveModification}
+                disabled={busy}
+                className="inline-flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 transition-colors shadow-sm shadow-emerald-200"
+              >
+                {t('modification.approve')}
+              </button>
+              <button
+                type="button"
+                onClick={onRejectModification}
+                disabled={busy}
+                className="inline-flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-semibold text-rose-700 bg-white border border-rose-200 hover:bg-rose-50 disabled:opacity-60 transition-colors"
+              >
+                {t('modification.reject')}
+              </button>
+            </div>
+          ) : (
+            <p className="text-xs text-surface-500 mt-2">{t('modification.awaitingHost')}</p>
+          )}
+        </div>
+      )}
+
+      {canRequestModification && onRequestModification && !reservation.pendingModification && (
+        <div className="px-5 pb-4">
+          <button
+            type="button"
+            onClick={onRequestModification}
+            disabled={busy}
+            className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-semibold text-surface-700 bg-white border border-surface-200 hover:bg-surface-50 disabled:opacity-60 transition-colors"
+          >
+            {t('modification.requestAction')}
+          </button>
+        </div>
+      )}
 
       {showActions && (
         <div className="px-5 pb-4">

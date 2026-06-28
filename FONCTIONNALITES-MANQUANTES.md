@@ -32,6 +32,17 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   une plage pour la bloquer (vacances, maintenance, indispo externe). Motif optionnel,
   libellé « Bloqué » par défaut. Les dates bloquées rendent le logement indisponible à la
   réservation comme une réservation classique.
+- **Tarification dynamique** : en plus du prix fixe et de la promo hebdo, l'hôte définit une
+  majoration week-end (vendredi/samedi), une remise last-minute (X % si réservé à moins de
+  N jours de l'arrivée) et des tarifs par période (saisonnier / dates). Le calcul par nuit
+  est centralisé (`StayPriceCalculator`), figé à la réservation, affiché côté voyageur et
+  appliqué au paiement. Endpoints `PATCH /accommodations/{id}/dynamic-pricing` et
+  `PUT /accommodations/{id}/price-periods`.
+- **Modification de réservation** : depuis la messagerie, le voyageur propose de nouvelles
+  dates sur une réservation confirmée non commencée ; le prix est recalculé et figé dans une
+  modification en attente, que l'hôte accepte ou refuse (les nouvelles dates/prix s'appliquent
+  à l'acceptation). Disponibilité revérifiée (hors elle-même) à la demande et à l'acceptation.
+  Pas de charge/remboursement Stripe de l'écart (cohérent avec le manque « remboursement réel »).
 
 ## 🔴 Manques importants (impact direct conversion/usage)
 
@@ -43,10 +54,7 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 
 ## 🟠 Manques structurants
 
-- **Tarification dynamique** : prix fixe par nuit + promo hebdo uniquement. Pas de tarifs
-  saisonniers, prix par date, week-end, last-minute.
 - **Codes promo / coupons** : aucun.
-- **Modification de réservation** : impossible de changer dates/voyageurs après création.
 - **Réponses de l'hôte aux avis** : les avis sont à sens unique, l'hôte ne peut pas répliquer.
 - **Multi-langue front** : le back gère FR/EN mais le front est FR uniquement.
 

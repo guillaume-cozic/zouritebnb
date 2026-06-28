@@ -8,6 +8,7 @@ use App\Reservation\Domain\Entity\CancellationPolicy;
 use App\Reservation\Domain\Entity\DateRange;
 use App\Reservation\Domain\Entity\GuestCount;
 use App\Reservation\Domain\Entity\GuestName;
+use App\Reservation\Domain\Entity\PendingModification;
 use App\Reservation\Domain\Entity\Reservation as DomainReservation;
 use App\Reservation\Domain\Entity\ReservationId;
 use App\Reservation\Domain\Entity\ReservationPrice;
@@ -48,7 +49,8 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             ->setCommissionAmount($reservation->getPrice()->commissionAmount)
             ->setDonationAmount($reservation->getPrice()->donationAmount)
             ->setCancellationPolicy($reservation->getCancellationPolicy()->value)
-            ->setCancelledByHost($reservation->isCancelledByHost());
+            ->setCancelledByHost($reservation->isCancelledByHost())
+            ->setPendingModification($reservation->getPendingModification()?->toArray());
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -114,9 +116,9 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
         );
     }
 
-    public function hasOverlappingReservation(Uuid $accommodationId, DateRange $dateRange): bool
+    public function hasOverlappingReservation(Uuid $accommodationId, DateRange $dateRange, ?ReservationId $excludeReservationId = null): bool
     {
-        $count = (int) $this->createQueryBuilder('r')
+        $qb = $this->createQueryBuilder('r')
             ->select('COUNT(r.id)')
             ->andWhere('r.accommodationId = :accommodationId')
             ->andWhere('r.status IN (:statuses)')
@@ -127,11 +129,14 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             ->setParameter('accommodationId', $accommodationId, \Symfony\Bridge\Doctrine\Types\UuidType::NAME)
             ->setParameter('statuses', [ReservationStatus::Pending->value, ReservationStatus::Confirmed->value])
             ->setParameter('checkIn', $dateRange->checkIn())
-            ->setParameter('checkOut', $dateRange->checkOut())
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->setParameter('checkOut', $dateRange->checkOut());
 
-        return $count > 0;
+        if (null !== $excludeReservationId) {
+            $qb->andWhere('r.id != :excludeId')
+                ->setParameter('excludeId', $excludeReservationId->toUuid(), \Symfony\Bridge\Doctrine\Types\UuidType::NAME);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
 
     private function toDomain(ReservationEntity $entity): DomainReservation
@@ -157,6 +162,9 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             guestUserId: $entity->getGuestUserId(),
             cancellationPolicy: CancellationPolicy::fromString($entity->getCancellationPolicy()),
             cancelledByHost: $entity->isCancelledByHost(),
+            pendingModification: null === $entity->getPendingModification()
+                ? null
+                : PendingModification::fromArray($entity->getPendingModification()),
         );
     }
 }

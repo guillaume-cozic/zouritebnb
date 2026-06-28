@@ -166,6 +166,19 @@
       "confirm": "Confirm cancellation"
     }
   },
+  "modification": {
+    "requestAction": "Change dates",
+    "modalTitle": "Change the stay dates",
+    "modalSubtitle": "Propose new dates. The price will be recalculated and the host must approve the change.",
+    "cancelAction": "Cancel",
+    "submit": "Send request",
+    "hint": "The reservation stays unchanged until the host approves the change.",
+    "pendingTitle": "Pending date change",
+    "priceDifference": "Price difference",
+    "approve": "Approve change",
+    "reject": "Reject change",
+    "awaitingHost": "Awaiting the host's approval."
+  },
   "navbar": {
     "home": "Home",
     "openMenu": "Open menu",

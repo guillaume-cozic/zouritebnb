@@ -26,6 +26,13 @@ final readonly class ReservationAccessGuard
         }
     }
 
+    public function assertGuest(Reservation $reservation, CurrentUser $currentUser): void
+    {
+        if (!$this->isGuest($reservation, $currentUser)) {
+            throw new AccessDeniedHttpException('Only the guest can perform this action on the reservation.');
+        }
+    }
+
     public function assertHostOrGuest(Reservation $reservation, CurrentUser $currentUser): void
     {
         if (!$this->isHost($reservation, $currentUser) && !$this->isGuest($reservation, $currentUser)) {

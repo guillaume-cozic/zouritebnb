@@ -146,6 +146,58 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: CancelReservationProcessor::class,
         ),
         new Post(
+            uriTemplate: '/reservations/{id}/modification-request',
+            read: false,
+            status: 200,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            openapi: new OpenApiOperation(
+                summary: 'Demander une modification des dates (voyageur)',
+                description: 'Le voyageur propose de nouvelles dates pour sa réservation confirmée. Le prix est recalculé et figé dans la modification en attente ; l\'hôte doit l\'accepter ou la refuser. Réservé au voyageur de la réservation (403 sinon). Retourne 404 si introuvable, 422 si la réservation n\'est pas confirmée, si le séjour a déjà commencé, si les dates ne sont pas disponibles ou hors bornes min/max.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/ld+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Nouvelles dates',
+                                    value: ['checkIn' => '2026-07-10T15:00:00+00:00', 'checkOut' => '2026-07-14T11:00:00+00:00'],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            denormalizationContext: ['groups' => ['reservation:write']],
+            normalizationContext: ['groups' => ['reservation:read']],
+            input: RequestReservationModificationInput::class,
+            processor: RequestReservationModificationProcessor::class,
+        ),
+        new Post(
+            uriTemplate: '/reservations/{id}/modification/approve',
+            read: false,
+            status: 200,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            openapi: new OpenApiOperation(
+                summary: 'Accepter une modification de dates (hôte)',
+                description: 'L\'hôte accepte la modification en attente : les nouvelles dates et le nouveau prix sont appliqués à la réservation. Réservé à l\'équipe loueur (403 sinon). Retourne 404 si introuvable, 422 s\'il n\'y a pas de modification en attente ou si les dates ne sont plus disponibles.',
+            ),
+            normalizationContext: ['groups' => ['reservation:read']],
+            input: false,
+            processor: ApproveReservationModificationProcessor::class,
+        ),
+        new Post(
+            uriTemplate: '/reservations/{id}/modification/reject',
+            read: false,
+            status: 200,
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            openapi: new OpenApiOperation(
+                summary: 'Refuser une modification de dates (hôte)',
+                description: 'L\'hôte refuse la modification en attente : la réservation conserve ses dates et son prix d\'origine. Réservé à l\'équipe loueur (403 sinon). Retourne 404 si introuvable, 422 s\'il n\'y a pas de modification en attente.',
+            ),
+            normalizationContext: ['groups' => ['reservation:read']],
+            input: false,
+            processor: RejectReservationModificationProcessor::class,
+        ),
+        new Post(
             uriTemplate: '/reservations/request',
             status: 201,
             security: "is_granted('IS_AUTHENTICATED_FULLY')",
@@ -272,6 +324,11 @@ class ReservationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Pourcentage remboursé en cas d\'annulation immédiate (0, 50 ou 100)', example: 100)]
     public ?int $refundPercentage = null;
 
+    /** @var array{checkIn: string, checkOut: string, totalPrice: float, totalPaid: float, priceDifference: float}|null */
+    #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Modification de dates demandée par le voyageur et en attente de validation de l\'hôte, ou null. priceDifference est l\'écart de total payé par rapport à la réservation actuelle (positif = supplément).')]
+    public ?array $pendingModification = null;
+
     public static function fromEntity(object $entity, ?\DateTimeImmutable $now = null, bool $byHost = false): static
     {
         if (!$entity instanceof Reservation) {
@@ -295,6 +352,17 @@ class ReservationOutput implements FromEntityInterface
         // Grand total actually paid, mirroring the invoice (stay + frozen fee + donation).
         $output->totalPaid = round($price->totalPrice + $price->commissionAmount + $price->donationAmount, 2);
         $output->cancellationPolicy = $entity->getCancellationPolicy()->value;
+
+        $pending = $entity->getPendingModification();
+        if (null !== $pending) {
+            $output->pendingModification = [
+                'checkIn' => $pending->dateRange->checkIn()->format(\DateTimeInterface::ATOM),
+                'checkOut' => $pending->dateRange->checkOut()->format(\DateTimeInterface::ATOM),
+                'totalPrice' => $pending->price->totalPrice,
+                'totalPaid' => $pending->totalPaid(),
+                'priceDifference' => round($pending->totalPaid() - $output->totalPaid, 2),
+            ];
+        }
 
         // The refund preview depends on "now", so it is only computed when a clock is
         // provided (item/collection reads, cancel response); other flows leave it null.

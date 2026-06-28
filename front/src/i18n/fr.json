@@ -166,6 +166,19 @@
       "confirm": "Confirmer l'annulation"
     }
   },
+  "modification": {
+    "requestAction": "Modifier les dates",
+    "modalTitle": "Modifier les dates du séjour",
+    "modalSubtitle": "Proposez de nouvelles dates. Le prix sera recalculé et l'hôte devra valider la modification.",
+    "cancelAction": "Annuler",
+    "submit": "Envoyer la demande",
+    "hint": "La réservation reste inchangée tant que l'hôte n'a pas accepté la modification.",
+    "pendingTitle": "Modification de dates en attente",
+    "priceDifference": "Différence de prix",
+    "approve": "Accepter la modification",
+    "reject": "Refuser la modification",
+    "awaitingHost": "En attente de la validation de l'hôte."
+  },
   "navbar": {
     "home": "Accueil",
     "openMenu": "Ouvrir le menu",

@@ -345,6 +345,27 @@ export interface paths {
      */
     patch: operations["api_reservations_idconfirm_patch"];
   };
+  "/api/reservations/{id}/modification-request": {
+    /**
+     * Demander une modification des dates (voyageur)
+     * @description Le voyageur propose de nouvelles dates pour sa réservation confirmée. Le prix est recalculé et figé dans la modification en attente ; l'hôte doit l'accepter ou la refuser. Réservé au voyageur de la réservation (403 sinon). Retourne 404 si introuvable, 422 si la réservation n'est pas confirmée, si le séjour a déjà commencé, si les dates ne sont pas disponibles ou hors bornes min/max.
+     */
+    post: operations["api_reservations_idmodification-request_post"];
+  };
+  "/api/reservations/{id}/modification/approve": {
+    /**
+     * Accepter une modification de dates (hôte)
+     * @description L'hôte accepte la modification en attente : les nouvelles dates et le nouveau prix sont appliqués à la réservation. Réservé à l'équipe loueur (403 sinon). Retourne 404 si introuvable, 422 s'il n'y a pas de modification en attente ou si les dates ne sont plus disponibles.
+     */
+    post: operations["api_reservations_idmodificationapprove_post"];
+  };
+  "/api/reservations/{id}/modification/reject": {
+    /**
+     * Refuser une modification de dates (hôte)
+     * @description L'hôte refuse la modification en attente : la réservation conserve ses dates et son prix d'origine. Réservé à l'équipe loueur (403 sinon). Retourne 404 si introuvable, 422 s'il n'y a pas de modification en attente.
+     */
+    post: operations["api_reservations_idmodificationreject_post"];
+  };
   "/api/reservations/{id}/refuse": {
     /**
      * Refuser une réservation (hôte)
@@ -1929,6 +1950,10 @@ export interface components {
        * @example 100
        */
       refundPercentage?: number | null;
+      /** @description Modification de dates demandée par le voyageur et en attente de validation de l'hôte, ou null. priceDifference est l'écart de total payé par rapport à la réservation actuelle (positif = supplément). */
+      pendingModification?: ({
+        [key: string]: number | string;
+      }) | null;
     });
     "SolidarityProject.jsonld-solidarity_project.list": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -4380,6 +4405,144 @@ export interface operations {
       };
       /** @description Not found */
       404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Demander une modification des dates (voyageur)
+   * @description Le voyageur propose de nouvelles dates pour sa réservation confirmée. Le prix est recalculé et figé dans la modification en attente ; l'hôte doit l'accepter ou la refuser. Réservé au voyageur de la réservation (403 sinon). Retourne 404 si introuvable, 422 si la réservation n'est pas confirmée, si le séjour a déjà commencé, si les dates ne sont pas disponibles ou hors bornes min/max.
+   */
+  "api_reservations_idmodification-request_post": {
+    parameters: {
+      path: {
+        /** @description Reservation identifier */
+        id: string;
+      };
+    };
+    /** @description The new Reservation resource */
+    requestBody?: {
+      content: {
+        "application/ld+json": unknown;
+      };
+    };
+    responses: {
+      /** @description Reservation resource created */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["Reservation.jsonld-reservation.read"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Accepter une modification de dates (hôte)
+   * @description L'hôte accepte la modification en attente : les nouvelles dates et le nouveau prix sont appliqués à la réservation. Réservé à l'équipe loueur (403 sinon). Retourne 404 si introuvable, 422 s'il n'y a pas de modification en attente ou si les dates ne sont plus disponibles.
+   */
+  api_reservations_idmodificationapprove_post: {
+    parameters: {
+      path: {
+        /** @description Reservation identifier */
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Reservation resource created */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["Reservation.jsonld-reservation.read"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Refuser une modification de dates (hôte)
+   * @description L'hôte refuse la modification en attente : la réservation conserve ses dates et son prix d'origine. Réservé à l'équipe loueur (403 sinon). Retourne 404 si introuvable, 422 s'il n'y a pas de modification en attente.
+   */
+  api_reservations_idmodificationreject_post: {
+    parameters: {
+      path: {
+        /** @description Reservation identifier */
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Reservation resource created */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["Reservation.jsonld-reservation.read"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];

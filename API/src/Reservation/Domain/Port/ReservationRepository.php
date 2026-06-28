@@ -28,8 +28,10 @@ interface ReservationRepository
      * Tells whether the accommodation already has a "pending" or "confirmed"
      * reservation overlapping the given date range. The departure day of an
      * existing stay does not count as an overlap (same-day turnover is allowed).
+     * An optional reservation id is excluded from the check (used when re-pricing a
+     * date change for an existing reservation).
      */
-    public function hasOverlappingReservation(Uuid $accommodationId, DateRange $dateRange): bool;
+    public function hasOverlappingReservation(Uuid $accommodationId, DateRange $dateRange, ?ReservationId $excludeReservationId = null): bool;
 
     /**
      * Lists the reservations visible to a user: those belonging to the user's team

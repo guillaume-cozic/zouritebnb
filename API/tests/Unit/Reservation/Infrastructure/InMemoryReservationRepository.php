@@ -74,10 +74,13 @@ final class InMemoryReservationRepository implements ReservationRepository
         return $result;
     }
 
-    public function hasOverlappingReservation(Uuid $accommodationId, DateRange $dateRange): bool
+    public function hasOverlappingReservation(Uuid $accommodationId, DateRange $dateRange, ?ReservationId $excludeReservationId = null): bool
     {
         foreach ($this->reservations as $reservation) {
             if (!$reservation->getAccommodationId()->equals($accommodationId)) {
+                continue;
+            }
+            if (null !== $excludeReservationId && $reservation->getId()->toString() === $excludeReservationId->toString()) {
                 continue;
             }
             if (!\in_array($reservation->getStatus(), [ReservationStatus::Pending, ReservationStatus::Confirmed], true)) {

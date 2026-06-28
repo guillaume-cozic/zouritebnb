@@ -25,6 +25,9 @@ import {
   fetchReservationById,
   fetchReservations,
   refuseReservation,
+  requestReservationModification,
+  approveReservationModification,
+  rejectReservationModification,
 } from '../../reservation/ReservationSlice';
 import { Button, Modal, Textarea } from '../../../components/ui';
 import {
@@ -79,6 +82,9 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelMessage, setCancelMessage] = useState('');
+  const [modifyOpen, setModifyOpen] = useState(false);
+  const [modifyCheckIn, setModifyCheckIn] = useState('');
+  const [modifyCheckOut, setModifyCheckOut] = useState('');
 
   const reservationStatusById = useMemo(() => {
     const map: Record<string, string> = {};
@@ -180,6 +186,43 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
     setBusy(false);
     setCancelOpen(false);
     setCancelMessage('');
+  };
+
+  // A traveler may request a date change on a confirmed booking not yet started and
+  // without a pending change; the host then approves or rejects it.
+  const stayNotStarted = !!reservation && new Date(reservation.checkIn) > new Date();
+  const canRequestModification =
+    !isHost && !readOnly && reservation?.status === 'confirmed' && stayNotStarted && !reservation?.pendingModification;
+  const canActOnModification = isHost && !readOnly && !!reservation?.pendingModification;
+
+  const handleConfirmModification = async () => {
+    if (!reservation || !modifyCheckIn || !modifyCheckOut) return;
+    setBusy(true);
+    const result = await dispatch(requestReservationModification({
+      id: reservation.id,
+      checkIn: new Date(modifyCheckIn).toISOString(),
+      checkOut: new Date(modifyCheckOut).toISOString(),
+    }));
+    setBusy(false);
+    if (requestReservationModification.fulfilled.match(result)) {
+      setModifyOpen(false);
+      setModifyCheckIn('');
+      setModifyCheckOut('');
+    }
+  };
+
+  const handleApproveModification = async () => {
+    if (!reservation) return;
+    setBusy(true);
+    await dispatch(approveReservationModification(reservation.id));
+    setBusy(false);
+  };
+
+  const handleRejectModification = async () => {
+    if (!reservation) return;
+    setBusy(true);
+    await dispatch(rejectReservationModification(reservation.id));
+    setBusy(false);
   };
 
   const handleDownloadInvoice = async () => {
@@ -421,6 +464,10 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                     readOnly={readOnly || !isHost}
                     onCancel={() => setCancelOpen(true)}
                     canCancel={canCancelReservation}
+                    onRequestModification={() => setModifyOpen(true)}
+                    canRequestModification={canRequestModification}
+                    onApproveModification={canActOnModification ? handleApproveModification : undefined}
+                    onRejectModification={canActOnModification ? handleRejectModification : undefined}
                   />
                 )}
               </div>
@@ -495,6 +542,53 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
               className="mt-1.5"
             />
           </label>
+        </Modal>
+      )}
+
+      {reservation && modifyOpen && (
+        <Modal
+          open={modifyOpen}
+          onClose={() => setModifyOpen(false)}
+          size="sm"
+          title={t('modification.modalTitle')}
+          subtitle={t('modification.modalSubtitle')}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setModifyOpen(false)} disabled={busy}>
+                {t('modification.cancelAction')}
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleConfirmModification}
+                loading={busy}
+                disabled={busy || modifyCheckIn === '' || modifyCheckOut === '' || modifyCheckOut <= modifyCheckIn}
+              >
+                {t('modification.submit')}
+              </Button>
+            </>
+          }
+        >
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">{t('host.panel.checkIn')}</span>
+              <input
+                type="date"
+                value={modifyCheckIn}
+                onChange={(e) => setModifyCheckIn(e.target.value)}
+                className="mt-1.5 w-full h-10 px-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">{t('host.panel.checkOut')}</span>
+              <input
+                type="date"
+                value={modifyCheckOut}
+                onChange={(e) => setModifyCheckOut(e.target.value)}
+                className="mt-1.5 w-full h-10 px-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
+              />
+            </label>
+          </div>
+          <p className="mt-3 text-xs text-gray-500">{t('modification.hint')}</p>
         </Modal>
       )}
     </div>

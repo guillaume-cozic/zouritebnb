@@ -1129,6 +1129,153 @@
                 }
             }
         },
+        "/api/accommodations/{id}/dynamic-pricing": {
+            "patch": {
+                "operationId": "api_accommodations_iddynamic-pricing_patch",
+                "tags": [
+                    "AccommodationEntity"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AccommodationEntity resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Modifier la tarification dynamique d'un h\u00e9bergement",
+                "description": "Met \u00e0 jour la majoration week-end (vendredi/samedi) et la remise last-minute. La majoration week-end doit \u00eatre dans ]0, 500]. La remise last-minute (]0, 100]) et sa fen\u00eatre lastMinuteDays (>= 1) vont de pair : les deux ensemble ou aucune. Envoyer null pour d\u00e9sactiver un m\u00e9canisme.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AccommodationEntity identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AccommodationEntity resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Week-end +20%, last-minute -15% sous 7 jours",
+                                    "value": {
+                                        "weekendSurchargePercentage": 20,
+                                        "lastMinuteDiscountPercentage": 15,
+                                        "lastMinuteDays": 7
+                                    }
+                                },
+                                "disable": {
+                                    "summary": "Tout d\u00e9sactiver",
+                                    "value": {
+                                        "weekendSurchargePercentage": null,
+                                        "lastMinuteDiscountPercentage": null,
+                                        "lastMinuteDays": null
+                                    }
+                                },
+                                "incomplete_last_minute": {
+                                    "summary": "Invalide : last-minute incomplet",
+                                    "description": "Retourne 422 car la remise est fournie sans sa fen\u00eatre en jours.",
+                                    "value": {
+                                        "lastMinuteDiscountPercentage": 15
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
         "/api/accommodations/{id}/geolocation": {
             "put": {
                 "operationId": "api_accommodations_idgeolocation_put",
@@ -1834,6 +1981,160 @@
                                     "description": "Retourne une erreur 422 car le prix doit \u00eatre strictement positif.",
                                     "value": {
                                         "price": -50
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
+        "/api/accommodations/{id}/price-periods": {
+            "put": {
+                "operationId": "api_accommodations_idprice-periods_put",
+                "tags": [
+                    "AccommodationEntity"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AccommodationEntity resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "D\u00e9finir les tarifs par p\u00e9riode d'un h\u00e9bergement",
+                "description": "Remplace l'int\u00e9gralit\u00e9 des tarifs par p\u00e9riode (saisonnier / dates). Chaque p\u00e9riode : startDate/endDate au format Y-m-d (endDate >= startDate) et pricePerNight strictement positif. Le premier intervalle correspondant l'emporte pour une nuit donn\u00e9e. Envoyer une liste vide pour tout retirer.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AccommodationEntity identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AccommodationEntity resource",
+                    "content": {
+                        "application/ld+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Haute saison estivale",
+                                    "value": {
+                                        "pricePeriods": [
+                                            {
+                                                "startDate": "2026-07-01",
+                                                "endDate": "2026-08-31",
+                                                "pricePerNight": 250
+                                            },
+                                            {
+                                                "startDate": "2026-12-20",
+                                                "endDate": "2027-01-05",
+                                                "pricePerNight": 300
+                                            }
+                                        ]
+                                    }
+                                },
+                                "invalid_range": {
+                                    "summary": "Invalide : endDate avant startDate",
+                                    "description": "Retourne 422.",
+                                    "value": {
+                                        "pricePeriods": [
+                                            {
+                                                "startDate": "2026-08-31",
+                                                "endDate": "2026-07-01",
+                                                "pricePerNight": 250
+                                            }
+                                        ]
                                     }
                                 }
                             }
@@ -4858,6 +5159,323 @@
                 }
             }
         },
+        "/api/reservations/{id}/modification-request": {
+            "post": {
+                "operationId": "api_reservations_idmodification-request_post",
+                "tags": [
+                    "Reservation"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reservation resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Reservation.jsonld-reservation.read"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Demander une modification des dates (voyageur)",
+                "description": "Le voyageur propose de nouvelles dates pour sa r\u00e9servation confirm\u00e9e. Le prix est recalcul\u00e9 et fig\u00e9 dans la modification en attente ; l'h\u00f4te doit l'accepter ou la refuser. R\u00e9serv\u00e9 au voyageur de la r\u00e9servation (403 sinon). Retourne 404 si introuvable, 422 si la r\u00e9servation n'est pas confirm\u00e9e, si le s\u00e9jour a d\u00e9j\u00e0 commenc\u00e9, si les dates ne sont pas disponibles ou hors bornes min/max.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Reservation identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The new Reservation resource",
+                    "content": {
+                        "application/ld+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Nouvelles dates",
+                                    "value": {
+                                        "checkIn": "2026-07-10T15:00:00+00:00",
+                                        "checkOut": "2026-07-14T11:00:00+00:00"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
+        "/api/reservations/{id}/modification/approve": {
+            "post": {
+                "operationId": "api_reservations_idmodificationapprove_post",
+                "tags": [
+                    "Reservation"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reservation resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Reservation.jsonld-reservation.read"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Accepter une modification de dates (h\u00f4te)",
+                "description": "L'h\u00f4te accepte la modification en attente : les nouvelles dates et le nouveau prix sont appliqu\u00e9s \u00e0 la r\u00e9servation. R\u00e9serv\u00e9 \u00e0 l'\u00e9quipe loueur (403 sinon). Retourne 404 si introuvable, 422 s'il n'y a pas de modification en attente ou si les dates ne sont plus disponibles.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Reservation identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ]
+            }
+        },
+        "/api/reservations/{id}/modification/reject": {
+            "post": {
+                "operationId": "api_reservations_idmodificationreject_post",
+                "tags": [
+                    "Reservation"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reservation resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Reservation.jsonld-reservation.read"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Refuser une modification de dates (h\u00f4te)",
+                "description": "L'h\u00f4te refuse la modification en attente : la r\u00e9servation conserve ses dates et son prix d'origine. R\u00e9serv\u00e9 \u00e0 l'\u00e9quipe loueur (403 sinon). Retourne 404 si introuvable, 422 s'il n'y a pas de modification en attente.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Reservation identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ]
+            }
+        },
         "/api/reservations/{id}/refuse": {
             "patch": {
                 "operationId": "api_reservations_idrefuse_patch",
@@ -5237,6 +5855,136 @@
                                         "guestUserId": "01961e2f-dead-7000-beef-0000000000c1",
                                         "rating": 5,
                                         "comment": "Voyageur exemplaire : communication parfaite, logement laiss\u00e9 impeccable et respect total du r\u00e8glement int\u00e9rieur."
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
+        "/api/reviews/{reviewId}/reply": {
+            "patch": {
+                "operationId": "api_reviews_reviewIdreply_patch",
+                "tags": [
+                    "ReviewReply"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "ReviewReply resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "R\u00e9pondre \u00e0 un avis (h\u00f4te)",
+                "description": "Permet \u00e0 un membre de l'\u00e9quipe propri\u00e9taire de l'h\u00e9bergement de publier (ou de remplacer) une r\u00e9ponse publique \u00e0 un avis voyageur. R\u00e9serv\u00e9 aux avis de type \"accommodation\". Retourne 403 si l'utilisateur n'appartient pas \u00e0 l'\u00e9quipe h\u00f4te, 404 si l'avis est introuvable, 422 si la r\u00e9ponse est vide.",
+                "parameters": [
+                    {
+                        "name": "reviewId",
+                        "in": "path",
+                        "description": "ReviewReply identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated ReviewReply resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Requ\u00eate valide",
+                                    "value": {
+                                        "reply": "Merci beaucoup pour votre s\u00e9jour, au plaisir de vous accueillir \u00e0 nouveau !"
                                     }
                                 }
                             }
@@ -7249,6 +7997,54 @@
                                     "null"
                                 ]
                             },
+                            "weekendSurchargePercentage": {
+                                "description": "Majoration appliqu\u00e9e aux nuits du vendredi et samedi (en %), ou null",
+                                "example": 20,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "lastMinuteDiscountPercentage": {
+                                "description": "Remise last-minute appliqu\u00e9e si la r\u00e9servation est faite \u00e0 moins de lastMinuteDays jours de l'arriv\u00e9e (en %), ou null",
+                                "example": 15,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "lastMinuteDays": {
+                                "description": "Fen\u00eatre (en jours avant l'arriv\u00e9e) en de\u00e7\u00e0 de laquelle la remise last-minute s'applique, ou null",
+                                "example": 7,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "pricePeriods": {
+                                "description": "Tarifs par p\u00e9riode (saisonnier / dates) : prix par nuit appliqu\u00e9 aux nuits comprises dans chaque plage [startDate, endDate] (format Y-m-d). Le premier intervalle correspondant l'emporte.",
+                                "example": [
+                                    {
+                                        "startDate": "2026-07-01",
+                                        "endDate": "2026-08-31",
+                                        "pricePerNight": 250
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
                             "status": {
                                 "description": "Statut de publication",
                                 "example": "draft",
@@ -7696,6 +8492,54 @@
                                     "null"
                                 ]
                             },
+                            "weekendSurchargePercentage": {
+                                "description": "Majoration appliqu\u00e9e aux nuits du vendredi et samedi (en %), ou null",
+                                "example": 20,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "lastMinuteDiscountPercentage": {
+                                "description": "Remise last-minute appliqu\u00e9e si la r\u00e9servation est faite \u00e0 moins de lastMinuteDays jours de l'arriv\u00e9e (en %), ou null",
+                                "example": 15,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "lastMinuteDays": {
+                                "description": "Fen\u00eatre (en jours avant l'arriv\u00e9e) en de\u00e7\u00e0 de laquelle la remise last-minute s'applique, ou null",
+                                "example": 7,
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "pricePeriods": {
+                                "description": "Tarifs par p\u00e9riode (saisonnier / dates) : prix par nuit appliqu\u00e9 aux nuits comprises dans chaque plage [startDate, endDate] (format Y-m-d). Le premier intervalle correspondant l'emporte.",
+                                "example": [
+                                    {
+                                        "startDate": "2026-07-01",
+                                        "endDate": "2026-08-31",
+                                        "pricePerNight": 250
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
                             "status": {
                                 "description": "Statut de publication",
                                 "example": "draft",
@@ -7910,6 +8754,22 @@
                             "createdAt": {
                                 "description": "Date de publication de l'avis (ISO 8601)",
                                 "example": "2026-05-12T14:30:00+00:00",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "hostReply": {
+                                "description": "R\u00e9ponse publique de l'h\u00f4te \u00e0 l'avis, ou null",
+                                "example": "Merci pour votre s\u00e9jour, au plaisir de vous revoir !",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "hostReplyAt": {
+                                "description": "Date de publication de la r\u00e9ponse de l'h\u00f4te (ISO 8601), ou null",
+                                "example": "2026-05-13T09:00:00+00:00",
                                 "type": [
                                     "string",
                                     "null"
@@ -9606,6 +10466,23 @@
                                     "integer",
                                     "null"
                                 ]
+                            },
+                            "pendingModification": {
+                                "description": "Modification de dates demand\u00e9e par le voyageur et en attente de validation de l'h\u00f4te, ou null. priceDifference est l'\u00e9cart de total pay\u00e9 par rapport \u00e0 la r\u00e9servation actuelle (positif = suppl\u00e9ment).",
+                                "type": [
+                                    "object",
+                                    "null"
+                                ],
+                                "additionalProperties": {
+                                    "anyOf": [
+                                        {
+                                            "type": "number"
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
                             }
                         }
                     }
@@ -10306,6 +11183,10 @@
         {
             "name": "AdminReview",
             "description": "Resource 'AdminReview' operations."
+        },
+        {
+            "name": "ReviewReply",
+            "description": "Resource 'ReviewReply' operations."
         },
         {
             "name": "Review",

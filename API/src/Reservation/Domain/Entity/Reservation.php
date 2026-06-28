@@ -8,6 +8,9 @@ use App\Reservation\Domain\Exception\InvalidReservationStateException;
 use App\Shared\Domain\Entity\AggregateRoot;
 use App\Shared\Domain\Event\ReservationCancelled;
 use App\Shared\Domain\Event\ReservationConfirmed;
+use App\Shared\Domain\Event\ReservationModificationApproved;
+use App\Shared\Domain\Event\ReservationModificationRejected;
+use App\Shared\Domain\Event\ReservationModificationRequested;
 use App\Shared\Domain\Event\ReservationRefused;
 use App\Shared\Domain\Event\ReservationRequested;
 use Symfony\Component\Uid\Uuid;
@@ -18,14 +21,15 @@ final class Reservation extends AggregateRoot
         private readonly ReservationId $id,
         private readonly Uuid $accommodationId,
         private readonly Uuid $teamId,
-        private readonly DateRange $dateRange,
+        private DateRange $dateRange,
         private readonly GuestName $guestName,
         private readonly GuestCount $guestCount,
         private ReservationStatus $status,
-        private readonly ReservationPrice $price,
+        private ReservationPrice $price,
         private readonly ?Uuid $guestUserId = null,
         private readonly CancellationPolicy $cancellationPolicy = CancellationPolicy::Flexible,
         private bool $cancelledByHost = false,
+        private ?PendingModification $pendingModification = null,
     ) {
     }
 
@@ -191,6 +195,51 @@ final class Reservation extends AggregateRoot
         );
     }
 
+    public function getPendingModification(): ?PendingModification
+    {
+        return $this->pendingModification;
+    }
+
+    /**
+     * A confirmed, not-yet-started reservation can have a date change requested by the
+     * guest. The proposal (new range + recomputed price) waits for the host's approval;
+     * re-requesting replaces any previous pending proposal.
+     */
+    public function requestModification(DateRange $dateRange, ReservationPrice $price, \DateTimeImmutable $now): void
+    {
+        if (ReservationStatus::Confirmed !== $this->status) {
+            throw InvalidReservationStateException::becauseOnlyConfirmedCanBeModified();
+        }
+        if ($now >= $this->dateRange->checkIn()) {
+            throw InvalidReservationStateException::becauseStayAlreadyStartedForModification();
+        }
+
+        $this->pendingModification = new PendingModification($dateRange, $price);
+        $this->recordEvent(new ReservationModificationRequested($this->id->toUuid()));
+    }
+
+    public function approveModification(): void
+    {
+        if (null === $this->pendingModification) {
+            throw InvalidReservationStateException::becauseNoPendingModification();
+        }
+
+        $this->dateRange = $this->pendingModification->dateRange;
+        $this->price = $this->pendingModification->price;
+        $this->pendingModification = null;
+        $this->recordEvent(new ReservationModificationApproved($this->id->toUuid()));
+    }
+
+    public function rejectModification(): void
+    {
+        if (null === $this->pendingModification) {
+            throw InvalidReservationStateException::becauseNoPendingModification();
+        }
+
+        $this->pendingModification = null;
+        $this->recordEvent(new ReservationModificationRejected($this->id->toUuid()));
+    }
+
     public function confirm(): void
     {
         if (ReservationStatus::Confirmed === $this->status) {
@@ -224,6 +273,7 @@ final class Reservation extends AggregateRoot
 
         $this->status = ReservationStatus::Cancelled;
         $this->cancelledByHost = $byHost;
+        $this->pendingModification = null;
         $this->recordEvent(new ReservationCancelled($this->id->toUuid(), $message));
     }
 

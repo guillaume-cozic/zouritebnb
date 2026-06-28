@@ -362,6 +362,105 @@ final class ReservationTest extends TestCase
         self::assertSame(100, $refund->refundPercentage);
     }
 
+    public function test_should_request_a_date_modification_on_a_confirmed_reservation(): void
+    {
+        $reservation = $this->confirmedReservation();
+        $reservation->releaseEvents();
+        $newRange = new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-04'));
+        $newPrice = new ReservationPrice(totalPrice: 300.0, pricePerNight: 100.0, appliedDiscountPercentage: null);
+
+        $reservation->requestModification($newRange, $newPrice, new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
+
+        // Original dates untouched until approval.
+        self::assertSame($this->dateRange()->checkIn()->format('Y-m-d'), $reservation->getDateRange()->checkIn()->format('Y-m-d'));
+        self::assertNotNull($reservation->getPendingModification());
+        self::assertSame('2026-05-01', $reservation->getPendingModification()->dateRange->checkIn()->format('Y-m-d'));
+
+        $events = $reservation->releaseEvents();
+        self::assertCount(1, $events);
+        self::assertInstanceOf(\App\Shared\Domain\Event\ReservationModificationRequested::class, $events[0]);
+    }
+
+    public function test_should_not_request_a_modification_on_a_non_confirmed_reservation(): void
+    {
+        $reservation = $this->pendingReservation();
+        $newRange = new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-04'));
+
+        $this->expectException(InvalidReservationStateException::class);
+        $this->expectExceptionMessage('Only a confirmed reservation can be modified.');
+
+        $reservation->requestModification($newRange, $this->price(), new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
+    }
+
+    public function test_should_not_request_a_modification_once_the_stay_started(): void
+    {
+        $reservation = $this->confirmedReservation();
+        $newRange = new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-04'));
+
+        $this->expectException(InvalidReservationStateException::class);
+        $this->expectExceptionMessage('cannot be modified');
+
+        $reservation->requestModification($newRange, $this->price(), new \DateTimeImmutable('2026-04-13T16:00:00+00:00'));
+    }
+
+    public function test_should_apply_dates_and_price_when_the_modification_is_approved(): void
+    {
+        $reservation = $this->confirmedReservation();
+        $newRange = new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-04'));
+        $newPrice = new ReservationPrice(totalPrice: 300.0, pricePerNight: 100.0, appliedDiscountPercentage: null);
+        $reservation->requestModification($newRange, $newPrice, new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
+        $reservation->releaseEvents();
+
+        $reservation->approveModification();
+
+        self::assertSame('2026-05-01', $reservation->getDateRange()->checkIn()->format('Y-m-d'));
+        self::assertSame(300.0, $reservation->getPrice()->totalPrice);
+        self::assertNull($reservation->getPendingModification());
+
+        $events = $reservation->releaseEvents();
+        self::assertInstanceOf(\App\Shared\Domain\Event\ReservationModificationApproved::class, $events[0]);
+    }
+
+    public function test_should_keep_original_dates_when_the_modification_is_rejected(): void
+    {
+        $reservation = $this->confirmedReservation();
+        $newRange = new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-04'));
+        $reservation->requestModification($newRange, $this->price(), new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
+        $reservation->releaseEvents();
+
+        $reservation->rejectModification();
+
+        self::assertSame('2026-04-13', $reservation->getDateRange()->checkIn()->format('Y-m-d'));
+        self::assertNull($reservation->getPendingModification());
+
+        $events = $reservation->releaseEvents();
+        self::assertInstanceOf(\App\Shared\Domain\Event\ReservationModificationRejected::class, $events[0]);
+    }
+
+    public function test_should_fail_to_approve_without_a_pending_modification(): void
+    {
+        $reservation = $this->confirmedReservation();
+
+        $this->expectException(InvalidReservationStateException::class);
+        $this->expectExceptionMessage('no pending modification');
+
+        $reservation->approveModification();
+    }
+
+    public function test_cancelling_clears_a_pending_modification(): void
+    {
+        $reservation = $this->confirmedReservation();
+        $reservation->requestModification(
+            new DateRange(new \DateTimeImmutable('2026-05-01'), new \DateTimeImmutable('2026-05-04')),
+            $this->price(),
+            new \DateTimeImmutable('2026-04-01T12:00:00+00:00'),
+        );
+
+        $reservation->cancel(new \DateTimeImmutable('2026-04-01T12:00:00+00:00'));
+
+        self::assertNull($reservation->getPendingModification());
+    }
+
     private function reservationId(): ReservationId
     {
         return new ReservationId(Uuid::fromString(self::RESERVATION_UUID));

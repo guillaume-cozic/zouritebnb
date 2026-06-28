@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createAction, isAnyOf } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import { extractErrorMessage } from '../../services/errors';
 import {
@@ -177,6 +177,46 @@ export const cancelReservation = createAsyncThunk(
   }
 );
 
+export const requestReservationModification = createAsyncThunk(
+  'reservation/requestModification',
+  async ({ id, checkIn, checkOut }: { id: string; checkIn: string; checkOut: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(
+        `/api/reservations/${id}/modification-request`,
+        { checkIn, checkOut },
+        { headers: { 'Content-Type': 'application/ld+json' } }
+      );
+      return response.data as Reservation;
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors de la demande de modification'));
+    }
+  }
+);
+
+export const approveReservationModification = createAsyncThunk(
+  'reservation/approveModification',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/api/reservations/${id}/modification/approve`, {}, { headers: { 'Content-Type': 'application/ld+json' } });
+      return response.data as Reservation;
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors de la validation de la modification'));
+    }
+  }
+);
+
+export const rejectReservationModification = createAsyncThunk(
+  'reservation/rejectModification',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/api/reservations/${id}/modification/reject`, {}, { headers: { 'Content-Type': 'application/ld+json' } });
+      return response.data as Reservation;
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'Erreur lors du refus de la modification'));
+    }
+  }
+);
+
 const reservationSlice = createSlice({
   name: 'reservation',
   initialState,
@@ -264,7 +304,29 @@ const reservationSlice = createSlice({
       .addCase(reservationModalOpened, (state) => {
         state.mutationError = null;
         state.mutationStatus = 'idle';
-      });
+      })
+      .addMatcher(
+        isAnyOf(
+          requestReservationModification.fulfilled,
+          approveReservationModification.fulfilled,
+          rejectReservationModification.fulfilled
+        ),
+        (state, action) => {
+          const idx = state.items.findIndex((r) => r.id === action.payload.id);
+          if (idx >= 0) state.items[idx] = action.payload;
+          else state.items.push(action.payload);
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          requestReservationModification.rejected,
+          approveReservationModification.rejected,
+          rejectReservationModification.rejected
+        ),
+        (state, action) => {
+          state.mutationError = (action.payload as string) || null;
+        }
+      );
   },
 });
 

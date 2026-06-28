@@ -62,6 +62,10 @@ class ReservationEntity
     #[ORM\Column(options: ['default' => false])]
     private bool $cancelledByHost = false;
 
+    /** @var array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float}|null */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $pendingModification = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -250,6 +254,20 @@ class ReservationEntity
     public function setCancelledByHost(bool $cancelledByHost): static
     {
         $this->cancelledByHost = $cancelledByHost;
+
+        return $this;
+    }
+
+    /** @return array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float}|null */
+    public function getPendingModification(): ?array
+    {
+        return $this->pendingModification;
+    }
+
+    /** @param array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float}|null $pendingModification */
+    public function setPendingModification(?array $pendingModification): static
+    {
+        $this->pendingModification = $pendingModification;
 
         return $this;
     }

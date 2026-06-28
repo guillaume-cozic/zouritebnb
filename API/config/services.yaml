@@ -143,6 +143,15 @@ services:
     App\Conversation\Application\Listener\PostCancellationMessageOnReservationCancelled:
         tags: [messenger.message_handler]
 
+    App\Conversation\Application\Listener\PostMessageOnReservationModificationRequested:
+        tags: [messenger.message_handler]
+
+    App\Conversation\Application\Listener\PostMessageOnReservationModificationApproved:
+        tags: [messenger.message_handler]
+
+    App\Conversation\Application\Listener\PostMessageOnReservationModificationRejected:
+        tags: [messenger.message_handler]
+
     App\Reservation\Infrastructure\Messenger\ScheduleReservationExpiry:
         tags: [messenger.message_handler]
 
