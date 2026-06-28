@@ -873,6 +873,14 @@
     "noRatingYet": "Pas encore d'avis",
     "reviewCount_one": "{{count}} avis",
     "reviewCount_other": "{{count}} avis",
+    "hostReply": {
+      "title": "Réponse de l'hôte",
+      "action": "Répondre à cet avis",
+      "edit": "Modifier la réponse",
+      "placeholder": "Remerciez le voyageur ou apportez une précision…",
+      "submit": "Publier la réponse",
+      "cancel": "Annuler"
+    },
     "error": {
       "validation": "Vérifiez votre note (1 à 5) et votre commentaire (50 caractères minimum).",
       "forbidden": "Vous n'êtes pas autorisé à laisser cet avis.",

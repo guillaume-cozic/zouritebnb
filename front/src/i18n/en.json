@@ -873,6 +873,14 @@
     "noRatingYet": "No reviews yet",
     "reviewCount_one": "{{count}} review",
     "reviewCount_other": "{{count}} reviews",
+    "hostReply": {
+      "title": "Host's reply",
+      "action": "Reply to this review",
+      "edit": "Edit reply",
+      "placeholder": "Thank the guest or add a clarification…",
+      "submit": "Publish reply",
+      "cancel": "Cancel"
+    },
     "error": {
       "validation": "Check your rating (1 to 5) and your comment (50 characters minimum).",
       "forbidden": "You are not allowed to leave this review.",

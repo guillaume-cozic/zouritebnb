@@ -352,6 +352,13 @@ export interface paths {
      */
     post: operations["api_reviewsguest_post"];
   };
+  "/api/reviews/{reviewId}/reply": {
+    /**
+     * Répondre à un avis (hôte)
+     * @description Permet à un membre de l'équipe propriétaire de l'hébergement de publier (ou de remplacer) une réponse publique à un avis voyageur. Réservé aux avis de type "accommodation". Retourne 403 si l'utilisateur n'appartient pas à l'équipe hôte, 404 si l'avis est introuvable, 422 si la réponse est vide.
+     */
+    patch: operations["api_reviews_reviewIdreply_patch"];
+  };
   "/api/solidarity_projects": {
     /**
      * Lister les projets solidaires actifs
@@ -992,6 +999,16 @@ export interface components {
        * @example 2026-05-12T14:30:00+00:00
        */
       createdAt?: string | null;
+      /**
+       * @description Réponse publique de l'hôte à l'avis, ou null
+       * @example Merci pour votre séjour, au plaisir de vous revoir !
+       */
+      hostReply?: string | null;
+      /**
+       * @description Date de publication de la réponse de l'hôte (ISO 8601), ou null
+       * @example 2026-05-13T09:00:00+00:00
+       */
+      hostReplyAt?: string | null;
     });
     "AdminAccommodation.jsonld-admin_accommodation.list": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -4322,6 +4339,62 @@ export interface operations {
       };
       /** @description Forbidden */
       403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Répondre à un avis (hôte)
+   * @description Permet à un membre de l'équipe propriétaire de l'hébergement de publier (ou de remplacer) une réponse publique à un avis voyageur. Réservé aux avis de type "accommodation". Retourne 403 si l'utilisateur n'appartient pas à l'équipe hôte, 404 si l'avis est introuvable, 422 si la réponse est vide.
+   */
+  api_reviews_reviewIdreply_patch: {
+    parameters: {
+      path: {
+        /** @description ReviewReply identifier */
+        reviewId: string;
+      };
+    };
+    /** @description The updated ReviewReply resource */
+    requestBody?: {
+      content: {
+        "application/merge-patch+json": unknown;
+      };
+    };
+    responses: {
+      /** @description ReviewReply resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
