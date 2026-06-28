@@ -15,12 +15,15 @@ import {
   setLocation,
   updateCancellationPolicy,
   updateDescription,
+  updateDynamicPricing,
   updateInstantBooking,
+  updatePricePeriods,
   updateStayConstraints,
   updateType,
   updatePrice,
   updateWeeklyPromotion,
 } from './AccommodationSlice';
+import type { PricePeriod } from './AccommodationTypes';
 
 const AUTOSAVE_DELAY = 1200;
 const SAVED_BADGE_DELAY = 2500;
@@ -48,6 +51,27 @@ const isValidStayConstraints = (minNights: number | null, maxNights: number | nu
   return true;
 };
 
+const isValidPercentage = (value: number | null, max: number): boolean =>
+  value === null || (Number.isFinite(value) && value > 0 && value <= max);
+
+/** Last-minute discount and its day window go together; each set value must be in range. */
+const isValidLastMinute = (discount: number | null, days: number | null): boolean => {
+  if ((discount === null) !== (days === null)) return false;
+  if (discount === null) return true;
+  return isValidPercentage(discount, 100) && Number.isInteger(days) && (days ?? 0) >= 1;
+};
+
+/** Every period must have a valid inclusive range and a strictly positive nightly price. */
+const areValidPricePeriods = (periods: PricePeriod[]): boolean =>
+  periods.every(
+    (p) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(p.startDate) &&
+      /^\d{4}-\d{2}-\d{2}$/.test(p.endDate) &&
+      p.startDate <= p.endDate &&
+      Number.isFinite(p.pricePerNight) &&
+      p.pricePerNight > 0
+  );
+
 /** A payload is saved only when it satisfies the same business rules the forms enforce. */
 const isSavable = (p: AccommodationFieldEditedPayload): boolean => {
   switch (p.field) {
@@ -62,6 +86,10 @@ const isSavable = (p: AccommodationFieldEditedPayload): boolean => {
           p.weeklyPromotionPercentage > 0 &&
           p.weeklyPromotionPercentage <= 100)
       );
+    case 'dynamicPricing':
+      return isValidPercentage(p.weekendSurchargePercentage, 500) && isValidLastMinute(p.lastMinuteDiscountPercentage, p.lastMinuteDays);
+    case 'pricePeriods':
+      return areValidPricePeriods(p.pricePeriods);
     case 'cancellationPolicy':
       return p.cancellationPolicy === 'flexible' || p.cancellationPolicy === 'moderate';
     case 'instantBooking':
@@ -91,6 +119,15 @@ const dispatchSave = (p: AccommodationFieldEditedPayload, dispatch: AppDispatch)
       return dispatch(updatePrice({ id: p.id, price: p.price }));
     case 'weeklyPromotion':
       return dispatch(updateWeeklyPromotion({ id: p.id, weeklyPromotionPercentage: p.weeklyPromotionPercentage }));
+    case 'dynamicPricing':
+      return dispatch(updateDynamicPricing({
+        id: p.id,
+        weekendSurchargePercentage: p.weekendSurchargePercentage,
+        lastMinuteDiscountPercentage: p.lastMinuteDiscountPercentage,
+        lastMinuteDays: p.lastMinuteDays,
+      }));
+    case 'pricePeriods':
+      return dispatch(updatePricePeriods({ id: p.id, pricePeriods: p.pricePeriods }));
     case 'cancellationPolicy':
       return dispatch(updateCancellationPolicy({ id: p.id, cancellationPolicy: p.cancellationPolicy }));
     case 'instantBooking':
@@ -131,6 +168,8 @@ const EDIT_FIELDS: AccommodationEditField[] = [
   'description',
   'price',
   'weeklyPromotion',
+  'dynamicPricing',
+  'pricePeriods',
   'cancellationPolicy',
   'instantBooking',
   'type',

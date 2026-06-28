@@ -4,6 +4,13 @@ export type CancellationPolicy = 'flexible' | 'moderate';
 /** Host-selectable accommodation category. */
 export type AccommodationType = 'apartment' | 'house' | 'villa' | 'studio' | 'room' | 'bungalow';
 
+/** Seasonal / per-date nightly override. Dates are Y-m-d strings, inclusive range. */
+export interface PricePeriod {
+  startDate: string;
+  endDate: string;
+  pricePerNight: number;
+}
+
 /** All accommodation types, in display order. */
 export const ACCOMMODATION_TYPES: AccommodationType[] = ['apartment', 'house', 'villa', 'studio', 'room', 'bungalow'];
 
@@ -14,6 +21,13 @@ export interface Accommodation {
   description?: string;
   price?: number;
   weeklyPromotionPercentage?: number | null;
+  /** Surcharge (%) applied to Friday/Saturday nights. */
+  weekendSurchargePercentage?: number | null;
+  /** Discount (%) when booking within lastMinuteDays of check-in. */
+  lastMinuteDiscountPercentage?: number | null;
+  lastMinuteDays?: number | null;
+  /** Seasonal / per-date nightly overrides. */
+  pricePeriods?: PricePeriod[];
   cancellationPolicy?: CancellationPolicy;
   /** When true, guest requests are auto-confirmed without host approval. */
   instantBooking?: boolean;
@@ -102,6 +116,18 @@ export interface UpdatePricePayload {
 export interface UpdateWeeklyPromotionPayload {
   id: string;
   weeklyPromotionPercentage: number | null;
+}
+
+export interface UpdateDynamicPricingPayload {
+  id: string;
+  weekendSurchargePercentage: number | null;
+  lastMinuteDiscountPercentage: number | null;
+  lastMinuteDays: number | null;
+}
+
+export interface UpdatePricePeriodsPayload {
+  id: string;
+  pricePeriods: PricePeriod[];
 }
 
 export interface UpdateCancellationPolicyPayload {

@@ -10,14 +10,17 @@ use App\Accommodation\Domain\Event\AccommodationCancellationPolicyUpdated;
 use App\Accommodation\Domain\Event\AccommodationCapacityUpdated;
 use App\Accommodation\Domain\Event\AccommodationCheckInOutUpdated;
 use App\Accommodation\Domain\Event\AccommodationDescriptionUpdated;
+use App\Accommodation\Domain\Event\AccommodationDynamicPricingUpdated;
 use App\Accommodation\Domain\Event\AccommodationGeolocationUpdated;
 use App\Accommodation\Domain\Event\AccommodationInstantBookingUpdated;
+use App\Accommodation\Domain\Event\AccommodationPricePeriodsUpdated;
 use App\Accommodation\Domain\Event\AccommodationPriceUpdated;
 use App\Accommodation\Domain\Event\AccommodationPublished;
 use App\Accommodation\Domain\Event\AccommodationStayConstraintsUpdated;
 use App\Accommodation\Domain\Event\AccommodationTypeUpdated;
 use App\Accommodation\Domain\Event\AccommodationUnpublished;
 use App\Accommodation\Domain\Event\AccommodationWeeklyPromotionUpdated;
+use App\Accommodation\Domain\Exception\InvalidDynamicPricingException;
 use App\Accommodation\Domain\Exception\InvalidPriceException;
 use App\Accommodation\Domain\Exception\InvalidStayConstraintsException;
 use App\Accommodation\Domain\Exception\InvalidWeeklyPromotionException;
@@ -45,11 +48,19 @@ final class Accommodation extends AggregateRoot
         private ?AccommodationType $type = null,
         private ?int $minNights = null,
         private ?int $maxNights = null,
+        private ?float $weekendSurchargePercentage = null,
+        private ?float $lastMinuteDiscountPercentage = null,
+        private ?int $lastMinuteDays = null,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
         }
+
+        $this->pricePeriods = new PricePeriods([]);
     }
+
+    /** Seasonal / per-date nightly overrides. Set after construction (see updatePricePeriods). */
+    private PricePeriods $pricePeriods;
 
     public function getRegionId(): ?Uuid
     {
@@ -240,6 +251,56 @@ final class Accommodation extends AggregateRoot
         $this->minNights = $minNights;
         $this->maxNights = $maxNights;
         $this->recordEvent(new AccommodationStayConstraintsUpdated($this->id));
+    }
+
+    public function getWeekendSurchargePercentage(): ?float
+    {
+        return $this->weekendSurchargePercentage;
+    }
+
+    public function getLastMinuteDiscountPercentage(): ?float
+    {
+        return $this->lastMinuteDiscountPercentage;
+    }
+
+    public function getLastMinuteDays(): ?int
+    {
+        return $this->lastMinuteDays;
+    }
+
+    public function updateDynamicPricing(
+        ?float $weekendSurchargePercentage,
+        ?float $lastMinuteDiscountPercentage,
+        ?int $lastMinuteDays,
+    ): void {
+        if (null !== $weekendSurchargePercentage && ($weekendSurchargePercentage <= 0 || $weekendSurchargePercentage > 500)) {
+            throw InvalidDynamicPricingException::becauseWeekendSurchargeOutOfBounds($weekendSurchargePercentage);
+        }
+        if ((null === $lastMinuteDiscountPercentage) !== (null === $lastMinuteDays)) {
+            throw InvalidDynamicPricingException::becauseLastMinuteIncomplete();
+        }
+        if (null !== $lastMinuteDiscountPercentage && ($lastMinuteDiscountPercentage <= 0 || $lastMinuteDiscountPercentage > 100)) {
+            throw InvalidDynamicPricingException::becauseLastMinuteDiscountOutOfBounds($lastMinuteDiscountPercentage);
+        }
+        if (null !== $lastMinuteDays && $lastMinuteDays < 1) {
+            throw InvalidDynamicPricingException::becauseLastMinuteDaysNotPositive($lastMinuteDays);
+        }
+
+        $this->weekendSurchargePercentage = $weekendSurchargePercentage;
+        $this->lastMinuteDiscountPercentage = $lastMinuteDiscountPercentage;
+        $this->lastMinuteDays = $lastMinuteDays;
+        $this->recordEvent(new AccommodationDynamicPricingUpdated($this->id));
+    }
+
+    public function getPricePeriods(): PricePeriods
+    {
+        return $this->pricePeriods;
+    }
+
+    public function updatePricePeriods(PricePeriods $pricePeriods): void
+    {
+        $this->pricePeriods = $pricePeriods;
+        $this->recordEvent(new AccommodationPricePeriodsUpdated($this->id));
     }
 
     private static function hasNonPositiveNights(?int $minNights, ?int $maxNights): bool

@@ -78,6 +78,13 @@ export interface paths {
      */
     put: operations["api_accommodations_iddescription_put"];
   };
+  "/api/accommodations/{id}/dynamic-pricing": {
+    /**
+     * Modifier la tarification dynamique d'un hébergement
+     * @description Met à jour la majoration week-end (vendredi/samedi) et la remise last-minute. La majoration week-end doit être dans ]0, 500]. La remise last-minute (]0, 100]) et sa fenêtre lastMinuteDays (>= 1) vont de pair : les deux ensemble ou aucune. Envoyer null pour désactiver un mécanisme.
+     */
+    patch: operations["api_accommodations_iddynamic-pricing_patch"];
+  };
   "/api/accommodations/{id}/geolocation": {
     /**
      * Définir la géolocalisation d'un hébergement
@@ -119,6 +126,13 @@ export interface paths {
      * @description Met à jour le prix d'un hébergement. Le prix doit être strictement positif (> 0).
      */
     patch: operations["api_accommodations_idprice_patch"];
+  };
+  "/api/accommodations/{id}/price-periods": {
+    /**
+     * Définir les tarifs par période d'un hébergement
+     * @description Remplace l'intégralité des tarifs par période (saisonnier / dates). Chaque période : startDate/endDate au format Y-m-d (endDate >= startDate) et pricePerNight strictement positif. Le premier intervalle correspondant l'emporte pour une nuit donnée. Envoyer une liste vide pour tout retirer.
+     */
+    put: operations["api_accommodations_idprice-periods_put"];
   };
   "/api/accommodations/{id}/publish": {
     /**
@@ -604,6 +618,34 @@ export interface components {
        */
       maxNights?: number | null;
       /**
+       * @description Majoration appliquée aux nuits du vendredi et samedi (en %), ou null
+       * @example 20
+       */
+      weekendSurchargePercentage?: number | null;
+      /**
+       * @description Remise last-minute appliquée si la réservation est faite à moins de lastMinuteDays jours de l'arrivée (en %), ou null
+       * @example 15
+       */
+      lastMinuteDiscountPercentage?: number | null;
+      /**
+       * @description Fenêtre (en jours avant l'arrivée) en deçà de laquelle la remise last-minute s'applique, ou null
+       * @example 7
+       */
+      lastMinuteDays?: number | null;
+      /**
+       * @description Tarifs par période (saisonnier / dates) : prix par nuit appliqué aux nuits comprises dans chaque plage [startDate, endDate] (format Y-m-d). Le premier intervalle correspondant l'emporte.
+       * @example [
+       *   {
+       *     "startDate": "2026-07-01",
+       *     "endDate": "2026-08-31",
+       *     "pricePerNight": 250
+       *   }
+       * ]
+       */
+      pricePeriods?: ({
+          [key: string]: number | string;
+        })[];
+      /**
        * @description Statut de publication
        * @example draft
        */
@@ -874,6 +916,34 @@ export interface components {
        * @example 30
        */
       maxNights?: number | null;
+      /**
+       * @description Majoration appliquée aux nuits du vendredi et samedi (en %), ou null
+       * @example 20
+       */
+      weekendSurchargePercentage?: number | null;
+      /**
+       * @description Remise last-minute appliquée si la réservation est faite à moins de lastMinuteDays jours de l'arrivée (en %), ou null
+       * @example 15
+       */
+      lastMinuteDiscountPercentage?: number | null;
+      /**
+       * @description Fenêtre (en jours avant l'arrivée) en deçà de laquelle la remise last-minute s'applique, ou null
+       * @example 7
+       */
+      lastMinuteDays?: number | null;
+      /**
+       * @description Tarifs par période (saisonnier / dates) : prix par nuit appliqué aux nuits comprises dans chaque plage [startDate, endDate] (format Y-m-d). Le premier intervalle correspondant l'emporte.
+       * @example [
+       *   {
+       *     "startDate": "2026-07-01",
+       *     "endDate": "2026-08-31",
+       *     "pricePerNight": 250
+       *   }
+       * ]
+       */
+      pricePeriods?: ({
+          [key: string]: number | string;
+        })[];
       /**
        * @description Statut de publication
        * @example draft
@@ -2680,6 +2750,62 @@ export interface operations {
     };
   };
   /**
+   * Modifier la tarification dynamique d'un hébergement
+   * @description Met à jour la majoration week-end (vendredi/samedi) et la remise last-minute. La majoration week-end doit être dans ]0, 500]. La remise last-minute (]0, 100]) et sa fenêtre lastMinuteDays (>= 1) vont de pair : les deux ensemble ou aucune. Envoyer null pour désactiver un mécanisme.
+   */
+  "api_accommodations_iddynamic-pricing_patch": {
+    parameters: {
+      path: {
+        /** @description AccommodationEntity identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AccommodationEntity resource */
+    requestBody?: {
+      content: {
+        "application/merge-patch+json": unknown;
+      };
+    };
+    responses: {
+      /** @description AccommodationEntity resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
    * Définir la géolocalisation d'un hébergement
    * @description Définit ou remplace les coordonnées GPS d'un hébergement.
    */
@@ -2940,6 +3066,62 @@ export interface operations {
     requestBody?: {
       content: {
         "application/merge-patch+json": unknown;
+      };
+    };
+    responses: {
+      /** @description AccommodationEntity resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Définir les tarifs par période d'un hébergement
+   * @description Remplace l'intégralité des tarifs par période (saisonnier / dates). Chaque période : startDate/endDate au format Y-m-d (endDate >= startDate) et pricePerNight strictement positif. Le premier intervalle correspondant l'emporte pour une nuit donnée. Envoyer une liste vide pour tout retirer.
+   */
+  "api_accommodations_idprice-periods_put": {
+    parameters: {
+      path: {
+        /** @description AccommodationEntity identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AccommodationEntity resource */
+    requestBody?: {
+      content: {
+        "application/ld+json": unknown;
       };
     };
     responses: {

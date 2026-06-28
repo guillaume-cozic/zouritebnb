@@ -10,6 +10,7 @@ use App\Accommodation\Domain\Entity\Amenities;
 use App\Accommodation\Domain\Entity\Capacity;
 use App\Accommodation\Domain\Entity\CheckInOut;
 use App\Accommodation\Domain\Entity\Geolocation;
+use App\Accommodation\Domain\Entity\PricePeriods;
 use App\Accommodation\Domain\Port\AccommodationRepository as AccommodationRepositoryPort;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -44,7 +45,9 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
         $capacityData = $data['capacity'] ?? null;
         $amenitiesData = $data['amenities'] ?? null;
         $checkInOutData = $data['checkInOut'] ?? null;
-        unset($data['address'], $data['geolocation'], $data['capacity'], $data['amenities'], $data['checkInOut']);
+        // Persisted explicitly below from the domain VO (kept out of the serializer flow).
+        $pricePeriodsData = $accommodation->getPricePeriods()->toArray();
+        unset($data['address'], $data['geolocation'], $data['capacity'], $data['amenities'], $data['checkInOut'], $data['pricePeriods']);
 
         if (\is_array($checkInOutData)) {
             $data['checkIn'] = $checkInOutData['checkIn'] ?? null;
@@ -70,6 +73,8 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
         $this->serializer->denormalize($data, AccommodationEntity::class, null, [
             AbstractNormalizer::OBJECT_TO_POPULATE => $entity,
         ]);
+
+        $entity->setPricePeriods([] === $pricePeriodsData ? null : $pricePeriodsData);
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -109,7 +114,8 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
         $amenitiesArray = $data['amenities'] ?? null;
         $checkIn = $data['checkIn'] ?? null;
         $checkOut = $data['checkOut'] ?? null;
-        unset($data['street'], $data['city'], $data['zipCode'], $data['country'], $data['latitude'], $data['longitude'], $data['bedrooms'], $data['bathrooms'], $data['maxGuests'], $data['singleBeds'], $data['doubleBeds'], $data['amenities'], $data['checkIn'], $data['checkOut']);
+        $pricePeriodsArray = $data['pricePeriods'] ?? null;
+        unset($data['street'], $data['city'], $data['zipCode'], $data['country'], $data['latitude'], $data['longitude'], $data['bedrooms'], $data['bathrooms'], $data['maxGuests'], $data['singleBeds'], $data['doubleBeds'], $data['amenities'], $data['checkIn'], $data['checkOut'], $data['pricePeriods']);
 
         $accommodation = $this->serializer->denormalize($data, DomainAccommodation::class);
 
@@ -150,6 +156,10 @@ class DoctrineAccommodationRepository extends ServiceEntityRepository implements
         if (null !== $checkIn && null !== $checkOut) {
             $checkInOut = new CheckInOut(checkIn: $checkIn, checkOut: $checkOut);
             $accommodation->updateCheckInOut($checkInOut);
+        }
+
+        if (null !== $pricePeriodsArray) {
+            $accommodation->updatePricePeriods(PricePeriods::fromArray($pricePeriodsArray));
         }
 
         $accommodation->releaseEvents();

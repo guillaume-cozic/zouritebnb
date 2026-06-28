@@ -15,6 +15,7 @@ use App\Shared\Domain\Event\ReservationConfirmed;
 use App\Shared\Domain\Event\ReservationRequested;
 use App\Shared\Domain\Port\UuidGenerator;
 use App\Shared\Domain\Service\StayPriceCalculator;
+use App\Tests\Unit\Conversation\Infrastructure\FixedClock;
 use App\Tests\Unit\Reservation\Infrastructure\InMemoryAccommodationPricingProvider;
 use App\Tests\Unit\Reservation\Infrastructure\InMemoryReservationRepository;
 use App\Tests\Unit\Shared\Infrastructure\InMemoryEventBus;
@@ -36,7 +37,7 @@ final class RequestReservationTest extends TestCase
         $this->repository = new InMemoryReservationRepository();
         $this->eventBus = new InMemoryEventBus();
         $this->pricingProvider = new InMemoryAccommodationPricingProvider();
-        $this->useCase = new RequestReservation($this->repository, $this->eventBus, $this->pricingProvider, new StayPriceCalculator());
+        $this->useCase = new RequestReservation($this->repository, $this->eventBus, $this->pricingProvider, new StayPriceCalculator(), new FixedClock(new \DateTimeImmutable('2026-01-01T00:00:00+00:00')));
     }
 
     #[After]

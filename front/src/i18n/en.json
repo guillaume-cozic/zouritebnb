@@ -531,6 +531,7 @@
     "private": "Private",
     "night": "night",
     "weeklyDiscountBadge": "{{percent}}% discount applied (stay ≥ 7 nights)",
+    "discountBadge": "{{percent}}% discount applied",
     "checkIn": "Check-in",
     "checkOut": "Check-out",
     "amenitiesTitle": "Amenities",
@@ -623,6 +624,21 @@
       "title": "Moderate",
       "description": "Full refund up to 5 days before check-in, then 50% afterwards."
     }
+  },
+  "dynamicPricing": {
+    "title": "Dynamic pricing",
+    "weekendLabel": "Weekend surcharge",
+    "weekendHint": "Percentage added to Friday and Saturday nights. Leave empty to disable.",
+    "lastMinuteDiscountLabel": "Last-minute discount",
+    "lastMinuteDaysLabel": "Days before check-in",
+    "lastMinuteHint": "Discount applied when booking fewer than the given number of days before check-in. Fill both fields or neither.",
+    "periodsTitle": "Seasonal pricing",
+    "addPeriod": "Add a period",
+    "noPeriods": "No seasonal pricing. The nightly price applies everywhere.",
+    "from": "From",
+    "to": "To",
+    "nightlyPrice": "Price / night",
+    "remove": "Remove"
   },
   "instantBooking": {
     "title": "Instant booking",

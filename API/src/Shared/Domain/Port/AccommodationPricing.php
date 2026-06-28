@@ -8,6 +8,9 @@ use Symfony\Component\Uid\Uuid;
 
 final readonly class AccommodationPricing
 {
+    /**
+     * @param array<array{startDate: string, endDate: string, pricePerNight: float}> $pricePeriods
+     */
     public function __construct(
         public float $pricePerNight,
         public ?float $weeklyPromotionPercentage,
@@ -17,6 +20,10 @@ final readonly class AccommodationPricing
         public bool $instantBooking = false,
         public ?int $minNights = null,
         public ?int $maxNights = null,
+        public ?float $weekendSurchargePercentage = null,
+        public ?float $lastMinuteDiscountPercentage = null,
+        public ?int $lastMinuteDays = null,
+        public array $pricePeriods = [],
     ) {
     }
 }

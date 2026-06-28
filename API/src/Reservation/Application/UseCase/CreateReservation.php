@@ -15,6 +15,7 @@ use App\Reservation\Domain\Entity\ReservationPrice;
 use App\Reservation\Domain\Exception\InvalidReservationException;
 use App\Reservation\Domain\Port\ReservationRepository;
 use App\Shared\Domain\Port\AccommodationPricingProvider;
+use App\Shared\Domain\Port\Clock;
 use App\Shared\Domain\Port\EventBus;
 use App\Shared\Domain\Port\UuidGenerator;
 use App\Shared\Domain\Service\StayPriceCalculator;
@@ -26,6 +27,7 @@ final readonly class CreateReservation
         private EventBus $eventBus,
         private AccommodationPricingProvider $pricingProvider,
         private StayPriceCalculator $priceCalculator,
+        private Clock $clock,
     ) {
     }
 
@@ -47,7 +49,7 @@ final readonly class CreateReservation
             throw InvalidReservationException::becauseGuestCountExceedsCapacity($guestCount->value(), $pricing->maxGuests);
         }
 
-        $stayPrice = $this->priceCalculator->calculate($pricing, $dateRange->checkIn(), $dateRange->checkOut());
+        $stayPrice = $this->priceCalculator->calculate($pricing, $dateRange->checkIn(), $dateRange->checkOut(), $this->clock->now());
 
         $price = ReservationPrice::fromStay(
             totalPrice: $stayPrice->totalPrice,

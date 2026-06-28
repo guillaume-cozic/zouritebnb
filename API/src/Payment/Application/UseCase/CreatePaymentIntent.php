@@ -42,7 +42,7 @@ final readonly class CreatePaymentIntent
         }
 
         $amountCents = $this->priceCalculator
-            ->calculate($pricing, $command->checkIn, $command->checkOut)
+            ->calculate($pricing, $command->checkIn, $command->checkOut, $this->clock->now())
             ->amountInCents();
 
         // Reject degenerate bookings (e.g. zero nights) before reaching the gateway.

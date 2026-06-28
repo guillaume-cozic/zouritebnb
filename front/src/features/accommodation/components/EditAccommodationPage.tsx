@@ -16,10 +16,10 @@ import {
   selectAccommodationError,
   selectEditSaveStatus,
 } from '../AccommodationSelectors';
-import { Accommodation, CancellationPolicy, AccommodationType, ACCOMMODATION_TYPES } from '../AccommodationTypes';
+import { Accommodation, CancellationPolicy, AccommodationType, ACCOMMODATION_TYPES, PricePeriod } from '../AccommodationTypes';
 import { AMENITY_CATEGORIES } from '../AmenityData';
 import MapSelector from '../../../components/MapSelector';
-import { Card, Field, Input, SaveIndicator, Select, Textarea } from '../../../components/ui';
+import { Button, Card, Field, Input, SaveIndicator, Select, Textarea } from '../../../components/ui';
 import EditLayout, { SECTIONS, EditSection } from './EditLayout';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -61,6 +61,11 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
       ? String(accommodation.weeklyPromotionPercentage)
       : ''
   );
+  const numToStr = (n: number | null | undefined): string => (n != null ? String(n) : '');
+  const [weekendSurcharge, setWeekendSurcharge] = useState<string>(numToStr(accommodation.weekendSurchargePercentage));
+  const [lastMinuteDiscount, setLastMinuteDiscount] = useState<string>(numToStr(accommodation.lastMinuteDiscountPercentage));
+  const [lastMinuteDays, setLastMinuteDays] = useState<string>(numToStr(accommodation.lastMinuteDays));
+  const [pricePeriods, setPricePeriods] = useState<PricePeriod[]>(accommodation.pricePeriods ?? []);
   const [capacityValues, setCapacityValues] = useState({
     bedrooms: accommodation.bedrooms ?? 0,
     bathrooms: accommodation.bathrooms ?? 0,
@@ -134,6 +139,46 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
       id,
       weeklyPromotionPercentage: v === '' ? null : Number(v),
     }));
+  };
+
+  const dispatchDynamicPricing = (weekend: string, discount: string, days: string) => {
+    dispatch(accommodationFieldEdited({
+      field: 'dynamicPricing',
+      id,
+      weekendSurchargePercentage: weekend === '' ? null : Number(weekend),
+      lastMinuteDiscountPercentage: discount === '' ? null : Number(discount),
+      lastMinuteDays: days === '' ? null : Number(days),
+    }));
+  };
+
+  const handleWeekendSurchargeChange = (v: string) => {
+    setWeekendSurcharge(v);
+    dispatchDynamicPricing(v, lastMinuteDiscount, lastMinuteDays);
+  };
+  const handleLastMinuteDiscountChange = (v: string) => {
+    setLastMinuteDiscount(v);
+    dispatchDynamicPricing(weekendSurcharge, v, lastMinuteDays);
+  };
+  const handleLastMinuteDaysChange = (v: string) => {
+    setLastMinuteDays(v);
+    dispatchDynamicPricing(weekendSurcharge, lastMinuteDiscount, v);
+  };
+
+  const commitPricePeriods = (next: PricePeriod[]) => {
+    setPricePeriods(next);
+    dispatch(accommodationFieldEdited({ field: 'pricePeriods', id, pricePeriods: next }));
+  };
+  const handleAddPricePeriod = () => {
+    setPricePeriods((prev) => [...prev, { startDate: '', endDate: '', pricePerNight: 0 }]);
+  };
+  const handleRemovePricePeriod = (index: number) => {
+    commitPricePeriods(pricePeriods.filter((_, i) => i !== index));
+  };
+  const handlePricePeriodChange = (index: number, field: keyof PricePeriod, value: string) => {
+    const next = pricePeriods.map((p, i) =>
+      i === index ? { ...p, [field]: field === 'pricePerNight' ? Number(value) : value } : p
+    );
+    commitPricePeriods(next);
   };
 
   const handleCapacityChange = (field: string, value: number) => {
@@ -325,6 +370,96 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
                     </div>
                   );
                 })()}
+              </div>
+
+              {/* Dynamic pricing: weekend surcharge + last-minute discount */}
+              <div className="pt-4 border-t border-surface-100 space-y-4">
+                <h3 className="text-sm font-semibold text-surface-700">{t('dynamicPricing.title')}</h3>
+                <Field label={t('dynamicPricing.weekendLabel')} hint={t('dynamicPricing.weekendHint')}>
+                  <div className="relative max-w-xs">
+                    <Input
+                      type="number"
+                      step="1"
+                      min={0}
+                      max={500}
+                      placeholder="0"
+                      value={weekendSurcharge}
+                      onChange={(e) => handleWeekendSurchargeChange(e.target.value)}
+                      className="pr-12"
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                      <span className="text-surface-400 font-medium text-sm">%</span>
+                    </div>
+                  </div>
+                </Field>
+                <div className="grid grid-cols-2 gap-4 max-w-md">
+                  <Field label={t('dynamicPricing.lastMinuteDiscountLabel')}>
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        step="1"
+                        min={0}
+                        max={100}
+                        placeholder="0"
+                        value={lastMinuteDiscount}
+                        onChange={(e) => handleLastMinuteDiscountChange(e.target.value)}
+                        className="pr-12"
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                        <span className="text-surface-400 font-medium text-sm">%</span>
+                      </div>
+                    </div>
+                  </Field>
+                  <Field label={t('dynamicPricing.lastMinuteDaysLabel')}>
+                    <Input
+                      type="number"
+                      step="1"
+                      min={1}
+                      placeholder="0"
+                      value={lastMinuteDays}
+                      onChange={(e) => handleLastMinuteDaysChange(e.target.value)}
+                    />
+                  </Field>
+                </div>
+                <p className="text-xs text-surface-400">{t('dynamicPricing.lastMinuteHint')}</p>
+              </div>
+
+              {/* Seasonal / per-date price periods */}
+              <div className="pt-4 border-t border-surface-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-surface-700">{t('dynamicPricing.periodsTitle')}</h3>
+                  <Button type="button" variant="secondary" size="sm" onClick={handleAddPricePeriod}>
+                    {t('dynamicPricing.addPeriod')}
+                  </Button>
+                </div>
+                {pricePeriods.length === 0 ? (
+                  <p className="text-xs text-surface-400">{t('dynamicPricing.noPeriods')}</p>
+                ) : (
+                  <div className="space-y-2">
+                    {pricePeriods.map((period, index) => (
+                      <div key={index} className="flex flex-wrap items-end gap-2">
+                        <Field label={t('dynamicPricing.from')}>
+                          <Input type="date" value={period.startDate} onChange={(e) => handlePricePeriodChange(index, 'startDate', e.target.value)} />
+                        </Field>
+                        <Field label={t('dynamicPricing.to')}>
+                          <Input type="date" value={period.endDate} onChange={(e) => handlePricePeriodChange(index, 'endDate', e.target.value)} />
+                        </Field>
+                        <Field label={t('dynamicPricing.nightlyPrice')}>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min={0}
+                            value={period.pricePerNight || ''}
+                            onChange={(e) => handlePricePeriodChange(index, 'pricePerNight', e.target.value)}
+                          />
+                        </Field>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => handleRemovePricePeriod(index)}>
+                          {t('dynamicPricing.remove')}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </Card>

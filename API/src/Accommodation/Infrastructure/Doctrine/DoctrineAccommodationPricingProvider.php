@@ -32,6 +32,10 @@ final readonly class DoctrineAccommodationPricingProvider implements Accommodati
             instantBooking: $entity->isInstantBooking(),
             minNights: $entity->getMinNights(),
             maxNights: $entity->getMaxNights(),
+            weekendSurchargePercentage: $entity->getWeekendSurchargePercentage(),
+            lastMinuteDiscountPercentage: $entity->getLastMinuteDiscountPercentage(),
+            lastMinuteDays: $entity->getLastMinuteDays(),
+            pricePeriods: $entity->getPricePeriods() ?? [],
         );
     }
 }

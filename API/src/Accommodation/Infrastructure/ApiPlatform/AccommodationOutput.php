@@ -142,6 +142,73 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: UpdateAccommodationWeeklyPromotionProcessor::class,
         ),
         new Patch(
+            uriTemplate: '/accommodations/{id}/dynamic-pricing',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Modifier la tarification dynamique d\'un hébergement',
+                description: 'Met à jour la majoration week-end (vendredi/samedi) et la remise last-minute. La majoration week-end doit être dans ]0, 500]. La remise last-minute (]0, 100]) et sa fenêtre lastMinuteDays (>= 1) vont de pair : les deux ensemble ou aucune. Envoyer null pour désactiver un mécanisme.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/merge-patch+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Week-end +20%, last-minute -15% sous 7 jours',
+                                    value: ['weekendSurchargePercentage' => 20.0, 'lastMinuteDiscountPercentage' => 15.0, 'lastMinuteDays' => 7],
+                                ),
+                                'disable' => new Example(
+                                    summary: 'Tout désactiver',
+                                    value: ['weekendSurchargePercentage' => null, 'lastMinuteDiscountPercentage' => null, 'lastMinuteDays' => null],
+                                ),
+                                'incomplete_last_minute' => new Example(
+                                    summary: 'Invalide : last-minute incomplet',
+                                    description: 'Retourne 422 car la remise est fournie sans sa fenêtre en jours.',
+                                    value: ['lastMinuteDiscountPercentage' => 15.0],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationDynamicPricingInput::class,
+            output: false,
+            processor: UpdateAccommodationDynamicPricingProcessor::class,
+        ),
+        new Put(
+            uriTemplate: '/accommodations/{id}/price-periods',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Définir les tarifs par période d\'un hébergement',
+                description: 'Remplace l\'intégralité des tarifs par période (saisonnier / dates). Chaque période : startDate/endDate au format Y-m-d (endDate >= startDate) et pricePerNight strictement positif. Le premier intervalle correspondant l\'emporte pour une nuit donnée. Envoyer une liste vide pour tout retirer.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/ld+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Haute saison estivale',
+                                    value: ['pricePeriods' => [
+                                        ['startDate' => '2026-07-01', 'endDate' => '2026-08-31', 'pricePerNight' => 250.0],
+                                        ['startDate' => '2026-12-20', 'endDate' => '2027-01-05', 'pricePerNight' => 300.0],
+                                    ]],
+                                ),
+                                'invalid_range' => new Example(
+                                    summary: 'Invalide : endDate avant startDate',
+                                    description: 'Retourne 422.',
+                                    value: ['pricePeriods' => [['startDate' => '2026-08-31', 'endDate' => '2026-07-01', 'pricePerNight' => 250.0]]],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationPricePeriodsInput::class,
+            output: false,
+            processor: UpdateAccommodationPricePeriodsProcessor::class,
+        ),
+        new Patch(
             uriTemplate: '/accommodations/{id}/instant-booking',
             status: 204,
             openapi: new OpenApiOperation(
@@ -572,6 +639,23 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Nombre maximum de nuits par séjour, ou null', example: 30)]
     public ?int $maxNights = null;
 
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Majoration appliquée aux nuits du vendredi et samedi (en %), ou null', example: 20.0)]
+    public ?float $weekendSurchargePercentage = null;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Remise last-minute appliquée si la réservation est faite à moins de lastMinuteDays jours de l\'arrivée (en %), ou null', example: 15.0)]
+    public ?float $lastMinuteDiscountPercentage = null;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Fenêtre (en jours avant l\'arrivée) en deçà de laquelle la remise last-minute s\'applique, ou null', example: 7)]
+    public ?int $lastMinuteDays = null;
+
+    /** @var array<array{startDate: string, endDate: string, pricePerNight: float}> */
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Tarifs par période (saisonnier / dates) : prix par nuit appliqué aux nuits comprises dans chaque plage [startDate, endDate] (format Y-m-d). Le premier intervalle correspondant l\'emporte.', example: [['startDate' => '2026-07-01', 'endDate' => '2026-08-31', 'pricePerNight' => 250.0]])]
+    public array $pricePeriods = [];
+
     #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Statut de publication', example: 'draft')]
     public ?string $status = null;
@@ -684,6 +768,10 @@ class AccommodationOutput implements FromEntityInterface
         $output->type = $entity->getType();
         $output->minNights = $entity->getMinNights();
         $output->maxNights = $entity->getMaxNights();
+        $output->weekendSurchargePercentage = $entity->getWeekendSurchargePercentage();
+        $output->lastMinuteDiscountPercentage = $entity->getLastMinuteDiscountPercentage();
+        $output->lastMinuteDays = $entity->getLastMinuteDays();
+        $output->pricePeriods = $entity->getPricePeriods() ?? [];
 
         return $output;
     }

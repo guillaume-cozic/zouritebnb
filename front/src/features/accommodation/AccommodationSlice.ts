@@ -11,6 +11,9 @@ import {
   DeletePhotoPayload,
   UpdatePricePayload,
   UpdateWeeklyPromotionPayload,
+  UpdateDynamicPricingPayload,
+  UpdatePricePeriodsPayload,
+  PricePeriod,
   UpdateCancellationPolicyPayload,
   UpdateInstantBookingPayload,
   UpdateTypePayload,
@@ -39,6 +42,8 @@ export type AccommodationFieldEditedPayload =
   | { field: 'description'; id: string; title: string; description: string }
   | { field: 'price'; id: string; price: number }
   | { field: 'weeklyPromotion'; id: string; weeklyPromotionPercentage: number | null }
+  | { field: 'dynamicPricing'; id: string; weekendSurchargePercentage: number | null; lastMinuteDiscountPercentage: number | null; lastMinuteDays: number | null }
+  | { field: 'pricePeriods'; id: string; pricePeriods: PricePeriod[] }
   | { field: 'cancellationPolicy'; id: string; cancellationPolicy: CancellationPolicy }
   | { field: 'instantBooking'; id: string; instantBooking: boolean }
   | { field: 'type'; id: string; type: AccommodationType | null }
@@ -61,6 +66,8 @@ export const editPageOpened = createAction<{ id: string }>('accommodation/editPa
 export const editSectionForField = (field: AccommodationEditField): EditSection => {
   switch (field) {
     case 'weeklyPromotion':
+    case 'dynamicPricing':
+    case 'pricePeriods':
       return 'price';
     case 'checkInOut':
       return 'checkinout';
@@ -271,6 +278,45 @@ export const updateWeeklyPromotion = createAsyncThunk(
   }
 );
 
+export const updateDynamicPricing = createAsyncThunk(
+  'accommodation/updateDynamicPricing',
+  async (
+    { id, weekendSurchargePercentage, lastMinuteDiscountPercentage, lastMinuteDays }: UpdateDynamicPricingPayload,
+    { rejectWithValue }
+  ) => {
+    try {
+      await api.patch(
+        `/api/accommodations/${id}/dynamic-pricing`,
+        { weekendSurchargePercentage, lastMinuteDiscountPercentage, lastMinuteDays },
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return { weekendSurchargePercentage, lastMinuteDiscountPercentage, lastMinuteDays };
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, 'Erreur lors de la mise à jour de la tarification dynamique')
+      );
+    }
+  }
+);
+
+export const updatePricePeriods = createAsyncThunk(
+  'accommodation/updatePricePeriods',
+  async ({ id, pricePeriods }: UpdatePricePeriodsPayload, { rejectWithValue }) => {
+    try {
+      await api.put(
+        `/api/accommodations/${id}/price-periods`,
+        { pricePeriods },
+        { headers: { 'Content-Type': 'application/ld+json' } }
+      );
+      return { pricePeriods };
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, 'Erreur lors de la mise à jour des tarifs par période')
+      );
+    }
+  }
+);
+
 export const updateCancellationPolicy = createAsyncThunk(
   'accommodation/updateCancellationPolicy',
   async ({ id, cancellationPolicy }: UpdateCancellationPolicyPayload, { rejectWithValue }) => {
@@ -413,6 +459,8 @@ const EDIT_SECTION_BY_THUNK_PREFIX: Record<string, EditSection> = {
   [updateDescription.typePrefix]: 'description',
   [updatePrice.typePrefix]: 'price',
   [updateWeeklyPromotion.typePrefix]: 'price',
+  [updateDynamicPricing.typePrefix]: 'price',
+  [updatePricePeriods.typePrefix]: 'price',
   [updateCancellationPolicy.typePrefix]: 'cancellation',
   [updateInstantBooking.typePrefix]: 'cancellation',
   [updateStayConstraints.typePrefix]: 'cancellation',
@@ -427,6 +475,8 @@ const EDIT_THUNKS = [
   updateDescription,
   updatePrice,
   updateWeeklyPromotion,
+  updateDynamicPricing,
+  updatePricePeriods,
   updateCancellationPolicy,
   updateInstantBooking,
   updateType,
@@ -600,6 +650,38 @@ const accommodationSlice = createSlice({
         }
       })
       .addCase(updateWeeklyPromotion.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update dynamic pricing (weekend surcharge + last-minute)
+      .addCase(updateDynamicPricing.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updateDynamicPricing.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.weekendSurchargePercentage = action.payload.weekendSurchargePercentage;
+          state.current.lastMinuteDiscountPercentage = action.payload.lastMinuteDiscountPercentage;
+          state.current.lastMinuteDays = action.payload.lastMinuteDays;
+        }
+      })
+      .addCase(updateDynamicPricing.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update price periods (seasonal / per-date)
+      .addCase(updatePricePeriods.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updatePricePeriods.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.pricePeriods = action.payload.pricePeriods;
+        }
+      })
+      .addCase(updatePricePeriods.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })

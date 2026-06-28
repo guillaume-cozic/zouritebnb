@@ -17,6 +17,7 @@ import { selectAuthUser } from '../../auth/AuthSelectors';
 import LocationMap from '../../../components/LocationMap';
 import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
+import { computeStayPrice } from '../pricing';
 import { fetchAccommodationAvailability } from '../../reservation/ReservationSlice';
 import { selectAccommodationAvailability } from '../../reservation/ReservationSelectors';
 import RatingBadge from '../../review/components/RatingBadge';
@@ -91,14 +92,26 @@ const AccommodationDetailPage: React.FC = () => {
     dispatch(setFilters({ checkIn: toStr(start), checkOut: toStr(end) }));
   };
 
-  const nights = startDate && endDate
-    ? Math.max(0, Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)))
-    : 0;
   const pricePerNight = accommodation?.price ?? 0;
-  const weeklyPromo = accommodation?.weeklyPromotionPercentage ?? null;
-  const promoApplies = nights >= 7 && weeklyPromo !== null && weeklyPromo !== undefined && weeklyPromo > 0;
-  const effectiveNightly = promoApplies ? pricePerNight * (1 - weeklyPromo / 100) : pricePerNight;
-  const subtotal = effectiveNightly * nights;
+  // Mirror the backend night-by-night pricing (periods, weekend, last-minute, weekly promo).
+  const stay = startDate && endDate
+    ? computeStayPrice(
+        {
+          pricePerNight,
+          weeklyPromotionPercentage: accommodation?.weeklyPromotionPercentage,
+          weekendSurchargePercentage: accommodation?.weekendSurchargePercentage,
+          lastMinuteDiscountPercentage: accommodation?.lastMinuteDiscountPercentage,
+          lastMinuteDays: accommodation?.lastMinuteDays,
+          pricePeriods: accommodation?.pricePeriods,
+        },
+        startDate,
+        endDate,
+        new Date()
+      )
+    : { nights: 0, subtotal: 0, appliedDiscountPercentage: null };
+  const nights = stay.nights;
+  const subtotal = stay.subtotal;
+  const appliedDiscount = stay.appliedDiscountPercentage;
   const platformFee = subtotal * PLATFORM_COMMISSION_RATE;
   const solidarityFee = subtotal * SOLIDARITY_RATE;
   const total = subtotal + platformFee + solidarityFee;
@@ -569,14 +582,13 @@ const AccommodationDetailPage: React.FC = () => {
                 {/* Price breakdown */}
                 {nights > 0 && (
                   <div className="space-y-2 pt-4 border-t border-gray-100 text-sm">
-                    {promoApplies && (
+                    {appliedDiscount !== null && (
                       <div className="flex items-center justify-between rounded-lg bg-emerald-50 border border-emerald-100 px-3 py-2 text-emerald-700">
-                        <span className="text-xs font-medium">{t('detail.weeklyDiscountBadge', { percent: weeklyPromo })}</span>
-                        <span className="text-xs line-through text-emerald-500/70">{formatPrice(pricePerNight)}</span>
+                        <span className="text-xs font-medium">{t('detail.discountBadge', { percent: appliedDiscount })}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-gray-600">
-                      <span>{formatPrice(effectiveNightly)} × {t('detail.nights', { count: nights })}</span>
+                      <span>{t('detail.nights', { count: nights })}</span>
                       <span>{formatPrice(subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
@@ -631,7 +643,11 @@ const AccommodationDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <AccommodationReviews reviews={reviews} />
+        <AccommodationReviews
+          reviews={reviews}
+          accommodationId={id ?? ''}
+          canReply={!!user && !!accommodation?.teamId && user.teamId === accommodation.teamId}
+        />
       </div>
 
     </main>

@@ -95,6 +95,19 @@ class AccommodationEntity
     #[ORM\Column(nullable: true)]
     private ?int $maxNights = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $weekendSurchargePercentage = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $lastMinuteDiscountPercentage = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $lastMinuteDays = null;
+
+    /** @var array<array{startDate: string, endDate: string, pricePerNight: float}>|null */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $pricePeriods = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -415,6 +428,56 @@ class AccommodationEntity
     public function setMaxNights(?int $maxNights): static
     {
         $this->maxNights = $maxNights;
+
+        return $this;
+    }
+
+    public function getWeekendSurchargePercentage(): ?float
+    {
+        return $this->weekendSurchargePercentage;
+    }
+
+    public function setWeekendSurchargePercentage(?float $weekendSurchargePercentage): static
+    {
+        $this->weekendSurchargePercentage = $weekendSurchargePercentage;
+
+        return $this;
+    }
+
+    public function getLastMinuteDiscountPercentage(): ?float
+    {
+        return $this->lastMinuteDiscountPercentage;
+    }
+
+    public function setLastMinuteDiscountPercentage(?float $lastMinuteDiscountPercentage): static
+    {
+        $this->lastMinuteDiscountPercentage = $lastMinuteDiscountPercentage;
+
+        return $this;
+    }
+
+    public function getLastMinuteDays(): ?int
+    {
+        return $this->lastMinuteDays;
+    }
+
+    public function setLastMinuteDays(?int $lastMinuteDays): static
+    {
+        $this->lastMinuteDays = $lastMinuteDays;
+
+        return $this;
+    }
+
+    /** @return array<array{startDate: string, endDate: string, pricePerNight: float}>|null */
+    public function getPricePeriods(): ?array
+    {
+        return $this->pricePeriods;
+    }
+
+    /** @param array<array{startDate: string, endDate: string, pricePerNight: float}>|null $pricePeriods */
+    public function setPricePeriods(?array $pricePeriods): static
+    {
+        $this->pricePeriods = $pricePeriods;
 
         return $this;
     }

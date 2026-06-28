@@ -531,6 +531,7 @@
     "private": "Privatives",
     "night": "nuit",
     "weeklyDiscountBadge": "Remise {{percent}}% appliquée (séjour ≥ 7 nuits)",
+    "discountBadge": "Remise {{percent}} % appliquée",
     "checkIn": "Arrivée",
     "checkOut": "Départ",
     "amenitiesTitle": "Équipements",
@@ -623,6 +624,21 @@
       "title": "Modérée",
       "description": "Remboursement intégral jusqu'à 5 jours avant l'arrivée, puis 50 % au-delà."
     }
+  },
+  "dynamicPricing": {
+    "title": "Tarification dynamique",
+    "weekendLabel": "Majoration week-end",
+    "weekendHint": "Pourcentage ajouté aux nuits du vendredi et du samedi. Laisser vide pour désactiver.",
+    "lastMinuteDiscountLabel": "Remise last-minute",
+    "lastMinuteDaysLabel": "Jours avant l'arrivée",
+    "lastMinuteHint": "Remise appliquée si la réservation est faite à moins du nombre de jours indiqué avant l'arrivée. Renseigner les deux champs ou aucun.",
+    "periodsTitle": "Tarifs par période",
+    "addPeriod": "Ajouter une période",
+    "noPeriods": "Aucun tarif par période. Le prix par nuit s'applique partout.",
+    "from": "Du",
+    "to": "Au",
+    "nightlyPrice": "Prix / nuit",
+    "remove": "Supprimer"
   },
   "instantBooking": {
     "title": "Réservation instantanée",
