@@ -24,7 +24,9 @@
       "settings": "Settings",
       "verification": "Identity verification",
       "termsOfUse": "Terms of Use",
-      "termsOfSale": "Terms of Sale"
+      "termsOfSale": "Terms of Sale",
+      "legalNotice": "Legal Notice",
+      "privacyPolicy": "Privacy Policy"
     }
   },
   "autosave": {
@@ -592,7 +594,9 @@
     "copyright": "© 2026 ZouriteBnb. All rights reserved.",
     "legal": "Legal",
     "termsOfUse": "Terms of Use",
-    "termsOfSale": "Terms of Sale"
+    "termsOfSale": "Terms of Sale",
+    "legalNotice": "Legal Notice",
+    "privacyPolicy": "Privacy Policy"
   },
   "wizard": {
     "newAccommodation": "New accommodation",

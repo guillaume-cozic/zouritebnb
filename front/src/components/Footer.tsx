@@ -62,9 +62,11 @@ const Footer: React.FC = () => {
         </div>
         <div className="border-t border-gray-800 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
           <span>{t('footer.copyright')}</span>
-          <nav className="flex items-center gap-5" aria-label={t('footer.legal') as string}>
+          <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2" aria-label={t('footer.legal') as string}>
             <Link to="/cgu" className="hover:text-white transition-colors">{t('footer.termsOfUse')}</Link>
             <Link to="/cgv" className="hover:text-white transition-colors">{t('footer.termsOfSale')}</Link>
+            <Link to="/mentions-legales" className="hover:text-white transition-colors">{t('footer.legalNotice')}</Link>
+            <Link to="/confidentialite" className="hover:text-white transition-colors">{t('footer.privacyPolicy')}</Link>
           </nav>
         </div>
       </div>
