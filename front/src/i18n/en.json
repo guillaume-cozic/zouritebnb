@@ -22,7 +22,9 @@
       "conversations": "Messages",
       "account": "Traveler area",
       "settings": "Settings",
-      "verification": "Identity verification"
+      "verification": "Identity verification",
+      "termsOfUse": "Terms of Use",
+      "termsOfSale": "Terms of Sale"
     }
   },
   "autosave": {
@@ -574,7 +576,10 @@
     "blog": "Blog",
     "hosts": "For hosts",
     "contact": "Contact",
-    "copyright": "© 2026 ZouriteBnb. All rights reserved."
+    "copyright": "© 2026 ZouriteBnb. All rights reserved.",
+    "legal": "Legal",
+    "termsOfUse": "Terms of Use",
+    "termsOfSale": "Terms of Sale"
   },
   "wizard": {
     "newAccommodation": "New accommodation",

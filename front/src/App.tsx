@@ -33,6 +33,8 @@ import AdminReservationsPage from './features/reservation/components/AdminReserv
 import ReservationConfirmationPage from './features/reservation/components/ReservationConfirmationPage';
 import ReservationSuccessPage from './features/reservation/components/ReservationSuccessPage';
 import IdentityVerificationPage from './features/userProfile/components/IdentityVerificationPage';
+import TermsOfUsePage from './features/legal/components/TermsOfUsePage';
+import TermsOfSalePage from './features/legal/components/TermsOfSalePage';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -54,6 +56,8 @@ function App() {
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/solidarity-projects" element={<SolidarityProjectsPage />} />
           <Route path="/solidarity-projects/:id" element={<SolidarityProjectDetailPage />} />
+          <Route path="/cgu" element={<TermsOfUsePage />} />
+          <Route path="/cgv" element={<TermsOfSalePage />} />
           <Route path="/accommodations" element={<AccommodationsListingPage />} />
           <Route path="/accommodations/:id" element={<AccommodationDetailPage />} />
           <Route element={<ProtectedRoute />}>

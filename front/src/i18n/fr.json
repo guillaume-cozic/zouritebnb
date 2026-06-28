@@ -22,7 +22,9 @@
       "conversations": "Messagerie",
       "account": "Espace voyageur",
       "settings": "Paramètres",
-      "verification": "Vérification d'identité"
+      "verification": "Vérification d'identité",
+      "termsOfUse": "Conditions Générales d'Utilisation",
+      "termsOfSale": "Conditions Générales de Vente"
     }
   },
   "autosave": {
@@ -574,7 +576,10 @@
     "blog": "Blog",
     "hosts": "Espace hôtes",
     "contact": "Contact",
-    "copyright": "© 2026 ZouriteBnb. Tous droits réservés."
+    "copyright": "© 2026 ZouriteBnb. Tous droits réservés.",
+    "legal": "Informations légales",
+    "termsOfUse": "Conditions d'utilisation (CGU)",
+    "termsOfSale": "Conditions de vente (CGV)"
   },
   "wizard": {
     "newAccommodation": "Nouvel hébergement",

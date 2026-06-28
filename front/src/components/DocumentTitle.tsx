@@ -17,6 +17,8 @@ const ROUTE_TITLES: ReadonlyArray<readonly [string, string]> = [
   ['/reservation-confirmed', 'reservationConfirmed'],
   ['/solidarity-projects/:id', 'solidarityProject'],
   ['/solidarity-projects', 'solidarityProjects'],
+  ['/cgu', 'termsOfUse'],
+  ['/cgv', 'termsOfSale'],
   ['/login', 'login'],
   ['/register', 'register'],
   ['/create', 'create'],
