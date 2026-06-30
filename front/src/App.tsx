@@ -30,6 +30,7 @@ import AllAccommodationsCalendarPage from './features/reservation/components/All
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
 import MessagingPage from './features/conversation/components/MessagingPage';
 import AdminReservationsPage from './features/reservation/components/AdminReservationsPage';
+import HostRevenuePage from './features/hostRevenue/components/HostRevenuePage';
 import ReservationConfirmationPage from './features/reservation/components/ReservationConfirmationPage';
 import ReservationSuccessPage from './features/reservation/components/ReservationSuccessPage';
 import IdentityVerificationPage from './features/userProfile/components/IdentityVerificationPage';
@@ -85,6 +86,7 @@ function App() {
                 <Route path="/admin/calendar" element={<AllAccommodationsCalendarPage />} />
                 <Route path="/admin/accommodations/:id/calendar" element={<AccommodationCalendarPage />} />
                 <Route path="/admin/reservations" element={<AdminReservationsPage />} />
+                <Route path="/admin/revenue" element={<HostRevenuePage />} />
               </Route>
               <Route path="/admin/team" element={<TeamSettingsPage />} />
               <Route path="/admin/conversations" element={<MessagingPage role="host" />} />

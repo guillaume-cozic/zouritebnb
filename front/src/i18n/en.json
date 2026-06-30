@@ -313,6 +313,41 @@
       "holderRequired": "The account holder name is required when you provide an IBAN."
     }
   },
+  "revenue": {
+    "title": "Revenue & payouts",
+    "subtitle": "Track your earnings and payout status, computed from your confirmed reservations.",
+    "empty": "No data yet.",
+    "summary": {
+      "total": "Total earned",
+      "totalHint": "{{count}} confirmed reservation(s)",
+      "pending": "Pending",
+      "pendingHint": "{{count}} upcoming stay(s)",
+      "available": "Available",
+      "availableHint": "Completed stays"
+    },
+    "payouts": {
+      "title": "Payout statement",
+      "subtitle": "A payout becomes available once the stay is over.",
+      "accommodation": "Accommodation",
+      "guest": "Guest",
+      "dates": "Dates",
+      "amount": "Amount",
+      "status": "Status",
+      "unknownAccommodation": "Deleted accommodation"
+    },
+    "payoutStatus": {
+      "pending": "Pending",
+      "available": "Available"
+    },
+    "byAccommodation": {
+      "title": "By accommodation",
+      "reservations": "{{count}} res."
+    },
+    "byMonth": {
+      "title": "By month",
+      "subtitle": "Grouped by stay end month."
+    }
+  },
   "backoffice": {
     "title": "Manage accommodations",
     "subtitle": "Full list including drafts",
@@ -323,6 +358,7 @@
       "accommodations": "Accommodations",
       "calendar": "Calendar",
       "reservations": "Reservations",
+      "revenue": "Revenue",
       "conversations": "Messages",
       "team": "My settings"
     },

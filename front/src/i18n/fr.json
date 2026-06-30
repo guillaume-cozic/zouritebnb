@@ -313,6 +313,41 @@
       "holderRequired": "Le nom du titulaire est requis quand vous renseignez un IBAN."
     }
   },
+  "revenue": {
+    "title": "Revenus & versements",
+    "subtitle": "Suivez vos gains et le statut de vos versements, calculés sur vos réservations confirmées.",
+    "empty": "Aucune donnée pour le moment.",
+    "summary": {
+      "total": "Total encaissé",
+      "totalHint": "{{count}} réservation(s) confirmée(s)",
+      "pending": "En attente",
+      "pendingHint": "{{count}} séjour(s) à venir",
+      "available": "Disponible",
+      "availableHint": "Séjours terminés"
+    },
+    "payouts": {
+      "title": "Relevé des versements",
+      "subtitle": "Un versement devient disponible une fois le séjour terminé.",
+      "accommodation": "Hébergement",
+      "guest": "Voyageur",
+      "dates": "Dates",
+      "amount": "Montant",
+      "status": "Statut",
+      "unknownAccommodation": "Hébergement supprimé"
+    },
+    "payoutStatus": {
+      "pending": "En attente",
+      "available": "Disponible"
+    },
+    "byAccommodation": {
+      "title": "Par hébergement",
+      "reservations": "{{count}} résa."
+    },
+    "byMonth": {
+      "title": "Par mois",
+      "subtitle": "Réparti sur le mois de fin de séjour."
+    }
+  },
   "backoffice": {
     "title": "Gestion des hébergements",
     "subtitle": "Liste complète de vos hébergements, brouillons inclus",
@@ -323,6 +358,7 @@
       "accommodations": "Hébergements",
       "calendar": "Calendrier",
       "reservations": "Réservations",
+      "revenue": "Revenus",
       "conversations": "Messagerie",
       "team": "Mes paramètres"
     },
