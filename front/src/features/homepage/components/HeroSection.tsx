@@ -189,6 +189,27 @@ const HeroSection: React.FC = () => {
       <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-xl shadow-black/10 border border-gray-100">
+            {/* Mots-clés */}
+            <div className="space-y-1.5 mb-3">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                {t('listing.keyword.label')}
+              </label>
+              <div className="relative">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder={t('listing.keyword.placeholder')}
+                  value={filters.q}
+                  onChange={(e) => dispatch(setFilters({ q: e.target.value }))}
+                  autoComplete="off"
+                  className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white transition-all"
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
               {/* Lieu */}
               <div className="space-y-1.5">

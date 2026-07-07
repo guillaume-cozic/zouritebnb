@@ -453,6 +453,10 @@
   "listing": {
     "title": "Hébergements",
     "subtitle": "Affinez votre recherche pour trouver le logement idéal",
+    "keyword": {
+      "label": "Mots-clés",
+      "placeholder": "Piscine, vue mer, villa…"
+    },
     "reset": "Tout effacer",
     "activeFilters": "Filtres actifs",
     "resultCount_one": "{{count}} hébergement",

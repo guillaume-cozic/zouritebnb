@@ -11,6 +11,9 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 
 ## ✅ Corrigé
 
+- **Recherche full-text** : recherche par mots-clés sur le titre et la description via le
+  paramètre `q` (tous les mots doivent correspondre, insensible à la casse). Champ
+  « Mots-clés » en tête de la barre de recherche du catalogue, avec chip de filtre actif.
 - **Recherche par dates** : le catalogue filtre désormais sur les disponibilités. Les
   paramètres `checkIn`/`checkOut` (déjà envoyés par le front) excluent les logements ayant
   une réservation `pending`/`confirmed` qui chevauche la période (comparaison au jour, le
@@ -51,8 +54,6 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 
 ## 🔴 Manques importants (impact direct conversion/usage)
 
-- **Recherche full-text** : pas de recherche par mot-clé (titre/description). Uniquement
-  ville + capacité + prix + équipements.
 - **Remboursement réel au voyageur** : l'annulation calcule le montant et annule le
   PaymentIntent Stripe, mais **aucun vrai remboursement carte** n'est émis. Le breakdown
   existe mais l'argent n'est pas rendu.

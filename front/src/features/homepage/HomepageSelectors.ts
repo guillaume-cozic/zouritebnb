@@ -4,7 +4,7 @@ export const selectAccommodations = (state: RootState) =>
   state.homepage?.accommodations ?? [];
 
 export const selectHomepageFilters = (state: RootState) =>
-  state.homepage?.filters ?? { city: '', checkIn: '', checkOut: '', guests: 1, amenities: [], priceMin: null, priceMax: null, sort: '', instantBooking: false, type: '', bounds: null };
+  state.homepage?.filters ?? { q: '', city: '', checkIn: '', checkOut: '', guests: 1, amenities: [], priceMin: null, priceMax: null, sort: '', instantBooking: false, type: '', bounds: null };
 
 export const selectHomepageStatus = (state: RootState) =>
   state.homepage?.status ?? 'idle';

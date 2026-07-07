@@ -33,6 +33,8 @@ export interface MapBounds {
 }
 
 export interface SearchFilters {
+  /** Full-text keyword search on title + description. */
+  q: string;
   city: string;
   checkIn: string;
   checkOut: string;

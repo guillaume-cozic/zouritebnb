@@ -66,6 +66,7 @@ const AccommodationsListingPage: React.FC = () => {
     : '';
   useEffect(() => {
     dispatch(fetchPublishedAccommodations({
+      q: filters.q,
       checkIn: filters.checkIn,
       checkOut: filters.checkOut,
       city: filters.city,
@@ -82,7 +83,7 @@ const AccommodationsListingPage: React.FC = () => {
       west: filters.bounds?.west,
       page: 1,
     }));
-  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, filters.sort, filters.instantBooking, filters.type, amenitiesKey, boundsKey]);
+  }, [dispatch, filters.q, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, filters.sort, filters.instantBooking, filters.type, amenitiesKey, boundsKey]);
 
   // Infinite scroll: ask for the next page when the sentinel enters the viewport.
   // The component only declares the intent; the listener decides what to fetch.
@@ -109,6 +110,7 @@ const AccommodationsListingPage: React.FC = () => {
   };
 
   const activeCount =
+    (filters.q ? 1 : 0) +
     (filters.city ? 1 : 0) +
     (filters.guests !== null && filters.guests > 1 ? 1 : 0) +
     filters.amenities.length +
@@ -126,7 +128,7 @@ const AccommodationsListingPage: React.FC = () => {
     (filters.type ? 1 : 0);
 
   const resetAll = () => {
-    dispatch(setFilters({ city: '', guests: 1, amenities: [], priceMin: null, priceMax: null, instantBooking: false, type: '', bounds: null }));
+    dispatch(setFilters({ q: '', city: '', guests: 1, amenities: [], priceMin: null, priceMax: null, instantBooking: false, type: '', bounds: null }));
   };
 
   const priceChipLabel = (() => {
@@ -148,7 +150,27 @@ const AccommodationsListingPage: React.FC = () => {
 
       <div className="mb-6">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_auto] divide-y md:divide-y-0 md:divide-x divide-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1.2fr_1fr_auto] divide-y md:divide-y-0 md:divide-x divide-gray-100">
+            <label className="group flex items-center gap-3 px-5 py-3 cursor-text">
+              <svg className="text-gray-400 group-focus-within:text-primary-500 transition-colors flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                  {t('listing.keyword.label')}
+                </p>
+                <input
+                  type="text"
+                  placeholder={t('listing.keyword.placeholder')}
+                  value={filters.q}
+                  onChange={(e) => dispatch(setFilters({ q: e.target.value }))}
+                  autoComplete="off"
+                  className="w-full text-sm text-gray-900 placeholder:text-gray-400 bg-transparent border-0 p-0 focus:outline-none focus:ring-0"
+                />
+              </div>
+            </label>
+
             <label className="group relative flex items-center gap-3 px-5 py-3 cursor-text">
               <svg className="text-gray-400 group-focus-within:text-primary-500 transition-colors flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
@@ -365,6 +387,9 @@ const AccommodationsListingPage: React.FC = () => {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mr-1">
               {t('listing.activeFilters')}
             </span>
+            {filters.q && (
+              <Chip label={`« ${filters.q} »`} onRemove={() => dispatch(setFilters({ q: '' }))} />
+            )}
             {filters.city && (
               <Chip label={filters.city} onRemove={() => dispatch(setFilters({ city: '' }))} />
             )}

@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Public, cross-team catalog used by the homepage: published accommodations
- * with search filters (city, guests, price range, amenities) and review stats.
+ * with search filters (keyword, city, guests, price range, amenities) and review stats.
  *
  * @implements ProviderInterface<AccommodationOutput>
  */
@@ -45,6 +45,21 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
         if (\is_string($cityRaw) && '' !== trim($cityRaw)) {
             $clauses[] = "REPLACE(LOWER(a.city), '-', ' ') LIKE REPLACE(LOWER(:city), '-', ' ')";
             $params['city'] = '%'.trim($cityRaw).'%';
+        }
+
+        // Full-text keyword search on title + description: every word of the
+        // query must appear in at least one of the two fields. LIKE (not
+        // MATCH...AGAINST) because InnoDB fulltext indexes are only updated at
+        // commit time, which would make the filter blind to rows inserted in
+        // the current transaction (e.g. E2E fixtures) and to short words.
+        $qRaw = $query?->get('q');
+        if (\is_string($qRaw) && '' !== trim($qRaw)) {
+            $words = preg_split('/\s+/', trim($qRaw), -1, \PREG_SPLIT_NO_EMPTY) ?: [];
+            foreach ($words as $i => $word) {
+                $paramName = 'q'.$i;
+                $clauses[] = "(LOWER(a.title) LIKE LOWER(:{$paramName}) OR LOWER(a.description) LIKE LOWER(:{$paramName}))";
+                $params[$paramName] = '%'.$word.'%';
+            }
         }
 
         $guestsRaw = $query?->get('guests');

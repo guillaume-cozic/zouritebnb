@@ -61,7 +61,8 @@ const HomePage: React.FC = () => {
       <HeroSection />
 
       {/* Featured accommodations */}
-      <section className="flex-1 pt-36 pb-20 bg-gray-50/50">
+      {/* pt-44: clears the search card that overhangs the hero by half its height */}
+      <section className="flex-1 pt-44 pb-20 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-10">
             <div>

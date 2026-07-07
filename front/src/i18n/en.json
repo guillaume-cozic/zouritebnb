@@ -453,6 +453,10 @@
   "listing": {
     "title": "Accommodations",
     "subtitle": "Refine your search to find the perfect place",
+    "keyword": {
+      "label": "Keywords",
+      "placeholder": "Pool, sea view, villa…"
+    },
     "reset": "Clear all",
     "activeFilters": "Active filters",
     "resultCount_one": "{{count}} stay",

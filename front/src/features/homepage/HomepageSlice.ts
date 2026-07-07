@@ -18,7 +18,7 @@ interface HomepageState {
 
 const initialState: HomepageState = {
   accommodations: [],
-  filters: { city: '', checkIn: '', checkOut: '', guests: 1, amenities: [], priceMin: null, priceMax: null, sort: '', instantBooking: false, type: '', bounds: null },
+  filters: { q: '', city: '', checkIn: '', checkOut: '', guests: 1, amenities: [], priceMin: null, priceMax: null, sort: '', instantBooking: false, type: '', bounds: null },
   page: 1,
   totalItems: 0,
   status: 'idle',
@@ -27,6 +27,7 @@ const initialState: HomepageState = {
 };
 
 interface FetchPublishedParams {
+  q?: string;
   checkIn?: string;
   checkOut?: string;
   city?: string;
@@ -68,6 +69,7 @@ export const fetchPublishedAccommodations = createAsyncThunk<
         page: String(page),
         itemsPerPage: String(ITEMS_PER_PAGE),
       };
+      if (params?.q) queryParams.q = params.q;
       if (params?.checkIn) queryParams.checkIn = params.checkIn;
       if (params?.checkOut) queryParams.checkOut = params.checkOut;
       if (params?.city) queryParams.city = params.city;

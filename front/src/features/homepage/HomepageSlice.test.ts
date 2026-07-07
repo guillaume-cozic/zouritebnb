@@ -94,6 +94,28 @@ describe('fetchPublishedAccommodations', () => {
     });
   });
 
+  test('la recherche par mots-clés envoie le paramètre q', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [], 'hydra:totalItems': 0 } });
+    const store = buildStore();
+
+    await store.dispatch(fetchPublishedAccommodations({ q: 'piscine vue mer' }));
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations', {
+      params: { page: '1', itemsPerPage: String(ITEMS_PER_PAGE), q: 'piscine vue mer' },
+    });
+  });
+
+  test('une recherche par mots-clés vide est omise de la requête', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [], 'hydra:totalItems': 0 } });
+    const store = buildStore();
+
+    await store.dispatch(fetchPublishedAccommodations({ q: '' }));
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations', {
+      params: { page: '1', itemsPerPage: String(ITEMS_PER_PAGE) },
+    });
+  });
+
   test('le filtre type envoie le paramètre type', async () => {
     mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [], 'hydra:totalItems': 0 } });
     const store = buildStore();

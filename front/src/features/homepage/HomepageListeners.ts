@@ -13,6 +13,7 @@ startAppListening({
 
     api.dispatch(
       fetchPublishedAccommodations({
+        q: filters.q,
         checkIn: filters.checkIn,
         checkOut: filters.checkOut,
         city: filters.city,
