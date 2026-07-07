@@ -1,11 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
-const BLOG_URL = import.meta.env.VITE_BLOG_URL ?? '/blog';
+import { blogHomeUrl } from '../i18n/blogUrl';
 
 const Footer: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <footer className="bg-gray-900 text-gray-400">
@@ -36,7 +35,7 @@ const Footer: React.FC = () => {
                 <Link to="/solidarity-projects" className="hover:text-white transition-colors">{t('footer.solidarityProjects')}</Link>
               </li>
               <li>
-                <a href={BLOG_URL} className="hover:text-white transition-colors">{t('footer.blog')}</a>
+                <a href={blogHomeUrl(i18n.language)} className="hover:text-white transition-colors">{t('footer.blog')}</a>
               </li>
             </ul>
           </div>

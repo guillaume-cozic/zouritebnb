@@ -10,13 +10,7 @@ import RodriguesMap from './RodriguesMap';
 import SolidarityProjectsSection from '../../solidarityProject/components/SolidarityProjectsSection';
 import Footer from '../../../components/Footer';
 
-const BLOG_URL = import.meta.env.VITE_BLOG_URL ?? '/blog';
-const ACTIVITY_LINKS = {
-  diving: `${BLOG_URL}/#tag=Snorkeling`,
-  hiking: `${BLOG_URL}/#cat-randonnees`,
-  excursions: `${BLOG_URL}/#tag=Bateau`,
-  gastronomy: `${BLOG_URL}/#tag=Gastronomie`,
-};
+import { blogActivityLinks } from '../../../i18n/blogUrl';
 
 const LoadingSkeleton: React.FC = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -51,7 +45,8 @@ const EmptyState: React.FC<{ message: string }> = ({ message }) => (
 );
 
 const HomePage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const activityLinks = blogActivityLinks(i18n.language);
   const dispatch = useAppDispatch();
   const accommodations = useAppSelector(selectAccommodations);
   const status = useAppSelector(selectHomepageStatus);
@@ -116,7 +111,7 @@ const HomePage: React.FC = () => {
           <h2 className="text-3xl font-bold mb-12 text-center">{t('activities.title')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Diving */}
-            <a href={ACTIVITY_LINKS.diving} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
+            <a href={activityLinks.diving} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
                 <div className="mx-auto w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
@@ -135,7 +130,7 @@ const HomePage: React.FC = () => {
             </a>
 
             {/* Hiking */}
-            <a href={ACTIVITY_LINKS.hiking} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
+            <a href={activityLinks.hiking} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
                 <div className="mx-auto w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
@@ -152,7 +147,7 @@ const HomePage: React.FC = () => {
             </a>
 
             {/* Excursions */}
-            <a href={ACTIVITY_LINKS.excursions} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
+            <a href={activityLinks.excursions} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
                 <div className="mx-auto w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
@@ -170,7 +165,7 @@ const HomePage: React.FC = () => {
             </a>
 
             {/* Gastronomy */}
-            <a href={ACTIVITY_LINKS.gastronomy} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
+            <a href={activityLinks.gastronomy} className="block rounded-2xl border border-gray-100 bg-white shadow-sm text-center group hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="flex flex-col space-y-1.5 p-6">
                 <div className="mx-auto w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
