@@ -18,7 +18,7 @@ interface HomepageState {
 
 const initialState: HomepageState = {
   accommodations: [],
-  filters: { city: '', checkIn: '', checkOut: '', guests: 1, amenities: [], priceMin: null, priceMax: null, sort: '', instantBooking: false, type: '' },
+  filters: { city: '', checkIn: '', checkOut: '', guests: 1, amenities: [], priceMin: null, priceMax: null, sort: '', instantBooking: false, type: '', bounds: null },
   page: 1,
   totalItems: 0,
   status: 'idle',
@@ -37,6 +37,10 @@ interface FetchPublishedParams {
   sort?: string;
   instantBooking?: boolean;
   type?: string;
+  north?: number;
+  south?: number;
+  east?: number;
+  west?: number;
   page?: number;
 }
 
@@ -80,6 +84,15 @@ export const fetchPublishedAccommodations = createAsyncThunk<
       if (params?.sort) queryParams.sort = params.sort;
       if (params?.instantBooking) queryParams.instantBooking = 'true';
       if (params?.type) queryParams.type = params.type;
+      if (
+        params?.north !== undefined && params?.south !== undefined &&
+        params?.east !== undefined && params?.west !== undefined
+      ) {
+        queryParams.north = String(params.north);
+        queryParams.south = String(params.south);
+        queryParams.east = String(params.east);
+        queryParams.west = String(params.west);
+      }
       const response = await api.get('/api/accommodations', { params: queryParams });
       const data = response.data;
       const items = (data['hydra:member'] ?? data['member'] ?? []) as AccommodationListItem[];

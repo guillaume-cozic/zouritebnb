@@ -105,6 +105,26 @@ describe('fetchPublishedAccommodations', () => {
     });
   });
 
+  test('les bornes de la carte envoient north/south/east/west', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [], 'hydra:totalItems': 0 } });
+    const store = buildStore();
+
+    await store.dispatch(
+      fetchPublishedAccommodations({ north: 48.9, south: 48.8, east: 2.45, west: 2.25 })
+    );
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/api/accommodations', {
+      params: {
+        page: '1',
+        itemsPerPage: String(ITEMS_PER_PAGE),
+        north: '48.9',
+        south: '48.8',
+        east: '2.45',
+        west: '2.25',
+      },
+    });
+  });
+
   test('instantBooking=false n\'ajoute pas le paramètre', async () => {
     mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [], 'hydra:totalItems': 0 } });
     const store = buildStore();

@@ -24,6 +24,14 @@ export interface AccommodationListItem {
  */
 export type SortOption = '' | 'price_asc' | 'price_desc' | 'rating';
 
+/** Geographic bounding box of the map viewport, for "search this area". */
+export interface MapBounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
 export interface SearchFilters {
   city: string;
   checkIn: string;
@@ -35,4 +43,5 @@ export interface SearchFilters {
   sort: SortOption;
   instantBooking: boolean;
   type: string;
+  bounds: MapBounds | null;
 }

@@ -123,6 +123,21 @@ final readonly class PublishedAccommodationProvider implements ProviderInterface
             $params[$paramName] = $code;
         }
 
+        // Map bounding box ("search this area"): keep only accommodations whose
+        // coordinates fall inside the visible viewport. BETWEEN excludes rows with a
+        // NULL latitude/longitude, so non-geolocated listings drop out of a zone search.
+        $north = $query?->get('north');
+        $south = $query?->get('south');
+        $east = $query?->get('east');
+        $west = $query?->get('west');
+        if (is_numeric($north) && is_numeric($south) && is_numeric($east) && is_numeric($west)) {
+            $clauses[] = 'a.latitude BETWEEN :south AND :north AND a.longitude BETWEEN :west AND :east';
+            $params['south'] = (float) $south;
+            $params['north'] = (float) $north;
+            $params['west'] = (float) $west;
+            $params['east'] = (float) $east;
+        }
+
         $orderBy = $this->listingQuery->orderByFromQuery($query, withReviewStats: true);
 
         return $this->listingQuery->paginate($clauses, $params, $types, $page, $itemsPerPage, withReviewStats: true, orderBy: $orderBy);

@@ -462,6 +462,9 @@
     "showMap": "Afficher la carte",
     "hideMap": "Masquer la carte",
     "mapEmpty": "Aucun hébergement géolocalisé à afficher.",
+    "searchThisArea": "Rechercher dans cette zone",
+    "searchAsIMove": "Rechercher quand je déplace la carte",
+    "mapAreaChip": "Zone de la carte",
     "sort": {
       "label": "Trier par",
       "relevance": "Recommandé",

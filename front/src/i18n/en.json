@@ -462,6 +462,9 @@
     "showMap": "Show map",
     "hideMap": "Hide map",
     "mapEmpty": "No geolocated accommodations to display.",
+    "searchThisArea": "Search this area",
+    "searchAsIMove": "Search as I move the map",
+    "mapAreaChip": "Map area",
     "sort": {
       "label": "Sort by",
       "relevance": "Recommended",

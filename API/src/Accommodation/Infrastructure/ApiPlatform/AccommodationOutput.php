@@ -38,7 +38,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/accommodations',
             openapi: new OpenApiOperation(
                 summary: 'Lister les hébergements publiés',
-                description: 'Retourne la liste paginée des hébergements publiés avec leur photo principale.',
+                description: 'Retourne la liste paginée des hébergements publiés avec leur photo principale. '
+                    .'Filtres optionnels (query) : city, guests, priceMin, priceMax, type, instantBooking, amenities[], checkIn/checkOut, sort. '
+                    .'Recherche géographique « dans cette zone » via l\'emprise de la carte : north, south, east, west (latitudes/longitudes en degrés) — seuls les hébergements géolocalisés dans ce cadre sont renvoyés.',
             ),
             normalizationContext: ['groups' => ['accommodation:list']],
             provider: PublishedAccommodationProvider::class,

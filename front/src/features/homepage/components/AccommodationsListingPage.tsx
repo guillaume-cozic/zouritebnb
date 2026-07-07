@@ -55,10 +55,15 @@ const AccommodationsListingPage: React.FC = () => {
   const [cityOpen, setCityOpen] = useState(false);
   // The map is shown by default on the search page.
   const [mapOpen, setMapOpen] = useState(true);
+  // Re-run the search automatically whenever the map viewport moves.
+  const [searchAsIMove, setSearchAsIMove] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const amenitiesKey = filters.amenities.join(',');
+  const boundsKey = filters.bounds
+    ? `${filters.bounds.north},${filters.bounds.south},${filters.bounds.east},${filters.bounds.west}`
+    : '';
   useEffect(() => {
     dispatch(fetchPublishedAccommodations({
       checkIn: filters.checkIn,
@@ -71,9 +76,13 @@ const AccommodationsListingPage: React.FC = () => {
       sort: filters.sort,
       instantBooking: filters.instantBooking,
       type: filters.type,
+      north: filters.bounds?.north,
+      south: filters.bounds?.south,
+      east: filters.bounds?.east,
+      west: filters.bounds?.west,
       page: 1,
     }));
-  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, filters.sort, filters.instantBooking, filters.type, amenitiesKey]);
+  }, [dispatch, filters.checkIn, filters.checkOut, filters.city, filters.guests, filters.priceMin, filters.priceMax, filters.sort, filters.instantBooking, filters.type, amenitiesKey, boundsKey]);
 
   // Infinite scroll: ask for the next page when the sentinel enters the viewport.
   // The component only declares the intent; the listener decides what to fetch.
@@ -106,7 +115,8 @@ const AccommodationsListingPage: React.FC = () => {
     (filters.priceMin !== null ? 1 : 0) +
     (filters.priceMax !== null ? 1 : 0) +
     (filters.instantBooking ? 1 : 0) +
-    (filters.type ? 1 : 0);
+    (filters.type ? 1 : 0) +
+    (filters.bounds ? 1 : 0);
 
   const advancedCount =
     filters.amenities.length +
@@ -116,7 +126,7 @@ const AccommodationsListingPage: React.FC = () => {
     (filters.type ? 1 : 0);
 
   const resetAll = () => {
-    dispatch(setFilters({ city: '', guests: 1, amenities: [], priceMin: null, priceMax: null, instantBooking: false, type: '' }));
+    dispatch(setFilters({ city: '', guests: 1, amenities: [], priceMin: null, priceMax: null, instantBooking: false, type: '', bounds: null }));
   };
 
   const priceChipLabel = (() => {
@@ -389,6 +399,12 @@ const AccommodationsListingPage: React.FC = () => {
                 onRemove={() => dispatch(setFilters({ type: '' }))}
               />
             )}
+            {filters.bounds && (
+              <Chip
+                label={t('listing.mapAreaChip')}
+                onRemove={() => dispatch(setFilters({ bounds: null }))}
+              />
+            )}
             <button
               type="button"
               onClick={resetAll}
@@ -466,6 +482,10 @@ const AccommodationsListingPage: React.FC = () => {
                   accommodations={accommodations}
                   height="calc(100vh - 8rem)"
                   highlightedId={hoveredId}
+                  onSearchArea={(bounds) => dispatch(setFilters({ bounds }))}
+                  searchAsIMove={searchAsIMove}
+                  onSearchAsIMoveChange={setSearchAsIMove}
+                  autoFit={!filters.bounds}
                 />
               </div>
             </div>
