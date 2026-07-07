@@ -44,6 +44,11 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   à l'acceptation). Disponibilité revérifiée (hors elle-même) à la demande et à l'acceptation.
   Pas de charge/remboursement Stripe de l'écart (cohérent avec le manque « remboursement réel »).
 
+- **Multi-langue** : le front avait déjà le sélecteur FR/EN (i18next + `Accept-Language`
+  sur les appels projets solidaires) ; le contenu est maintenant traduit — les 14 articles
+  du blog existent en anglais sous `/blog/en/` et les projets solidaires ont leur
+  traduction `en` en base, servie selon l'en-tête `Accept-Language`.
+
 ## 🔴 Manques importants (impact direct conversion/usage)
 
 - **Recherche full-text** : pas de recherche par mot-clé (titre/description). Uniquement
@@ -56,7 +61,6 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 
 - **Codes promo / coupons** : aucun.
 - **Réponses de l'hôte aux avis** : les avis sont à sens unique, l'hôte ne peut pas répliquer.
-- **Multi-langue front** : le back gère FR/EN mais le front est FR uniquement.
 
 ## 🟡 Manques « expérience » / confiance
 
