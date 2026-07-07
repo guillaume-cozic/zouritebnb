@@ -2,6 +2,12 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Circle, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import {
+  RODRIGUES_BOUNDS_VISCOSITY,
+  RODRIGUES_CENTER,
+  RODRIGUES_MAX_BOUNDS,
+  RODRIGUES_MIN_ZOOM,
+} from './rodriguesMapConfig';
 
 // Fix default marker icon
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -46,8 +52,8 @@ function MapSelector({
   onSelect,
   radiusMeters = 500,
   height = 350,
-  defaultCenter = [46.603354, 1.888334],
-  defaultZoom = 5,
+  defaultCenter = RODRIGUES_CENTER,
+  defaultZoom = 11,
 }: MapSelectorProps) {
   const hasMarker = latitude !== undefined && longitude !== undefined;
   const markerPosition: [number, number] | null = hasMarker ? [latitude, longitude] : null;
@@ -58,6 +64,9 @@ function MapSelector({
         <MapContainer
           center={markerPosition || defaultCenter}
           zoom={markerPosition ? 14 : defaultZoom}
+          minZoom={RODRIGUES_MIN_ZOOM}
+          maxBounds={RODRIGUES_MAX_BOUNDS}
+          maxBoundsViscosity={RODRIGUES_BOUNDS_VISCOSITY}
           style={{ height: '100%', width: '100%' }}
           className="z-0"
         >

@@ -2,6 +2,11 @@ import React, { useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import {
+  RODRIGUES_BOUNDS_VISCOSITY,
+  RODRIGUES_MAX_BOUNDS,
+  RODRIGUES_MIN_ZOOM,
+} from '../../../components/rodriguesMapConfig';
 
 type Category = 'kitesurf' | 'viewpoint' | 'nature' | 'beach' | 'diving' | 'heritage';
 
@@ -255,6 +260,9 @@ const RodriguesMap: React.FC = () => {
           <MapContainer
             center={RODRIGUES_CENTER}
             zoom={12}
+            minZoom={RODRIGUES_MIN_ZOOM}
+            maxBounds={RODRIGUES_MAX_BOUNDS}
+            maxBoundsViscosity={RODRIGUES_BOUNDS_VISCOSITY}
             scrollWheelZoom={false}
             style={{ height: '100%', width: '100%' }}
           >

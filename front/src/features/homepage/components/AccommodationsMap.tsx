@@ -5,6 +5,11 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AccommodationListItem } from '../HomepageTypes';
+import {
+  RODRIGUES_BOUNDS_VISCOSITY,
+  RODRIGUES_MAX_BOUNDS,
+  RODRIGUES_MIN_ZOOM,
+} from '../../../components/rodriguesMapConfig';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -105,6 +110,9 @@ const AccommodationsMap: React.FC<AccommodationsMapProps> = ({
       <MapContainer
         center={points[0] ?? DEFAULT_CENTER}
         zoom={12}
+        minZoom={RODRIGUES_MIN_ZOOM}
+        maxBounds={RODRIGUES_MAX_BOUNDS}
+        maxBoundsViscosity={RODRIGUES_BOUNDS_VISCOSITY}
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
