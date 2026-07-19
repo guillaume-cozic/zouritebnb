@@ -20,7 +20,7 @@ export interface paths {
   "/api/accommodations": {
     /**
      * Lister les hébergements publiés
-     * @description Retourne la liste paginée des hébergements publiés avec leur photo principale.
+     * @description Retourne la liste paginée des hébergements publiés avec leur photo principale. Filtres optionnels (query) : q (recherche par mots-clés sur le titre et la description, tous les mots doivent correspondre), city, guests, priceMin, priceMax, type, instantBooking, amenities[], checkIn/checkOut, sort. Recherche géographique « dans cette zone » via l'emprise de la carte : north, south, east, west (latitudes/longitudes en degrés) — seuls les hébergements géolocalisés dans ce cadre sont renvoyés.
      */
     get: operations["api_accommodations_get_collection"];
     /**
@@ -91,6 +91,13 @@ export interface paths {
      * @description Définit ou remplace les coordonnées GPS d'un hébergement.
      */
     put: operations["api_accommodations_idgeolocation_put"];
+  };
+  "/api/accommodations/{id}/house-rules": {
+    /**
+     * Modifier le règlement intérieur d'un hébergement
+     * @description Définit les règles maison affichées sur la fiche : fumeurs, animaux et fêtes autorisés ou non, plus des règles complémentaires en texte libre (max 1000 caractères, null ou vide pour retirer).
+     */
+    patch: operations["api_accommodations_idhouse-rules_patch"];
   };
   "/api/accommodations/{id}/instant-booking": {
     /**
@@ -283,6 +290,13 @@ export interface paths {
      * @description Retourne le profil public de l'hôte (prénom, nom, photo, présentation) à partir de l'identifiant de son équipe. Accessible sans authentification : utilisé sur la page publique d'une annonce et dans la messagerie. 404 si l'équipe n'a aucun hôte.
      */
     get: operations["api_host-profiles_teamId_get"];
+  };
+  "/api/host/revenue": {
+    /**
+     * Tableau de bord des revenus de l'hôte
+     * @description Retourne le détail des revenus et versements de l'équipe hôte authentifiée, dérivé de ses réservations confirmées. La commission (8 %) et le don solidaire (7 %) sont des surcharges payées en plus par le voyageur : l'hôte perçoit l'intégralité du prix du séjour (total_price). Un versement est « en attente » tant que le séjour n'est pas terminé, puis « disponible » une fois le départ passé. Réservé à un utilisateur authentifié (résultats limités à sa propre équipe).
+     */
+    get: operations["api_hostrevenue_get"];
   };
   "/api/localities": {
     /**
@@ -667,6 +681,29 @@ export interface components {
           [key: string]: number | string;
         })[];
       /**
+       * @description Règlement intérieur : fumeurs autorisés
+       * @default false
+       * @example false
+       */
+      smokingAllowed?: boolean;
+      /**
+       * @description Règlement intérieur : animaux de compagnie acceptés
+       * @default false
+       * @example true
+       */
+      petsAllowed?: boolean;
+      /**
+       * @description Règlement intérieur : fêtes et événements autorisés
+       * @default false
+       * @example false
+       */
+      partiesAllowed?: boolean;
+      /**
+       * @description Règles complémentaires en texte libre définies par l'hôte, ou null
+       * @example Merci de retirer vos chaussures à l'intérieur.
+       */
+      houseRulesNotes?: string | null;
+      /**
        * @description Statut de publication
        * @example draft
        */
@@ -965,6 +1002,29 @@ export interface components {
       pricePeriods?: ({
           [key: string]: number | string;
         })[];
+      /**
+       * @description Règlement intérieur : fumeurs autorisés
+       * @default false
+       * @example false
+       */
+      smokingAllowed?: boolean;
+      /**
+       * @description Règlement intérieur : animaux de compagnie acceptés
+       * @default false
+       * @example true
+       */
+      petsAllowed?: boolean;
+      /**
+       * @description Règlement intérieur : fêtes et événements autorisés
+       * @default false
+       * @example false
+       */
+      partiesAllowed?: boolean;
+      /**
+       * @description Règles complémentaires en texte libre définies par l'hôte, ou null
+       * @example Merci de retirer vos chaussures à l'intérieur.
+       */
+      houseRulesNotes?: string | null;
       /**
        * @description Statut de publication
        * @example draft
@@ -1735,6 +1795,87 @@ export interface components {
        */
       avatarUrl?: string | null;
     });
+    "HostRevenue.jsonld-host_revenue.read": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant logique du tableau de bord
+       * @default current
+       * @example current
+       */
+      id?: string;
+      /**
+       * @description Revenu total brut de l'hôte (somme des prix de séjour des réservations confirmées), en euros
+       * @default 0
+       * @example 12450
+       */
+      totalEarned?: number;
+      /**
+       * @description Montant en attente de versement (séjours confirmés pas encore terminés), en euros
+       * @default 0
+       * @example 3200
+       */
+      pendingAmount?: number;
+      /**
+       * @description Montant disponible (séjours confirmés et terminés), en euros
+       * @default 0
+       * @example 9250
+       */
+      availableAmount?: number;
+      /**
+       * @description Nombre de réservations confirmées prises en compte
+       * @default 0
+       * @example 42
+       */
+      confirmedReservations?: number;
+      /**
+       * @description Nombre de séjours à venir (réservations confirmées dont le départ est dans le futur)
+       * @default 0
+       * @example 8
+       */
+      upcomingStays?: number;
+      /**
+       * @description Revenu confirmé réparti par hébergement
+       * @example [
+       *   {
+       *     "accommodationId": "01961e2f-dead-7000-beef-000000000002",
+       *     "title": "Studio vue mer",
+       *     "amount": 4800,
+       *     "reservations": 12
+       *   }
+       * ]
+       */
+      byAccommodation?: ({
+          [key: string]: number | string | null;
+        })[];
+      /**
+       * @description Échéancier des versements : revenu confirmé réparti par mois de fin de séjour (format YYYY-MM)
+       * @example [
+       *   {
+       *     "month": "2026-05",
+       *     "amount": 1600
+       *   }
+       * ]
+       */
+      byMonth?: ({
+          [key: string]: number | string;
+        })[];
+      /**
+       * @description Relevé des versements ligne à ligne : une entrée par réservation confirmée, avec son statut de versement ("pending" tant que le séjour n'est pas terminé, "available" ensuite)
+       * @example [
+       *   {
+       *     "reservationId": "01961e2f-dead-7000-beef-000000000001",
+       *     "accommodationTitle": "Studio vue mer",
+       *     "guestName": "Jean Dupont",
+       *     "checkIn": "2026-05-01T15:00:00+00:00",
+       *     "checkOut": "2026-05-05T11:00:00+00:00",
+       *     "amount": 400,
+       *     "status": "available"
+       *   }
+       * ]
+       */
+      payouts?: ({
+          [key: string]: number | string | null;
+        })[];
+    });
     HydraCollectionBaseSchema: components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
       /**
        * @example {
@@ -2346,7 +2487,7 @@ export interface operations {
   };
   /**
    * Lister les hébergements publiés
-   * @description Retourne la liste paginée des hébergements publiés avec leur photo principale.
+   * @description Retourne la liste paginée des hébergements publiés avec leur photo principale. Filtres optionnels (query) : q (recherche par mots-clés sur le titre et la description, tous les mots doivent correspondre), city, guests, priceMin, priceMax, type, instantBooking, amenities[], checkIn/checkOut, sort. Recherche géographique « dans cette zone » via l'emprise de la carte : north, south, east, west (latitudes/longitudes en degrés) — seuls les hébergements géolocalisés dans ce cadre sont renvoyés.
    */
   api_accommodations_get_collection: {
     parameters: {
@@ -2845,6 +2986,62 @@ export interface operations {
     requestBody?: {
       content: {
         "application/ld+json": unknown;
+      };
+    };
+    responses: {
+      /** @description AccommodationEntity resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Modifier le règlement intérieur d'un hébergement
+   * @description Définit les règles maison affichées sur la fiche : fumeurs, animaux et fêtes autorisés ou non, plus des règles complémentaires en texte libre (max 1000 caractères, null ou vide pour retirer).
+   */
+  "api_accommodations_idhouse-rules_patch": {
+    parameters: {
+      path: {
+        /** @description AccommodationEntity identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AccommodationEntity resource */
+    requestBody?: {
+      content: {
+        "application/merge-patch+json": unknown;
       };
     };
     responses: {
@@ -4064,6 +4261,36 @@ export interface operations {
       200: {
         content: {
           "application/ld+json": components["schemas"]["HostProfile.jsonld-host_profile.read"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Tableau de bord des revenus de l'hôte
+   * @description Retourne le détail des revenus et versements de l'équipe hôte authentifiée, dérivé de ses réservations confirmées. La commission (8 %) et le don solidaire (7 %) sont des surcharges payées en plus par le voyageur : l'hôte perçoit l'intégralité du prix du séjour (total_price). Un versement est « en attente » tant que le séjour n'est pas terminé, puis « disponible » une fois le départ passé. Réservé à un utilisateur authentifié (résultats limités à sa propre équipe).
+   */
+  api_hostrevenue_get: {
+    responses: {
+      /** @description HostRevenue resource */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HostRevenue.jsonld-host_revenue.read"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Not found */

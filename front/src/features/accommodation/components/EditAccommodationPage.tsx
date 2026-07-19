@@ -80,6 +80,12 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
     checkIn: accommodation.checkIn ?? '16:00',
     checkOut: accommodation.checkOut ?? '12:00',
   });
+  const [houseRules, setHouseRules] = useState({
+    smokingAllowed: accommodation.smokingAllowed ?? false,
+    petsAllowed: accommodation.petsAllowed ?? false,
+    partiesAllowed: accommodation.partiesAllowed ?? false,
+    houseRulesNotes: accommodation.houseRulesNotes ?? '',
+  });
   const [cancellationPolicy, setCancellationPolicy] = useState<CancellationPolicy>(
     accommodation.cancellationPolicy ?? 'flexible'
   );
@@ -202,6 +208,21 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
     setCheckInOutState((prev) => {
       const next = { ...prev, [field]: value };
       dispatch(accommodationFieldEdited({ field: 'checkInOut', id, ...next }));
+      return next;
+    });
+  };
+
+  const handleHouseRulesChange = (patch: Partial<typeof houseRules>) => {
+    setHouseRules((prev) => {
+      const next = { ...prev, ...patch };
+      dispatch(accommodationFieldEdited({
+        field: 'houseRules',
+        id,
+        smokingAllowed: next.smokingAllowed,
+        petsAllowed: next.petsAllowed,
+        partiesAllowed: next.partiesAllowed,
+        houseRulesNotes: next.houseRulesNotes.trim() === '' ? null : next.houseRulesNotes,
+      }));
       return next;
     });
   };
@@ -618,6 +639,49 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
                   onChange={(e) => handleCheckInOutChange('checkOut', e.target.value)}
                 />
               </Field>
+            </div>
+
+            <div className="mt-5 pt-5 border-t border-surface-200">
+              <p className="font-semibold text-surface-800">{t('houseRules.title')}</p>
+              <p className="text-sm text-surface-500 mt-1 mb-4">{t('houseRules.description')}</p>
+              <div className="space-y-3">
+                {([
+                  ['smokingAllowed', houseRules.smokingAllowed],
+                  ['petsAllowed', houseRules.petsAllowed],
+                  ['partiesAllowed', houseRules.partiesAllowed],
+                ] as const).map(([rule, value]) => (
+                  <div key={rule} className="flex items-center justify-between gap-4">
+                    <span className="text-surface-700">{t(`houseRules.${rule}`)}</span>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={value}
+                      aria-label={t(`houseRules.${rule}`)}
+                      onClick={() => handleHouseRulesChange({ [rule]: !value })}
+                      className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${
+                        value ? 'bg-primary-600' : 'bg-surface-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                          value ? 'translate-x-5' : 'translate-x-0.5'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4">
+                <Field label={t('houseRules.notesLabel')} hint={t('houseRules.notesHint')}>
+                  <Textarea
+                    rows={3}
+                    maxLength={1000}
+                    value={houseRules.houseRulesNotes}
+                    onChange={(e) => handleHouseRulesChange({ houseRulesNotes: e.target.value })}
+                    placeholder={t('houseRules.notesPlaceholder')}
+                  />
+                </Field>
+              </div>
             </div>
           </Card>
         </div>

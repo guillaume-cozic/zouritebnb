@@ -16,6 +16,7 @@ import {
   updateCancellationPolicy,
   updateDescription,
   updateDynamicPricing,
+  updateHouseRules,
   updateInstantBooking,
   updatePricePeriods,
   updateStayConstraints,
@@ -98,6 +99,8 @@ const isSavable = (p: AccommodationFieldEditedPayload): boolean => {
       return true;
     case 'stayConstraints':
       return isValidStayConstraints(p.minNights, p.maxNights);
+    case 'houseRules':
+      return p.houseRulesNotes === null || p.houseRulesNotes.length <= 1000;
     case 'location':
       return (
         p.street.trim() !== '' &&
@@ -136,6 +139,14 @@ const dispatchSave = (p: AccommodationFieldEditedPayload, dispatch: AppDispatch)
       return dispatch(updateType({ id: p.id, type: p.type }));
     case 'stayConstraints':
       return dispatch(updateStayConstraints({ id: p.id, minNights: p.minNights, maxNights: p.maxNights }));
+    case 'houseRules':
+      return dispatch(updateHouseRules({
+        id: p.id,
+        smokingAllowed: p.smokingAllowed,
+        petsAllowed: p.petsAllowed,
+        partiesAllowed: p.partiesAllowed,
+        houseRulesNotes: p.houseRulesNotes,
+      }));
     case 'capacity':
       return dispatch(setCapacity({
         id: p.id,
@@ -174,6 +185,7 @@ const EDIT_FIELDS: AccommodationEditField[] = [
   'instantBooking',
   'type',
   'stayConstraints',
+  'houseRules',
   'capacity',
   'amenities',
   'checkInOut',

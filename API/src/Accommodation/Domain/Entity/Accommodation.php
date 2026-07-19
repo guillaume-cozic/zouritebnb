@@ -12,6 +12,7 @@ use App\Accommodation\Domain\Event\AccommodationCheckInOutUpdated;
 use App\Accommodation\Domain\Event\AccommodationDescriptionUpdated;
 use App\Accommodation\Domain\Event\AccommodationDynamicPricingUpdated;
 use App\Accommodation\Domain\Event\AccommodationGeolocationUpdated;
+use App\Accommodation\Domain\Event\AccommodationHouseRulesUpdated;
 use App\Accommodation\Domain\Event\AccommodationInstantBookingUpdated;
 use App\Accommodation\Domain\Event\AccommodationPricePeriodsUpdated;
 use App\Accommodation\Domain\Event\AccommodationPriceUpdated;
@@ -21,6 +22,7 @@ use App\Accommodation\Domain\Event\AccommodationTypeUpdated;
 use App\Accommodation\Domain\Event\AccommodationUnpublished;
 use App\Accommodation\Domain\Event\AccommodationWeeklyPromotionUpdated;
 use App\Accommodation\Domain\Exception\InvalidDynamicPricingException;
+use App\Accommodation\Domain\Exception\InvalidHouseRulesException;
 use App\Accommodation\Domain\Exception\InvalidPriceException;
 use App\Accommodation\Domain\Exception\InvalidStayConstraintsException;
 use App\Accommodation\Domain\Exception\InvalidWeeklyPromotionException;
@@ -29,6 +31,8 @@ use Symfony\Component\Uid\Uuid;
 
 final class Accommodation extends AggregateRoot
 {
+    public const int HOUSE_RULES_NOTES_MAX_LENGTH = 1000;
+
     public function __construct(
         private readonly Uuid $id,
         private string $title,
@@ -51,6 +55,10 @@ final class Accommodation extends AggregateRoot
         private ?float $weekendSurchargePercentage = null,
         private ?float $lastMinuteDiscountPercentage = null,
         private ?int $lastMinuteDays = null,
+        private bool $smokingAllowed = false,
+        private bool $petsAllowed = false,
+        private bool $partiesAllowed = false,
+        private ?string $houseRulesNotes = null,
     ) {
         if ($price <= 0) {
             throw InvalidPriceException::becauseNegativeOrZero($price);
@@ -290,6 +298,47 @@ final class Accommodation extends AggregateRoot
         $this->lastMinuteDiscountPercentage = $lastMinuteDiscountPercentage;
         $this->lastMinuteDays = $lastMinuteDays;
         $this->recordEvent(new AccommodationDynamicPricingUpdated($this->id));
+    }
+
+    public function isSmokingAllowed(): bool
+    {
+        return $this->smokingAllowed;
+    }
+
+    public function isPetsAllowed(): bool
+    {
+        return $this->petsAllowed;
+    }
+
+    public function isPartiesAllowed(): bool
+    {
+        return $this->partiesAllowed;
+    }
+
+    public function getHouseRulesNotes(): ?string
+    {
+        return $this->houseRulesNotes;
+    }
+
+    public function updateHouseRules(
+        bool $smokingAllowed,
+        bool $petsAllowed,
+        bool $partiesAllowed,
+        ?string $houseRulesNotes,
+    ): void {
+        $houseRulesNotes = null === $houseRulesNotes ? null : trim($houseRulesNotes);
+        if ('' === $houseRulesNotes) {
+            $houseRulesNotes = null;
+        }
+        if (null !== $houseRulesNotes && mb_strlen($houseRulesNotes) > self::HOUSE_RULES_NOTES_MAX_LENGTH) {
+            throw InvalidHouseRulesException::becauseNotesTooLong(mb_strlen($houseRulesNotes), self::HOUSE_RULES_NOTES_MAX_LENGTH);
+        }
+
+        $this->smokingAllowed = $smokingAllowed;
+        $this->petsAllowed = $petsAllowed;
+        $this->partiesAllowed = $partiesAllowed;
+        $this->houseRulesNotes = $houseRulesNotes;
+        $this->recordEvent(new AccommodationHouseRulesUpdated($this->id));
     }
 
     public function getPricePeriods(): PricePeriods

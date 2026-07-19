@@ -108,6 +108,18 @@ class AccommodationEntity
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $pricePeriods = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $smokingAllowed = false;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $petsAllowed = false;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $partiesAllowed = false;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $houseRulesNotes = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -478,6 +490,54 @@ class AccommodationEntity
     public function setPricePeriods(?array $pricePeriods): static
     {
         $this->pricePeriods = $pricePeriods;
+
+        return $this;
+    }
+
+    public function isSmokingAllowed(): bool
+    {
+        return $this->smokingAllowed;
+    }
+
+    public function setSmokingAllowed(bool $smokingAllowed): static
+    {
+        $this->smokingAllowed = $smokingAllowed;
+
+        return $this;
+    }
+
+    public function isPetsAllowed(): bool
+    {
+        return $this->petsAllowed;
+    }
+
+    public function setPetsAllowed(bool $petsAllowed): static
+    {
+        $this->petsAllowed = $petsAllowed;
+
+        return $this;
+    }
+
+    public function isPartiesAllowed(): bool
+    {
+        return $this->partiesAllowed;
+    }
+
+    public function setPartiesAllowed(bool $partiesAllowed): static
+    {
+        $this->partiesAllowed = $partiesAllowed;
+
+        return $this;
+    }
+
+    public function getHouseRulesNotes(): ?string
+    {
+        return $this->houseRulesNotes;
+    }
+
+    public function setHouseRulesNotes(?string $houseRulesNotes): static
+    {
+        $this->houseRulesNotes = $houseRulesNotes;
 
         return $this;
     }

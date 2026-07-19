@@ -108,7 +108,7 @@
                     }
                 },
                 "summary": "Lister les h\u00e9bergements publi\u00e9s",
-                "description": "Retourne la liste pagin\u00e9e des h\u00e9bergements publi\u00e9s avec leur photo principale.",
+                "description": "Retourne la liste pagin\u00e9e des h\u00e9bergements publi\u00e9s avec leur photo principale. Filtres optionnels (query) : q (recherche par mots-cl\u00e9s sur le titre et la description, tous les mots doivent correspondre), city, guests, priceMin, priceMax, type, instantBooking, amenities[], checkIn/checkOut, sort. Recherche g\u00e9ographique \u00ab dans cette zone \u00bb via l'emprise de la carte : north, south, east, west (latitudes/longitudes en degr\u00e9s) \u2014 seuls les h\u00e9bergements g\u00e9olocalis\u00e9s dans ce cadre sont renvoy\u00e9s.",
                 "parameters": [
                     {
                         "name": "page",
@@ -1398,6 +1398,148 @@
                                     "value": {
                                         "latitude": 48.8566,
                                         "longitude": 2.3522
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
+        "/api/accommodations/{id}/house-rules": {
+            "patch": {
+                "operationId": "api_accommodations_idhouse-rules_patch",
+                "tags": [
+                    "AccommodationEntity"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AccommodationEntity resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Modifier le r\u00e8glement int\u00e9rieur d'un h\u00e9bergement",
+                "description": "D\u00e9finit les r\u00e8gles maison affich\u00e9es sur la fiche : fumeurs, animaux et f\u00eates autoris\u00e9s ou non, plus des r\u00e8gles compl\u00e9mentaires en texte libre (max 1000 caract\u00e8res, null ou vide pour retirer).",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AccommodationEntity identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AccommodationEntity resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Requ\u00eate valide",
+                                    "value": {
+                                        "smokingAllowed": false,
+                                        "petsAllowed": true,
+                                        "partiesAllowed": false,
+                                        "houseRulesNotes": "Merci de retirer vos chaussures \u00e0 l'int\u00e9rieur."
+                                    }
+                                },
+                                "no_notes": {
+                                    "summary": "Sans r\u00e8gles compl\u00e9mentaires",
+                                    "value": {
+                                        "smokingAllowed": false,
+                                        "petsAllowed": false,
+                                        "partiesAllowed": false,
+                                        "houseRulesNotes": null
                                     }
                                 }
                             }
@@ -4312,6 +4454,71 @@
                         "explode": false
                     }
                 ]
+            }
+        },
+        "/api/host/revenue": {
+            "get": {
+                "operationId": "api_hostrevenue_get",
+                "tags": [
+                    "HostRevenue"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HostRevenue resource",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HostRevenue.jsonld-host_revenue.read"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Tableau de bord des revenus de l'h\u00f4te",
+                "description": "Retourne le d\u00e9tail des revenus et versements de l'\u00e9quipe h\u00f4te authentifi\u00e9e, d\u00e9riv\u00e9 de ses r\u00e9servations confirm\u00e9es. La commission (8 %) et le don solidaire (7 %) sont des surcharges pay\u00e9es en plus par le voyageur : l'h\u00f4te per\u00e7oit l'int\u00e9gralit\u00e9 du prix du s\u00e9jour (total_price). Un versement est \u00ab en attente \u00bb tant que le s\u00e9jour n'est pas termin\u00e9, puis \u00ab disponible \u00bb une fois le d\u00e9part pass\u00e9. R\u00e9serv\u00e9 \u00e0 un utilisateur authentifi\u00e9 (r\u00e9sultats limit\u00e9s \u00e0 sa propre \u00e9quipe).",
+                "parameters": []
             }
         },
         "/api/localities": {
@@ -8045,6 +8252,32 @@
                                     }
                                 }
                             },
+                            "smokingAllowed": {
+                                "description": "R\u00e8glement int\u00e9rieur : fumeurs autoris\u00e9s",
+                                "default": false,
+                                "example": false,
+                                "type": "boolean"
+                            },
+                            "petsAllowed": {
+                                "description": "R\u00e8glement int\u00e9rieur : animaux de compagnie accept\u00e9s",
+                                "default": false,
+                                "example": true,
+                                "type": "boolean"
+                            },
+                            "partiesAllowed": {
+                                "description": "R\u00e8glement int\u00e9rieur : f\u00eates et \u00e9v\u00e9nements autoris\u00e9s",
+                                "default": false,
+                                "example": false,
+                                "type": "boolean"
+                            },
+                            "houseRulesNotes": {
+                                "description": "R\u00e8gles compl\u00e9mentaires en texte libre d\u00e9finies par l'h\u00f4te, ou null",
+                                "example": "Merci de retirer vos chaussures \u00e0 l'int\u00e9rieur.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
                             "status": {
                                 "description": "Statut de publication",
                                 "example": "draft",
@@ -8539,6 +8772,32 @@
                                         ]
                                     }
                                 }
+                            },
+                            "smokingAllowed": {
+                                "description": "R\u00e8glement int\u00e9rieur : fumeurs autoris\u00e9s",
+                                "default": false,
+                                "example": false,
+                                "type": "boolean"
+                            },
+                            "petsAllowed": {
+                                "description": "R\u00e8glement int\u00e9rieur : animaux de compagnie accept\u00e9s",
+                                "default": false,
+                                "example": true,
+                                "type": "boolean"
+                            },
+                            "partiesAllowed": {
+                                "description": "R\u00e8glement int\u00e9rieur : f\u00eates et \u00e9v\u00e9nements autoris\u00e9s",
+                                "default": false,
+                                "example": false,
+                                "type": "boolean"
+                            },
+                            "houseRulesNotes": {
+                                "description": "R\u00e8gles compl\u00e9mentaires en texte libre d\u00e9finies par l'h\u00f4te, ou null",
+                                "example": "Merci de retirer vos chaussures \u00e0 l'int\u00e9rieur.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
                             },
                             "status": {
                                 "description": "Statut de publication",
@@ -10023,6 +10282,139 @@
                     }
                 ]
             },
+            "HostRevenue.jsonld-host_revenue.read": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Identifiant logique du tableau de bord",
+                                "default": "current",
+                                "example": "current",
+                                "type": "string"
+                            },
+                            "totalEarned": {
+                                "description": "Revenu total brut de l'h\u00f4te (somme des prix de s\u00e9jour des r\u00e9servations confirm\u00e9es), en euros",
+                                "default": 0,
+                                "example": 12450,
+                                "type": "number"
+                            },
+                            "pendingAmount": {
+                                "description": "Montant en attente de versement (s\u00e9jours confirm\u00e9s pas encore termin\u00e9s), en euros",
+                                "default": 0,
+                                "example": 3200,
+                                "type": "number"
+                            },
+                            "availableAmount": {
+                                "description": "Montant disponible (s\u00e9jours confirm\u00e9s et termin\u00e9s), en euros",
+                                "default": 0,
+                                "example": 9250,
+                                "type": "number"
+                            },
+                            "confirmedReservations": {
+                                "description": "Nombre de r\u00e9servations confirm\u00e9es prises en compte",
+                                "default": 0,
+                                "example": 42,
+                                "type": "integer"
+                            },
+                            "upcomingStays": {
+                                "description": "Nombre de s\u00e9jours \u00e0 venir (r\u00e9servations confirm\u00e9es dont le d\u00e9part est dans le futur)",
+                                "default": 0,
+                                "example": 8,
+                                "type": "integer"
+                            },
+                            "byAccommodation": {
+                                "description": "Revenu confirm\u00e9 r\u00e9parti par h\u00e9bergement",
+                                "example": [
+                                    {
+                                        "accommodationId": "01961e2f-dead-7000-beef-000000000002",
+                                        "title": "Studio vue mer",
+                                        "amount": 4800,
+                                        "reservations": 12
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "byMonth": {
+                                "description": "\u00c9ch\u00e9ancier des versements : revenu confirm\u00e9 r\u00e9parti par mois de fin de s\u00e9jour (format YYYY-MM)",
+                                "example": [
+                                    {
+                                        "month": "2026-05",
+                                        "amount": 1600
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "payouts": {
+                                "description": "Relev\u00e9 des versements ligne \u00e0 ligne : une entr\u00e9e par r\u00e9servation confirm\u00e9e, avec son statut de versement (\"pending\" tant que le s\u00e9jour n'est pas termin\u00e9, \"available\" ensuite)",
+                                "example": [
+                                    {
+                                        "reservationId": "01961e2f-dead-7000-beef-000000000001",
+                                        "accommodationTitle": "Studio vue mer",
+                                        "guestName": "Jean Dupont",
+                                        "checkIn": "2026-05-01T15:00:00+00:00",
+                                        "checkOut": "2026-05-05T11:00:00+00:00",
+                                        "amount": 400,
+                                        "status": "available"
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
             "HydraCollectionBaseSchema": {
                 "allOf": [
                     {
@@ -11171,6 +11563,10 @@
         {
             "name": "AdminReservation",
             "description": "Resource 'AdminReservation' operations."
+        },
+        {
+            "name": "HostRevenue",
+            "description": "Resource 'HostRevenue' operations."
         },
         {
             "name": "Reservation",

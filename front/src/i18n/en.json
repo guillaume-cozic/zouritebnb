@@ -727,6 +727,19 @@
     "maxNights": "Maximum nights",
     "noLimit": "No limit"
   },
+  "houseRules": {
+    "title": "House rules",
+    "description": "Tell guests what is allowed in your accommodation and any additional rules.",
+    "smokingAllowed": "Smoking allowed",
+    "smokingAllowedNot": "No smoking",
+    "petsAllowed": "Pets allowed",
+    "petsAllowedNot": "No pets",
+    "partiesAllowed": "Parties and events allowed",
+    "partiesAllowedNot": "No parties or events",
+    "notesLabel": "Additional rules",
+    "notesHint": "Shown on the accommodation page (1000 characters max).",
+    "notesPlaceholder": "E.g. Please remove your shoes indoors."
+  },
   "capacityStep": {
     "intro": "Specify the capacity of your accommodation to help travellers find the ideal place.",
     "sectionTitle": "Capacity and bedding",

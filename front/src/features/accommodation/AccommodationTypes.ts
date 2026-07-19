@@ -49,6 +49,12 @@ export interface Accommodation {
   amenities?: string[];
   checkIn?: string | null;
   checkOut?: string | null;
+  /** House rules shown on the accommodation page. */
+  smokingAllowed?: boolean;
+  petsAllowed?: boolean;
+  partiesAllowed?: boolean;
+  /** Free-text additional house rules set by the host. */
+  houseRulesNotes?: string | null;
   teamId?: string | null;
   /** Host's featured solidarity project (UUID), exposed publicly. */
   favoriteSolidarityProjectId?: string | null;
@@ -149,6 +155,14 @@ export interface UpdateStayConstraintsPayload {
   id: string;
   minNights: number | null;
   maxNights: number | null;
+}
+
+export interface UpdateHouseRulesPayload {
+  id: string;
+  smokingAllowed: boolean;
+  petsAllowed: boolean;
+  partiesAllowed: boolean;
+  houseRulesNotes: string | null;
 }
 
 export interface SetCheckInOutPayload {

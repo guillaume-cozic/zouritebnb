@@ -354,6 +354,30 @@ const AccommodationDetailPage: React.FC = () => {
               </div>
             </div>
 
+            {/* House rules */}
+            <div className="border-b pb-8 mb-8">
+              <h2 className="text-2xl font-semibold mb-6">{t('houseRules.title')}</h2>
+              <div className="space-y-3">
+                {([
+                  ['smokingAllowed', accommodation.smokingAllowed ?? false],
+                  ['petsAllowed', accommodation.petsAllowed ?? false],
+                  ['partiesAllowed', accommodation.partiesAllowed ?? false],
+                ] as const).map(([rule, allowed]) => (
+                  <div key={rule} className="flex items-center gap-3">
+                    {allowed ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600 flex-shrink-0"><path d="M20 6L9 17l-5-5" /></svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
+                    )}
+                    <span>{t(`houseRules.${rule}${allowed ? '' : 'Not'}`)}</span>
+                  </div>
+                ))}
+              </div>
+              {accommodation.houseRulesNotes && (
+                <p className="text-gray-500 whitespace-pre-line mt-4">{accommodation.houseRulesNotes}</p>
+              )}
+            </div>
+
             {/* Amenities */}
             {accommodation.amenities && accommodation.amenities.length > 0 && (
               <div className="border-b pb-8 mb-8">

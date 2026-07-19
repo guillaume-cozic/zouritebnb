@@ -727,6 +727,19 @@
     "maxNights": "Nuits maximum",
     "noLimit": "Aucune limite"
   },
+  "houseRules": {
+    "title": "Règlement intérieur",
+    "description": "Indiquez ce qui est autorisé dans votre logement et vos règles complémentaires.",
+    "smokingAllowed": "Fumeurs autorisés",
+    "smokingAllowedNot": "Non fumeur",
+    "petsAllowed": "Animaux acceptés",
+    "petsAllowedNot": "Animaux non acceptés",
+    "partiesAllowed": "Fêtes et événements autorisés",
+    "partiesAllowedNot": "Pas de fête ni d'événement",
+    "notesLabel": "Règles complémentaires",
+    "notesHint": "Affichées sur la fiche du logement (1000 caractères max).",
+    "notesPlaceholder": "Ex. : Merci de retirer vos chaussures à l'intérieur."
+  },
   "capacityStep": {
     "intro": "Indiquez la capacité de votre hébergement pour aider les voyageurs à trouver le logement idéal.",
     "sectionTitle": "Capacité et couchages",

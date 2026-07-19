@@ -18,6 +18,7 @@ import {
   UpdateInstantBookingPayload,
   UpdateTypePayload,
   UpdateStayConstraintsPayload,
+  UpdateHouseRulesPayload,
   CancellationPolicy,
   AccommodationType,
   SetCheckInOutPayload,
@@ -48,6 +49,7 @@ export type AccommodationFieldEditedPayload =
   | { field: 'instantBooking'; id: string; instantBooking: boolean }
   | { field: 'type'; id: string; type: AccommodationType | null }
   | { field: 'stayConstraints'; id: string; minNights: number | null; maxNights: number | null }
+  | { field: 'houseRules'; id: string; smokingAllowed: boolean; petsAllowed: boolean; partiesAllowed: boolean; houseRulesNotes: string | null }
   | { field: 'capacity'; id: string; bedrooms: number; bathrooms: number; maxGuests: number; singleBeds: number; doubleBeds: number }
   | { field: 'amenities'; id: string; codes: string[] }
   | { field: 'checkInOut'; id: string; checkIn: string; checkOut: string }
@@ -70,6 +72,7 @@ export const editSectionForField = (field: AccommodationEditField): EditSection 
     case 'pricePeriods':
       return 'price';
     case 'checkInOut':
+    case 'houseRules':
       return 'checkinout';
     case 'cancellationPolicy':
     case 'instantBooking':
@@ -389,6 +392,27 @@ export const updateStayConstraints = createAsyncThunk(
   }
 );
 
+export const updateHouseRules = createAsyncThunk(
+  'accommodation/updateHouseRules',
+  async (
+    { id, smokingAllowed, petsAllowed, partiesAllowed, houseRulesNotes }: UpdateHouseRulesPayload,
+    { rejectWithValue }
+  ) => {
+    try {
+      await api.patch(
+        `/api/accommodations/${id}/house-rules`,
+        { smokingAllowed, petsAllowed, partiesAllowed, houseRulesNotes },
+        { headers: { 'Content-Type': 'application/merge-patch+json' } }
+      );
+      return { smokingAllowed, petsAllowed, partiesAllowed, houseRulesNotes };
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, 'Erreur lors de la mise à jour du règlement intérieur')
+      );
+    }
+  }
+);
+
 export const setCheckInOut = createAsyncThunk(
   'accommodation/setCheckInOut',
   async ({ id, checkIn, checkOut }: SetCheckInOutPayload, { rejectWithValue }) => {
@@ -468,6 +492,7 @@ const EDIT_SECTION_BY_THUNK_PREFIX: Record<string, EditSection> = {
   [setCapacity.typePrefix]: 'capacity',
   [setAmenities.typePrefix]: 'amenities',
   [setCheckInOut.typePrefix]: 'checkinout',
+  [updateHouseRules.typePrefix]: 'checkinout',
   [setLocation.typePrefix]: 'location',
 };
 
@@ -484,6 +509,7 @@ const EDIT_THUNKS = [
   setCapacity,
   setAmenities,
   setCheckInOut,
+  updateHouseRules,
   setLocation,
 ];
 
@@ -751,6 +777,20 @@ const accommodationSlice = createSlice({
         }
       })
       .addCase(setCheckInOut.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // House rules
+      .addCase(updateHouseRules.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.smokingAllowed = action.payload.smokingAllowed;
+          state.current.petsAllowed = action.payload.petsAllowed;
+          state.current.partiesAllowed = action.payload.partiesAllowed;
+          state.current.houseRulesNotes = action.payload.houseRulesNotes;
+        }
+      })
+      .addCase(updateHouseRules.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })

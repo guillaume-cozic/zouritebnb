@@ -270,6 +270,57 @@ describe('accommodationFieldEdited', () => {
     }
   });
 
+  test('saves the house rules under the checkinout badge section', async () => {
+    vi.useFakeTimers();
+    try {
+      mockedApi.patch.mockResolvedValue({ data: {} });
+      const store = buildStore();
+
+      store.dispatch(accommodationFieldEdited({
+        field: 'houseRules',
+        id: 'a-1',
+        smokingAllowed: false,
+        petsAllowed: true,
+        partiesAllowed: false,
+        houseRulesNotes: 'Merci de retirer vos chaussures.',
+      }));
+      expect(mockedApi.patch).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(1201);
+      await flush();
+
+      expect(mockedApi.patch).toHaveBeenCalledWith(
+        '/api/accommodations/a-1/house-rules',
+        { smokingAllowed: false, petsAllowed: true, partiesAllowed: false, houseRulesNotes: 'Merci de retirer vos chaussures.' },
+        expect.anything()
+      );
+      expect(store.getState().accommodation.editSaveStatus.checkinout).toBe('saved');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('skips saving house rules when the notes exceed 1000 characters', async () => {
+    vi.useFakeTimers();
+    try {
+      const store = buildStore();
+
+      store.dispatch(accommodationFieldEdited({
+        field: 'houseRules',
+        id: 'a-1',
+        smokingAllowed: false,
+        petsAllowed: false,
+        partiesAllowed: false,
+        houseRulesNotes: 'a'.repeat(1001),
+      }));
+      vi.advanceTimersByTime(1201);
+      await flush();
+
+      expect(mockedApi.patch).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   test('saves the weekly promotion under the price badge section', async () => {
     vi.useFakeTimers();
     try {

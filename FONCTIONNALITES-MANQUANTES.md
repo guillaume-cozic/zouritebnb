@@ -47,6 +47,10 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   à l'acceptation). Disponibilité revérifiée (hors elle-même) à la demande et à l'acceptation.
   Pas de charge/remboursement Stripe de l'écart (cohérent avec le manque « remboursement réel »).
 
+- **Règlement intérieur & règles maison** : l'hôte définit fumeurs/animaux/fêtes
+  (autorisé ou non) et des règles complémentaires en texte libre (1000 caractères max) depuis
+  l'éditeur (auto-save) ; le tout est affiché dans une section « Règlement intérieur » de la
+  fiche logement. Endpoint `PATCH /accommodations/{id}/house-rules`.
 - **Multi-langue** : le front avait déjà le sélecteur FR/EN (i18next + `Accept-Language`
   sur les appels projets solidaires) ; le contenu est maintenant traduit — les 14 articles
   du blog existent en anglais sous `/blog/en/` et les projets solidaires ont leur
@@ -69,7 +73,6 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 - **Login social** (Google/Apple) : absent.
 - **Pièces jointes / photos dans la messagerie** : texte seul.
 - **Modération des avis / signalement** : pas de système de flag.
-- **Règlement intérieur & règles maison** : pas de house rules sur la fiche.
 - **Politiques d'annulation** : seulement flexible / modérée — pas de « stricte » ni personnalisable.
 - **Devise** : EUR codé en dur, pas de multi-devise.
 

@@ -308,6 +308,35 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: UpdateAccommodationStayConstraintsProcessor::class,
         ),
         new Patch(
+            uriTemplate: '/accommodations/{id}/house-rules',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Modifier le règlement intérieur d\'un hébergement',
+                description: 'Définit les règles maison affichées sur la fiche : fumeurs, animaux et fêtes autorisés ou non, plus des règles complémentaires en texte libre (max 1000 caractères, null ou vide pour retirer).',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/merge-patch+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Requête valide',
+                                    value: ['smokingAllowed' => false, 'petsAllowed' => true, 'partiesAllowed' => false, 'houseRulesNotes' => 'Merci de retirer vos chaussures à l\'intérieur.'],
+                                ),
+                                'no_notes' => new Example(
+                                    summary: 'Sans règles complémentaires',
+                                    value: ['smokingAllowed' => false, 'petsAllowed' => false, 'partiesAllowed' => false, 'houseRulesNotes' => null],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationHouseRulesInput::class,
+            output: false,
+            processor: UpdateAccommodationHouseRulesProcessor::class,
+        ),
+        new Patch(
             uriTemplate: '/accommodations/{id}/cancellation-policy',
             status: 204,
             openapi: new OpenApiOperation(
@@ -658,6 +687,22 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Tarifs par période (saisonnier / dates) : prix par nuit appliqué aux nuits comprises dans chaque plage [startDate, endDate] (format Y-m-d). Le premier intervalle correspondant l\'emporte.', example: [['startDate' => '2026-07-01', 'endDate' => '2026-08-31', 'pricePerNight' => 250.0]])]
     public array $pricePeriods = [];
 
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Règlement intérieur : fumeurs autorisés', example: false)]
+    public bool $smokingAllowed = false;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Règlement intérieur : animaux de compagnie acceptés', example: true)]
+    public bool $petsAllowed = false;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Règlement intérieur : fêtes et événements autorisés', example: false)]
+    public bool $partiesAllowed = false;
+
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Règles complémentaires en texte libre définies par l\'hôte, ou null', example: 'Merci de retirer vos chaussures à l\'intérieur.')]
+    public ?string $houseRulesNotes = null;
+
     #[Groups(['accommodation:read', 'accommodation:list'])]
     #[ApiProperty(description: 'Statut de publication', example: 'draft')]
     public ?string $status = null;
@@ -774,6 +819,10 @@ class AccommodationOutput implements FromEntityInterface
         $output->lastMinuteDiscountPercentage = $entity->getLastMinuteDiscountPercentage();
         $output->lastMinuteDays = $entity->getLastMinuteDays();
         $output->pricePeriods = $entity->getPricePeriods() ?? [];
+        $output->smokingAllowed = $entity->isSmokingAllowed();
+        $output->petsAllowed = $entity->isPetsAllowed();
+        $output->partiesAllowed = $entity->isPartiesAllowed();
+        $output->houseRulesNotes = $entity->getHouseRulesNotes();
 
         return $output;
     }

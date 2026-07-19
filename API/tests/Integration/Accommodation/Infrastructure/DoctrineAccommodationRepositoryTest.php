@@ -220,6 +220,33 @@ final class DoctrineAccommodationRepositoryTest extends RepositoryTestCase
         self::assertSame('11:00', $found->getCheckInOut()->checkOut());
     }
 
+    public function test_should_save_and_find_accommodation_with_house_rules(): void
+    {
+        $id = Uuid::v4();
+        $accommodation = new Accommodation(
+            id: $id,
+            title: 'Ruled Stay',
+            description: 'Has house rules',
+            price: 90.0,
+        );
+        $accommodation->updateHouseRules(
+            smokingAllowed: false,
+            petsAllowed: true,
+            partiesAllowed: false,
+            houseRulesNotes: 'Merci de retirer vos chaussures.',
+        );
+        $accommodation->releaseEvents();
+
+        $this->repository->save($accommodation);
+        $found = $this->repository->findById($id);
+
+        self::assertNotNull($found);
+        self::assertFalse($found->isSmokingAllowed());
+        self::assertTrue($found->isPetsAllowed());
+        self::assertFalse($found->isPartiesAllowed());
+        self::assertSame('Merci de retirer vos chaussures.', $found->getHouseRulesNotes());
+    }
+
     public function test_should_save_and_find_fully_populated_accommodation(): void
     {
         $id = Uuid::v4();
