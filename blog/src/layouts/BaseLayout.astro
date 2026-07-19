@@ -28,10 +28,30 @@ const logoHref = `${baseUrl}logo.png`;
 const faviconHref = `${baseUrl}favicon.ico`;
 const frontUrl = import.meta.env.PUBLIC_FRONT_URL ?? '/';
 const blogHome = homeUrl ?? baseUrl;
+// Legal pages live on the front app; frontUrl may or may not end with a slash.
+const frontPage = (path: string) => `${frontUrl.endsWith('/') ? frontUrl.slice(0, -1) : frontUrl}/${path}`;
 
 const t = {
-  fr: { notebook: 'Carnet de Rodrigues', book: 'Réserver un hébergement', accommodation: 'Hébergements', other: 'EN' },
-  en: { notebook: 'Rodrigues Notebook', book: 'Book a stay', accommodation: 'Accommodation', other: 'FR' },
+  fr: {
+    notebook: 'Carnet de Rodrigues',
+    book: 'Réserver un hébergement',
+    accommodation: 'Hébergements',
+    other: 'EN',
+    termsOfUse: "Conditions d'utilisation (CGU)",
+    termsOfSale: 'Conditions de vente (CGV)',
+    legalNotice: 'Mentions légales',
+    privacyPolicy: 'Politique de confidentialité',
+  },
+  en: {
+    notebook: 'Rodrigues Notebook',
+    book: 'Book a stay',
+    accommodation: 'Accommodation',
+    other: 'FR',
+    termsOfUse: 'Terms of use',
+    termsOfSale: 'Terms of sale',
+    legalNotice: 'Legal notice',
+    privacyPolicy: 'Privacy policy',
+  },
 }[lang];
 ---
 
@@ -123,8 +143,14 @@ const t = {
             </ul>
           </div>
         </div>
-        <div class="border-t border-gray-800 py-6 text-center text-sm text-gray-500">
-          &copy; {new Date().getFullYear()} ZouriteBnb. Tous droits réservés.
+        <div class="border-t border-gray-800 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+          <span>&copy; {new Date().getFullYear()} ZouriteBnb. Tous droits réservés.</span>
+          <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <a href={frontPage('cgu')} class="hover:text-white transition-colors">{t.termsOfUse}</a>
+            <a href={frontPage('cgv')} class="hover:text-white transition-colors">{t.termsOfSale}</a>
+            <a href={frontPage('mentions-legales')} class="hover:text-white transition-colors">{t.legalNotice}</a>
+            <a href={frontPage('confidentialite')} class="hover:text-white transition-colors">{t.privacyPolicy}</a>
+          </nav>
         </div>
       </div>
     </footer>

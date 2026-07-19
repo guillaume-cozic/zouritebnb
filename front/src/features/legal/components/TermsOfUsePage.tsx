@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import LegalPageLayout, { LegalSection } from './LegalPageLayout';
 
-const LAST_UPDATED = '28 juin 2026';
+const LAST_UPDATED = '19 juillet 2026';
 
 /**
  * Conditions Générales d'Utilisation (CGU) — governs how everyone uses the
@@ -63,6 +63,12 @@ const TermsOfUsePage: React.FC = () => (
         Vous vous engagez à fournir des informations exactes et à les tenir à jour. Vous êtes seul responsable de
         la confidentialité de vos identifiants et de toute activité réalisée depuis votre compte. Toute
         utilisation frauduleuse doit nous être signalée sans délai.
+      </p>
+      <p>
+        Le compte peut être créé avec une adresse email et un mot de passe, ou via un{' '}
+        <strong>fournisseur d'identité tiers</strong> (Google, Apple ou Facebook) lorsque cette option est
+        proposée. Dans ce cas, l'adresse email transmise par le fournisseur est utilisée pour identifier votre
+        compte, et l'accès à ce fournisseur relève de votre responsabilité et des conditions dudit fournisseur.
       </p>
       <p>
         Pour certaines opérations, une <strong>vérification d'identité</strong> peut être requise afin de

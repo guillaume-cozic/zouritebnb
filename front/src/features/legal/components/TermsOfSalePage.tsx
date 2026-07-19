@@ -2,14 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import LegalPageLayout, { LegalSection } from './LegalPageLayout';
 
-const LAST_UPDATED = '28 juin 2026';
+const LAST_UPDATED = '19 juillet 2026';
 
 /**
  * Conditions Générales de Vente (CGV) — governs the booking transaction between
  * Voyageur and Hôte, and ZouriteBnb's service fee / payment intermediation.
  * Figures reflect the platform's actual rules: prices in EUR, 8% service fee,
- * Stripe payments, optional solidarity donation, host cancellation with full
- * refund. Drafted under Mauritian law.
+ * 7% solidarity contribution, Stripe deferred capture, flexible/moderate
+ * cancellation scales with real card refunds. Drafted under Mauritian law.
  */
 const TermsOfSalePage: React.FC = () => (
   <LegalPageLayout title="Conditions Générales de Vente" lastUpdated={LAST_UPDATED}>
@@ -47,10 +47,17 @@ const TermsOfSalePage: React.FC = () => (
           rémunérant l'utilisation de la Plateforme ;
         </li>
         <li>
-          le cas échéant, un <strong>don solidaire</strong> facultatif au profit d'un projet local, dont le
-          montant est choisi et accepté par le Voyageur au moment de la réservation.
+          une <strong>contribution solidaire</strong> égale à <strong>7 %</strong> du prix du séjour, reversée
+          à un projet local de Rodrigues (le projet mis en avant par l'Hôte, le cas échéant). Cette contribution
+          fait partie intégrante de la démarche de la Plateforme et est incluse dans le montant total affiché
+          avant validation.
         </li>
       </ul>
+      <p>
+        Les taux des frais de service et de la contribution solidaire applicables sont ceux en vigueur au moment
+        de la réservation ; ils sont <strong>figés</strong> pour la réservation concernée et ne sont pas modifiés
+        rétroactivement.
+      </p>
     </LegalSection>
 
     <LegalSection id="reservation" title="3. Processus de réservation">
@@ -59,14 +66,18 @@ const TermsOfSalePage: React.FC = () => (
         <li>le Voyageur sélectionne un hébergement, des dates disponibles et le nombre de voyageurs ;</li>
         <li>il vérifie le récapitulatif (prix du séjour, frais de service, don éventuel, montant total) ;</li>
         <li>
-          il adresse une <strong>demande de réservation</strong> à l'Hôte ou, selon l'annonce, confirme
-          directement ;
+          il adresse une <strong>demande de réservation</strong> à l'Hôte ou, si l'annonce propose la{' '}
+          <strong>réservation instantanée</strong>, confirme directement sans validation préalable de l'Hôte ;
         </li>
         <li>
-          la réservation est <strong>ferme</strong> une fois acceptée par l'Hôte (le cas échéant) et le paiement
-          autorisé. Un courriel de confirmation est alors envoyé.
+          la réservation est <strong>ferme</strong> une fois acceptée par l'Hôte (ou immédiatement en
+          réservation instantanée) et le paiement autorisé. Un courriel de confirmation est alors envoyé.
         </li>
       </ol>
+      <p>
+        Une demande de réservation restée sans réponse de l'Hôte peut <strong>expirer automatiquement</strong> ;
+        elle est alors refusée et l'autorisation bancaire du Voyageur est levée sans aucun débit.
+      </p>
     </LegalSection>
 
     <LegalSection id="paiement" title="4. Paiement">
@@ -74,6 +85,12 @@ const TermsOfSalePage: React.FC = () => (
         Le paiement s'effectue en ligne par carte bancaire via notre prestataire de paiement{' '}
         <strong>Stripe</strong>. ZouriteBnb n'a jamais accès aux données complètes de votre carte, traitées de
         manière sécurisée par Stripe.
+      </p>
+      <p>
+        Lors d'une demande de réservation, le montant total fait l'objet d'une{' '}
+        <strong>autorisation bancaire</strong> (empreinte) : aucun débit n'intervient tant que l'Hôte n'a pas
+        accepté. La carte est <strong>débitée à la confirmation</strong> de la réservation (immédiatement en
+        réservation instantanée). Si la demande est refusée ou expire, l'autorisation est levée sans débit.
       </p>
       <p>
         ZouriteBnb encaisse le montant total au nom et pour le compte de l'Hôte, puis reverse à ce dernier le
@@ -89,20 +106,42 @@ const TermsOfSalePage: React.FC = () => (
         éventuel). Le remboursement est effectué via Stripe sur le moyen de paiement d'origine.
       </p>
       <p>
-        <strong>Annulation par le Voyageur.</strong> Les conditions d'annulation à l'initiative du Voyageur sont
-        celles indiquées sur l'annonce et acceptées lors de la réservation. À défaut de mention contraire, les
-        frais de service ne sont pas remboursables une fois la réservation confirmée.
+        <strong>Annulation par le Voyageur.</strong> La politique d'annulation applicable est celle indiquée sur
+        l'annonce au moment de la réservation ; elle est figée pour la réservation concernée. Le pourcentage de
+        remboursement s'applique au <strong>montant total payé</strong> (prix du séjour, frais de service et
+        contribution solidaire) :
+      </p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>
+          <strong>Politique flexible</strong> : remboursement intégral (100 %) si l'annulation intervient au
+          moins <strong>24 heures</strong> avant l'arrivée ; aucun remboursement en deçà ;
+        </li>
+        <li>
+          <strong>Politique modérée</strong> : remboursement intégral (100 %) si l'annulation intervient au
+          moins <strong>5 jours</strong> avant l'arrivée ; remboursement de <strong>50 %</strong> en deçà ;
+        </li>
+        <li>
+          <strong>Demande en attente</strong> (non encore acceptée par l'Hôte) : annulation à tout moment sans
+          frais, l'autorisation bancaire est levée sans débit.
+        </li>
+      </ul>
+      <p>
+        Une réservation dont le séjour a commencé ne peut plus être annulée via la Plateforme. Le barème de
+        remboursement applicable est affiché avant la confirmation de l'annulation.
       </p>
       <p>
-        Les délais de remboursement dépendent de Stripe et de l'établissement bancaire du Voyageur.
+        Tout remboursement est effectué via Stripe <strong>sur le moyen de paiement d'origine</strong>. Les
+        délais de mise à disposition des fonds dépendent de Stripe et de l'établissement bancaire du Voyageur.
       </p>
     </LegalSection>
 
     <LegalSection id="modification" title="6. Modification d'une réservation">
       <p>
-        Une demande de modification (dates, durée) peut être proposée via la Plateforme. Elle ne prend effet
-        qu'après acceptation de l'autre partie. Tout ajustement de prix en résultant est recalculé et affiché
-        avant validation.
+        Le Voyageur peut proposer via la Plateforme une modification des dates d'une réservation confirmée dont
+        le séjour n'a pas commencé. Le nouveau prix est recalculé selon les tarifs de l'annonce et présenté avant
+        l'envoi de la demande ; la modification ne prend effet qu'après <strong>acceptation de l'Hôte</strong>.
+        L'éventuelle différence de prix entre l'ancienne et la nouvelle réservation fait l'objet d'un règlement
+        entre les parties selon les modalités indiquées par la Plateforme au moment de la validation.
       </p>
     </LegalSection>
 
