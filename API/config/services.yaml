@@ -147,6 +147,16 @@ services:
     App\Conversation\Domain\Port\ConversationRepository:
         alias: App\Conversation\Infrastructure\Doctrine\DoctrineConversationRepository
 
+    App\Conversation\Domain\Port\AttachmentStorage:
+        alias: App\Conversation\Infrastructure\Filesystem\LocalAttachmentStorage
+
+    App\Conversation\Infrastructure\Filesystem\LocalAttachmentStorage:
+        arguments:
+            $uploadDir: '%kernel.project_dir%/var/uploads/photos'
+
+    App\Conversation\Domain\Port\AttachmentImageTransformer:
+        alias: App\Conversation\Infrastructure\Gd\GdAttachmentImageTransformer
+
     App\Conversation\Application\Listener\StartConversationOnReservationRequested:
         tags: [messenger.message_handler]
 

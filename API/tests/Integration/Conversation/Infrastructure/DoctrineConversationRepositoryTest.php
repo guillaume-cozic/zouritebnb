@@ -6,6 +6,7 @@ namespace App\Tests\Integration\Conversation\Infrastructure;
 
 use App\Conversation\Domain\Entity\Conversation;
 use App\Conversation\Domain\Entity\ConversationId;
+use App\Conversation\Domain\Entity\MessageAttachment;
 use App\Conversation\Domain\Entity\MessageBody;
 use App\Conversation\Domain\Entity\MessageId;
 use App\Conversation\Domain\Port\ConversationRepository;
@@ -134,6 +135,36 @@ final class DoctrineConversationRepositoryTest extends RepositoryTestCase
         self::assertFalse($messages[2]->isSystem());
         self::assertNotNull($messages[2]->getAuthorUserId());
         self::assertTrue($messages[2]->getAuthorUserId()->equals($hostUserId));
+    }
+
+    public function test_should_round_trip_attachment_message_without_body(): void
+    {
+        $id = new ConversationId(Uuid::v4());
+        $conversation = Conversation::start(
+            id: $id,
+            reservationId: Uuid::v4(),
+            accommodationId: Uuid::v4(),
+            teamId: Uuid::v4(),
+            guestUserId: Uuid::v4(),
+            openingMessageId: new MessageId(Uuid::v4()),
+            openingMessageBody: new MessageBody('Opening message'),
+            createdAt: new \DateTimeImmutable('2026-01-01 10:00:00'),
+        );
+        $conversation->postGuestMessage(
+            new MessageId(Uuid::v4()),
+            null,
+            new \DateTimeImmutable('2026-01-01 11:00:00'),
+            new MessageAttachment('0197b1c2-0000-7000-8000-000000000001.webp'),
+        );
+        $this->repository->save($conversation);
+
+        $found = $this->repository->ofId($id);
+
+        self::assertNotNull($found);
+        $message = $found->getMessages()[1];
+        self::assertNull($message->getBody());
+        self::assertNotNull($message->getAttachment());
+        self::assertSame('0197b1c2-0000-7000-8000-000000000001.webp', $message->getAttachment()->filename());
     }
 
     public function test_should_not_duplicate_existing_messages_on_update(): void

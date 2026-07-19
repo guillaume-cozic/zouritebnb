@@ -1,7 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import { extractErrorMessage } from '../../services/errors';
-import { Conversation, ConversationMessage, SendMessagePayload } from './ConversationTypes';
+import {
+  Conversation,
+  ConversationMessage,
+  SendAttachmentPayload,
+  SendMessagePayload,
+} from './ConversationTypes';
 import {
   ConversationReads,
   loadConversationReads,
@@ -111,6 +116,31 @@ export const sendMessage = createAsyncThunk(
   }
 );
 
+export const sendAttachment = createAsyncThunk(
+  'conversation/sendAttachment',
+  async (payload: SendAttachmentPayload, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', payload.file);
+      if (payload.body) {
+        formData.append('body', payload.body);
+      }
+      const response = await api.post(
+        `/api/conversations/${payload.conversationId}/attachments`,
+        formData
+      );
+      return {
+        conversationId: payload.conversationId,
+        message: response.data as ConversationMessage,
+      };
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, "Impossible d'envoyer la photo")
+      );
+    }
+  }
+);
+
 const conversationSlice = createSlice({
   name: 'conversation',
   initialState,
@@ -187,6 +217,21 @@ const conversationSlice = createSlice({
         }
       })
       .addCase(sendMessage.rejected, (state, action) => {
+        state.sendStatus = 'failed';
+        state.sendError = (action.payload as string) || null;
+      })
+      .addCase(sendAttachment.pending, (state) => {
+        state.sendStatus = 'loading';
+        state.sendError = null;
+      })
+      .addCase(sendAttachment.fulfilled, (state, action) => {
+        state.sendStatus = 'succeeded';
+        const { conversationId, message } = action.payload;
+        if (state.current && state.current.id === conversationId) {
+          state.current.messages.push(message);
+        }
+      })
+      .addCase(sendAttachment.rejected, (state, action) => {
         state.sendStatus = 'failed';
         state.sendError = (action.payload as string) || null;
       });

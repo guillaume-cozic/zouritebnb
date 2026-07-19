@@ -53,6 +53,22 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: SendMessageProcessor::class,
             read: false,
         ),
+        new Post(
+            uriTemplate: '/conversations/{id}/attachments',
+            status: 201,
+            openapi: new OpenApiOperation(
+                summary: 'Envoyer une photo dans une conversation',
+                description: 'Ajoute un message contenant une photo (multipart/form-data, champ `file`, avec un champ texte `body` optionnel en légende). Formats acceptés : JPEG, PNG, WebP — 10 Mo maximum ; l\'image est convertie en WebP côté serveur. L\'auteur est l\'utilisateur authentifié, qui doit être soit le loueur, soit un membre de l\'équipe hôte. Authentification requise (401 sinon). Retourne 422 si la conversation est introuvable, si l\'auteur n\'est pas participant ou si le fichier n\'est pas une image valide.',
+            ),
+            inputFormats: ['multipart' => ['multipart/form-data']],
+            normalizationContext: ['groups' => ['conversation:read']],
+            security: 'is_authenticated()',
+            input: false,
+            output: MessageOutput::class,
+            processor: SendAttachmentMessageProcessor::class,
+            deserialize: false,
+            read: false,
+        ),
     ],
 )]
 class ConversationOutput implements FromEntityInterface

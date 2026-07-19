@@ -24,8 +24,11 @@ class MessageEntity
     #[ORM\Column(type: UuidType::NAME, nullable: true)]
     private ?Uuid $authorUserId = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $body = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $attachmentFilename = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $sentAt = null;
@@ -74,9 +77,21 @@ class MessageEntity
         return $this->body;
     }
 
-    public function setBody(string $body): static
+    public function setBody(?string $body): static
     {
         $this->body = $body;
+
+        return $this;
+    }
+
+    public function getAttachmentFilename(): ?string
+    {
+        return $this->attachmentFilename;
+    }
+
+    public function setAttachmentFilename(?string $attachmentFilename): static
+    {
+        $this->attachmentFilename = $attachmentFilename;
 
         return $this;
     }

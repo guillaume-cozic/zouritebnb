@@ -11,6 +11,7 @@ import conversationReducer, {
   fetchConversationsForUser,
   fetchConversationById,
   sendMessage,
+  sendAttachment,
   markConversationRead,
 } from './ConversationSlice';
 import { selectUnreadCount } from './ConversationSelectors';
@@ -88,6 +89,46 @@ describe('sendMessage', () => {
     const state = store.getState().conversation;
     expect(state.sendStatus).toBe('failed');
     expect(state.sendError).toBe('too long');
+  });
+});
+
+describe('sendAttachment', () => {
+  test('le store ajoute le message photo à la conversation courante après fulfilled', async () => {
+    mockedApi.get.mockResolvedValue({ data: { id: 'c-1', messages: [] } });
+    const store = buildStore();
+    await store.dispatch(fetchConversationById('c-1'));
+
+    mockedApi.post.mockResolvedValue({
+      data: { id: 'm-1', body: null, attachmentUrl: '/uploads/photos/abc.webp' },
+    });
+    const file = new File(['fake-bytes'], 'photo.jpg', { type: 'image/jpeg' });
+    await store.dispatch(
+      sendAttachment({ conversationId: 'c-1', file, body: 'Légende' })
+    );
+
+    const state = store.getState().conversation;
+    expect(state.sendStatus).toBe('succeeded');
+    expect(state.current?.messages).toHaveLength(1);
+    expect(state.current?.messages[0].attachmentUrl).toBe('/uploads/photos/abc.webp');
+
+    // The photo goes through multipart/form-data: file + optional caption.
+    const [url, formData] = mockedApi.post.mock.calls[0];
+    expect(url).toBe('/api/conversations/c-1/attachments');
+    expect(formData).toBeInstanceOf(FormData);
+    expect((formData as FormData).get('file')).toBe(file);
+    expect((formData as FormData).get('body')).toBe('Légende');
+  });
+
+  test('le store passe sendStatus à failed après rejected', async () => {
+    mockedApi.post.mockRejectedValue({ response: { data: { detail: 'not an image' } } });
+    const store = buildStore();
+
+    const file = new File(['fake-bytes'], 'notes.txt', { type: 'text/plain' });
+    await store.dispatch(sendAttachment({ conversationId: 'c-1', file }));
+
+    const state = store.getState().conversation;
+    expect(state.sendStatus).toBe('failed');
+    expect(state.sendError).toBe('not an image');
   });
 });
 

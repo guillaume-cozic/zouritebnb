@@ -15,8 +15,12 @@ final class MessageOutput
     public ?string $id = null;
 
     #[Groups(['conversation:read'])]
-    #[ApiProperty(description: 'Corps du message')]
+    #[ApiProperty(description: 'Corps du message (null pour un message ne contenant qu\'une photo)')]
     public ?string $body = null;
+
+    #[Groups(['conversation:read'])]
+    #[ApiProperty(description: 'URL relative de la photo jointe (null si le message n\'en contient pas)', example: '/uploads/photos/0197b1c2-1111-7000-8000-000000000000.webp')]
+    public ?string $attachmentUrl = null;
 
     #[Groups(['conversation:read'])]
     #[ApiProperty(description: 'Identifiant UUID de l\'auteur (null pour les messages système)')]
@@ -34,7 +38,9 @@ final class MessageOutput
     {
         $output = new self();
         $output->id = $message->getId()->toString();
-        $output->body = $message->getBody()->toString();
+        $output->body = $message->getBody()?->toString();
+        $attachment = $message->getAttachment();
+        $output->attachmentUrl = null !== $attachment ? '/uploads/photos/'.$attachment->filename() : null;
         $output->authorUserId = $message->getAuthorUserId()?->toRfc4122();
         $output->sentAt = $message->getSentAt()->format(\DateTimeInterface::ATOM);
         $output->isSystem = $message->isSystem();

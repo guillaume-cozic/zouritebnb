@@ -277,6 +277,13 @@ export interface paths {
      */
     get: operations["api_conversations_id_get"];
   };
+  "/api/conversations/{id}/attachments": {
+    /**
+     * Envoyer une photo dans une conversation
+     * @description Ajoute un message contenant une photo (multipart/form-data, champ `file`, avec un champ texte `body` optionnel en légende). Formats acceptés : JPEG, PNG, WebP — 10 Mo maximum ; l'image est convertie en WebP côté serveur. L'auteur est l'utilisateur authentifié, qui doit être soit le loueur, soit un membre de l'équipe hôte. Authentification requise (401 sinon). Retourne 422 si la conversation est introuvable, si l'auteur n'est pas participant ou si le fichier n'est pas une image valide.
+     */
+    post: operations["api_conversations_idattachments_post"];
+  };
   "/api/conversations/{id}/messages": {
     /**
      * Envoyer un message dans une conversation
@@ -468,6 +475,13 @@ export interface paths {
      * @description Crée une invitation en statut "pending" pour un nouveau co-hôte. L'email doit être valide et ne pas déjà faire l'objet d'une invitation en attente pour cette équipe.
      */
     post: operations["api_teams_idinvitations_post"];
+  };
+  "/api/auth/social": {
+    /**
+     * Authentification via un fournisseur social (Google, Apple, Facebook)
+     * @description Vérifie le token émis par le fournisseur (ID token Google, identity token Apple, access token Facebook). Si aucun compte n'existe pour l'email attesté, un utilisateur et sa team sont créés (l'email est marqué vérifié si le fournisseur le garantit). Retourne l'utilisateur et un JWT (champ `token`) à utiliser comme Bearer.
+     */
+    post: operations["api_authsocial_post"];
   };
   "/api/forgot-password": {
     /**
@@ -1706,8 +1720,13 @@ export interface components {
     "Conversation.MessageOutput.jsonld-conversation.read": components["schemas"]["HydraItemBaseSchema"] & ({
       /** @description Identifiant unique du message (UUID) */
       id?: string | null;
-      /** @description Corps du message */
+      /** @description Corps du message (null pour un message ne contenant qu'une photo) */
       body?: string | null;
+      /**
+       * @description URL relative de la photo jointe (null si le message n'en contient pas)
+       * @example /uploads/photos/0197b1c2-1111-7000-8000-000000000000.webp
+       */
+      attachmentUrl?: string | null;
       /** @description Identifiant UUID de l'auteur (null pour les messages système) */
       authorUserId?: string | null;
       /** @description Date et heure d'envoi (ISO 8601) */
@@ -1945,8 +1964,13 @@ export interface components {
     "MessageOutput.jsonld-conversation.read": {
       /** @description Identifiant unique du message (UUID) */
       id?: string | null;
-      /** @description Corps du message */
+      /** @description Corps du message (null pour un message ne contenant qu'une photo) */
       body?: string | null;
+      /**
+       * @description URL relative de la photo jointe (null si le message n'en contient pas)
+       * @example /uploads/photos/0197b1c2-1111-7000-8000-000000000000.webp
+       */
+      attachmentUrl?: string | null;
       /** @description Identifiant UUID de l'auteur (null pour les messages système) */
       authorUserId?: string | null;
       /** @description Date et heure d'envoi (ISO 8601) */
@@ -2294,6 +2318,19 @@ export interface components {
        * @example supersecret
        */
       password: string;
+    };
+    "User.SocialLoginInput-user.write": {
+      /**
+       * @description Fournisseur d'identité : "google", "apple" ou "facebook"
+       * @example google
+       * @enum {string}
+       */
+      provider: "google" | "apple" | "facebook";
+      /**
+       * @description Token émis par le fournisseur : ID token Google, identity token Apple ou access token Facebook
+       * @example eyJhbGciOiJSUzI1NiIs...
+       */
+      token: string;
     };
     "User.UpdateUserProfileInput-user.write.jsonMergePatch": {
       /**
@@ -4196,6 +4233,50 @@ export interface operations {
     };
   };
   /**
+   * Envoyer une photo dans une conversation
+   * @description Ajoute un message contenant une photo (multipart/form-data, champ `file`, avec un champ texte `body` optionnel en légende). Formats acceptés : JPEG, PNG, WebP — 10 Mo maximum ; l'image est convertie en WebP côté serveur. L'auteur est l'utilisateur authentifié, qui doit être soit le loueur, soit un membre de l'équipe hôte. Authentification requise (401 sinon). Retourne 422 si la conversation est introuvable, si l'auteur n'est pas participant ou si le fichier n'est pas une image valide.
+   */
+  api_conversations_idattachments_post: {
+    parameters: {
+      path: {
+        /** @description Conversation identifier */
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Conversation resource created */
+      201: {
+        content: {
+          "application/ld+json": components["schemas"]["Conversation.MessageOutput.jsonld-conversation.read"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
    * Envoyer un message dans une conversation
    * @description Ajoute un nouveau message à une conversation existante. L'auteur est l'utilisateur authentifié, qui doit être soit le loueur, soit un membre de l'équipe hôte. Authentification requise (401 sinon). Retourne 422 si la conversation est introuvable ou si l'auteur n'est pas participant.
    */
@@ -5327,6 +5408,42 @@ export interface operations {
       };
       /** @description Forbidden */
       403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Authentification via un fournisseur social (Google, Apple, Facebook)
+   * @description Vérifie le token émis par le fournisseur (ID token Google, identity token Apple, access token Facebook). Si aucun compte n'existe pour l'email attesté, un utilisateur et sa team sont créés (l'email est marqué vérifié si le fournisseur le garantit). Retourne l'utilisateur et un JWT (champ `token`) à utiliser comme Bearer.
+   */
+  api_authsocial_post: {
+    /** @description The new User resource */
+    requestBody: {
+      content: {
+        "application/ld+json": components["schemas"]["User.SocialLoginInput-user.write"];
+      };
+    };
+    responses: {
+      /** @description User resource created */
+      201: {
+        content: {
+          "application/ld+json": components["schemas"]["User.jsonld-user.read_user.token"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
         content: {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];

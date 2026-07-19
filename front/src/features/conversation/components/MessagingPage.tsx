@@ -145,7 +145,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
     return byAction.filter(
       (c) =>
         c.reservationId.toLowerCase().includes(q) ||
-        c.messages.some((m) => m.body.toLowerCase().includes(q))
+        c.messages.some((m) => m.body?.toLowerCase().includes(q))
     );
   }, [isHost, conversations, search, onlyNeedsAction, reservationStatusById]);
 

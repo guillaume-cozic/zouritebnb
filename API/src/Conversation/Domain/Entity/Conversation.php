@@ -51,9 +51,9 @@ final class Conversation extends AggregateRoot
         return $message;
     }
 
-    public function postGuestMessage(MessageId $messageId, MessageBody $body, \DateTimeImmutable $sentAt): Message
+    public function postGuestMessage(MessageId $messageId, ?MessageBody $body, \DateTimeImmutable $sentAt, ?MessageAttachment $attachment = null): Message
     {
-        $message = Message::user($messageId, $body, $this->guestUserId, $sentAt);
+        $message = Message::user($messageId, $body, $this->guestUserId, $sentAt, $attachment);
         $this->messages[] = $message;
         $this->recordEvent(new MessagePosted($this->id->toUuid(), $messageId->toUuid(), false));
 
@@ -64,9 +64,9 @@ final class Conversation extends AggregateRoot
      * Authorship by a host team member. The use case is responsible for verifying
      * that `$authorUserId` belongs to the host team (the aggregate does not know team membership).
      */
-    public function postHostMessage(MessageId $messageId, MessageBody $body, Uuid $authorUserId, \DateTimeImmutable $sentAt): Message
+    public function postHostMessage(MessageId $messageId, ?MessageBody $body, Uuid $authorUserId, \DateTimeImmutable $sentAt, ?MessageAttachment $attachment = null): Message
     {
-        $message = Message::user($messageId, $body, $authorUserId, $sentAt);
+        $message = Message::user($messageId, $body, $authorUserId, $sentAt, $attachment);
         $this->messages[] = $message;
         $this->recordEvent(new MessagePosted($this->id->toUuid(), $messageId->toUuid(), false));
 

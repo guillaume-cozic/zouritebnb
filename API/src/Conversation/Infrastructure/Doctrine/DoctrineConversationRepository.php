@@ -7,6 +7,7 @@ namespace App\Conversation\Infrastructure\Doctrine;
 use App\Conversation\Domain\Entity\Conversation as DomainConversation;
 use App\Conversation\Domain\Entity\ConversationId;
 use App\Conversation\Domain\Entity\Message as DomainMessage;
+use App\Conversation\Domain\Entity\MessageAttachment;
 use App\Conversation\Domain\Entity\MessageBody;
 use App\Conversation\Domain\Entity\MessageId;
 use App\Conversation\Domain\Port\ConversationRepository as ConversationRepositoryPort;
@@ -51,10 +52,11 @@ class DoctrineConversationRepository extends ServiceEntityRepository implements 
 
             $messageEntity = new MessageEntity()
                 ->setId($message->getId()->toUuid())
-                ->setBody($message->getBody()->toString())
+                ->setBody($message->getBody()?->toString())
                 ->setAuthorUserId($message->getAuthorUserId())
                 ->setSentAt($message->getSentAt())
-                ->setIsSystem($message->isSystem());
+                ->setIsSystem($message->isSystem())
+                ->setAttachmentFilename($message->getAttachment()?->filename());
 
             $entity->addMessage($messageEntity);
         }
@@ -108,10 +110,11 @@ class DoctrineConversationRepository extends ServiceEntityRepository implements 
         foreach ($entity->getMessages() as $messageEntity) {
             $messages[] = new DomainMessage(
                 id: new MessageId($messageEntity->getId()),
-                body: new MessageBody($messageEntity->getBody()),
+                body: null !== $messageEntity->getBody() ? new MessageBody($messageEntity->getBody()) : null,
                 authorUserId: $messageEntity->getAuthorUserId(),
                 sentAt: $messageEntity->getSentAt(),
                 isSystem: $messageEntity->isSystem(),
+                attachment: null !== $messageEntity->getAttachmentFilename() ? new MessageAttachment($messageEntity->getAttachmentFilename()) : null,
             );
         }
 

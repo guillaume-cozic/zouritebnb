@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { sendMessage, clearSendError } from '../ConversationSlice';
+import { sendMessage, sendAttachment, clearSendError } from '../ConversationSlice';
 import { selectSendMessageStatus, selectSendMessageError } from '../ConversationSelectors';
 import { Conversation, ConversationMessage } from '../ConversationTypes';
 import { selectAuthUser } from '../../auth/AuthSelectors';
 import { fetchHostProfile } from '../../hostProfile/HostProfileSlice';
 import { selectHostProfileByTeamId } from '../../hostProfile/HostProfileSelectors';
 import { Avatar } from '../../../components/ui';
+import PhotoLightbox from '../../../components/PhotoLightbox';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 interface Props {
   conversation: Conversation;
@@ -51,7 +54,8 @@ const UserBubble: React.FC<{
   mine: boolean;
   avatarUrl?: string | null;
   avatarName: string;
-}> = ({ message, locale, isHost, authorLabel, mine, avatarUrl, avatarName }) => {
+  onOpenPhoto: (url: string) => void;
+}> = ({ message, locale, isHost, authorLabel, mine, avatarUrl, avatarName, onOpenPhoto }) => {
   // Host messages always on the LEFT (white card, emerald accent), guest always on the RIGHT (blue gradient).
   const onRight = !isHost;
   const avatar = (
@@ -79,7 +83,21 @@ const UserBubble: React.FC<{
               : 'bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-br-md'
           }`}
         >
-          <div className="leading-relaxed">{message.body}</div>
+          {message.attachmentUrl && (
+            <button
+              type="button"
+              onClick={() => onOpenPhoto(`${API_BASE}${message.attachmentUrl}`)}
+              className={`block overflow-hidden rounded-xl ${message.body ? 'mb-2' : ''}`}
+            >
+              <img
+                src={`${API_BASE}${message.attachmentUrl}`}
+                alt=""
+                loading="lazy"
+                className="max-h-64 w-auto max-w-full object-cover"
+              />
+            </button>
+          )}
+          {message.body && <div className="leading-relaxed">{message.body}</div>}
           <div className={`text-[10px] mt-1 ${isHost ? 'text-gray-400' : 'text-primary-100'}`}>
             {formatTime(message.sentAt, locale)}
           </div>
@@ -123,7 +141,30 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
   const guestAvatarUrl = conversation.guestAvatarUrl ?? null;
 
   const [body, setBody] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const clearFile = () => {
+    setFile(null);
+    setPreviewUrl((url) => {
+      if (url) URL.revokeObjectURL(url);
+      return null;
+    });
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0] ?? null;
+    if (!selected) return;
+    setFile(selected);
+    setPreviewUrl((url) => {
+      if (url) URL.revokeObjectURL(url);
+      return URL.createObjectURL(selected);
+    });
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -140,15 +181,24 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = body.trim();
-    if (!trimmed) return;
-    const result = await dispatch(
-      sendMessage({
-        conversationId: conversation.id,
-        body: trimmed,
-      })
-    );
-    if (sendMessage.fulfilled.match(result)) {
+    if (!trimmed && !file) return;
+    const result = file
+      ? await dispatch(
+          sendAttachment({
+            conversationId: conversation.id,
+            file,
+            body: trimmed || undefined,
+          })
+        )
+      : await dispatch(
+          sendMessage({
+            conversationId: conversation.id,
+            body: trimmed,
+          })
+        );
+    if (sendMessage.fulfilled.match(result) || sendAttachment.fulfilled.match(result)) {
       setBody('');
+      clearFile();
     }
   };
 
@@ -179,6 +229,7 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
                   mine={mine}
                   avatarUrl={avatarUrl}
                   avatarName={avatarName}
+                  onOpenPhoto={setLightboxUrl}
                 />
               )}
             </React.Fragment>
@@ -200,7 +251,47 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
         </div>
       ) : (
         <form onSubmit={handleSend} className="border-t border-gray-100 bg-white px-4 sm:px-6 py-3">
+          {previewUrl && (
+            <div className="mb-2 inline-flex items-start gap-1">
+              <img
+                src={previewUrl}
+                alt=""
+                className="h-20 w-20 rounded-xl object-cover border border-gray-200"
+              />
+              <button
+                type="button"
+                onClick={clearFile}
+                className="rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 h-6 w-6 flex items-center justify-center -ml-4 -mt-1 border border-white shadow-sm"
+                aria-label={t('conversation.removePhoto') as string}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
           <div className="flex gap-2 items-end">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileSelected}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded-full border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-500 hover:text-gray-700 h-10 w-10 flex items-center justify-center transition-colors"
+              aria-label={t('conversation.attachPhoto') as string}
+              title={t('conversation.attachPhoto') as string}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="9" cy="9" r="2" />
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+              </svg>
+            </button>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
@@ -217,7 +308,7 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
             />
             <button
               type="submit"
-              disabled={!body.trim() || sendStatus === 'loading'}
+              disabled={(!body.trim() && !file) || sendStatus === 'loading'}
               className="rounded-full bg-gradient-to-br from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white h-10 w-10 flex items-center justify-center disabled:opacity-50 transition-all shadow-sm shadow-primary-200 disabled:shadow-none"
               aria-label={t('conversation.send') as string}
             >
@@ -231,6 +322,14 @@ const ConversationThread: React.FC<Props> = ({ conversation, currentUserId, read
             <p className="mt-2 text-xs text-red-600">{sendError}</p>
           )}
         </form>
+      )}
+      {lightboxUrl && (
+        <PhotoLightbox
+          photos={[lightboxUrl]}
+          index={0}
+          onClose={() => setLightboxUrl(null)}
+          onChange={() => undefined}
+        />
       )}
     </div>
   );

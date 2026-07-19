@@ -4288,6 +4288,106 @@
                 ]
             }
         },
+        "/api/conversations/{id}/attachments": {
+            "post": {
+                "operationId": "api_conversations_idattachments_post",
+                "tags": [
+                    "Conversation"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Conversation resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Conversation.MessageOutput.jsonld-conversation.read"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Envoyer une photo dans une conversation",
+                "description": "Ajoute un message contenant une photo (multipart/form-data, champ `file`, avec un champ texte `body` optionnel en l\u00e9gende). Formats accept\u00e9s : JPEG, PNG, WebP \u2014 10 Mo maximum ; l'image est convertie en WebP c\u00f4t\u00e9 serveur. L'auteur est l'utilisateur authentifi\u00e9, qui doit \u00eatre soit le loueur, soit un membre de l'\u00e9quipe h\u00f4te. Authentification requise (401 sinon). Retourne 422 si la conversation est introuvable, si l'auteur n'est pas participant ou si le fichier n'est pas une image valide.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Conversation identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ]
+            }
+        },
         "/api/conversations/{id}/messages": {
             "post": {
                 "operationId": "api_conversations_idmessages_post",
@@ -7046,6 +7146,83 @@
                         }
                     },
                     "required": false
+                }
+            }
+        },
+        "/api/auth/social": {
+            "post": {
+                "operationId": "api_authsocial_post",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User.jsonld-user.read_user.token"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Authentification via un fournisseur social (Google, Apple, Facebook)",
+                "description": "V\u00e9rifie le token \u00e9mis par le fournisseur (ID token Google, identity token Apple, access token Facebook). Si aucun compte n'existe pour l'email attest\u00e9, un utilisateur et sa team sont cr\u00e9\u00e9s (l'email est marqu\u00e9 v\u00e9rifi\u00e9 si le fournisseur le garantit). Retourne l'utilisateur et un JWT (champ `token`) \u00e0 utiliser comme Bearer.",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new User resource",
+                    "content": {
+                        "application/ld+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User.SocialLoginInput-user.write"
+                            }
+                        }
+                    },
+                    "required": true
                 }
             }
         },
@@ -10010,7 +10187,15 @@
                                 ]
                             },
                             "body": {
-                                "description": "Corps du message",
+                                "description": "Corps du message (null pour un message ne contenant qu'une photo)",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "attachmentUrl": {
+                                "description": "URL relative de la photo jointe (null si le message n'en contient pas)",
+                                "example": "/uploads/photos/0197b1c2-1111-7000-8000-000000000000.webp",
                                 "type": [
                                     "string",
                                     "null"
@@ -10597,7 +10782,15 @@
                         ]
                     },
                     "body": {
-                        "description": "Corps du message",
+                        "description": "Corps du message (null pour un message ne contenant qu'une photo)",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "attachmentUrl": {
+                        "description": "URL relative de la photo jointe (null si le message n'en contient pas)",
+                        "example": "/uploads/photos/0197b1c2-1111-7000-8000-000000000000.webp",
                         "type": [
                             "string",
                             "null"
@@ -11253,6 +11446,30 @@
                         "minLength": 8,
                         "description": "Nouveau mot de passe (8 caract\u00e8res minimum)",
                         "example": "supersecret",
+                        "type": "string"
+                    }
+                }
+            },
+            "User.SocialLoginInput-user.write": {
+                "type": "object",
+                "required": [
+                    "provider",
+                    "token"
+                ],
+                "properties": {
+                    "provider": {
+                        "enum": [
+                            "google",
+                            "apple",
+                            "facebook"
+                        ],
+                        "description": "Fournisseur d'identit\u00e9 : \"google\", \"apple\" ou \"facebook\"",
+                        "example": "google",
+                        "type": "string"
+                    },
+                    "token": {
+                        "description": "Token \u00e9mis par le fournisseur : ID token Google, identity token Apple ou access token Facebook",
+                        "example": "eyJhbGciOiJSUzI1NiIs...",
                         "type": "string"
                     }
                 }

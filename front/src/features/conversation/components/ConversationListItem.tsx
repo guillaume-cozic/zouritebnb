@@ -152,7 +152,7 @@ const ConversationListItem: React.FC<Props> = ({
                       : 'text-gray-600'
                 }`}
               >
-                {last.body}
+                {last.body ?? t('conversation.photoMessage')}
               </p>
             )}
             {needsAction && (
