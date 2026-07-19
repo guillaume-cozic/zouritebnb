@@ -37,6 +37,9 @@ class PaymentEntity
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(name: 'refunded_amount_cents', type: Types::INTEGER, nullable: true)]
+    private ?int $refundedAmountCents = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -117,6 +120,18 @@ class PaymentEntity
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getRefundedAmountCents(): ?int
+    {
+        return $this->refundedAmountCents;
+    }
+
+    public function setRefundedAmountCents(?int $refundedAmountCents): static
+    {
+        $this->refundedAmountCents = $refundedAmountCents;
 
         return $this;
     }

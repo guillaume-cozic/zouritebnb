@@ -271,10 +271,14 @@ final class Reservation extends AggregateRoot
             throw InvalidReservationStateException::becauseHostCancellationRequiresMessage();
         }
 
+        // Snapshot the refund terms before mutating the status: once cancelled, the
+        // breakdown no longer reflects what the guest was owed at cancellation time.
+        $refundPercentage = $this->refundBreakdown($now, $byHost)->refundPercentage;
+
         $this->status = ReservationStatus::Cancelled;
         $this->cancelledByHost = $byHost;
         $this->pendingModification = null;
-        $this->recordEvent(new ReservationCancelled($this->id->toUuid(), $message));
+        $this->recordEvent(new ReservationCancelled($this->id->toUuid(), $message, $refundPercentage));
     }
 
     public function isCancelledByHost(): bool

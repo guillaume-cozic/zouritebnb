@@ -55,4 +55,9 @@ final class FakePaymentGateway implements PaymentGateway
     {
         $this->calls[] = ['type' => 'cancel', 'paymentIntentId' => $paymentIntentId];
     }
+
+    public function refund(string $paymentIntentId, int $amountCents): void
+    {
+        $this->calls[] = ['type' => 'refund', 'paymentIntentId' => $paymentIntentId, 'amountCents' => $amountCents];
+    }
 }

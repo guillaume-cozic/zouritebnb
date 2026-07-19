@@ -8,7 +8,9 @@ use Symfony\Component\Uid\Uuid;
 
 final readonly class CancelPaymentForReservationCommand
 {
-    public function __construct(public Uuid $reservationId)
-    {
+    public function __construct(
+        public Uuid $reservationId,
+        public int $refundPercentage = 100,
+    ) {
     }
 }

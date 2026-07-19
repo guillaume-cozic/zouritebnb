@@ -28,6 +28,15 @@ final class InvalidPaymentException extends \DomainException
         return new self('Payment intent identifier must not be blank.');
     }
 
+    public static function becauseRefundAmountIsInvalid(int $refundedAmountCents, int $amountCents): self
+    {
+        return new self(\sprintf(
+            'Refund amount must be between 1 and %d cents, got %d cents.',
+            $amountCents,
+            $refundedAmountCents,
+        ));
+    }
+
     public static function becauseTransitionIsInvalid(PaymentStatus $from, PaymentStatus $to): self
     {
         return new self(\sprintf(

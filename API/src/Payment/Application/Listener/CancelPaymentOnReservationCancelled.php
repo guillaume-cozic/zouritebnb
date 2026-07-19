@@ -16,6 +16,9 @@ final readonly class CancelPaymentOnReservationCancelled
 
     public function __invoke(ReservationCancelled $event): void
     {
-        $this->cancelPayment->handle(new CancelPaymentForReservationCommand($event->reservationId));
+        $this->cancelPayment->handle(new CancelPaymentForReservationCommand(
+            reservationId: $event->reservationId,
+            refundPercentage: $event->refundPercentage,
+        ));
     }
 }

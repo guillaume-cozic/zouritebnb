@@ -11,6 +11,7 @@ use App\Payment\Domain\Event\PaymentCancelled;
 use App\Payment\Domain\Event\PaymentCaptured;
 use App\Payment\Domain\Event\PaymentFailed;
 use App\Payment\Domain\Event\PaymentLinkedToReservation;
+use App\Payment\Domain\Event\PaymentRefunded;
 use App\Payment\Domain\Exception\InvalidPaymentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -221,6 +222,60 @@ final class PaymentTest extends TestCase
         $this->expectExceptionMessage('Cannot transition payment from "captured" to "cancelled".');
 
         $payment->markCancelled();
+    }
+
+    public function test_should_mark_refunded_from_captured(): void
+    {
+        $payment = $this->payment(status: PaymentStatus::Captured, stripePaymentIntentId: 'pi_refund');
+
+        $payment->markRefunded(2500);
+
+        self::assertSame(PaymentStatus::Refunded, $payment->getStatus());
+        self::assertSame(2500, $payment->getRefundedAmountCents());
+        $events = $payment->releaseEvents();
+        self::assertCount(1, $events);
+        self::assertInstanceOf(PaymentRefunded::class, $events[0]);
+        self::assertTrue($payment->getId()->equals($events[0]->paymentId));
+        self::assertSame('pi_refund', $events[0]->stripePaymentIntentId);
+        self::assertSame(2500, $events[0]->refundedAmountCents);
+    }
+
+    public function test_should_be_idempotent_when_already_refunded(): void
+    {
+        $payment = $this->payment(status: PaymentStatus::Refunded);
+
+        $payment->markRefunded(2500);
+
+        self::assertSame(PaymentStatus::Refunded, $payment->getStatus());
+        self::assertSame([], $payment->releaseEvents());
+    }
+
+    public function test_should_throw_when_refunding_from_invalid_status(): void
+    {
+        $payment = $this->payment(status: PaymentStatus::Authorized);
+
+        $this->expectException(InvalidPaymentException::class);
+        $this->expectExceptionMessage('Cannot transition payment from "authorized" to "refunded".');
+
+        $payment->markRefunded(2500);
+    }
+
+    #[DataProvider('invalidRefundAmounts')]
+    public function test_should_throw_when_refund_amount_is_invalid(int $refundedAmountCents): void
+    {
+        $payment = $this->payment(status: PaymentStatus::Captured, amountCents: 5000);
+
+        $this->expectException(InvalidPaymentException::class);
+        $this->expectExceptionMessage(\sprintf('Refund amount must be between 1 and 5000 cents, got %d cents.', $refundedAmountCents));
+
+        $payment->markRefunded($refundedAmountCents);
+    }
+
+    public static function invalidRefundAmounts(): \Generator
+    {
+        yield 'zero' => [0];
+        yield 'negative' => [-100];
+        yield 'more than captured' => [5001];
     }
 
     #[DataProvider('failableStatuses')]

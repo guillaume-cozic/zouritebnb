@@ -28,13 +28,24 @@ final readonly class CancelPaymentForReservation
             return;
         }
 
-        if (PaymentStatus::Cancelled === $payment->getStatus() || PaymentStatus::Captured === $payment->getStatus()) {
+        if (PaymentStatus::Cancelled === $payment->getStatus() || PaymentStatus::Refunded === $payment->getStatus()) {
             return;
         }
 
-        $this->gateway->cancel($payment->getStripePaymentIntentId());
+        if (PaymentStatus::Captured === $payment->getStatus()) {
+            // The money already reached us: give back the share the cancellation
+            // policy grants the guest, rounded down to avoid over-refunding.
+            $refundCents = intdiv($payment->getAmountCents() * $command->refundPercentage, 100);
+            if ($refundCents <= 0) {
+                return;
+            }
 
-        $payment->markCancelled();
+            $this->gateway->refund($payment->getStripePaymentIntentId(), $refundCents);
+            $payment->markRefunded($refundCents);
+        } else {
+            $this->gateway->cancel($payment->getStripePaymentIntentId());
+            $payment->markCancelled();
+        }
 
         $this->repository->save($payment);
         $this->eventBus->dispatch($payment->releaseEvents());

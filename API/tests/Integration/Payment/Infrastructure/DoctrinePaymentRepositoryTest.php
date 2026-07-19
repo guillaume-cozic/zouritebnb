@@ -105,6 +105,30 @@ final class DoctrinePaymentRepositoryTest extends RepositoryTestCase
         self::assertSame(9900, $found->getAmountCents());
     }
 
+    public function test_should_persist_the_refunded_amount(): void
+    {
+        $id = Uuid::v4();
+        $payment = new Payment(
+            id: $id,
+            reservationId: null,
+            stripePaymentIntentId: 'pi_refund_roundtrip',
+            status: PaymentStatus::Captured,
+            amountCents: 8000,
+            currency: 'eur',
+            createdAt: new \DateTimeImmutable('2026-07-01 10:00:00'),
+        );
+        $this->repository->save($payment);
+        self::assertNull($this->repository->findById($id)->getRefundedAmountCents());
+
+        $payment->markRefunded(4000);
+        $this->repository->save($payment);
+
+        $found = $this->repository->findById($id);
+        self::assertNotNull($found);
+        self::assertSame(PaymentStatus::Refunded, $found->getStatus());
+        self::assertSame(4000, $found->getRefundedAmountCents());
+    }
+
     public function test_should_persist_each_status(): void
     {
         $statuses = [
@@ -112,6 +136,7 @@ final class DoctrinePaymentRepositoryTest extends RepositoryTestCase
             PaymentStatus::Authorized,
             PaymentStatus::Captured,
             PaymentStatus::Cancelled,
+            PaymentStatus::Refunded,
             PaymentStatus::Failed,
         ];
 

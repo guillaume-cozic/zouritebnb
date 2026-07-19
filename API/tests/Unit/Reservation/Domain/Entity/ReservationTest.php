@@ -169,6 +169,46 @@ final class ReservationTest extends TestCase
         self::assertCount(1, $events);
         self::assertInstanceOf(ReservationCancelled::class, $events[0]);
         self::assertTrue($reservation->getId()->toUuid()->equals($events[0]->reservationId));
+        // Flexible policy, more than 24h before check-in: the guest gets everything back.
+        self::assertSame(100, $events[0]->refundPercentage);
+    }
+
+    public function test_should_carry_the_policy_refund_percentage_on_the_cancellation_event(): void
+    {
+        // Moderate policy, 2 days before check-in: the guest is refunded half.
+        $reservation = $this->confirmedReservation(CancellationPolicy::Moderate);
+        $reservation->releaseEvents();
+
+        $reservation->cancel(new \DateTimeImmutable('2026-04-11T15:00:00+00:00'));
+
+        $events = $reservation->releaseEvents();
+        self::assertInstanceOf(ReservationCancelled::class, $events[0]);
+        self::assertSame(50, $events[0]->refundPercentage);
+    }
+
+    public function test_should_carry_a_zero_refund_percentage_when_cancelling_last_minute(): void
+    {
+        // Flexible policy, within 24h of check-in: the guest gets nothing back.
+        $reservation = $this->confirmedReservation();
+        $reservation->releaseEvents();
+
+        $reservation->cancel(new \DateTimeImmutable('2026-04-13T03:00:00+00:00'));
+
+        $events = $reservation->releaseEvents();
+        self::assertInstanceOf(ReservationCancelled::class, $events[0]);
+        self::assertSame(0, $events[0]->refundPercentage);
+    }
+
+    public function test_should_carry_a_full_refund_percentage_when_the_host_cancels_last_minute(): void
+    {
+        $reservation = $this->confirmedReservation();
+        $reservation->releaseEvents();
+
+        $reservation->cancel(new \DateTimeImmutable('2026-04-13T03:00:00+00:00'), 'Imprévu', byHost: true);
+
+        $events = $reservation->releaseEvents();
+        self::assertInstanceOf(ReservationCancelled::class, $events[0]);
+        self::assertSame(100, $events[0]->refundPercentage);
     }
 
     public function test_should_not_cancel_an_already_cancelled_reservation(): void

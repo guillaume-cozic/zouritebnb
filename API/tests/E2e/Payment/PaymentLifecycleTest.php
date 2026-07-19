@@ -85,6 +85,28 @@ final class PaymentLifecycleTest extends PaymentApiTestCase
         );
     }
 
+    public function test_should_refund_captured_payment_when_host_cancels_confirmed_reservation(): void
+    {
+        $gateway = new FakePaymentGateway();
+        $client = $this->createClientWithFakeGateway($gateway);
+        $this->createAuthUser(email: 'host@example.com', teamId: self::TEAM_ID);
+        $reservationId = $this->insertReservation(status: 'confirmed');
+        $this->insertPayment('pi_refund', status: 'captured', reservationId: $reservationId, amountCents: 40000);
+
+        $client->request('PATCH', '/api/reservations/'.$reservationId.'/cancel', [
+            'headers' => $this->authHeaders('host@example.com') + ['Content-Type' => 'application/merge-patch+json'],
+            'json' => ['message' => 'Annulation par l\'hôte.'],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        // A host cancellation fully compensates the guest: the whole capture is refunded.
+        self::assertSame('refunded', $this->paymentStatus('pi_refund'));
+        self::assertContains(
+            ['type' => 'refund', 'paymentIntentId' => 'pi_refund', 'amountCents' => 40000],
+            $gateway->calls,
+        );
+    }
+
     /**
      * Persists a reservation owned by the host team and returns its UUID (RFC4122).
      */

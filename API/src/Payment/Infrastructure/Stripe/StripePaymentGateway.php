@@ -45,6 +45,14 @@ final readonly class StripePaymentGateway implements PaymentGateway
         $this->stripeClient->paymentIntents->cancel($paymentIntentId);
     }
 
+    public function refund(string $paymentIntentId, int $amountCents): void
+    {
+        $this->stripeClient->refunds->create([
+            'payment_intent' => $paymentIntentId,
+            'amount' => $amountCents,
+        ]);
+    }
+
     /**
      * Stripe metadata must be string-keyed and scalar-valued.
      *

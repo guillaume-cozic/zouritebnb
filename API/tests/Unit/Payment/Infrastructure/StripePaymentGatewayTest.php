@@ -14,6 +14,7 @@ use Stripe\Exception\CardException;
 use Stripe\Exception\InvalidRequestException;
 use Stripe\PaymentIntent;
 use Stripe\Service\PaymentIntentService;
+use Stripe\Service\RefundService;
 use Stripe\StripeClient;
 
 final class StripePaymentGatewayTest extends TestCase
@@ -191,5 +192,44 @@ final class StripePaymentGatewayTest extends TestCase
         $this->expectExceptionMessage('Intent cannot be canceled.');
 
         $this->gateway->cancel('pi_cancel');
+    }
+
+    public function test_should_create_a_refund_on_the_payment_intent(): void
+    {
+        $refunds = $this->createMock(RefundService::class);
+        $refunds
+            ->expects(self::once())
+            ->method('create')
+            ->with([
+                'payment_intent' => 'pi_refund',
+                'amount' => 20_000,
+            ]);
+
+        $this->refundGateway($refunds)->refund('pi_refund', 20_000);
+    }
+
+    public function test_should_propagate_stripe_exception_on_refund(): void
+    {
+        $refunds = $this->createMock(RefundService::class);
+        $refunds
+            ->expects(self::once())
+            ->method('create')
+            ->willThrowException(InvalidRequestException::factory('Charge already refunded.'));
+
+        $this->expectException(InvalidRequestException::class);
+        $this->expectExceptionMessage('Charge already refunded.');
+
+        $this->refundGateway($refunds)->refund('pi_refund', 100);
+    }
+
+    private function refundGateway(RefundService&MockObject $refunds): StripePaymentGateway
+    {
+        $stripeClient = $this->createStub(StripeClient::class);
+        $stripeClient
+            ->method('__get')
+            ->with('refunds')
+            ->willReturn($refunds);
+
+        return new StripePaymentGateway($stripeClient);
     }
 }

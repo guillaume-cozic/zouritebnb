@@ -54,14 +54,13 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 
 ## 🔴 Manques importants (impact direct conversion/usage)
 
-- **Remboursement réel au voyageur** : l'annulation calcule le montant et annule le
-  PaymentIntent Stripe, mais **aucun vrai remboursement carte** n'est émis. Le breakdown
-  existe mais l'argent n'est pas rendu.
+- ~~**Remboursement réel au voyageur**~~ ✅ fait : l'annulation d'une réservation dont le
+  paiement est capturé émet un vrai `Refund` Stripe (total ou partiel selon la politique
+  d'annulation, 100 % si l'hôte annule), statut `refunded` et montant remboursé persistés.
 
 ## 🟠 Manques structurants
 
 - **Codes promo / coupons** : aucun.
-- **Réponses de l'hôte aux avis** : les avis sont à sens unique, l'hôte ne peut pas répliquer.
 
 ## 🟡 Manques « expérience » / confiance
 
@@ -87,7 +86,7 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 ## Top 3 prioritaire
 
 1. ~~**Recherche par dates de disponibilité**~~ ✅ fait
-2. **Remboursement réel** au voyageur lors d'une annulation
+2. ~~**Remboursement réel** au voyageur lors d'une annulation~~ ✅ fait
 3. **Blocage manuel de dates par l'hôte**
 
 Ce sont les trois trous les plus visibles entre l'expérience actuelle et un vrai Airbnb.

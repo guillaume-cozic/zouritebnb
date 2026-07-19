@@ -17,7 +17,7 @@ final class PaymentStatusTest extends TestCase
         );
 
         self::assertSame(
-            ['pending', 'authorized', 'captured', 'cancelled', 'failed'],
+            ['pending', 'authorized', 'captured', 'cancelled', 'refunded', 'failed'],
             $values,
         );
     }
@@ -28,6 +28,7 @@ final class PaymentStatusTest extends TestCase
         self::assertSame(PaymentStatus::Authorized, PaymentStatus::from('authorized'));
         self::assertSame(PaymentStatus::Captured, PaymentStatus::from('captured'));
         self::assertSame(PaymentStatus::Cancelled, PaymentStatus::from('cancelled'));
+        self::assertSame(PaymentStatus::Refunded, PaymentStatus::from('refunded'));
         self::assertSame(PaymentStatus::Failed, PaymentStatus::from('failed'));
     }
 

@@ -9,6 +9,7 @@ use App\Payment\Domain\Event\PaymentCancelled;
 use App\Payment\Domain\Event\PaymentCaptured;
 use App\Payment\Domain\Event\PaymentFailed;
 use App\Payment\Domain\Event\PaymentLinkedToReservation;
+use App\Payment\Domain\Event\PaymentRefunded;
 use App\Payment\Domain\Exception\InvalidPaymentException;
 use App\Shared\Domain\Entity\AggregateRoot;
 use Symfony\Component\Uid\Uuid;
@@ -17,6 +18,7 @@ final class Payment extends AggregateRoot
 {
     private PaymentStatus $status;
     private ?Uuid $reservationId;
+    private ?int $refundedAmountCents;
     private readonly Uuid $id;
     private readonly string $stripePaymentIntentId;
     private readonly int $amountCents;
@@ -31,6 +33,7 @@ final class Payment extends AggregateRoot
         int $amountCents,
         string $currency,
         \DateTimeImmutable $createdAt,
+        ?int $refundedAmountCents = null,
     ) {
         $stripePaymentIntentId = trim($stripePaymentIntentId);
         if ('' === $stripePaymentIntentId) {
@@ -53,6 +56,7 @@ final class Payment extends AggregateRoot
         $this->amountCents = $amountCents;
         $this->currency = $currency;
         $this->createdAt = $createdAt;
+        $this->refundedAmountCents = $refundedAmountCents;
     }
 
     public function getId(): Uuid
@@ -90,6 +94,11 @@ final class Payment extends AggregateRoot
         return $this->createdAt;
     }
 
+    public function getRefundedAmountCents(): ?int
+    {
+        return $this->refundedAmountCents;
+    }
+
     public function markAuthorized(): void
     {
         if (PaymentStatus::Authorized === $this->status) {
@@ -118,6 +127,20 @@ final class Payment extends AggregateRoot
         $this->ensureCanTransitionTo(PaymentStatus::Cancelled, [PaymentStatus::Pending, PaymentStatus::Authorized, PaymentStatus::Failed]);
         $this->status = PaymentStatus::Cancelled;
         $this->recordEvent(new PaymentCancelled($this->id, $this->stripePaymentIntentId));
+    }
+
+    public function markRefunded(int $refundedAmountCents): void
+    {
+        if (PaymentStatus::Refunded === $this->status) {
+            return;
+        }
+        if ($refundedAmountCents <= 0 || $refundedAmountCents > $this->amountCents) {
+            throw InvalidPaymentException::becauseRefundAmountIsInvalid($refundedAmountCents, $this->amountCents);
+        }
+        $this->ensureCanTransitionTo(PaymentStatus::Refunded, [PaymentStatus::Captured]);
+        $this->status = PaymentStatus::Refunded;
+        $this->refundedAmountCents = $refundedAmountCents;
+        $this->recordEvent(new PaymentRefunded($this->id, $this->stripePaymentIntentId, $refundedAmountCents));
     }
 
     public function markFailed(): void

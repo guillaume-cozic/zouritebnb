@@ -23,4 +23,9 @@ interface PaymentGateway
     public function capture(string $paymentIntentId): void;
 
     public function cancel(string $paymentIntentId): void;
+
+    /**
+     * Refunds part or all of a captured payment back to the card.
+     */
+    public function refund(string $paymentIntentId, int $amountCents): void;
 }

@@ -31,7 +31,8 @@ class DoctrinePaymentRepository extends ServiceEntityRepository implements Payme
             ->setStatus($payment->getStatus()->value)
             ->setAmountCents($payment->getAmountCents())
             ->setCurrency($payment->getCurrency())
-            ->setCreatedAt($payment->getCreatedAt());
+            ->setCreatedAt($payment->getCreatedAt())
+            ->setRefundedAmountCents($payment->getRefundedAmountCents());
 
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -69,6 +70,7 @@ class DoctrinePaymentRepository extends ServiceEntityRepository implements Payme
             amountCents: $entity->getAmountCents(),
             currency: $entity->getCurrency(),
             createdAt: $entity->getCreatedAt(),
+            refundedAmountCents: $entity->getRefundedAmountCents(),
         );
     }
 }

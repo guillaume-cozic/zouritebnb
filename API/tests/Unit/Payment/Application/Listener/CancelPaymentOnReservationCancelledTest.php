@@ -59,6 +59,28 @@ final class CancelPaymentOnReservationCancelledTest extends TestCase
         self::assertInstanceOf(PaymentCancelled::class, $events[0]);
     }
 
+    public function test_should_refund_captured_payment_with_the_event_percentage(): void
+    {
+        $reservationId = Uuid::v7();
+        $payment = new Payment(
+            id: Uuid::v7(),
+            reservationId: $reservationId,
+            stripePaymentIntentId: 'pi_test_1',
+            status: PaymentStatus::Captured,
+            amountCents: 1000,
+            currency: 'eur',
+            createdAt: new \DateTimeImmutable(),
+        );
+        $this->repository->save($payment);
+
+        ($this->listener)(new ReservationCancelled($reservationId, refundPercentage: 50));
+
+        self::assertSame([['type' => 'refund', 'paymentIntentId' => 'pi_test_1', 'amountCents' => 500]], $this->gateway->calls);
+        $saved = $this->repository->findByReservationId($reservationId);
+        self::assertSame(PaymentStatus::Refunded, $saved->getStatus());
+        self::assertSame(500, $saved->getRefundedAmountCents());
+    }
+
     public function test_should_noop_when_no_payment_for_reservation(): void
     {
         ($this->listener)(new ReservationCancelled(Uuid::v7()));
