@@ -110,6 +110,21 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+/** Exchange a provider-issued token (Google/Apple/Facebook) for the app session. */
+export const socialLogin = createAsyncThunk(
+  'auth/socialLogin',
+  async (payload: { provider: 'google' | 'apple' | 'facebook'; token: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/api/auth/social', payload, {
+        headers: { 'Content-Type': 'application/ld+json' },
+      });
+      return response.data as AuthUser;
+    } catch (err) {
+      return rejectWithValue(extractErrorMessage(err, 'La connexion via ce fournisseur a échoué'));
+    }
+  }
+);
+
 /** Ask the API to email a password reset link. Always resolves (the API answers 202
  *  whether or not the address has an account) so the UI cannot be used to probe emails. */
 export const requestPasswordReset = createAsyncThunk(
@@ -210,6 +225,9 @@ const authSlice = createSlice({
       .addCase(loginUser.pending, handlePending)
       .addCase(loginUser.fulfilled, handleFulfilled)
       .addCase(loginUser.rejected, handleRejected)
+      .addCase(socialLogin.pending, handlePending)
+      .addCase(socialLogin.fulfilled, handleFulfilled)
+      .addCase(socialLogin.rejected, handleRejected)
       .addCase(updateUserProfile.pending, (state) => {
         state.profileSaveState = 'saving';
       })

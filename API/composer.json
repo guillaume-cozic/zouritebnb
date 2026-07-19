@@ -13,6 +13,7 @@
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.6",
         "dompdf/dompdf": "^3.1",
+        "firebase/php-jwt": "^7.1",
         "lexik/jwt-authentication-bundle": "^3.2",
         "nelmio/cors-bundle": "^2.6",
         "phpdocumentor/reflection-docblock": "^5.6",
@@ -25,6 +26,7 @@
         "symfony/expression-language": "8.0.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "8.0.*",
+        "symfony/http-client": "8.0.*",
         "symfony/mailer": "8.0.*",
         "symfony/messenger": "8.0.*",
         "symfony/mime": "8.0.*",
@@ -98,7 +100,6 @@
         "opis/json-schema": "^2.6",
         "phparkitect/phparkitect": "^0.8.0",
         "phpunit/phpunit": "^12.5",
-        "symfony/browser-kit": "8.0.*",
-        "symfony/http-client": "8.0.*"
+        "symfony/browser-kit": "8.0.*"
     }
 }

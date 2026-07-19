@@ -20,6 +20,7 @@ import authReducer, {
   logout,
   loginUser,
   registerUser,
+  socialLogin,
   updateUserProfile,
   requestPasswordReset,
   resetPassword,
@@ -73,6 +74,39 @@ describe('loginUser', () => {
     const state = store.getState().auth;
     expect(state.status).toBe('failed');
     expect(state.error).toBe('Identifiants invalides');
+    expect(state.user).toBeNull();
+  });
+});
+
+describe('socialLogin', () => {
+  test('le store connecte l\'utilisateur et persiste le token après fulfilled', async () => {
+    mockedApi.post.mockResolvedValue({ data: userWithToken });
+    const store = buildStore();
+
+    await store.dispatch(socialLogin({ provider: 'google', token: 'google-id-token' }));
+
+    expect(mockedApi.post).toHaveBeenCalledWith(
+      '/api/auth/social',
+      { provider: 'google', token: 'google-id-token' },
+      { headers: { 'Content-Type': 'application/ld+json' } }
+    );
+    const state = store.getState().auth;
+    expect(state.status).toBe('succeeded');
+    expect(state.user?.token).toBe('jwt-abc-123');
+    expect(localStorage.getItem('auth.token')).toBe('jwt-abc-123');
+  });
+
+  test('le store expose l\'erreur quand le fournisseur est rejeté', async () => {
+    mockedApi.post.mockRejectedValue({
+      response: { data: { detail: 'The google token could not be verified.' } },
+    });
+    const store = buildStore();
+
+    await store.dispatch(socialLogin({ provider: 'google', token: 'forged' }));
+
+    const state = store.getState().auth;
+    expect(state.status).toBe('failed');
+    expect(state.error).toBe('The google token could not be verified.');
     expect(state.user).toBeNull();
   });
 });

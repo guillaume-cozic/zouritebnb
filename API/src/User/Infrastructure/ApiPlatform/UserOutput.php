@@ -37,6 +37,17 @@ use Symfony\Component\Serializer\Attribute\Groups;
             input: LoginUserInput::class,
             processor: LoginUserProcessor::class,
         ),
+        new Post(
+            uriTemplate: '/auth/social',
+            openapi: new OpenApiOperation(
+                summary: 'Authentification via un fournisseur social (Google, Apple, Facebook)',
+                description: 'Vérifie le token émis par le fournisseur (ID token Google, identity token Apple, access token Facebook). Si aucun compte n\'existe pour l\'email attesté, un utilisateur et sa team sont créés (l\'email est marqué vérifié si le fournisseur le garantit). Retourne l\'utilisateur et un JWT (champ `token`) à utiliser comme Bearer.',
+            ),
+            normalizationContext: ['groups' => ['user:read', 'user:token']],
+            denormalizationContext: ['groups' => ['user:write']],
+            input: SocialLoginInput::class,
+            processor: SocialLoginProcessor::class,
+        ),
         new Patch(
             uriTemplate: '/users/profile',
             status: 204,

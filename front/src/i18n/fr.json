@@ -266,7 +266,10 @@
       "another": "Tirer un autre projet",
       "fallbackTitle": "Voyagez solidaire à Rodrigues",
       "fallbackText": "Chaque réservation contribue à un projet qui fait vivre l'île et ses habitants."
-    }
+    },
+    "orDivider": "ou",
+    "continueWithApple": "Continuer avec Apple",
+    "continueWithFacebook": "Continuer avec Facebook"
   },
   "team": {
     "title": "Paramètres",

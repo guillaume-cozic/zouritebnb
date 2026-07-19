@@ -51,6 +51,12 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
   (autorisé ou non) et des règles complémentaires en texte libre (1000 caractères max) depuis
   l'éditeur (auto-save) ; le tout est affiché dans une section « Règlement intérieur » de la
   fiche logement. Endpoint `PATCH /accommodations/{id}/house-rules`.
+- **Login social** : connexion/inscription via Google, Apple ou Facebook
+  (`POST /api/auth/social`) : le token du fournisseur est vérifié côté API, le compte est
+  créé au premier passage (team incluse, email marqué vérifié si le fournisseur le
+  garantit). Boutons sur les pages login/inscription, affichés seulement si le client ID
+  (`GOOGLE_CLIENT_ID`, `APPLE_CLIENT_ID`, `FACEBOOK_APP_ID`/`SECRET` + `VITE_*` côté
+  front) est configuré.
 - **Multi-langue** : le front avait déjà le sélecteur FR/EN (i18next + `Accept-Language`
   sur les appels projets solidaires) ; le contenu est maintenant traduit — les 14 articles
   du blog existent en anglais sous `/blog/en/` et les projets solidaires ont leur
@@ -70,7 +76,6 @@ Voici ce qui **manque** pour se rapprocher d'un Airbnb complet, classé par prio
 
 - **Notifications in-app + push** : tout est par email (et SMS pour la demande). Pas de centre
   de notifications ni de push.
-- **Login social** (Google/Apple) : absent.
 - **Pièces jointes / photos dans la messagerie** : texte seul.
 - **Modération des avis / signalement** : pas de système de flag.
 - **Politiques d'annulation** : seulement flexible / modérée — pas de « stricte » ni personnalisable.

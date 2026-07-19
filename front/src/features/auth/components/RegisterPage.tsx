@@ -6,6 +6,7 @@ import { registerUser } from '../AuthSlice';
 import { selectAuthError, selectAuthStatus, selectAuthUser } from '../AuthSelectors';
 import AuthLayout from './AuthLayout';
 import BookingAuthNotice from './BookingAuthNotice';
+import SocialAuthButtons from './SocialAuthButtons';
 
 const RegisterPage: React.FC = () => {
   const { t } = useTranslation();
@@ -104,6 +105,7 @@ const RegisterPage: React.FC = () => {
         >
           {status === 'loading' ? t('auth.loading') : t('auth.register')}
         </button>
+        <SocialAuthButtons onSuccess={() => navigate(redirectTo)} />
         <p className="text-sm text-center text-gray-500 pt-1">
           {t('auth.hasAccount')}{' '}
           <Link to={loginTo} className="text-primary-700 font-medium hover:underline">{t('auth.login')}</Link>

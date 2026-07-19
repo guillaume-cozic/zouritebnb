@@ -34,6 +34,7 @@ security:
         # Public auth routes
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/social$, methods: [POST], roles: PUBLIC_ACCESS }
 
         # Password reset and email verification: reached from an emailed link, so the
         # visitor is not (yet) authenticated. The token itself is the credential.

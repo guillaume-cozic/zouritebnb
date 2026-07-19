@@ -266,7 +266,10 @@
       "another": "Draw another project",
       "fallbackTitle": "Travel with purpose in Rodrigues",
       "fallbackText": "Every booking contributes to a project that supports the island and its people."
-    }
+    },
+    "orDivider": "or",
+    "continueWithApple": "Continue with Apple",
+    "continueWithFacebook": "Continue with Facebook"
   },
   "team": {
     "title": "Settings",

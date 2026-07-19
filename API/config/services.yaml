@@ -58,6 +58,22 @@ services:
     App\User\Domain\Port\UserTokenRepository:
         alias: App\User\Infrastructure\Doctrine\DoctrineUserTokenRepository
 
+    App\User\Domain\Port\SocialIdentityVerifier:
+        alias: App\User\Infrastructure\SocialAuth\CompositeSocialIdentityVerifier
+
+    App\User\Infrastructure\SocialAuth\GoogleTokenVerifier:
+        arguments:
+            $clientId: '%env(GOOGLE_CLIENT_ID)%'
+
+    App\User\Infrastructure\SocialAuth\AppleTokenVerifier:
+        arguments:
+            $clientId: '%env(APPLE_CLIENT_ID)%'
+
+    App\User\Infrastructure\SocialAuth\FacebookTokenVerifier:
+        arguments:
+            $appId: '%env(FACEBOOK_APP_ID)%'
+            $appSecret: '%env(FACEBOOK_APP_SECRET)%'
+
     App\User\Domain\Port\TokenGenerator:
         alias: App\User\Infrastructure\Security\RandomTokenGenerator
 
