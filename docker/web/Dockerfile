@@ -27,6 +27,11 @@ WORKDIR /app
 ARG PUBLIC_FRONT_URL
 ENV PUBLIC_FRONT_URL=${PUBLIC_FRONT_URL}
 
+# Les pages "où dormir" interrogent l'API publique au build (repli silencieux
+# si elle est injoignable : les pages sortent sans cartes d'hébergements).
+ARG PUBLIC_API_URL
+ENV PUBLIC_API_URL=${PUBLIC_API_URL}
+
 COPY blog/package.json blog/package-lock.json ./
 RUN npm ci
 

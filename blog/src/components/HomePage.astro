@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { articleHref, homeHref, type Lang } from '../lib/i18n';
+import { ZONES, zoneHref } from '../lib/zones';
 
 interface Props {
   lang: Lang;
@@ -92,6 +93,10 @@ const t = {
     guideRequired: 'Guide requis',
     articleSingular: 'article',
     articlePlural: 'articles',
+    stayKicker: 'Préparer son séjour',
+    stayTitle: 'Où dormir à Rodrigues ?',
+    staySubtitle:
+      'Nos guides par coin de l’île, avec les hébergements à réserver en direct auprès des hôtes rodriguais.',
   },
   en: {
     pageTitle: 'Rodrigues Notebook — Activities, walks and trips',
@@ -109,6 +114,10 @@ const t = {
     guideRequired: 'Guide required',
     articleSingular: 'article',
     articlePlural: 'articles',
+    stayKicker: 'Plan your stay',
+    stayTitle: 'Where to stay in Rodrigues?',
+    staySubtitle:
+      'Our guides for every corner of the island, with accommodation bookable directly with Rodriguan hosts.',
   },
 }[lang];
 
@@ -292,6 +301,28 @@ const heroSlides = [
           </section>
         ))}
       </div>
+
+      <section class="mt-20 pt-14 border-t border-gray-200">
+        <p class="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-2">{t.stayKicker}</p>
+        <h2 class="text-3xl font-bold text-gray-900 mb-3">{t.stayTitle}</h2>
+        <p class="text-gray-500 mb-8 max-w-2xl">{t.staySubtitle}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {ZONES.map((zone) => (
+            <a
+              href={zoneHref(baseUrl, zone, lang)}
+              class="group flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm hover:shadow-md hover:border-blue-300 transition-all"
+            >
+              <span class="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                {zone.name[lang]}
+              </span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-blue-600 shrink-0 transition-colors">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      </section>
     </div>
   </div>
 </BaseLayout>

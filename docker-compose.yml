@@ -55,3 +55,9 @@ services:
       - /app/node_modules
     environment:
       PUBLIC_FRONT_URL: http://localhost:3000
+      # URL de l'API vue du navigateur (photos, liens) vs vue du conteneur
+      # (fetch des logements au rendu des pages).
+      PUBLIC_API_URL: http://localhost:8080
+      API_INTERNAL_URL: http://nginx
+    depends_on:
+      - nginx

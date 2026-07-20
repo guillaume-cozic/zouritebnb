@@ -1,0 +1,56 @@
+---
+import type { Accommodation } from '../lib/accommodations';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  accommodation: Accommodation;
+  lang: Lang;
+}
+
+const { accommodation: a, lang } = Astro.props;
+
+const frontUrl = (import.meta.env.PUBLIC_FRONT_URL ?? '/').replace(/\/$/, '');
+const href = `${frontUrl}/accommodations/${a.id}`;
+
+const typeLabels: Record<string, Record<string, string>> = {
+  fr: { house: 'Maison', apartment: 'Appartement', room: 'Chambre', bungalow: 'Bungalow', villa: 'Villa', studio: 'Studio' },
+  en: { house: 'House', apartment: 'Apartment', room: 'Room', bungalow: 'Bungalow', villa: 'Villa', studio: 'Studio' },
+};
+const typeLabel = typeLabels[lang][a.type] ?? a.type;
+const perNight = lang === 'en' ? 'per night' : 'par nuit';
+const guests = lang === 'en' ? `${a.maxGuests} guests` : `${a.maxGuests} voyageurs`;
+const photo = a.photoUrl ?? `https://picsum.photos/seed/${a.id}/800/600`;
+const price = Math.round(a.price);
+---
+
+<a
+  href={href}
+  class="group block rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow"
+>
+  <div class="aspect-[4/3] overflow-hidden bg-gray-100">
+    <img
+      src={photo}
+      alt={a.title}
+      loading="lazy"
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    />
+  </div>
+  <div class="p-4">
+    <div class="flex items-start justify-between gap-2">
+      <h3 class="font-semibold text-gray-900 leading-snug line-clamp-1">{a.title}</h3>
+      {a.averageRating != null && (
+        <span class="inline-flex items-center gap-1 text-sm text-gray-700 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" class="text-yellow-500">
+            <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+          </svg>
+          {a.averageRating}
+        </span>
+      )}
+    </div>
+    <p class="text-sm text-gray-500 mt-0.5">{typeLabel} · {a.city} · {guests}</p>
+    <p class="text-sm mt-2">
+      <span class="font-semibold text-gray-900">{price}&nbsp;€</span>
+      <span class="text-gray-500">{perNight}</span>
+    </p>
+  </div>
+</a>

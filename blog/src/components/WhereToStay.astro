@@ -1,0 +1,72 @@
+---
+import AccommodationCard from './AccommodationCard.astro';
+import { accommodationsInZone } from '../lib/accommodations';
+import { zoneBySlug, zoneHref, zoneSlugsForArticleZone } from '../lib/zones';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  /** Free-text `zone` frontmatter of the article. */
+  articleZone: string | undefined;
+  lang: Lang;
+}
+
+const { articleZone, lang } = Astro.props;
+
+const baseUrl = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
+// Primary zone = first mapped zone that actually has accommodations,
+// falling back to the first mapped zone (the landing page link still helps).
+const slugs = zoneSlugsForArticleZone(articleZone);
+let zone = null;
+let accommodations: Awaited<ReturnType<typeof accommodationsInZone>> = [];
+for (const slug of slugs) {
+  const candidate = zoneBySlug(slug);
+  if (!candidate) continue;
+  zone ??= candidate;
+  const inZone = await accommodationsInZone(slug);
+  if (inZone.length > 0) {
+    zone = candidate;
+    accommodations = inZone;
+    break;
+  }
+}
+
+const t =
+  lang === 'en'
+    ? {
+        title: (name: string) => `Where to stay ${name}`,
+        subtitle: 'Holiday rentals close to this spot, bookable directly with their Rodriguan hosts.',
+        seeAll: (name: string) => `See all accommodation ${name}`,
+      }
+    : {
+        title: (name: string) => `Où dormir ${name}`,
+        subtitle: 'Des locations de vacances à proximité, à réserver en direct auprès de leurs hôtes rodriguais.',
+        seeAll: (name: string) => `Voir tous les hébergements ${name}`,
+      };
+---
+
+{zone && (
+  <aside class="mt-16 pt-10 border-t border-gray-200">
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">{t.title(zone.shortName[lang])}</h2>
+    <p class="text-gray-500 mb-6">{t.subtitle}</p>
+
+    {accommodations.length > 0 && (
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+        {accommodations.slice(0, 3).map((a) => <AccommodationCard accommodation={a} lang={lang} />)}
+      </div>
+    )}
+
+    <a
+      href={zoneHref(baseUrl, zone, lang)}
+      class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700"
+    >
+      {t.seeAll(zone.shortName[lang])}
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      </svg>
+    </a>
+  </aside>
+)}

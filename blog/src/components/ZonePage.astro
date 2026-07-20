@@ -1,0 +1,149 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AccommodationCard from './AccommodationCard.astro';
+import { accommodationsInZone } from '../lib/accommodations';
+import { zoneHref, zoneSlugsForArticleZone, type Zone } from '../lib/zones';
+import { articleHref, bareSlug, homeHref, type Lang } from '../lib/i18n';
+
+interface Props {
+  zone: Zone;
+  lang: Lang;
+}
+
+const { zone, lang } = Astro.props;
+
+const baseUrl = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const frontUrl = (import.meta.env.PUBLIC_FRONT_URL ?? '/').replace(/\/$/, '');
+
+const accommodations = await accommodationsInZone(zone.slug);
+
+const articles = (await getCollection('articles'))
+  .filter(
+    (a) => a.data.lang === lang && zoneSlugsForArticleZone(a.data.zone).includes(zone.slug),
+  )
+  .sort((a, b) => a.data.order - b.data.order);
+
+const otherLang: Lang = lang === 'en' ? 'fr' : 'en';
+const langSwitch = { href: zoneHref(baseUrl, zone, otherLang), lang: otherLang };
+
+const t =
+  lang === 'en'
+    ? {
+        eyebrow: 'Where to stay in Rodrigues',
+        title: `Where to stay — ${zone.name.en}`,
+        metaTitle: `Where to stay — ${zone.name.en} | Rodrigues holiday rentals`,
+        metaDescription: `Holiday rentals in ${zone.name.en}, Rodrigues: houses, bungalows and guest rooms bookable directly with local hosts.`,
+        stays: 'Available accommodation',
+        noStays: 'Browse all our accommodation and filter by location on the booking site.',
+        allStays: 'See all accommodation in Rodrigues',
+        toDo: 'Things to do nearby',
+        back: 'All articles',
+      }
+    : {
+        eyebrow: 'Où dormir à Rodrigues',
+        title: `Où dormir — ${zone.name.fr}`,
+        metaTitle: `Où dormir — ${zone.name.fr} | Location de vacances à Rodrigues`,
+        metaDescription: `Locations de vacances ${zone.shortName.fr} à Rodrigues : maisons, bungalows et chambres d'hôtes à réserver en direct auprès des hôtes locaux.`,
+        stays: 'Hébergements disponibles',
+        noStays: "Parcourez tous nos hébergements et filtrez par localisation sur le site de réservation.",
+        allStays: 'Voir tous les hébergements à Rodrigues',
+        toDo: 'À voir, à faire dans le coin',
+        back: 'Tous les articles',
+      };
+
+const jsonLd =
+  accommodations.length > 0
+    ? JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: t.title,
+        itemListElement: accommodations.map((a, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          url: `${frontUrl}/accommodations/${a.id}`,
+          name: a.title,
+        })),
+      })
+    : null;
+---
+
+<BaseLayout
+  title={t.metaTitle}
+  description={t.metaDescription}
+  lang={lang}
+  homeUrl={homeHref(baseUrl, lang)}
+  langSwitch={langSwitch}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20">
+    <div class="max-w-5xl mx-auto">
+      <nav class="mb-8">
+        <a href={homeHref(baseUrl, lang)} class="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 19-7-7 7-7" />
+            <path d="M19 12H5" />
+          </svg>
+          {t.back}
+        </a>
+      </nav>
+
+      <header class="mb-10">
+        <p class="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-3">{t.eyebrow}</p>
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-5 leading-tight">{t.title}</h1>
+        <p class="text-xl text-gray-500 leading-relaxed">{zone.intro[lang]}</p>
+      </header>
+
+      <section class="mb-14">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">{t.stays}</h2>
+        {accommodations.length > 0 ? (
+          <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {accommodations.map((a) => <AccommodationCard accommodation={a} lang={lang} />)}
+          </div>
+        ) : (
+          <p class="text-gray-500">{t.noStays}</p>
+        )}
+        <a
+          href={`${frontUrl}/accommodations`}
+          class="inline-flex items-center gap-1.5 mt-6 text-sm font-medium text-blue-600 hover:text-blue-700"
+        >
+          {t.allStays}
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </a>
+      </section>
+
+      {articles.length > 0 && (
+        <section>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">{t.toDo}</h2>
+          <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {articles.map((article) => (
+              <a
+                href={articleHref(baseUrl, article)}
+                class="group block rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                  <img
+                    src={article.data.cover ?? `https://picsum.photos/seed/${bareSlug(article)}/800/500`}
+                    alt={article.data.title}
+                    loading="lazy"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div class="p-4">
+                  <h3 class="font-semibold text-gray-900 leading-snug">{article.data.title}</h3>
+                  <p class="text-sm text-gray-500 mt-1 line-clamp-2">{article.data.summary}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </div>
+
+  {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
+</BaseLayout>

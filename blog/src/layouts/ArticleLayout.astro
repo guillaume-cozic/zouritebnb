@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import WhereToStay from '../components/WhereToStay.astro';
 import type { CollectionEntry } from 'astro:content';
 import { bareSlug, homeHref, type Lang } from '../lib/i18n';
 
@@ -125,6 +126,8 @@ const difficultyClasses: Record<string, string> = {
       <div class="prose-article">
         <slot />
       </div>
+
+      <WhereToStay articleZone={data.zone} lang={lang} />
     </div>
   </article>
 </BaseLayout>

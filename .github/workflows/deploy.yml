@@ -154,6 +154,7 @@ jobs:
           build-args: |
             VITE_API_URL=${{ vars.VITE_API_URL }}
             PUBLIC_FRONT_URL=https://www.zouritebnb.com
+            PUBLIC_API_URL=${{ vars.VITE_API_URL }}
           tags: |
             ${{ steps.tags.outputs.web_repo }}:${{ github.sha }}
             ${{ steps.tags.outputs.web_repo }}:latest
