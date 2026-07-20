@@ -26,6 +26,13 @@ final readonly class ServeSolidarityProjectImageController
             return new Response('Not found', Response::HTTP_NOT_FOUND);
         }
 
-        return new BinaryFileResponse($path);
+        // Filenames are immutable UUIDs (a new upload gets a new URL), so
+        // browsers and the CDN edge can cache the file indefinitely.
+        $response = new BinaryFileResponse($path);
+        $response->setPublic();
+        $response->setMaxAge(31536000);
+        $response->setImmutable();
+
+        return $response;
     }
 }
