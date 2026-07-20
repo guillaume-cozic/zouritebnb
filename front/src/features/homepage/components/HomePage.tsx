@@ -6,6 +6,7 @@ import { fetchHomepageFeatured } from '../HomepageSlice';
 import { selectAccommodations, selectHomepageStatus, selectHomepageError } from '../HomepageSelectors';
 import HeroSection from './HeroSection';
 import AccommodationCard from './AccommodationCard';
+import AboutRodriguesSection from './AboutRodriguesSection';
 
 // La carte (Leaflet, ~150 Ko) est sous la ligne de flottaison : chunk séparé,
 // chargé après le rendu initial.
@@ -258,6 +259,7 @@ const HomePage: React.FC = () => {
 
       <SolidarityProjectsSection />
 
+      <AboutRodriguesSection />
 
       <Footer />
     </div>

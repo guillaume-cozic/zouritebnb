@@ -52,6 +52,41 @@
     "message": "The page you are looking for does not exist or has been moved.",
     "backHome": "Back to home"
   },
+  "about": {
+    "title": "Renting a place to stay in Rodrigues",
+    "intro1": "A ninety-minute flight from Mauritius, Rodrigues remains one of the last unspoiled islands of the Indian Ocean: a lagoon twice the size of the land it surrounds, peaceful Creole villages and a sense of hospitality that comes naturally to Rodriguans. There are no big resorts here — you stay with locals, in a Creole house facing the sea, a village guesthouse or a villa right on the lagoon.",
+    "intro2": "ZouriteBnb connects travelers directly with Rodriguan hosts: you book without intermediaries, hosts keep a fairer share of your stay, and every booking supports a local solidarity project — fishing, farming, education or lagoon conservation. Traveling to Rodrigues with ZouriteBnb means supporting the island's economy while sleeping better than in a hotel.",
+    "zonesTitle": "Where to stay on the island?",
+    "zonesIntro": "Every corner of Rodrigues has its own character. Our area guides help you pick the right base:",
+    "zones": {
+      "portMathurin": {
+        "name": "Port Mathurin",
+        "blurb": "The capital and its Saturday market: ideal for doing everything on foot and exploring the island."
+      },
+      "anseAuxAnglais": {
+        "name": "Anse aux Anglais",
+        "blurb": "The family-friendly seaside spot, minutes from the lagoon, restaurants and snorkeling trips."
+      },
+      "pointeCoton": {
+        "name": "Pointe Coton",
+        "blurb": "The long white-sand beach lined with casuarina trees, on the wild east coast."
+      },
+      "mourouk": {
+        "name": "Mourouk",
+        "blurb": "The southern spot: kitesurfing, turquoise lagoon and coastal hiking trailheads."
+      },
+      "coteOuest": {
+        "name": "West Coast",
+        "blurb": "Sunsets, quiet coves and authentic villages, far from everything."
+      },
+      "centre": {
+        "name": "The Center",
+        "blurb": "The green heights of the island, with plantations, cool air and Creole table d'hôtes."
+      }
+    },
+    "bookingTitle": "How does direct booking work?",
+    "booking": "Pick your dates on a listing and send your request: the host replies within 24 hours and your card is only charged once the request is accepted. You then chat directly with your host before and during your stay — sightseeing tips, transfers, Creole meals: nobody knows Rodrigues better than the people who live there."
+  },
   "autosave": {
     "saving": "Saving...",
     "saved": "Saved",

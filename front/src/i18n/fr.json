@@ -52,6 +52,41 @@
     "message": "La page que vous cherchez n'existe pas ou a été déplacée.",
     "backHome": "Retour à l'accueil"
   },
+  "about": {
+    "title": "Louer un hébergement à Rodrigues",
+    "intro1": "À une heure et demie de vol de l'île Maurice, Rodrigues reste l'une des dernières îles préservées de l'océan Indien : un lagon deux fois plus grand que la terre qui l'entoure, des villages créoles paisibles et un sens de l'accueil dont les Rodriguais ont fait une seconde nature. Ici, pas de grands complexes hôteliers — on séjourne chez l'habitant, dans une case créole face à la mer, une chambre d'hôtes de village ou une villa les pieds dans le lagon.",
+    "intro2": "ZouriteBnb met en relation directe les voyageurs et les hôtes rodriguais : vous réservez sans intermédiaire, l'hôte reçoit une part plus juste de votre séjour, et chaque réservation soutient un projet solidaire local — pêche, agriculture, éducation ou protection du lagon. Voyager à Rodrigues avec ZouriteBnb, c'est faire vivre l'économie de l'île en dormant mieux que dans un hôtel.",
+    "zonesTitle": "Où dormir sur l'île ?",
+    "zonesIntro": "Chaque coin de Rodrigues a son caractère. Nos guides par zone vous aident à choisir le bon point de chute :",
+    "zones": {
+      "portMathurin": {
+        "name": "Port Mathurin",
+        "blurb": "La capitale et son marché du samedi : idéal pour tout faire à pied et rayonner sur l'île."
+      },
+      "anseAuxAnglais": {
+        "name": "Anse aux Anglais",
+        "blurb": "La station balnéaire familiale, à quelques minutes du lagon, des restaurants et des sorties snorkeling."
+      },
+      "pointeCoton": {
+        "name": "Pointe Coton",
+        "blurb": "La grande plage de sable blanc bordée de filaos, sur la côte est sauvage."
+      },
+      "mourouk": {
+        "name": "Mourouk",
+        "blurb": "Le spot du sud : kitesurf, lagon turquoise et départs de randonnées côtières."
+      },
+      "coteOuest": {
+        "name": "Côte Ouest",
+        "blurb": "Couchers de soleil, criques tranquilles et villages authentiques, loin de tout."
+      },
+      "centre": {
+        "name": "Le Centre",
+        "blurb": "Les hauteurs verdoyantes de l'île, entre plantations, fraîcheur et tables d'hôtes créoles."
+      }
+    },
+    "bookingTitle": "La réservation en direct, comment ça marche ?",
+    "booking": "Choisissez vos dates sur l'annonce et envoyez votre demande : l'hôte vous répond sous 24 heures et votre carte n'est débitée qu'une fois la demande acceptée. Vous échangez ensuite directement avec votre hôte par messagerie, avant et pendant le séjour — conseils de visite, transferts, repas créoles : personne ne connaît mieux Rodrigues que ceux qui y vivent."
+  },
   "autosave": {
     "saving": "Enregistrement...",
     "saved": "Enregistré",
