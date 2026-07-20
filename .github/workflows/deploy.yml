@@ -254,6 +254,20 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
+      # Les secrets runtime vivent dans le secret GitHub ENV_PROD_LOCAL
+      # (contenu complet du fichier, modèle : API/.env.prod.local.dist) :
+      # le workflow le (ré)écrit à chaque déploiement — aucun fichier géré à
+      # la main sur le VPS. Si le secret est vide, on garde le fichier déjà
+      # présent sur le serveur (le garde-fou plus bas échoue s'il n'y en a pas).
+      - name: Write .env.prod.local from secret
+        if: ${{ secrets.ENV_PROD_LOCAL != '' }}
+        env:
+          ENV_PROD_LOCAL: ${{ secrets.ENV_PROD_LOCAL }}
+        run: |
+          printf '%s\n' "${ENV_PROD_LOCAL}" | ssh -i ~/.ssh/id_ed25519 -p "${{ secrets.SSH_PORT || 22 }}" \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "umask 077 && mkdir -p '${{ secrets.API_DEPLOY_PATH }}' && cat > '${{ secrets.API_DEPLOY_PATH }}/.env.prod.local'"
+
       - name: Sync prod compose file to VPS
         run: |
           rsync -az \
