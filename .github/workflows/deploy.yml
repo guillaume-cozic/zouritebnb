@@ -332,8 +332,17 @@ jobs:
           docker logout ghcr.io
           EOF
 
+      # Au premier déploiement, Traefik doit encore obtenir ses certificats
+      # Let's Encrypt : on laisse jusqu'à ~2 min avant de déclarer l'échec.
       - name: Smoke test
         run: |
-          curl --fail --silent --show-error --max-time 15 \
-            "${{ vars.PRODUCTION_URL }}/api/docs" > /dev/null
-          echo "==> API is responding"
+          for i in $(seq 1 12); do
+            if curl --fail --silent --show-error --max-time 15 \
+                "${{ vars.PRODUCTION_URL }}/api/docs" > /dev/null; then
+              echo "==> API is responding"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::API still not responding after 2 min" >&2
+          exit 1
