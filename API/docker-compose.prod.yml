@@ -3,14 +3,12 @@ services:
   # conteneurs via les labels ci-dessous et gère les certificats Let's Encrypt
   # (émission + renouvellement automatiques, stockés dans le volume traefik_acme).
   traefik:
-    image: traefik:v3.5
+    # v3.6 minimum : les versions antérieures figent l'API docker en 1.24
+    # (même avec DOCKER_API_VERSION), refusée par les Docker Engine récents —
+    # Traefik ne voit alors aucun conteneur et n'émet aucun certificat.
+    image: traefik:v3.6
     container_name: traefik
     restart: unless-stopped
-    environment:
-      # Sans ça le provider docker négocie en API 1.24, refusée par les
-      # Docker Engine récents (minimum 1.40) : Traefik ne voit alors aucun
-      # conteneur et n'émet aucun certificat.
-      - DOCKER_API_VERSION=1.44
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
