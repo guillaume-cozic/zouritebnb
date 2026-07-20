@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -43,12 +44,22 @@ final class SeedRodriguesCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->addOption(
+            'force',
+            null,
+            InputOption::VALUE_NONE,
+            'Autorise l\'exécution en environnement prod (données de démo générées).',
+        );
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        if ('prod' === $this->environment) {
-            $io->error('Refusing to seed demo data in the prod environment.');
+        if ('prod' === $this->environment && !$input->getOption('force')) {
+            $io->error('Refusing to seed demo data in the prod environment. Use --force to override.');
 
             return Command::FAILURE;
         }
