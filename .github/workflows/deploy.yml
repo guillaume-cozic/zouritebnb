@@ -330,9 +330,9 @@ jobs:
           docker compose -f docker-compose.prod.yml exec -T php \
               bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration </dev/null
 
-          echo "==> Verifying schema is present"
+          echo "==> Verifying database is up to date"
           docker compose -f docker-compose.prod.yml exec -T php \
-              bin/console doctrine:query:sql "SELECT COUNT(*) FROM accommodation" </dev/null
+              bin/console doctrine:migrations:up-to-date --no-interaction </dev/null
 
           echo "==> Cleaning up dangling images"
           docker image prune -f
