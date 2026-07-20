@@ -26,8 +26,31 @@
       "termsOfUse": "Conditions Générales d'Utilisation",
       "termsOfSale": "Conditions Générales de Vente",
       "legalNotice": "Mentions légales",
-      "privacyPolicy": "Politique de confidentialité"
+      "privacyPolicy": "Politique de confidentialité",
+      "wishlist": "Mes favoris",
+      "forgotPassword": "Mot de passe oublié",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "verifyEmail": "Vérification de l'email",
+      "revenue": "Revenus",
+      "notFound": "Page introuvable"
+    },
+    "descriptions": {
+      "default": "ZouriteBnb, la plateforme rodriguaise de locations de vacances : réservez en direct auprès d'hôtes locaux.",
+      "home": "Locations de vacances à Rodrigues : cases créoles, villas et chambres chez l'habitant. Réservez en direct auprès d'hôtes rodriguais et soutenez des projets solidaires locaux.",
+      "accommodations": "Parcourez tous les hébergements disponibles à Rodrigues : cases créoles, villas, bungalows et chambres chez l'habitant, réservables en direct auprès des hôtes.",
+      "accommodation": "Photos, équipements, disponibilités et localisation : tout pour préparer votre séjour dans cet hébergement à Rodrigues.",
+      "solidarityProjects": "Découvrez les projets solidaires soutenus par ZouriteBnb et les hôtes de Rodrigues : chaque réservation contribue au développement local de l'île.",
+      "solidarityProject": "Présentation du projet solidaire : objectifs, avancement et contribution des réservations ZouriteBnb.",
+      "termsOfUse": "Conditions générales d'utilisation de la plateforme de location de vacances ZouriteBnb.",
+      "termsOfSale": "Conditions générales de vente des réservations effectuées sur ZouriteBnb.",
+      "legalNotice": "Mentions légales du site ZouriteBnb, plateforme de locations de vacances à Rodrigues.",
+      "privacyPolicy": "Politique de confidentialité et protection des données personnelles sur ZouriteBnb."
     }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "message": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "backHome": "Retour à l'accueil"
   },
   "autosave": {
     "saving": "Enregistrement...",

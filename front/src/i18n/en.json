@@ -26,8 +26,31 @@
       "termsOfUse": "Terms of Use",
       "termsOfSale": "Terms of Sale",
       "legalNotice": "Legal Notice",
-      "privacyPolicy": "Privacy Policy"
+      "privacyPolicy": "Privacy Policy",
+      "wishlist": "My favorites",
+      "forgotPassword": "Forgot password",
+      "resetPassword": "Reset password",
+      "verifyEmail": "Email verification",
+      "revenue": "Revenue",
+      "notFound": "Page not found"
+    },
+    "descriptions": {
+      "default": "ZouriteBnb, the Rodrigues holiday rental platform: book directly with local hosts.",
+      "home": "Holiday rentals in Rodrigues: Creole houses, villas and homestay rooms. Book directly with Rodriguan hosts and support local solidarity projects.",
+      "accommodations": "Browse all available accommodations in Rodrigues: Creole houses, villas, bungalows and homestay rooms, bookable directly with hosts.",
+      "accommodation": "Photos, amenities, availability and location: everything you need to plan your stay in this Rodrigues accommodation.",
+      "solidarityProjects": "Discover the solidarity projects supported by ZouriteBnb and Rodrigues hosts: every booking contributes to local development.",
+      "solidarityProject": "About this solidarity project: goals, progress and how ZouriteBnb bookings contribute.",
+      "termsOfUse": "Terms of use of the ZouriteBnb holiday rental platform.",
+      "termsOfSale": "Terms of sale for bookings made on ZouriteBnb.",
+      "legalNotice": "Legal notice of ZouriteBnb, holiday rental platform in Rodrigues.",
+      "privacyPolicy": "Privacy policy and personal data protection on ZouriteBnb."
     }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The page you are looking for does not exist or has been moved.",
+    "backHome": "Back to home"
   },
   "autosave": {
     "saving": "Saving...",

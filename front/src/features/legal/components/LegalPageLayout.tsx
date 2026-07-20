@@ -10,7 +10,7 @@ interface LegalPageLayoutProps {
 /**
  * Shared shell for the legal pages (CGU, CGV). Renders a centered, readable
  * column with consistent heading/paragraph rhythm so each document only has to
- * provide its sections. The document title is set centrally by DocumentTitle.
+ * provide its sections. The document title is set centrally by Seo.
  */
 const LegalPageLayout: React.FC<LegalPageLayoutProps> = ({ title, lastUpdated, children }) => (
   <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gray-50/50">

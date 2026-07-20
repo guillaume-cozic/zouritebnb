@@ -1,3 +1,9 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /account
+Disallow: /create
+Disallow: /wishlist
+
+Sitemap: https://www.zouritebnb.com/sitemap.xml
+Sitemap: https://www.zouritebnb.com/blog/sitemap-index.xml

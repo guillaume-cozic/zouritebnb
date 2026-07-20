@@ -106,6 +106,10 @@ services:
         arguments:
             $photoUploadDir: '%kernel.project_dir%/var/uploads/photos'
 
+    App\Shared\Infrastructure\Controller\SitemapController:
+        arguments:
+            $frontendUrl: '%env(FRONTEND_URL)%'
+
     App\SolidarityProject\Domain\Port\SolidarityProjectImageStorage:
         alias: App\SolidarityProject\Infrastructure\Filesystem\LocalSolidarityProjectImageStorage
 

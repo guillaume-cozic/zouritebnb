@@ -4,7 +4,8 @@ import { useAppDispatch } from './store/hooks';
 import { fetchWishlist } from './features/wishlist/WishlistSlice';
 import WishlistPage from './features/wishlist/components/WishlistPage';
 import Navbar from './components/Navbar';
-import DocumentTitle from './components/DocumentTitle';
+import Seo from './components/Seo';
+import NotFoundPage from './components/NotFoundPage';
 import HomePage from './features/homepage/components/HomePage';
 import AccommodationsListingPage from './features/homepage/components/AccommodationsListingPage';
 import CreateAccommodationWizard from './features/accommodation/components/CreateAccommodationWizard';
@@ -50,10 +51,10 @@ function App() {
 
   return (
     <BrowserRouter>
-      <DocumentTitle />
+      <Seo />
       <Navbar />
-      <EmailVerificationBanner />
       <div className="pt-16 min-h-screen">
+        <EmailVerificationBanner />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
@@ -100,6 +101,7 @@ function App() {
               <Route path="/account/verification" element={<IdentityVerificationPage />} />
             </Route>
           </Route>
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
     </BrowserRouter>
