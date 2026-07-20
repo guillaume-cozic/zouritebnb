@@ -1,0 +1,30 @@
+# syntax=docker/dockerfile:1.7
+
+# Image auto-suffisante du back-office admin : build Vite embarqué, servi par
+# nginx. Contexte de build attendu : le dossier admin/.
+
+# ---------- Stage 1: build ----------
+FROM node:24-alpine AS build
+
+WORKDIR /app
+
+# L'URL de l'API est cuite dans le bundle au build (import.meta.env).
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . ./
+RUN npm run build
+
+# ---------- Stage 2: runtime ----------
+FROM nginx:1.27-alpine
+
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

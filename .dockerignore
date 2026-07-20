@@ -1,0 +1,10 @@
+# Contexte du build docker/web/Dockerfile (racine du monorepo) : seuls
+# front/, blog/ et docker/ sont nécessaires.
+.git
+API
+admin
+ansible
+**/node_modules
+**/dist
+front/.env*
+blog/.astro
