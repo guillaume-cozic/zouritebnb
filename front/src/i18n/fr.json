@@ -462,7 +462,7 @@
     }
   },
   "hero": {
-    "title": "Trouvez votre hébergement idéal",
+    "title": "Location de vacances à l'île Rodrigues",
     "subtitle": "Découvrez des logements uniques pour votre prochain séjour",
     "city": "Lieu",
     "checkIn": "Arrivée",
@@ -523,7 +523,7 @@
     "night": "nuit",
     "guest_one": "{{count}} voyageur",
     "guest_other": "{{count}} voyageurs",
-    "featuredTitle": "Hébergements en vedette",
+    "featuredTitle": "Hébergements en vedette à Rodrigues",
     "featuredSubtitle": "Découvrez nos logements les mieux notés par nos voyageurs",
     "viewAll": "Voir tous les hébergements",
     "viewDetails": "Voir les détails",

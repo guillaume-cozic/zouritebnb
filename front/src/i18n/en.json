@@ -462,7 +462,7 @@
     }
   },
   "hero": {
-    "title": "Find your perfect accommodation",
+    "title": "Holiday rentals on Rodrigues island",
     "subtitle": "Discover unique places to stay for your next trip",
     "city": "Location",
     "checkIn": "Check-in",
@@ -523,7 +523,7 @@
     "night": "night",
     "guest_one": "{{count}} guest",
     "guest_other": "{{count}} guests",
-    "featuredTitle": "Featured accommodations",
+    "featuredTitle": "Featured accommodations in Rodrigues",
     "featuredSubtitle": "Discover our top-rated properties selected by travellers",
     "viewAll": "View all accommodations",
     "viewDetails": "View details",
