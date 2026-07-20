@@ -314,9 +314,13 @@ jobs:
           echo "==> Starting containers"
           docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
+          # IMPORTANT : `< /dev/null` sur chaque `docker compose exec -T`. Ce
+          # script est le stdin de `bash -s` (heredoc) ; sans redirection, le
+          # premier `exec -T` draine tout le reste du heredoc — les migrations
+          # ne s'exécutaient alors jamais et bash sortait en 0 sans rien faire.
           echo "==> Waiting for php container to be ready"
           for i in $(seq 1 30); do
-            if docker compose -f docker-compose.prod.yml exec -T php php -v >/dev/null 2>&1; then
+            if docker compose -f docker-compose.prod.yml exec -T php php -v >/dev/null 2>&1 </dev/null; then
               break
             fi
             sleep 2
@@ -324,7 +328,11 @@ jobs:
 
           echo "==> Running migrations"
           docker compose -f docker-compose.prod.yml exec -T php \
-              bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+              bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration </dev/null
+
+          echo "==> Verifying schema is present"
+          docker compose -f docker-compose.prod.yml exec -T php \
+              bin/console doctrine:query:sql "SELECT COUNT(*) FROM accommodation" </dev/null
 
           echo "==> Cleaning up dangling images"
           docker image prune -f
