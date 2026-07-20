@@ -326,6 +326,14 @@ jobs:
             sleep 2
           done
 
+          # Le volume php_var monté sur var/ masque le cache prod cuit dans
+          # l'image (Dockerfile: cache:warmup) et n'est peuplé qu'au 1er `up` :
+          # sans ce clear, prod réutilise indéfiniment le conteneur compilé du
+          # tout premier déploiement (commandes/services/config figés).
+          echo "==> Clearing cached compiled container"
+          docker compose -f docker-compose.prod.yml exec -T php \
+              bin/console cache:clear --no-interaction </dev/null
+
           echo "==> Running migrations"
           docker compose -f docker-compose.prod.yml exec -T php \
               bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration </dev/null
