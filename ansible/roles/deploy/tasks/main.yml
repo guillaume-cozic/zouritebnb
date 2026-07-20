@@ -1,8 +1,8 @@
 ---
-# Make the host ready for .github/workflows/deploy.yml: the workflow rsyncs the
-# built front/admin/blog over SSH and runs `docker compose` as `deploy_user`.
+# Make the host ready for .github/workflows/deploy.yml: the workflow writes the
+# compose + env files over SSH and runs `docker compose` as `deploy_user`.
 
-- name: Install rsync (the deploy workflow syncs static builds with it)
+- name: Install rsync (the deploy workflow syncs the compose file with it)
   ansible.builtin.apt:
     name: rsync
     state: present

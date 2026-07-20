@@ -1,11 +1,9 @@
 ---
 # User the GitHub Actions deploy workflow logs in as (SSH_USER secret).
-# It owns the deploy directories and runs `docker compose`.
+# It owns the deploy directory and runs `docker compose`.
 deploy_user: zourite-deploy
 
-# Directories the workflow rsyncs into (FRONT/ADMIN/API_DEPLOY_PATH secrets).
-# Must match the *_DEPLOY_PATH GitHub secrets exactly.
+# Single directory the workflow writes into (docker-compose.prod.yml +
+# .env.prod.local). Everything else lives in the GHCR images.
 deploy_paths:
-  - /home/{{ deploy_user }}/zouritebnb/front
-  - /home/{{ deploy_user }}/zouritebnb/admin
-  - /home/{{ deploy_user }}/zouritebnb/api
+  - /home/{{ deploy_user }}/zouritebnb
