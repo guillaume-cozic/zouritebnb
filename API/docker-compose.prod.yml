@@ -6,6 +6,11 @@ services:
     image: traefik:v3.5
     container_name: traefik
     restart: unless-stopped
+    environment:
+      # Sans ça le provider docker négocie en API 1.24, refusée par les
+      # Docker Engine récents (minimum 1.40) : Traefik ne voit alors aucun
+      # conteneur et n'émet aucun certificat.
+      - DOCKER_API_VERSION=1.44
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
