@@ -55,3 +55,5 @@ blog/.env.development
 # Scraping Airbnb éphémère (scrape-rodrigues.sh) — le seed figé et commité
 # vit dans API/src/DevSeed/data/, pas ici.
 rodrigues-*/
+# Sortie du --dry-run de import-rodrigues-prod.sh
+import-rodrigues-prod.sql
