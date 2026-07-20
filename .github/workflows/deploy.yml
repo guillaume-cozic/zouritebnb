@@ -335,6 +335,21 @@ jobs:
           docker compose -f docker-compose.prod.yml exec -T php \
               bin/console cache:clear --no-interaction </dev/null
 
+          # php-fpm a démarré AVANT le cache:clear et a préchargé (opcache.preload
+          # + validate_timestamps=0) le conteneur compilé périmé du volume php_var :
+          # sans restart, prod tourne avec le conteneur DI du déploiement précédent
+          # (services/routes incohérents → 500).
+          echo "==> Restarting php-fpm to reload the fresh compiled container"
+          docker compose -f docker-compose.prod.yml restart php </dev/null
+
+          echo "==> Waiting for php container to be back"
+          for i in $(seq 1 30); do
+            if docker compose -f docker-compose.prod.yml exec -T php php -v >/dev/null 2>&1 </dev/null; then
+              break
+            fi
+            sleep 2
+          done
+
           echo "==> Running migrations"
           docker compose -f docker-compose.prod.yml exec -T php \
               bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration </dev/null
