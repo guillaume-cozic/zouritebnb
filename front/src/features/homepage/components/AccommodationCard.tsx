@@ -23,7 +23,14 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
 
   const [photoIndex, setPhotoIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
+  // Highest photo index ever shown: only those are mounted, so the browser
+  // downloads one photo per card up front instead of the whole gallery
+  // (~6 × 220 Ko par carte), et une de plus à chaque pas du carrousel.
+  const [maxRevealed, setMaxRevealed] = useState(0);
   const intervalRef = useRef<number | null>(null);
+
+  const reveal = (i: number) =>
+    setMaxRevealed((m) => Math.max(m, Math.min(i, absolutePhotos.length - 1)));
 
   useEffect(() => {
     if (!isHovering || absolutePhotos.length <= 1) {
@@ -33,8 +40,14 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
       }
       return;
     }
+    // Mount the next photo right away so it is loaded before the first cycle.
+    reveal(1);
     intervalRef.current = window.setInterval(() => {
-      setPhotoIndex((i) => (i + 1) % absolutePhotos.length);
+      setPhotoIndex((i) => {
+        const next = (i + 1) % absolutePhotos.length;
+        reveal(next + 1);
+        return next;
+      });
     }, PHOTO_CYCLE_MS);
     return () => {
       if (intervalRef.current) {
@@ -60,12 +73,13 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
       <Link to={`/accommodations/${accommodation.id}`} className="block aspect-video relative overflow-hidden cursor-pointer">
         {absolutePhotos.length > 0 ? (
           <>
-            {absolutePhotos.map((src, i) => (
+            {absolutePhotos.slice(0, maxRevealed + 1).map((src, i) => (
               <img
                 key={src}
                 src={src}
                 alt={accommodation.title}
-                loading={i === 0 ? 'eager' : 'lazy'}
+                loading="lazy"
+                decoding="async"
                 className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${i === photoIndex ? 'opacity-100' : 'opacity-0'} ${i === photoIndex && isHovering ? 'scale-105' : ''} transform-gpu`}
               />
             ))}

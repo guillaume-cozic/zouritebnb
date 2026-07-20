@@ -6,7 +6,10 @@ import { fetchHomepageFeatured } from '../HomepageSlice';
 import { selectAccommodations, selectHomepageStatus, selectHomepageError } from '../HomepageSelectors';
 import HeroSection from './HeroSection';
 import AccommodationCard from './AccommodationCard';
-import RodriguesMap from './RodriguesMap';
+
+// La carte (Leaflet, ~150 Ko) est sous la ligne de flottaison : chunk séparé,
+// chargé après le rendu initial.
+const RodriguesMap = React.lazy(() => import('./RodriguesMap'));
 import SolidarityProjectsSection from '../../solidarityProject/components/SolidarityProjectsSection';
 import Footer from '../../../components/Footer';
 
@@ -249,7 +252,9 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      <RodriguesMap />
+      <React.Suspense fallback={<div className="h-96 rounded-2xl bg-gray-100 animate-pulse" />}>
+        <RodriguesMap />
+      </React.Suspense>
 
       <SolidarityProjectsSection />
 
