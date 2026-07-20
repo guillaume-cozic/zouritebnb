@@ -368,9 +368,11 @@ jobs:
       # Let's Encrypt : on laisse jusqu'à ~2 min avant de déclarer l'échec.
       - name: Smoke test
         run: |
+          # /api/docs est volontairement coupé en prod (enable_docs: false) :
+          # on sonde une route publique réelle à la place.
           for i in $(seq 1 12); do
             if curl --fail --silent --show-error --max-time 15 \
-                "${{ vars.PRODUCTION_URL }}/api/docs" > /dev/null; then
+                "${{ vars.PRODUCTION_URL }}/api/accommodations" > /dev/null; then
               echo "==> API is responding"
               exit 0
             fi
