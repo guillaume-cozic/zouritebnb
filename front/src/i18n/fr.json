@@ -2,7 +2,7 @@
   "meta": {
     "brand": "ZouriteBnb",
     "titles": {
-      "home": "Locations de vacances à Rodrigues",
+      "home": "Locations de vacances à l'île Rodrigues",
       "accommodations": "Hébergements",
       "accommodation": "Détail du logement",
       "book": "Demander une réservation",
@@ -36,7 +36,7 @@
     },
     "descriptions": {
       "default": "ZouriteBnb, la plateforme rodriguaise de locations de vacances : réservez en direct auprès d'hôtes locaux.",
-      "home": "Locations de vacances à Rodrigues : cases créoles, villas et chambres chez l'habitant. Réservez en direct auprès d'hôtes rodriguais et soutenez des projets solidaires locaux.",
+      "home": "Locations de vacances à Rodrigues : cases créoles, villas et chambres chez l'habitant. Réservez en direct auprès d'hôtes rodriguais.",
       "accommodations": "Parcourez tous les hébergements disponibles à Rodrigues : cases créoles, villas, bungalows et chambres chez l'habitant, réservables en direct auprès des hôtes.",
       "accommodation": "Photos, équipements, disponibilités et localisation : tout pour préparer votre séjour dans cet hébergement à Rodrigues.",
       "solidarityProjects": "Découvrez les projets solidaires soutenus par ZouriteBnb et les hôtes de Rodrigues : chaque réservation contribue au développement local de l'île.",

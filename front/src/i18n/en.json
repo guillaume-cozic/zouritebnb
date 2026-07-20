@@ -2,7 +2,7 @@
   "meta": {
     "brand": "ZouriteBnb",
     "titles": {
-      "home": "Holiday rentals in Rodrigues",
+      "home": "Holiday rentals on Rodrigues Island, Mauritius",
       "accommodations": "Accommodations",
       "accommodation": "Accommodation details",
       "book": "Request a booking",
@@ -36,7 +36,7 @@
     },
     "descriptions": {
       "default": "ZouriteBnb, the Rodrigues holiday rental platform: book directly with local hosts.",
-      "home": "Holiday rentals in Rodrigues: Creole houses, villas and homestay rooms. Book directly with Rodriguan hosts and support local solidarity projects.",
+      "home": "Holiday rentals in Rodrigues: Creole houses, villas and homestay rooms. Book your stay directly with local Rodriguan hosts.",
       "accommodations": "Browse all available accommodations in Rodrigues: Creole houses, villas, bungalows and homestay rooms, bookable directly with hosts.",
       "accommodation": "Photos, amenities, availability and location: everything you need to plan your stay in this Rodrigues accommodation.",
       "solidarityProjects": "Discover the solidarity projects supported by ZouriteBnb and Rodrigues hosts: every booking contributes to local development.",
