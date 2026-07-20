@@ -281,15 +281,6 @@ jobs:
             API/docker-compose.prod.yml \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:zouritebnb/docker-compose.prod.yml"
 
-      # Outil d'import manuel (logements + photos de démo Rodrigues). Déposé
-      # sur le VPS pour être lancé à la demande : `cd ~/zouritebnb && ./import-rodrigues-prod.sh`.
-      - name: Sync import script to VPS
-        run: |
-          rsync -az --chmod=F755 \
-            -e "ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT || 22 }}" \
-            import-rodrigues-prod.sh \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:zouritebnb/import-rodrigues-prod.sh"
-
       - name: Deploy stack on VPS
         env:
           PHP_IMAGE: ${{ needs.build-api.outputs.php_image }}
