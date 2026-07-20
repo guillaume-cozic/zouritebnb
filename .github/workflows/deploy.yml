@@ -237,6 +237,10 @@ jobs:
   deploy:
     name: Deploy to VPS
     needs: [build-web, build-api]
+    # success() implicite regarde toute la chaîne de needs : un job Tests
+    # skippé (skip_tests=true) ferait sauter le deploy alors que les builds
+    # sont verts. On ne conditionne donc qu'aux résultats des builds.
+    if: ${{ always() && needs.build-web.result == 'success' && needs.build-api.result == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: production
