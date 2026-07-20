@@ -260,10 +260,13 @@ jobs:
       # la main sur le VPS. Si le secret est vide, on garde le fichier déjà
       # présent sur le serveur (le garde-fou plus bas échoue s'il n'y en a pas).
       - name: Write .env.prod.local from secret
-        if: ${{ secrets.ENV_PROD_LOCAL != '' }}
         env:
           ENV_PROD_LOCAL: ${{ secrets.ENV_PROD_LOCAL }}
         run: |
+          if [ -z "${ENV_PROD_LOCAL}" ]; then
+            echo "Secret ENV_PROD_LOCAL vide — on garde le fichier présent sur le VPS"
+            exit 0
+          fi
           printf '%s\n' "${ENV_PROD_LOCAL}" | ssh -i ~/.ssh/id_ed25519 -p "${{ secrets.SSH_PORT || 22 }}" \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
             "umask 077 && mkdir -p '${{ secrets.API_DEPLOY_PATH }}' && cat > '${{ secrets.API_DEPLOY_PATH }}/.env.prod.local'"
