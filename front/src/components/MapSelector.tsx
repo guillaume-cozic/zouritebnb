@@ -2,6 +2,7 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Circle, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { tileA11yHandlers } from './leafletA11y';
 import {
   RODRIGUES_BOUNDS_VISCOSITY,
   RODRIGUES_CENTER,
@@ -73,6 +74,7 @@ function MapSelector({
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            eventHandlers={tileA11yHandlers}
           />
           <ClickHandler onSelect={onSelect} />
           {markerPosition && (

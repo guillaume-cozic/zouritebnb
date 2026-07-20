@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { tileA11yHandlers } from '../../../components/leafletA11y';
 import {
   RODRIGUES_BOUNDS_VISCOSITY,
   RODRIGUES_MAX_BOUNDS,
@@ -269,12 +270,14 @@ const RodriguesMap: React.FC = () => {
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              eventHandlers={tileA11yHandlers}
             />
             {filteredActivities.map((activity) => (
               <Marker
                 key={activity.id}
                 position={[activity.latitude, activity.longitude]}
                 icon={icons[activity.category]}
+                alt={activity.name}
               >
                 <Popup>
                   <div className="space-y-1" style={{ minWidth: 200 }}>

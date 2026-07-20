@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { tileA11yHandlers } from '../../../components/leafletA11y';
 import { AccommodationListItem, MapBounds } from '../HomepageTypes';
 import {
   RODRIGUES_BOUNDS_VISCOSITY,
@@ -179,6 +180,7 @@ const AccommodationsMap: React.FC<AccommodationsMapProps> = ({
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          eventHandlers={tileA11yHandlers}
         />
         <FitBounds points={points} enabled={autoFit} />
         {interactive && (
@@ -200,6 +202,7 @@ const AccommodationsMap: React.FC<AccommodationsMapProps> = ({
               position={[item.latitude, item.longitude]}
               icon={createPriceIcon(item.price, isHighlighted)}
               zIndexOffset={isHighlighted ? 1000 : 0}
+              alt={item.title}
             >
               <Popup>
                 <Link

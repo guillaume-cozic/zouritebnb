@@ -2,6 +2,7 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { tileA11yHandlers } from './leafletA11y';
 import {
   RODRIGUES_BOUNDS_VISCOSITY,
   RODRIGUES_MAX_BOUNDS,
@@ -37,8 +38,9 @@ const LocationMap: React.FC<LocationMapProps> = ({ latitude, longitude, label, z
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        eventHandlers={tileA11yHandlers}
       />
-      <Marker position={[latitude, longitude]}>
+      <Marker position={[latitude, longitude]} alt={label ?? ''}>
         {label && <Popup>{label}</Popup>}
       </Marker>
     </MapContainer>
