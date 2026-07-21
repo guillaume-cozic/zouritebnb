@@ -61,30 +61,26 @@ const HeroSection: React.FC = () => {
     setCurrent((prev) => (prev + 1) % SLIDES.length);
   }, []);
 
-  // Défilement auto du diaporama de secours : desktop uniquement — sur mobile
-  // l'image reste fixe (pas de téléchargement des autres slides ni de travail
-  // CPU pour une animation que le doigt n'exploite pas).
+  // Sur mobile le bloc image/diaporama n'est pas rendu du tout (seul le H1
+  // reste) : aucune image du hero n'est téléchargée sur petit écran.
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 768px)').matches
+  );
+
   useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
     const desktop = window.matchMedia('(min-width: 768px)');
-    let timer: number | null = null;
+    const onChange = () => setIsDesktop(desktop.matches);
+    desktop.addEventListener('change', onChange);
+    return () => desktop.removeEventListener('change', onChange);
+  }, []);
 
-    const sync = () => {
-      if (desktop.matches && timer === null) {
-        timer = window.setInterval(next, 5000);
-      } else if (!desktop.matches && timer !== null) {
-        window.clearInterval(timer);
-        timer = null;
-      }
-    };
-
-    sync();
-    desktop.addEventListener('change', sync);
-
-    return () => {
-      desktop.removeEventListener('change', sync);
-      if (timer !== null) window.clearInterval(timer);
-    };
-  }, [next]);
+  // Défilement auto du diaporama de secours, desktop uniquement.
+  useEffect(() => {
+    if (!isDesktop) return;
+    const timer = window.setInterval(next, 5000);
+    return () => window.clearInterval(timer);
+  }, [isDesktop, next]);
 
   const startDate = toDate(filters.checkIn);
   const endDate = toDate(filters.checkOut);
@@ -113,8 +109,9 @@ const HeroSection: React.FC = () => {
 
   return (
     <div className="relative">
-      {/* Slider */}
-      <div className="relative h-[320px] md:h-[500px] w-full overflow-hidden">
+      {/* Slider — desktop uniquement : sur mobile seul le H1 est conservé */}
+      {isDesktop && (
+      <div className="relative h-[500px] w-full overflow-hidden">
         {heroImage ? (
           <img
             src={heroImage}
@@ -168,17 +165,17 @@ const HeroSection: React.FC = () => {
 
         {/* Hero text */}
         <div className="relative h-full flex flex-col items-center justify-center px-4 pb-16">
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-4 text-center tracking-tight">
+          <h1 className="text-5xl lg:text-6xl font-bold text-white mb-4 text-center tracking-tight">
             {t('hero.title')}
           </h1>
-          <p className="text-base md:text-xl text-white/80 max-w-2xl mx-auto text-center font-light">
+          <p className="text-xl text-white/80 max-w-2xl mx-auto text-center font-light">
             {t('hero.subtitle')}
           </p>
 
           {solidarityProject && (
             <Link
               to={`/solidarity-projects/${solidarityProject.id}`}
-              className="group mt-4 md:mt-7 inline-flex items-center gap-3 rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/25 py-2 pl-4 pr-2 hover:bg-white/25 transition-colors"
+              className="group mt-7 inline-flex items-center gap-3 rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/25 py-2 pl-4 pr-2 hover:bg-white/25 transition-colors"
             >
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/90 whitespace-nowrap">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -205,7 +202,10 @@ const HeroSection: React.FC = () => {
             {SLIDES.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setCurrent(i)}
+                onClick={() => {
+                  setRevealed((r) => Math.max(r, i + 1));
+                  setCurrent(i);
+                }}
                 className={`h-2 rounded-full transition-all duration-300 ${
                   i === current ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/70'
                 }`}
@@ -214,9 +214,17 @@ const HeroSection: React.FC = () => {
           </div>
         )}
       </div>
+      )}
 
-      {/* Search form */}
-      <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2 z-10">
+      {/* Mobile : seul le H1 est conservé, la recherche arrive juste dessous */}
+      {!isDesktop && (
+        <div className="px-4 pt-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{t('hero.title')}</h1>
+        </div>
+      )}
+
+      {/* Search form : superposée au bas du hero en desktop, dans le flux sur mobile */}
+      <div className={isDesktop ? 'absolute bottom-0 left-0 right-0 transform translate-y-1/2 z-10' : 'relative z-10 mt-5'}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-xl shadow-black/10 border border-gray-100">
             {/* Mots-clés */}
