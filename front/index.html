@@ -6,6 +6,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
+    <!-- L'image du hero (LCP) n'est découverte qu'après le JS puis l'appel
+         API : préparer les connexions TLS d'avance fait gagner ~300-500 ms. -->
+    <link rel="preconnect" href="https://api.zouritebnb.com" crossorigin />
+    <link rel="preconnect" href="https://api.zouritebnb.com" />
+    <link rel="preconnect" href="https://images.unsplash.com" />
     <meta
       name="description"
       content="Locations de vacances à Rodrigues : cases créoles, villas et chambres chez l'habitant. Réservez en direct auprès d'hôtes rodriguais."

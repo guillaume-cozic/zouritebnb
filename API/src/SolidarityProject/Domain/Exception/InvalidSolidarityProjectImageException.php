@@ -15,4 +15,9 @@ final class InvalidSolidarityProjectImageException extends \DomainException
     {
         return new self(\sprintf('The image is too large (%d bytes), the maximum allowed size is %d bytes.', $size, $maxSize));
     }
+
+    public static function becauseNotAnImage(): self
+    {
+        return new self('The uploaded file is not a valid image.');
+    }
 }

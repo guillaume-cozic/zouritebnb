@@ -9,6 +9,7 @@ use App\SolidarityProject\Application\UseCase\UploadSolidarityProjectImage;
 use App\SolidarityProject\Domain\Command\UploadSolidarityProjectImageCommand;
 use App\SolidarityProject\Domain\Exception\InvalidSolidarityProjectImageException;
 use App\SolidarityProject\Domain\Port\SolidarityProjectImageStorage;
+use App\SolidarityProject\Domain\Port\SolidarityProjectImageTransformer;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +34,14 @@ final class UploadSolidarityProjectImageTest extends TestCase
             }
         };
 
-        $this->useCase = new UploadSolidarityProjectImage($this->storage);
+        $transformer = new class implements SolidarityProjectImageTransformer {
+            public function toHeroWebp(string $content): string
+            {
+                return 'webp:'.$content;
+            }
+        };
+
+        $this->useCase = new UploadSolidarityProjectImage($this->storage, $transformer);
     }
 
     #[After]
@@ -42,7 +50,7 @@ final class UploadSolidarityProjectImageTest extends TestCase
         UuidGenerator::reset();
     }
 
-    public function test_should_store_image_with_extension_from_mime_type(): void
+    public function test_should_recompress_and_store_image_as_webp(): void
     {
         UuidGenerator::freeze(Uuid::fromString('01961e2f-dead-7000-beef-000000000001'));
 
@@ -52,8 +60,8 @@ final class UploadSolidarityProjectImageTest extends TestCase
             size: 1024,
         ));
 
-        self::assertSame('01961e2f-dead-7000-beef-000000000001.png', $filename);
-        self::assertSame('binary-bytes', $this->storage->stored[$filename]);
+        self::assertSame('01961e2f-dead-7000-beef-000000000001.webp', $filename);
+        self::assertSame('webp:binary-bytes', $this->storage->stored[$filename]);
     }
 
     public function test_should_reject_an_unsupported_mime_type(): void

@@ -117,6 +117,9 @@ services:
     App\SolidarityProject\Domain\Port\SolidarityProjectImageStorage:
         alias: App\SolidarityProject\Infrastructure\Filesystem\LocalSolidarityProjectImageStorage
 
+    App\SolidarityProject\Domain\Port\SolidarityProjectImageTransformer:
+        alias: App\SolidarityProject\Infrastructure\Gd\GdSolidarityProjectImageTransformer
+
     App\SolidarityProject\Infrastructure\Filesystem\LocalSolidarityProjectImageStorage:
         arguments:
             $uploadDir: '%kernel.project_dir%/var/uploads/solidarity-projects'
