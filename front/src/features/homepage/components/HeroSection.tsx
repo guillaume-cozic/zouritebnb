@@ -51,13 +51,39 @@ const HeroSection: React.FC = () => {
     (filters.priceMin !== null ? 1 : 0) +
     (filters.priceMax !== null ? 1 : 0);
 
+  // Slides montées dans le DOM : la première seule au départ, puis une de plus
+  // à chaque pas — sur mobile (défilement auto coupé) une seule image est
+  // téléchargée.
+  const [revealed, setRevealed] = useState(1);
+
   const next = useCallback(() => {
+    setRevealed((r) => Math.min(r + 1, SLIDES.length));
     setCurrent((prev) => (prev + 1) % SLIDES.length);
   }, []);
 
+  // Défilement auto du diaporama de secours : desktop uniquement — sur mobile
+  // l'image reste fixe (pas de téléchargement des autres slides ni de travail
+  // CPU pour une animation que le doigt n'exploite pas).
   useEffect(() => {
-    const timer = setInterval(next, 5000);
-    return () => clearInterval(timer);
+    const desktop = window.matchMedia('(min-width: 768px)');
+    let timer: number | null = null;
+
+    const sync = () => {
+      if (desktop.matches && timer === null) {
+        timer = window.setInterval(next, 5000);
+      } else if (!desktop.matches && timer !== null) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+    };
+
+    sync();
+    desktop.addEventListener('change', sync);
+
+    return () => {
+      desktop.removeEventListener('change', sync);
+      if (timer !== null) window.clearInterval(timer);
+    };
   }, [next]);
 
   const startDate = toDate(filters.checkIn);
@@ -88,7 +114,7 @@ const HeroSection: React.FC = () => {
   return (
     <div className="relative">
       {/* Slider */}
-      <div className="relative h-[500px] w-full overflow-hidden">
+      <div className="relative h-[320px] md:h-[500px] w-full overflow-hidden">
         {heroImage ? (
           <img
             src={heroImage}
@@ -101,7 +127,7 @@ const HeroSection: React.FC = () => {
         ) : projectMode ? (
           <div className="absolute inset-0 bg-gradient-to-br from-primary-700 to-primary-900" />
         ) : (
-          SLIDES.map((src, i) => (
+          SLIDES.slice(0, revealed).map((src, i) => (
             <img
               key={src}
               src={src}
@@ -142,17 +168,17 @@ const HeroSection: React.FC = () => {
 
         {/* Hero text */}
         <div className="relative h-full flex flex-col items-center justify-center px-4 pb-16">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 text-center tracking-tight">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-4 text-center tracking-tight">
             {t('hero.title')}
           </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto text-center font-light">
+          <p className="text-base md:text-xl text-white/80 max-w-2xl mx-auto text-center font-light">
             {t('hero.subtitle')}
           </p>
 
           {solidarityProject && (
             <Link
               to={`/solidarity-projects/${solidarityProject.id}`}
-              className="group mt-7 inline-flex items-center gap-3 rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/25 py-2 pl-4 pr-2 hover:bg-white/25 transition-colors"
+              className="group mt-4 md:mt-7 inline-flex items-center gap-3 rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/25 py-2 pl-4 pr-2 hover:bg-white/25 transition-colors"
             >
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/90 whitespace-nowrap">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
