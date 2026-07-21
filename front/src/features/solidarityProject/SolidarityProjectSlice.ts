@@ -11,6 +11,8 @@ interface SolidarityProjectState {
   currentStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   currentError: string | null;
+  /** Langue de la liste chargée (ou en cours) — sert à dédupliquer les fetchs. */
+  language: string | null;
 }
 
 const initialState: SolidarityProjectState = {
@@ -20,6 +22,7 @@ const initialState: SolidarityProjectState = {
   currentStatus: 'idle',
   error: null,
   currentError: null,
+  language: null,
 };
 
 export const fetchSolidarityProjects = createAsyncThunk(
@@ -36,6 +39,20 @@ export const fetchSolidarityProjects = createAsyncThunk(
         extractErrorMessage(err, 'Erreur lors du chargement des projets solidaires')
       );
     }
+  },
+  {
+    // Plusieurs composants de l'accueil (hero + section projets) demandent la
+    // liste : ne (re)partir en requête que si elle n'est ni chargée ni en cours
+    // de chargement dans la langue courante.
+    condition: (_, { getState }) => {
+      const { status, language } = (getState() as { solidarityProject: SolidarityProjectState })
+        .solidarityProject;
+
+      return !(
+        (status === 'loading' || status === 'succeeded')
+        && language === i18n.language
+      );
+    },
   }
 );
 
@@ -64,6 +81,7 @@ const solidarityProjectSlice = createSlice({
       .addCase(fetchSolidarityProjects.pending, (state) => {
         state.status = 'loading';
         state.error = null;
+        state.language = i18n.language;
       })
       .addCase(fetchSolidarityProjects.fulfilled, (state, action) => {
         state.status = 'succeeded';

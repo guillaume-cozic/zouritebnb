@@ -47,6 +47,41 @@ describe('fetchSolidarityProjects', () => {
     expect(state.status).toBe('failed');
     expect(state.error).toBe('down');
   });
+
+  test('deux dispatchs simultanés (hero + section) ne font qu\'une seule requête', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [{ id: 'sp-1' }] } });
+    const store = buildStore();
+
+    await Promise.all([
+      store.dispatch(fetchSolidarityProjects()),
+      store.dispatch(fetchSolidarityProjects()),
+    ]);
+
+    expect(mockedApi.get).toHaveBeenCalledTimes(1);
+    expect(store.getState().solidarityProject.items).toHaveLength(1);
+  });
+
+  test('un dispatch après un chargement réussi dans la même langue ne refait pas de requête', async () => {
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [{ id: 'sp-1' }] } });
+    const store = buildStore();
+
+    await store.dispatch(fetchSolidarityProjects());
+    await store.dispatch(fetchSolidarityProjects());
+
+    expect(mockedApi.get).toHaveBeenCalledTimes(1);
+  });
+
+  test('un dispatch après un échec retente la requête', async () => {
+    mockedApi.get.mockRejectedValueOnce({ response: { data: { detail: 'down' } } });
+    mockedApi.get.mockResolvedValue({ data: { 'hydra:member': [{ id: 'sp-1' }] } });
+    const store = buildStore();
+
+    await store.dispatch(fetchSolidarityProjects());
+    await store.dispatch(fetchSolidarityProjects());
+
+    expect(mockedApi.get).toHaveBeenCalledTimes(2);
+    expect(store.getState().solidarityProject.status).toBe('succeeded');
+  });
 });
 
 describe('fetchSolidarityProjectById', () => {
