@@ -7,7 +7,7 @@ const NotFoundPage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-16">
+    <div className="max-w-2xl mx-auto px-4 py-16">
       <EmptyState
         title={t('notFound.title')}
         description={t('notFound.message')}
@@ -20,7 +20,7 @@ const NotFoundPage: React.FC = () => {
           </Link>
         }
       />
-    </main>
+    </div>
   );
 };
 

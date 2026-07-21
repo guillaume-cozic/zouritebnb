@@ -13,6 +13,7 @@ import AboutRodriguesSection from './AboutRodriguesSection';
 const RodriguesMap = React.lazy(() => import('./RodriguesMap'));
 import SolidarityProjectsSection from '../../solidarityProject/components/SolidarityProjectsSection';
 import Footer from '../../../components/Footer';
+import LiteYouTube from '../../../components/LiteYouTube';
 
 import { blogActivityLinks } from '../../../i18n/blogUrl';
 
@@ -241,11 +242,9 @@ const HomePage: React.FC = () => {
               </button>
             </div>
             <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl">
-              <iframe
-                src="https://www.youtube.com/embed/67nE_apLm9Y"
+              <LiteYouTube
+                videoId="67nE_apLm9Y"
                 title={t('discover.videoTitle')}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
                 className="absolute inset-0 w-full h-full"
               />
             </div>

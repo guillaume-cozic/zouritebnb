@@ -148,7 +148,7 @@ const AccommodationDetailPage: React.FC = () => {
   // Loading
   if (status === 'loading') {
     return (
-      <main className="min-h-screen py-8">
+      <div className="min-h-screen py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded-lg w-1/3" />
@@ -162,14 +162,14 @@ const AccommodationDetailPage: React.FC = () => {
             <div className="h-32 bg-gray-100 rounded-lg" />
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
   // Error
   if (status === 'failed') {
     return (
-      <main className="min-h-screen py-8">
+      <div className="min-h-screen py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400"><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg>
@@ -177,7 +177,7 @@ const AccommodationDetailPage: React.FC = () => {
           <p className="text-red-500 mb-4">{error}</p>
           <Link to="/" className="text-primary-600 hover:underline">{t('detail.backToHome')}</Link>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -191,7 +191,7 @@ const AccommodationDetailPage: React.FC = () => {
 
   return (
     <>
-    <main className="min-h-screen py-8">
+    <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
@@ -674,7 +674,7 @@ const AccommodationDetailPage: React.FC = () => {
         />
       </div>
 
-    </main>
+    </div>
     <Footer />
     </>
   );

@@ -21,7 +21,7 @@ const WishlistPage: React.FC = () => {
 
   return (
     <>
-      <main className="min-h-screen py-8">
+      <div className="min-h-screen py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" className="text-rose-500">
@@ -101,7 +101,7 @@ const WishlistPage: React.FC = () => {
             </div>
           )}
         </div>
-      </main>
+      </div>
       <Footer />
     </>
   );

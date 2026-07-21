@@ -218,9 +218,9 @@ const BackofficeLayout: React.FC = () => {
           </p>
         </div>
       </aside>
-      <main className="flex-1 bg-gradient-to-br from-primary-50/30 via-gray-50 to-white">
+      <div className="flex-1 bg-gradient-to-br from-primary-50/30 via-gray-50 to-white">
         <Outlet />
-      </main>
+      </div>
     </div>
   );
 };

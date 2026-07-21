@@ -64,7 +64,7 @@ function App() {
     <BrowserRouter>
       <Seo />
       <Navbar />
-      <div className="pt-16 min-h-screen">
+      <main className="pt-16 min-h-screen">
         <EmailVerificationBanner />
         <Suspense fallback={<RouteFallback />}>
           <Routes>
@@ -116,7 +116,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
-      </div>
+      </main>
     </BrowserRouter>
   );
 }

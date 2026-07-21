@@ -828,23 +828,23 @@ const EditAccommodationPage: React.FC = () => {
   if (!accommodation || accommodation.id !== id) {
     if (status === 'loading' || status === 'idle') {
       return (
-        <main className="min-h-screen py-8">
+        <div className="min-h-screen py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="animate-pulse space-y-6">
               <div className="h-8 bg-surface-200 rounded-lg w-1/3" />
               <div className="h-64 bg-surface-100 rounded-lg" />
             </div>
           </div>
-        </main>
+        </div>
       );
     }
     return (
-      <main className="min-h-screen py-8">
+      <div className="min-h-screen py-8">
         <div className="max-w-7xl mx-auto px-4 text-center py-20">
           <p className="text-danger-500 mb-4">{error || t('edit.notFound')}</p>
           <Link to="/" className="text-primary-600 hover:underline">{t('detail.backToHome')}</Link>
         </div>
-      </main>
+      </div>
     );
   }
 

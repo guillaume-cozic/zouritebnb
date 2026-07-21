@@ -76,6 +76,8 @@ const Navbar: React.FC = () => {
             <img
               src="/logo.png"
               alt="ZouriteBnb"
+              width={153}
+              height={112}
               className="h-14 w-auto object-contain"
               loading="eager"
             />
@@ -93,13 +95,13 @@ const Navbar: React.FC = () => {
           <div className="hidden sm:flex items-center bg-gray-100 rounded-lg p-0.5 text-xs font-medium">
             <button
               onClick={() => changeLanguage('fr')}
-              className={`px-2.5 py-1 rounded-md transition-all ${i18n.language === 'fr' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`px-2.5 py-1 rounded-md transition-all ${i18n.language === 'fr' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
             >
               FR
             </button>
             <button
               onClick={() => changeLanguage('en')}
-              className={`px-2.5 py-1 rounded-md transition-all ${i18n.language === 'en' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`px-2.5 py-1 rounded-md transition-all ${i18n.language === 'en' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
             >
               EN
             </button>

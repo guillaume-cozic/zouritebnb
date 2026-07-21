@@ -92,6 +92,9 @@ const HeroSection: React.FC = () => {
           <img
             src={heroImage}
             alt={solidarityProject?.title ?? ''}
+            // Image LCP découverte après le JS + l'appel API : priorité réseau
+            // maximale dès qu'elle apparaît dans le DOM.
+            fetchPriority="high"
             className="absolute inset-0 h-full w-full object-cover"
           />
         ) : projectMode ? (
