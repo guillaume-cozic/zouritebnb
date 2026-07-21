@@ -95,8 +95,48 @@ final class SeedSolidarityProjectsCommand extends Command
             ->setStatus((string) $project['status'])
             ->setIsDefault((bool) ($project['isDefault'] ?? false))
             ->setCreatedAt(new \DateTimeImmutable(\sprintf('-%d days', (int) $project['daysAgo'])))
-            ->setTranslations($project['translations']);
+            ->setTranslations($this->resolveImageTokens($project['translations']));
         $this->em->persist($entity);
+    }
+
+    /**
+     * Remplace les tokens `{{image:<fichier>}}` des textes (descriptions HTML)
+     * par l'URL locale de l'image, stockée au passage comme les images de
+     * couverture — le JSON reste sans URL d'environnement en dur.
+     *
+     * @param array<string, mixed> $translations
+     *
+     * @return array<string, mixed>
+     */
+    private function resolveImageTokens(array $translations): array
+    {
+        array_walk_recursive($translations, function (mixed &$value): void {
+            if (!\is_string($value)) {
+                return;
+            }
+
+            $value = preg_replace_callback(
+                '/\{\{image:([\w.-]+)\}\}/',
+                fn (array $matches): string => $this->storeContentImage($matches[1]),
+                $value,
+            );
+        });
+
+        return $translations;
+    }
+
+    private function storeContentImage(string $image): string
+    {
+        $source = self::IMAGES_DIR.'/'.$image;
+
+        if (!is_file($source)) {
+            throw new \RuntimeException(\sprintf('Seed image not found: %s', $source));
+        }
+
+        $filename = preg_replace('/\.[a-z0-9]+$/i', '', $image).'.webp';
+        $this->imageStorage->store($filename, $this->imageTransformer->toHeroWebp((string) file_get_contents($source)));
+
+        return rtrim($this->baseUri, '/').'/uploads/solidarity-projects/'.$filename;
     }
 
     /**

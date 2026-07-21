@@ -11,6 +11,12 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setFilters } from '../HomepageSlice';
 import { selectHomepageFilters } from '../HomepageSelectors';
 import LocalitySuggestions from './LocalitySuggestions';
+// Diaporama de secours (affiché seulement sans projet mis en avant) : images
+// locales WebP embarquées dans le bundle — pas de dépendance à un CDN externe.
+import slideLagon1 from '../../../assets/hero/lagon-1.webp';
+import slideLagon2 from '../../../assets/hero/lagon-2.webp';
+import slideLagon3 from '../../../assets/hero/lagon-3.webp';
+import slideLagon4 from '../../../assets/hero/lagon-4.webp';
 
 registerLocale('fr', fr);
 registerLocale('en', enGB);
@@ -22,12 +28,7 @@ const toStr = (d: Date | null): string => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 };
 
-const SLIDES = [
-  'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?auto=format&fit=crop&q=80&w=2000',
-  'https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?auto=format&fit=crop&q=80&w=2000',
-  'https://images.unsplash.com/photo-1505881502353-a1986add3762?auto=format&fit=crop&q=80&w=2000',
-  'https://images.unsplash.com/photo-1537956965359-7573183d1f57?auto=format&fit=crop&q=80&w=2000',
-];
+const SLIDES = [slideLagon1, slideLagon2, slideLagon3, slideLagon4];
 
 const HeroSection: React.FC = () => {
   const { t, i18n } = useTranslation();
