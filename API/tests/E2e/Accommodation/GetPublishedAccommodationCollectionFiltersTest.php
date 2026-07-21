@@ -228,9 +228,9 @@ final class GetPublishedAccommodationCollectionFiltersTest extends Accommodation
 
         self::assertResponseIsSuccessful();
         $member = $response->toArray()['member'][0];
-        self::assertSame('/uploads/photos/first.jpg', $member['thumbnailUrl']);
-        self::assertContains('/uploads/photos/first.jpg', $member['photoUrls']);
-        self::assertContains('/uploads/photos/second.jpg', $member['photoUrls']);
+        self::assertSame('/uploads/photos/first-thumb.webp', $member['thumbnailUrl']);
+        self::assertContains('/uploads/photos/first-thumb.webp', $member['photoUrls']);
+        self::assertContains('/uploads/photos/second-thumb.webp', $member['photoUrls']);
     }
 
     /**

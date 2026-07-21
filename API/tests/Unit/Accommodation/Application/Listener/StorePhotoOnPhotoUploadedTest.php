@@ -41,5 +41,7 @@ final class StorePhotoOnPhotoUploadedTest extends TestCase
         self::assertSame('image/webp', $photo->getMimeType());
         self::assertTrue($accommodationId->equals($photo->getAccommodationId()));
         self::assertTrue($photoStorage->has('01961e2f-dead-7000-beef-000000000010.webp'));
+        self::assertTrue($photoStorage->has('01961e2f-dead-7000-beef-000000000010-thumb.webp'));
+        self::assertSame('thumb:fake-image-content', $photoStorage->get('01961e2f-dead-7000-beef-000000000010-thumb.webp'));
     }
 }

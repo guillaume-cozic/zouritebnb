@@ -9,6 +9,15 @@ use Symfony\Component\Uid\Uuid;
 
 final readonly class Photo
 {
+    /**
+     * Nom de fichier de la miniature d'une photo, par convention de nommage
+     * (aucune colonne en base) : `abc.jpg` → `abc-thumb.webp`.
+     */
+    public static function thumbnailFilename(string $filename): string
+    {
+        return preg_replace('/\.[a-z0-9]+$/i', '', $filename).'-thumb.webp';
+    }
+
     public function __construct(
         private Uuid $id,
         private Uuid $accommodationId,

@@ -22,6 +22,20 @@ final readonly class ServePhotoController
     {
         $path = $this->photoUploadDir.'/'.$filename;
 
+        // Miniature pas (encore) générée : retomber sur l'original, dont on
+        // retrouve le nom en retirant le suffixe conventionnel `-thumb.webp`
+        // (convention partagée avec le module Accommodation, non importable
+        // ici — Shared ne dépend d'aucun module).
+        if (!is_file($path) && 1 === preg_match('/^(.+)-thumb\.webp$/', $filename, $matches)) {
+            foreach (['webp', 'jpg', 'jpeg', 'png'] as $extension) {
+                $originalPath = \sprintf('%s/%s.%s', $this->photoUploadDir, $matches[1], $extension);
+                if (is_file($originalPath)) {
+                    $path = $originalPath;
+                    break;
+                }
+            }
+        }
+
         if (!is_file($path)) {
             return new Response('Not found', Response::HTTP_NOT_FOUND);
         }

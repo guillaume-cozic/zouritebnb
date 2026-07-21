@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Accommodation\Infrastructure\ApiPlatform;
 
 use ApiPlatform\State\Pagination\TraversablePaginator;
+use App\Accommodation\Domain\Entity\Photo;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
@@ -171,8 +172,11 @@ final readonly class AccommodationListingQuery
         $output->amenities = null !== $row['amenities']
             ? (\is_array($decoded = json_decode((string) $row['amenities'], true)) ? $decoded : null)
             : null;
+        // Les listings servent les miniatures (~30 Ko) plutôt que les
+        // originaux ; ServePhotoController retombe sur l'original si la
+        // miniature n'existe pas encore.
         $output->thumbnailUrl = null !== $row['thumbnail_filename']
-            ? '/uploads/photos/'.$row['thumbnail_filename']
+            ? '/uploads/photos/'.Photo::thumbnailFilename($row['thumbnail_filename'])
             : null;
         $output->photoUrls = $photoUrlsByAccommodation[$row['id']] ?? [];
 
@@ -214,7 +218,7 @@ final readonly class AccommodationListingQuery
 
         $map = [];
         foreach ($rows as $row) {
-            $map[$row['accommodation_id']][] = '/uploads/photos/'.$row['filename'];
+            $map[$row['accommodation_id']][] = '/uploads/photos/'.Photo::thumbnailFilename($row['filename']);
         }
 
         return $map;

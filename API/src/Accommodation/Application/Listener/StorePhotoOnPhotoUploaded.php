@@ -22,6 +22,7 @@ final readonly class StorePhotoOnPhotoUploaded
     public function __invoke(AccommodationPhotoUploaded $event): void
     {
         $transformed = $this->imageTransformer->transform($event->content, $event->mimeType);
+        $thumbnail = $this->imageTransformer->thumbnail($event->content, $event->mimeType);
 
         $filename = \sprintf('%s.webp', $event->photoId->toRfc4122());
 
@@ -35,6 +36,7 @@ final readonly class StorePhotoOnPhotoUploaded
         );
 
         $this->photoStorage->store($filename, $transformed->content());
+        $this->photoStorage->store(Photo::thumbnailFilename($filename), $thumbnail->content());
         $this->photoRepository->save($photo);
     }
 }

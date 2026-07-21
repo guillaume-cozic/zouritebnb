@@ -111,8 +111,8 @@ final class PublishedAccommodationProviderTest extends TestCase
         self::assertTrue($output->instantBooking);
         self::assertSame('villa', $output->type);
         self::assertSame(['wifi', 'pool'], $output->amenities);
-        self::assertSame('/uploads/photos/thumb.jpg', $output->thumbnailUrl);
-        self::assertSame(['/uploads/photos/a.jpg', '/uploads/photos/b.jpg'], $output->photoUrls);
+        self::assertSame('/uploads/photos/thumb-thumb.webp', $output->thumbnailUrl);
+        self::assertSame(['/uploads/photos/a-thumb.webp', '/uploads/photos/b-thumb.webp'], $output->photoUrls);
     }
 
     public function test_should_map_null_columns_to_null_outputs(): void

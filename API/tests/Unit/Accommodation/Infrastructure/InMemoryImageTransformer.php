@@ -17,4 +17,13 @@ final class InMemoryImageTransformer implements ImageTransformer
             size: \strlen($content),
         );
     }
+
+    public function thumbnail(string $content, string $mimeType): TransformedImage
+    {
+        return new TransformedImage(
+            content: 'thumb:'.$content,
+            mimeType: 'image/webp',
+            size: \strlen('thumb:'.$content),
+        );
+    }
 }

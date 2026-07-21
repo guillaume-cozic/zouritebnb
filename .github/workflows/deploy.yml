@@ -358,6 +358,11 @@ jobs:
           docker compose -f docker-compose.prod.yml exec -T php \
               bin/console doctrine:migrations:up-to-date --no-interaction </dev/null
 
+          # Idempotent : ne génère que les miniatures manquantes.
+          echo "==> Generating missing photo thumbnails"
+          docker compose -f docker-compose.prod.yml exec -T php \
+              bin/console app:photos:generate-thumbnails </dev/null
+
           echo "==> Cleaning up dangling images"
           docker image prune -f
 

@@ -34,4 +34,46 @@ final class GdImageTransformerTest extends TestCase
 
         $transformer->transform('not-an-image', 'image/png');
     }
+
+    public function test_should_downscale_wide_image_to_thumbnail(): void
+    {
+        $image = imagecreatetruecolor(1600, 800);
+        ob_start();
+        imagepng($image);
+        $pngContent = (string) ob_get_clean();
+
+        $transformer = new GdImageTransformer();
+        $result = $transformer->thumbnail($pngContent, 'image/png');
+
+        self::assertSame('image/webp', $result->mimeType());
+        $thumb = imagecreatefromstring($result->content());
+        self::assertNotFalse($thumb);
+        self::assertSame(640, imagesx($thumb));
+        self::assertSame(320, imagesy($thumb));
+    }
+
+    public function test_should_keep_small_image_size_in_thumbnail(): void
+    {
+        $image = imagecreatetruecolor(300, 200);
+        ob_start();
+        imagepng($image);
+        $pngContent = (string) ob_get_clean();
+
+        $transformer = new GdImageTransformer();
+        $result = $transformer->thumbnail($pngContent, 'image/png');
+
+        $thumb = imagecreatefromstring($result->content());
+        self::assertNotFalse($thumb);
+        self::assertSame(300, imagesx($thumb));
+        self::assertSame(200, imagesy($thumb));
+    }
+
+    public function test_should_throw_when_thumbnail_content_is_not_a_valid_image(): void
+    {
+        $transformer = new GdImageTransformer();
+
+        $this->expectException(\RuntimeException::class);
+
+        $transformer->thumbnail('not-an-image', 'image/png');
+    }
 }
