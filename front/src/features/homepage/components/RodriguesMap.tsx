@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -16,7 +17,7 @@ import {
 } from '../../activityPoint/ActivityPointSelectors';
 import type { ActivityPointCategory } from '../../activityPoint/ActivityPointTypes';
 
-const CATEGORY_META: Record<ActivityPointCategory, { label: string; color: string; emoji: string }> = {
+export const CATEGORY_META: Record<ActivityPointCategory, { label: string; color: string; emoji: string }> = {
   kitesurf: { label: 'Kitesurf', color: '#0ea5e9', emoji: '🪁' },
   viewpoint: { label: 'Point de vue', color: '#f97316', emoji: '🗻' },
   nature: { label: 'Parc & nature', color: '#16a34a', emoji: '🌳' },
@@ -50,7 +51,12 @@ const createIcon = (category: ActivityPointCategory): L.DivIcon => {
 
 const RODRIGUES_CENTER: [number, number] = [-19.7245, 63.4272];
 
-const RodriguesMap: React.FC = () => {
+interface RodriguesMapProps {
+  /** 'h2' on the homepage section (default); 'h1' on the dedicated /activites page. */
+  headingLevel?: 'h1' | 'h2';
+}
+
+const RodriguesMap: React.FC<RodriguesMapProps> = ({ headingLevel = 'h2' }) => {
   const dispatch = useAppDispatch();
   const points = useAppSelector(selectActivityPoints);
   const status = useAppSelector(selectActivityPointsStatus);
@@ -96,7 +102,11 @@ const RodriguesMap: React.FC = () => {
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Carte des activités à Rodrigues</h2>
+          {headingLevel === 'h1' ? (
+            <h1 className="text-3xl font-bold text-gray-900">Carte des activités à Rodrigues</h1>
+          ) : (
+            <h2 className="text-3xl font-bold text-gray-900">Carte des activités à Rodrigues</h2>
+          )}
           <p className="text-gray-500 mt-2">Explorez l'île et ses spots incontournables</p>
         </div>
 
@@ -181,6 +191,17 @@ const RodriguesMap: React.FC = () => {
             ))}
           </MapContainer>
         </div>
+
+        {headingLevel === 'h2' && (
+          <div className="text-center mt-6">
+            <Link
+              to="/activites"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700"
+            >
+              Voir toutes les activités →
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -30,6 +30,7 @@ const RegisterPage = React.lazy(() => import('./features/auth/components/Registe
 const ForgotPasswordPage = React.lazy(() => import('./features/auth/components/ForgotPasswordPage'));
 const ResetPasswordPage = React.lazy(() => import('./features/auth/components/ResetPasswordPage'));
 const VerifyEmailPage = React.lazy(() => import('./features/auth/components/VerifyEmailPage'));
+const ActivitiesMapPage = React.lazy(() => import('./features/activityPoint/components/ActivitiesMapPage'));
 const SolidarityProjectsPage = React.lazy(() => import('./features/solidarityProject/components/SolidarityProjectsPage'));
 const SolidarityProjectDetailPage = React.lazy(() => import('./features/solidarityProject/components/SolidarityProjectDetailPage'));
 const DonationPage = React.lazy(() => import('./features/donation/components/DonationPage'));
@@ -71,6 +72,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/wishlist" element={<WishlistPage />} />
+            <Route path="/activites" element={<ActivitiesMapPage />} />
             <Route path="/solidarity-projects" element={<SolidarityProjectsPage />} />
             <Route path="/solidarity-projects/:id" element={<SolidarityProjectDetailPage />} />
             <Route path="/solidarity-projects/:id/donate" element={<DonationPage />} />

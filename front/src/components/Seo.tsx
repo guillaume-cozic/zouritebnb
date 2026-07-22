@@ -34,6 +34,7 @@ const ROUTE_META: ReadonlyArray<readonly [string, RouteMeta]> = [
   ['/hebergements/:slug', { title: 'accommodation', description: 'accommodation', indexable: true }],
   ['/accommodations', { title: 'accommodations', description: 'accommodations', indexable: true }],
   ['/reservation-confirmed', { title: 'reservationConfirmed' }],
+  ['/activites', { title: 'activities', description: 'activities', indexable: true }],
   ['/solidarity-projects/:id', { title: 'solidarityProject', description: 'solidarityProject', indexable: true }],
   ['/solidarity-projects', { title: 'solidarityProjects', description: 'solidarityProjects', indexable: true }],
   ['/cgu', { title: 'termsOfUse', description: 'termsOfUse', indexable: true }],

@@ -11,6 +11,7 @@
       "photos": "Accommodation photos",
       "solidarityProjects": "Solidarity projects",
       "solidarityProject": "Solidarity project",
+      "activities": "Rodrigues activities map",
       "login": "Sign in",
       "register": "Sign up",
       "create": "Create a listing",
@@ -40,12 +41,16 @@
       "accommodations": "Browse all available accommodations in Rodrigues: Creole houses, villas, bungalows and homestay rooms, bookable directly with hosts.",
       "accommodation": "Photos, amenities, availability and location: everything you need to plan your stay in this Rodrigues accommodation.",
       "solidarityProjects": "Discover the solidarity projects supported by ZouriteBnb and Rodrigues hosts: every booking contributes to local development.",
+      "activities": "Kitesurfing, beaches, diving, hikes and heritage: explore all the must-see spots of Rodrigues on the island's interactive map.",
       "solidarityProject": "About this solidarity project: goals, progress and how ZouriteBnb bookings contribute.",
       "termsOfUse": "Terms of use of the ZouriteBnb holiday rental platform.",
       "termsOfSale": "Terms of sale for bookings made on ZouriteBnb.",
       "legalNotice": "Legal notice of ZouriteBnb, holiday rental platform in Rodrigues.",
       "privacyPolicy": "Privacy policy and personal data protection on ZouriteBnb."
     }
+  },
+  "nav": {
+    "activities": "Activities"
   },
   "notFound": {
     "title": "Page not found",

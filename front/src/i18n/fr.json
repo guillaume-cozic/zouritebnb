@@ -11,6 +11,7 @@
       "photos": "Photos du logement",
       "solidarityProjects": "Projets solidaires",
       "solidarityProject": "Projet solidaire",
+      "activities": "Carte des activités à Rodrigues",
       "login": "Connexion",
       "register": "Inscription",
       "create": "Créer un hébergement",
@@ -41,11 +42,15 @@
       "accommodation": "Photos, équipements, disponibilités et localisation : tout pour préparer votre séjour dans cet hébergement à Rodrigues.",
       "solidarityProjects": "Découvrez les projets solidaires soutenus par ZouriteBnb et les hôtes de Rodrigues : chaque réservation contribue au développement local de l'île.",
       "solidarityProject": "Présentation du projet solidaire : objectifs, avancement et contribution des réservations ZouriteBnb.",
+      "activities": "Kitesurf, plages, plongée, randonnées et patrimoine : explorez tous les spots incontournables de Rodrigues sur la carte interactive de l'île.",
       "termsOfUse": "Conditions générales d'utilisation de la plateforme de location de vacances ZouriteBnb.",
       "termsOfSale": "Conditions générales de vente des réservations effectuées sur ZouriteBnb.",
       "legalNotice": "Mentions légales du site ZouriteBnb, plateforme de locations de vacances à Rodrigues.",
       "privacyPolicy": "Politique de confidentialité et protection des données personnelles sur ZouriteBnb."
     }
+  },
+  "nav": {
+    "activities": "Activités"
   },
   "notFound": {
     "title": "Page introuvable",

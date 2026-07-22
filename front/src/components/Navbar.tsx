@@ -86,6 +86,9 @@ const Navbar: React.FC = () => {
             <Link to="/solidarity-projects" className="hover:text-primary-600 transition-colors">
               {t('projects.title')}
             </Link>
+            <Link to="/activites" className="hover:text-primary-600 transition-colors">
+              {t('nav.activities')}
+            </Link>
           </nav>
         </div>
 
