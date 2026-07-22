@@ -190,12 +190,48 @@ export interface paths {
      */
     get: operations["api_accommodations_accommodationIdreviews_get_collection"];
   };
+  "/api/activity-points": {
+    /**
+     * Lister les points d'activité de Rodrigues
+     * @description Retourne la liste complète (non paginée) des points d'activité de l'île Rodrigues : spots de kitesurf, points de vue, sites naturels, plages, sites de plongée et patrimoine. Route publique, destinée à la carte interactive du site.
+     */
+    get: operations["api_activity-points_get_collection"];
+  };
   "/api/admin/accommodations": {
     /**
      * Lister tous les hébergements (administration)
      * @description Retourne la liste complète des hébergements de la plateforme (brouillons inclus), triés par titre, avec l'email d'un membre de l'équipe hôte. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
      */
     get: operations["api_adminaccommodations_get_collection"];
+  };
+  "/api/admin/activity-points": {
+    /**
+     * Lister les points d'activité (administration)
+     * @description Retourne la liste paginée des points d'activité de la plateforme, triés par nom. Filtres optionnels : "search" (recherche partielle sur le nom et la description) et "category" (catégorie exacte). Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    get: operations["api_adminactivity-points_get_collection"];
+    /**
+     * Créer un point d'activité (administration)
+     * @description Crée un nouveau point d'activité sur la carte de Rodrigues. Le nom et la description sont obligatoires, la catégorie doit être l'une de kitesurf, viewpoint, nature, beach, diving, heritage ou activity, et les coordonnées doivent rester dans les bornes de l'île (latitude -20.05 à -19.35, longitude 62.95 à 63.95). Toute violation répond 422. Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    post: operations["api_adminactivity-points_post"];
+  };
+  "/api/admin/activity-points/{id}": {
+    /**
+     * Récupérer un point d'activité (administration)
+     * @description Retourne le détail complet d'un point d'activité par son identifiant UUID, pour pré-remplir le formulaire d'édition. Répond 404 si le point est inconnu. Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    get: operations["api_adminactivity-points_id_get"];
+    /**
+     * Supprimer un point d'activité (administration)
+     * @description Supprime définitivement un point d'activité de la carte. Répond 404 si le point est inconnu. Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    delete: operations["api_adminactivity-points_id_delete"];
+    /**
+     * Modifier un point d'activité (administration)
+     * @description Remplace les informations d'un point d'activité (nom, description, catégorie, coordonnées, URL d'article). Les mêmes règles de validation qu'à la création s'appliquent (422 en cas de violation). Répond 404 si le point est inconnu. Réservé aux administrateurs (ROLE_ADMIN).
+     */
+    patch: operations["api_adminactivity-points_id_patch"];
   };
   "/api/admin/dashboard": {
     /**
@@ -1182,6 +1218,43 @@ export interface components {
        */
       hostReplyAt?: string | null;
     });
+    "ActivityPoint.jsonld-activity_point.list": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant unique du point d'activité (UUID)
+       * @example 01961e2f-dead-7000-beef-000000000001
+       */
+      id?: string | null;
+      /**
+       * @description Nom du point d'activité
+       * @example Lagune de Mourouk
+       */
+      name?: string | null;
+      /**
+       * @description Description du point d'activité
+       * @example Spot de kitesurf réputé pour son lagon turquoise et son vent régulier.
+       */
+      description?: string | null;
+      /**
+       * @description Catégorie du point (kitesurf, viewpoint, nature, beach, diving, heritage ou activity)
+       * @example kitesurf
+       */
+      category?: string | null;
+      /**
+       * @description Latitude du point (bornes Rodrigues : -20.05 à -19.35)
+       * @example -19.7577
+       */
+      latitude?: number | null;
+      /**
+       * @description Longitude du point (bornes Rodrigues : 62.95 à 63.95)
+       * @example 63.4499
+       */
+      longitude?: number | null;
+      /**
+       * @description URL d'un article lié au point (null si aucun)
+       * @example /blog/kitesurf-mourouk
+       */
+      articleUrl?: string | null;
+    });
     "AdminAccommodation.jsonld-admin_accommodation.list": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
        * @description Identifiant unique de l'hébergement (UUID)
@@ -1233,6 +1306,43 @@ export interface components {
        * @example host@example.com
        */
       hostEmail?: string | null;
+    });
+    "AdminActivityPoint.jsonld-admin_activity_point.list": components["schemas"]["HydraItemBaseSchema"] & ({
+      /**
+       * @description Identifiant unique du point d'activité (UUID)
+       * @example 01961e2f-dead-7000-beef-000000000001
+       */
+      id?: string | null;
+      /**
+       * @description Nom du point d'activité
+       * @example Lagune de Mourouk
+       */
+      name?: string | null;
+      /**
+       * @description Description du point d'activité
+       * @example Spot de kitesurf réputé pour son lagon turquoise et son vent régulier.
+       */
+      description?: string | null;
+      /**
+       * @description Catégorie du point (kitesurf, viewpoint, nature, beach, diving, heritage ou activity)
+       * @example kitesurf
+       */
+      category?: string | null;
+      /**
+       * @description Latitude du point (bornes Rodrigues : -20.05 à -19.35)
+       * @example -19.7577
+       */
+      latitude?: number | null;
+      /**
+       * @description Longitude du point (bornes Rodrigues : 62.95 à 63.95)
+       * @example 63.4499
+       */
+      longitude?: number | null;
+      /**
+       * @description URL d'un article lié au point (null si aucun)
+       * @example /blog/kitesurf-mourouk
+       */
+      articleUrl?: string | null;
     });
     "AdminDashboard.jsonld-admin_dashboard.read": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -3766,6 +3876,22 @@ export interface operations {
     };
   };
   /**
+   * Lister les points d'activité de Rodrigues
+   * @description Retourne la liste complète (non paginée) des points d'activité de l'île Rodrigues : spots de kitesurf, points de vue, sites naturels, plages, sites de plongée et patrimoine. Route publique, destinée à la carte interactive du site.
+   */
+  "api_activity-points_get_collection": {
+    responses: {
+      /** @description ActivityPoint collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchemaNoPagination"] & {
+            member: components["schemas"]["ActivityPoint.jsonld-activity_point.list"][];
+          };
+        };
+      };
+    };
+  };
+  /**
    * Lister tous les hébergements (administration)
    * @description Retourne la liste complète des hébergements de la plateforme (brouillons inclus), triés par titre, avec l'email d'un membre de l'équipe hôte. Endpoint en lecture seule réservé aux administrateurs (ROLE_ADMIN).
    */
@@ -3793,6 +3919,216 @@ export interface operations {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
           "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Lister les points d'activité (administration)
+   * @description Retourne la liste paginée des points d'activité de la plateforme, triés par nom. Filtres optionnels : "search" (recherche partielle sur le nom et la description) et "category" (catégorie exacte). Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminactivity-points_get_collection": {
+    parameters: {
+      query?: {
+        /**
+         * @description Recherche partielle sur le nom ou la description
+         * @example lagon
+         */
+        search?: string;
+        /**
+         * @description Filtre sur la catégorie exacte (kitesurf, viewpoint, nature, beach, diving, heritage ou activity)
+         * @example kitesurf
+         */
+        category?: "kitesurf" | "viewpoint" | "nature" | "beach" | "diving" | "heritage" | "activity";
+        /** @description The collection page number */
+        page?: number;
+        /** @description The number of items per page */
+        itemsPerPage?: number;
+      };
+    };
+    responses: {
+      /** @description AdminActivityPoint collection */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["HydraCollectionBaseSchema"] & {
+            member: components["schemas"]["AdminActivityPoint.jsonld-admin_activity_point.list"][];
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Créer un point d'activité (administration)
+   * @description Crée un nouveau point d'activité sur la carte de Rodrigues. Le nom et la description sont obligatoires, la catégorie doit être l'une de kitesurf, viewpoint, nature, beach, diving, heritage ou activity, et les coordonnées doivent rester dans les bornes de l'île (latitude -20.05 à -19.35, longitude 62.95 à 63.95). Toute violation répond 422. Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminactivity-points_post": {
+    /** @description The new AdminActivityPoint resource */
+    requestBody?: {
+      content: {
+        "application/ld+json": unknown;
+      };
+    };
+    responses: {
+      /** @description AdminActivityPoint resource created */
+      201: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Récupérer un point d'activité (administration)
+   * @description Retourne le détail complet d'un point d'activité par son identifiant UUID, pour pré-remplir le formulaire d'édition. Répond 404 si le point est inconnu. Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminactivity-points_id_get": {
+    parameters: {
+      path: {
+        /** @description AdminActivityPoint identifier */
+        id: string;
+      };
+    };
+    responses: {
+      /** @description AdminActivityPoint resource */
+      200: {
+        content: {
+          "application/ld+json": components["schemas"]["AdminActivityPoint.jsonld-admin_activity_point.list"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Supprimer un point d'activité (administration)
+   * @description Supprime définitivement un point d'activité de la carte. Répond 404 si le point est inconnu. Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminactivity-points_id_delete": {
+    parameters: {
+      path: {
+        /** @description AdminActivityPoint identifier */
+        id: string;
+      };
+    };
+    responses: {
+      /** @description AdminActivityPoint resource deleted */
+      204: {
+        content: never;
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Modifier un point d'activité (administration)
+   * @description Remplace les informations d'un point d'activité (nom, description, catégorie, coordonnées, URL d'article). Les mêmes règles de validation qu'à la création s'appliquent (422 en cas de violation). Répond 404 si le point est inconnu. Réservé aux administrateurs (ROLE_ADMIN).
+   */
+  "api_adminactivity-points_id_patch": {
+    parameters: {
+      path: {
+        /** @description AdminActivityPoint identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AdminActivityPoint resource */
+    requestBody?: {
+      content: {
+        "application/merge-patch+json": unknown;
+      };
+    };
+    responses: {
+      /** @description AdminActivityPoint resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
         };
       };
     };

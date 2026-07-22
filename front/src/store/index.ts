@@ -17,6 +17,7 @@ import userProfileReducer from '../features/userProfile/UserProfileSlice';
 import hostProfileReducer from '../features/hostProfile/HostProfileSlice';
 import wishlistReducer from '../features/wishlist/WishlistSlice';
 import hostRevenueReducer from '../features/hostRevenue/HostRevenueSlice';
+import activityPointReducer from '../features/activityPoint/ActivityPointSlice';
 import { listenerMiddleware } from './listenerMiddleware';
 import './registerListeners';
 
@@ -40,6 +41,7 @@ export const store = configureStore({
     hostProfile: hostProfileReducer,
     wishlist: wishlistReducer,
     hostRevenue: hostRevenueReducer,
+    activityPoint: activityPointReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),

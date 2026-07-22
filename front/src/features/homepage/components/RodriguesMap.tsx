@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -8,167 +8,25 @@ import {
   RODRIGUES_MAX_BOUNDS,
   RODRIGUES_MIN_ZOOM,
 } from '../../../components/rodriguesMapConfig';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { fetchActivityPoints } from '../../activityPoint/ActivityPointSlice';
+import {
+  selectActivityPoints,
+  selectActivityPointsStatus,
+} from '../../activityPoint/ActivityPointSelectors';
+import type { ActivityPointCategory } from '../../activityPoint/ActivityPointTypes';
 
-type Category = 'kitesurf' | 'viewpoint' | 'nature' | 'beach' | 'diving' | 'heritage';
-
-interface Activity {
-  id: string;
-  name: string;
-  description: string;
-  category: Category;
-  latitude: number;
-  longitude: number;
-}
-
-const ACTIVITIES: Activity[] = [
-  {
-    id: 'pointe-coton',
-    name: 'Pointe Coton',
-    description: "Spot emblématique de kitesurf, avec vent régulier et lagon turquoise.",
-    category: 'kitesurf',
-    latitude: -19.6964,
-    longitude: 63.4793,
-  },
-  {
-    id: 'anse-mourouk',
-    name: 'Anse Mourouk',
-    description: "Paradis des kitesurfeurs, plage immense avec vent soutenu toute l'année.",
-    category: 'kitesurf',
-    latitude: -19.7583,
-    longitude: 63.4317,
-  },
-  {
-    id: 'mont-limon',
-    name: 'Mont Limon',
-    description: "Point culminant de l'île (398 m), panorama à 360° sur le lagon.",
-    category: 'viewpoint',
-    latitude: -19.7161,
-    longitude: 63.4236,
-  },
-  {
-    id: 'mont-lubin',
-    name: 'Mont Lubin',
-    description: "Vue imprenable sur les collines et la côte nord.",
-    category: 'viewpoint',
-    latitude: -19.7128,
-    longitude: 63.4131,
-  },
-  {
-    id: 'grande-montagne',
-    name: 'Réserve Grande Montagne',
-    description: "Réserve naturelle avec espèces endémiques et sentiers balisés.",
-    category: 'nature',
-    latitude: -19.7036,
-    longitude: 63.4450,
-  },
-  {
-    id: 'francois-leguat',
-    name: 'Réserve François Leguat',
-    description: "Parc aux tortues géantes et grotte Caverne Patate.",
-    category: 'nature',
-    latitude: -19.7672,
-    longitude: 63.4181,
-  },
-  {
-    id: 'anse-aux-anglais',
-    name: 'Anse aux Anglais (English Bay)',
-    description: "Plage facilement accessible, restaurants et maisons d'hôtes à proximité.",
-    category: 'beach',
-    latitude: -19.6736,
-    longitude: 63.4283,
-  },
-  {
-    id: 'riviere-banane',
-    name: 'Rivière Banane',
-    description: "Retraite paisible idéale pour le snorkeling dans l'Aquarium Naturel.",
-    category: 'beach',
-    latitude: -19.6750,
-    longitude: 63.4619,
-  },
-  {
-    id: 'torrent',
-    name: 'Torrent',
-    description: "Spot pittoresque et isolé au littoral rocheux, excellent pour le snorkeling.",
-    category: 'beach',
-    latitude: -19.7094,
-    longitude: 63.4833,
-  },
-  {
-    id: 'anse-ali',
-    name: 'Anse Ali',
-    description: "Longue plage paisible avec parking, adaptée à toute la famille.",
-    category: 'beach',
-    latitude: -19.7303,
-    longitude: 63.4875,
-  },
-  {
-    id: 'anse-bouteille',
-    name: 'Anse Bouteille',
-    description: "Accessible uniquement à pied, plage tranquille et préservée parfaite pour le snorkeling.",
-    category: 'beach',
-    latitude: -19.7361,
-    longitude: 63.4856,
-  },
-  {
-    id: 'anse-femi',
-    name: 'Anse Femi',
-    description: "Plage privée aux eaux turquoise, accès par piste et sentier de randonnée.",
-    category: 'beach',
-    latitude: -19.7500,
-    longitude: 63.4836,
-  },
-  {
-    id: 'graviers',
-    name: 'Graviers',
-    description: "Longue plage idéale pour pique-nique, balades côtières et baignade — départ vers Trou d'Argent.",
-    category: 'beach',
-    latitude: -19.7556,
-    longitude: 63.4742,
-  },
-  {
-    id: 'ile-aux-cocos',
-    name: 'Île aux Cocos',
-    description: "Réserve ornithologique protégée, excursion en bateau incontournable.",
-    category: 'nature',
-    latitude: -19.7533,
-    longitude: 63.2789,
-  },
-  {
-    id: 'caverne-patate',
-    name: 'Caverne Patate',
-    description: "Grotte calcaire spectaculaire avec stalactites et stalagmites.",
-    category: 'heritage',
-    latitude: -19.7561,
-    longitude: 63.3997,
-  },
-  {
-    id: 'passe-graviers',
-    name: 'Passe aux Graviers',
-    description: "Site de plongée réputé, récifs coralliens et faune marine.",
-    category: 'diving',
-    latitude: -19.6708,
-    longitude: 63.4600,
-  },
-  {
-    id: 'port-mathurin',
-    name: 'Port Mathurin',
-    description: "Capitale de l'île, marché coloré le samedi matin.",
-    category: 'heritage',
-    latitude: -19.6839,
-    longitude: 63.4178,
-  },
-];
-
-const CATEGORY_META: Record<Category, { label: string; color: string; emoji: string }> = {
+const CATEGORY_META: Record<ActivityPointCategory, { label: string; color: string; emoji: string }> = {
   kitesurf: { label: 'Kitesurf', color: '#0ea5e9', emoji: '🪁' },
   viewpoint: { label: 'Point de vue', color: '#f97316', emoji: '🗻' },
   nature: { label: 'Parc & nature', color: '#16a34a', emoji: '🌳' },
   beach: { label: 'Plage', color: '#eab308', emoji: '🏖️' },
   diving: { label: 'Plongée', color: '#2563eb', emoji: '🤿' },
   heritage: { label: 'Patrimoine', color: '#a855f7', emoji: '🏛️' },
+  activity: { label: 'Activité', color: '#ec4899', emoji: '🎯' },
 };
 
-const createIcon = (category: Category): L.DivIcon => {
+const createIcon = (category: ActivityPointCategory): L.DivIcon => {
   const { color, emoji } = CATEGORY_META[category];
   return L.divIcon({
     className: 'rodrigues-map-marker',
@@ -193,11 +51,19 @@ const createIcon = (category: Category): L.DivIcon => {
 const RODRIGUES_CENTER: [number, number] = [-19.7245, 63.4272];
 
 const RodriguesMap: React.FC = () => {
-  const [activeCategories, setActiveCategories] = useState<Set<Category>>(
-    () => new Set(Object.keys(CATEGORY_META) as Category[]),
+  const dispatch = useAppDispatch();
+  const points = useAppSelector(selectActivityPoints);
+  const status = useAppSelector(selectActivityPointsStatus);
+
+  const [activeCategories, setActiveCategories] = useState<Set<ActivityPointCategory>>(
+    () => new Set(Object.keys(CATEGORY_META) as ActivityPointCategory[]),
   );
 
-  const toggle = (category: Category) => {
+  useEffect(() => {
+    dispatch(fetchActivityPoints());
+  }, [dispatch]);
+
+  const toggle = (category: ActivityPointCategory) => {
     setActiveCategories((prev) => {
       const next = new Set(prev);
       if (next.has(category)) next.delete(category);
@@ -206,18 +72,25 @@ const RodriguesMap: React.FC = () => {
     });
   };
 
-  const filteredActivities = useMemo(
-    () => ACTIVITIES.filter((a) => activeCategories.has(a.category)),
-    [activeCategories],
+  const filteredPoints = useMemo(
+    () =>
+      points.filter(
+        (point) => point.category in CATEGORY_META && activeCategories.has(point.category),
+      ),
+    [points, activeCategories],
   );
 
   const icons = useMemo(() => {
-    const map = {} as Record<Category, L.DivIcon>;
-    (Object.keys(CATEGORY_META) as Category[]).forEach((cat) => {
+    const map = {} as Record<ActivityPointCategory, L.DivIcon>;
+    (Object.keys(CATEGORY_META) as ActivityPointCategory[]).forEach((cat) => {
       map[cat] = createIcon(cat);
     });
     return map;
   }, []);
+
+  if (status === 'succeeded' && points.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 bg-white">
@@ -228,7 +101,7 @@ const RodriguesMap: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mb-6">
-          {(Object.keys(CATEGORY_META) as Category[]).map((cat) => {
+          {(Object.keys(CATEGORY_META) as ActivityPointCategory[]).map((cat) => {
             const meta = CATEGORY_META[cat];
             const active = activeCategories.has(cat);
             return (
@@ -272,26 +145,36 @@ const RodriguesMap: React.FC = () => {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               eventHandlers={tileA11yHandlers}
             />
-            {filteredActivities.map((activity) => (
+            {filteredPoints.map((point) => (
               <Marker
-                key={activity.id}
-                position={[activity.latitude, activity.longitude]}
-                icon={icons[activity.category]}
-                alt={activity.name}
+                key={point.id}
+                position={[point.latitude, point.longitude]}
+                icon={icons[point.category]}
+                alt={point.name}
               >
                 <Popup>
                   <div className="space-y-1" style={{ minWidth: 200 }}>
                     <div className="flex items-center gap-2">
-                      <span>{CATEGORY_META[activity.category].emoji}</span>
-                      <strong>{activity.name}</strong>
+                      <span>{CATEGORY_META[point.category].emoji}</span>
+                      <strong>{point.name}</strong>
                     </div>
                     <div
                       className="text-xs font-semibold uppercase tracking-wide"
-                      style={{ color: CATEGORY_META[activity.category].color }}
+                      style={{ color: CATEGORY_META[point.category].color }}
                     >
-                      {CATEGORY_META[activity.category].label}
+                      {CATEGORY_META[point.category].label}
                     </div>
-                    <p className="text-sm text-gray-600 m-0">{activity.description}</p>
+                    <p className="text-sm text-gray-600 m-0">{point.description}</p>
+                    {point.articleUrl && (
+                      <a
+                        href={point.articleUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-block text-sm font-medium text-primary-600 hover:underline"
+                      >
+                        Lire l'article →
+                      </a>
+                    )}
                   </div>
                 </Popup>
               </Marker>
