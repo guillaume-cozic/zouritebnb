@@ -59,6 +59,9 @@ security:
         - { path: ^/api/wishlist/merge$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/wishlist, methods: [GET, POST, DELETE], roles: PUBLIC_ACCESS }
 
+        # Donations to solidarity projects are anonymous: no account is required
+        - { path: ^/api/donation-intents$, methods: [POST], roles: PUBLIC_ACCESS }
+
         # Admin back-office endpoints are restricted to platform administrators
         - { path: ^/api/admin, roles: ROLE_ADMIN }
 

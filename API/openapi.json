@@ -4499,6 +4499,121 @@
                 }
             }
         },
+        "/api/donation-intents": {
+            "post": {
+                "operationId": "api_donation-intents_post",
+                "tags": [
+                    "DonationIntent"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "DonationIntent resource created",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DonationIntent.jsonld-donation_intent.read"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Cr\u00e9er un PaymentIntent Stripe pour un don \u00e0 un projet solidaire",
+                "description": "Cr\u00e9e un PaymentIntent Stripe en capture automatique pour un don d'un montant libre \u00e0 un projet solidaire actif : le donateur est d\u00e9bit\u00e9 d\u00e8s qu'il confirme le paiement (contrairement aux r\u00e9servations, en capture manuelle). Le montant est exprim\u00e9 en centimes d'euro et doit \u00eatre compris entre 100 (1 \u20ac) et 1 000 000 (10 000 \u20ac) ; la devise est toujours l'euro. Endpoint public : aucun compte n'est requis, le don est anonyme. Renvoie le client_secret n\u00e9cessaire pour finaliser la confirmation c\u00f4t\u00e9 frontend avec Stripe Elements.",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new DonationIntent resource",
+                    "content": {
+                        "application/ld+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Don valide de 5 \u20ac",
+                                    "value": {
+                                        "solidarityProjectId": "019cf27a-96ba-7957-8622-eeccb7350e79",
+                                        "amountCents": 500
+                                    }
+                                },
+                                "amount_below_minimum": {
+                                    "summary": "Invalide : montant inf\u00e9rieur \u00e0 1 \u20ac",
+                                    "description": "Renvoie une erreur 422 : le montant du don doit \u00eatre d'au moins 100 centimes (1 \u20ac).",
+                                    "value": {
+                                        "solidarityProjectId": "019cf27a-96ba-7957-8622-eeccb7350e79",
+                                        "amountCents": 99
+                                    }
+                                },
+                                "amount_above_maximum": {
+                                    "summary": "Invalide : montant sup\u00e9rieur \u00e0 10 000 \u20ac",
+                                    "description": "Renvoie une erreur 422 : le montant du don ne doit pas d\u00e9passer 1 000 000 centimes (10 000 \u20ac).",
+                                    "value": {
+                                        "solidarityProjectId": "019cf27a-96ba-7957-8622-eeccb7350e79",
+                                        "amountCents": 1000001
+                                    }
+                                },
+                                "project_not_donatable": {
+                                    "summary": "Invalide : projet inexistant ou cl\u00f4tur\u00e9",
+                                    "description": "Renvoie une erreur 422 : le projet solidaire n'existe pas ou n'accepte plus de dons (statut diff\u00e9rent de \u00ab active \u00bb).",
+                                    "value": {
+                                        "solidarityProjectId": "00000000-0000-4000-8000-000000000000",
+                                        "amountCents": 500
+                                    }
+                                },
+                                "invalid_project_id": {
+                                    "summary": "Invalide : identifiant de projet non UUID",
+                                    "description": "Renvoie une erreur 422 avec une violation sur solidarityProjectId : l'identifiant doit \u00eatre un UUID valide.",
+                                    "value": {
+                                        "solidarityProjectId": "not-a-uuid",
+                                        "amountCents": 500
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
         "/api/host-profiles/{teamId}": {
             "get": {
                 "operationId": "api_host-profiles_teamId_get",
@@ -10312,6 +10427,34 @@
                     }
                 ]
             },
+            "DonationIntent.jsonld-donation_intent.read": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "paymentIntentId": {
+                                "description": "Identifiant Stripe du PaymentIntent cr\u00e9\u00e9 pour le don.",
+                                "example": "pi_3Pq...AbCd",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "clientSecret": {
+                                "description": "Secret client \u00e0 transmettre \u00e0 Stripe.js c\u00f4t\u00e9 frontend pour confirmer le paiement du don.",
+                                "example": "pi_3Pq...AbCd_secret_xyz",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
             "Error": {
                 "type": "object",
                 "description": "A representation of common errors.",
@@ -11756,6 +11899,10 @@
         {
             "name": "Conversation",
             "description": "Resource 'Conversation' operations."
+        },
+        {
+            "name": "DonationIntent",
+            "description": "Resource 'DonationIntent' operations."
         },
         {
             "name": "Locality",

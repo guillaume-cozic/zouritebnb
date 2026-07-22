@@ -204,6 +204,18 @@ services:
     App\Payment\Domain\Port\PaymentGateway:
         alias: App\Payment\Infrastructure\Stripe\StripePaymentGateway
 
+    App\Donation\Application\Listener\RecordDonationOnStripePaymentIntentEvent:
+        tags: [messenger.message_handler]
+
+    App\Donation\Domain\Port\DonationRepository:
+        alias: App\Donation\Infrastructure\Doctrine\DoctrineDonationRepository
+
+    App\Donation\Domain\Port\DonationGateway:
+        alias: App\Donation\Infrastructure\Stripe\StripeDonationGateway
+
+    App\Shared\Domain\Port\SolidarityProjectDonationChecker:
+        alias: App\SolidarityProject\Infrastructure\Doctrine\DoctrineSolidarityProjectDonationChecker
+
     App\Review\Domain\Port\ReviewRepository:
         alias: App\Review\Infrastructure\Doctrine\DoctrineReviewRepository
 

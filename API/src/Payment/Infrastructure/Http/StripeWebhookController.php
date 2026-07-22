@@ -7,6 +7,8 @@ namespace App\Payment\Infrastructure\Http;
 use App\Payment\Application\UseCase\RecordStripeEvent;
 use App\Payment\Domain\Command\RecordStripeEventCommand;
 use App\Payment\Infrastructure\Stripe\StripeWebhookSignatureVerifier;
+use App\Shared\Domain\Event\StripePaymentIntentEventReceived;
+use App\Shared\Domain\Port\EventBus;
 use App\Shared\Infrastructure\TransactionalUseCaseHandler;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Exception\UnexpectedValueException;
@@ -24,6 +26,7 @@ final readonly class StripeWebhookController
         private StripeWebhookSignatureVerifier $signatureVerifier,
         private RecordStripeEvent $recordStripeEvent,
         private TransactionalUseCaseHandler $handler,
+        private EventBus $eventBus,
     ) {
     }
 
@@ -52,6 +55,13 @@ final readonly class StripeWebhookController
             eventType: $event->type,
             paymentIntentId: $object->id,
         )));
+
+        // Other modules (e.g. Donation) react to the same webhook without Payment
+        // depending on them: the event is re-published on the shared bus.
+        $this->eventBus->dispatch([new StripePaymentIntentEventReceived(
+            eventType: $event->type,
+            paymentIntentId: $object->id,
+        )]);
 
         return new JsonResponse(['received' => true]);
     }

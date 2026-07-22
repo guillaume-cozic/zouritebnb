@@ -80,6 +80,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Wishlist/Infrastructure/Doctrine'
                 prefix: 'App\Wishlist\Infrastructure\Doctrine'
                 alias: Wishlist
+            Donation:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Donation/Infrastructure/Doctrine'
+                prefix: 'App\Donation\Infrastructure\Doctrine'
+                alias: Donation
         controller_resolver:
             auto_mapping: false
 

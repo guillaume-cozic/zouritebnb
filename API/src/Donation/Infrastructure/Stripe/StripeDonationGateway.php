@@ -1,0 +1,58 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Donation\Infrastructure\Stripe;
+
+use App\Donation\Domain\Port\DonationGateway;
+use App\Donation\Domain\Port\GatewayPayment;
+use Stripe\StripeClient;
+
+final readonly class StripeDonationGateway implements DonationGateway
+{
+    public function __construct(private StripeClient $stripeClient)
+    {
+    }
+
+    public function createPayment(
+        int $amountCents,
+        string $currency,
+        string $description,
+        array $metadata,
+    ): GatewayPayment {
+        // Automatic capture: the donation is charged as soon as the donor confirms,
+        // unlike reservations which authorize first (manual capture).
+        $intent = $this->stripeClient->paymentIntents->create([
+            'amount' => $amountCents,
+            'currency' => strtolower($currency),
+            'description' => $description,
+            'metadata' => $this->normalizeMetadata($metadata),
+            'automatic_payment_methods' => ['enabled' => true],
+        ]);
+
+        return new GatewayPayment(
+            paymentIntentId: $intent->id,
+            clientSecret: (string) $intent->client_secret,
+        );
+    }
+
+    /**
+     * Stripe metadata must be string-keyed and scalar-valued.
+     *
+     * @param array<string, string|int|float|bool|null> $metadata
+     *
+     * @return array<string, string>
+     */
+    private function normalizeMetadata(array $metadata): array
+    {
+        $normalized = [];
+        foreach ($metadata as $key => $value) {
+            if (null === $value) {
+                continue;
+            }
+            $normalized[$key] = \is_bool($value) ? ($value ? '1' : '0') : (string) $value;
+        }
+
+        return $normalized;
+    }
+}
