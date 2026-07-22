@@ -688,7 +688,9 @@
     "ownAccommodationNotice": "Vous ne pouvez pas réserver un hébergement appartenant à votre équipe.",
     "backToHome": "Retour à l'accueil",
     "loading": "Chargement...",
-    "error": "Impossible de charger cet hébergement."
+    "error": "Impossible de charger cet hébergement.",
+    "descriptionTitle": "À propos de ce logement",
+    "bookingTitle": "Réserver ce logement"
   },
   "footer": {
     "description": "Plateforme de location de vacances à Rodrigues, où chaque séjour soutient un projet solidaire local.",

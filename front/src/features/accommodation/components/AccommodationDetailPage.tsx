@@ -361,6 +361,7 @@ const AccommodationDetailPage: React.FC = () => {
               )}
 
               {/* Description */}
+              <h2 className="text-2xl font-semibold mb-4">{t('detail.descriptionTitle')}</h2>
               <p className="text-lg whitespace-pre-line">{accommodation.description}</p>
             </div>
 
@@ -448,9 +449,9 @@ const AccommodationDetailPage: React.FC = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-rose-500">
                     <path d="M19.5 12.572l-7.5 7.428l-7.5-7.428a5 5 0 1 1 7.5-6.566a5 5 0 1 1 7.5 6.572" />
                   </svg>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary-700">
+                  <h2 className="text-xs font-semibold uppercase tracking-wider text-primary-700">
                     {favoriteProject ? t('detail.favoriteProjectBadge') : t('detail.defaultProjectBadge')}
-                  </p>
+                  </h2>
                 </div>
                 <div className="flex gap-5">
                   {highlightedProject.imageUrl && (
@@ -484,6 +485,8 @@ const AccommodationDetailPage: React.FC = () => {
           {/* Right column - Booking card */}
           <div className="lg:col-span-4">
             <div className="rounded-2xl border border-gray-100 bg-white shadow-lg p-6 sticky top-24">
+              {/* Titre de section pour l'outline (lecteurs d'écran) sans impact visuel */}
+              <h2 className="sr-only">{t('detail.bookingTitle')}</h2>
               {/* Price + rating */}
               <div className="flex items-center justify-between mb-6">
                 <div className="text-2xl font-bold">

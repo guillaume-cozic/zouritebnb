@@ -688,7 +688,9 @@
     "ownAccommodationNotice": "You can't book an accommodation owned by your team.",
     "backToHome": "Back to home",
     "loading": "Loading...",
-    "error": "Unable to load this accommodation."
+    "error": "Unable to load this accommodation.",
+    "descriptionTitle": "About this accommodation",
+    "bookingTitle": "Book this accommodation"
   },
   "footer": {
     "description": "Vacation rental platform in Rodrigues, where every stay supports a local solidarity project.",
