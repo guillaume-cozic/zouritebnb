@@ -53,6 +53,112 @@
     }
   },
   {
+    "id": "0ade5eed-0004-7000-8000-000000000005",
+    "image": "protection-coraux.jpg",
+    "isDefault": false,
+    "status": "active",
+    "daysAgo": 5,
+    "translations": {
+      "fr": {
+        "title": "Protection des coraux",
+        "description": "<p>Autour de l'île Rodrigues, le Bluer Ocean Project mène un travail de terrain pour augmenter la résilience des récifs coralliens, par l'action et par l'éducation. L'équipe de douze personnes — plongeurs professionnels, biologiste marin, instructeurs et photographes — réunie autour de son fondateur Jérôme Branellec cumule cinquante ans d'expérience et plus de 9 000 heures de plongée.</p>\n<h2>Replanter le récif, bouture par bouture</h2>\n<p>La méthode est celle du bouturage : des fragments prélevés sur des colonies de corail résistantes sont fixés sur des cadres métalliques immergés, où ils grandissent avant de recoloniser le récif. Dès la première année, plus de 3 000 boutures ont été plantées sur 45 cadres, répartis sur six sites autour de l'île.</p>\n<figure><img src=\"{{image:protection-coraux-cadre.jpg}}\" alt=\"Cadre de bouturage de corail immergé sur le sable du lagon\" /><figcaption>Les cadres immergés servent de pépinières : les boutures y grandissent à l'abri avant de repeupler le récif.</figcaption></figure>\n<h2>Transmettre autant que restaurer</h2>\n<p>La restauration ne suffit pas si les pressions humaines demeurent. Le projet forme des plongeurs locaux et sensibilise les prochaines générations aux impacts humains sur l'océan, pour que la protection du récif devienne l'affaire de toute l'île.</p>\n<p>Chaque contribution finance la plantation de nouvelles boutures, l'entretien des cadres en mer et les actions d'éducation menées à Rodrigues.</p>",
+        "keyFigures": [
+          {
+            "value": "3 000+",
+            "label": "boutures de corail plantées la première année"
+          },
+          {
+            "value": "45",
+            "label": "cadres immergés"
+          },
+          {
+            "value": "6",
+            "label": "sites autour de l'île Rodrigues"
+          },
+          {
+            "value": "9 040",
+            "label": "heures de plongée cumulées par l'équipe"
+          }
+        ]
+      },
+      "en": {
+        "title": "Coral protection",
+        "description": "<p>Around Rodrigues Island, the Bluer Ocean Project works in the field to strengthen the resilience of coral reefs, through action and education. The twelve-strong team — professional divers, a marine biologist, instructors and photographers — gathered around founder Jérôme Branellec brings together fifty years of experience and more than 9,000 hours of diving.</p>\n<h2>Replanting the reef, cutting by cutting</h2>\n<p>The method is coral propagation: fragments taken from resilient coral colonies are fixed onto submerged metal frames, where they grow before recolonising the reef. In the very first year, more than 3,000 cuttings were planted on 45 frames, spread across six sites around the island.</p>\n<figure><img src=\"{{image:protection-coraux-cadre.jpg}}\" alt=\"Submerged coral propagation frame on the lagoon sand\" /><figcaption>The submerged frames act as nurseries: cuttings grow there in safety before repopulating the reef.</figcaption></figure>\n<h2>Passing on as much as restoring</h2>\n<p>Restoration is not enough if human pressures remain. The project trains local divers and raises the next generations' awareness of human impacts on the ocean, so that protecting the reef becomes the whole island's concern.</p>\n<p>Every contribution funds the planting of new cuttings, the upkeep of the frames at sea and the education work carried out on Rodrigues.</p>",
+        "keyFigures": [
+          {
+            "value": "3,000+",
+            "label": "coral cuttings planted in the first year"
+          },
+          {
+            "value": "45",
+            "label": "submerged frames"
+          },
+          {
+            "value": "6",
+            "label": "sites around Rodrigues Island"
+          },
+          {
+            "value": "9,040",
+            "label": "hours of diving across the team"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "0ade5eed-0004-7000-8000-000000000006",
+    "image": "mourouk-wind-sports.jpg",
+    "isDefault": false,
+    "status": "active",
+    "daysAgo": 3,
+    "translations": {
+      "fr": {
+        "title": "Le vent pour tous à Mourouk",
+        "description": "<p>À Mourouk, au sud de l'île Rodrigues, le Mourouk Wind Sports Club travaille toute l'année à structurer le kitesurf rodriguais et à faire de l'île une véritable école de glisse — pas seulement une destination touristique. Présidée par Andy Albert, figure reconnue du kite local, l'association est connue du grand public pour son festival international, mais son cœur d'action, ce sont trois programmes menés au quotidien auprès des Rodriguais.</p>\n<h2>Apprendre à nager, la première liberté</h2>\n<p>Beaucoup d'enfants rodriguais grandissent au bord de la mer sans savoir nager. Le club rend le lagon accessible à tous avec des cours de natation gratuits, encadrés par des maîtres-nageurs. Savoir nager, c'est la porte d'entrée vers tous les sports nautiques — et une question de sécurité au quotidien sur une île.</p>\n<h2>Former les moniteurs de demain</h2>\n<p>Pour que le kitesurf profite d'abord aux Rodriguais, le club a bâti un parcours de formation certifiant pour les moniteurs locaux : sécurité, pédagogie, gestion du matériel. Objectif : une nouvelle génération de moniteurs qualifiés qui vivent de la glisse sur leur propre île, dans un lagon aux conditions de vent exceptionnelles toute l'année.</p>\n<figure><img src=\"{{image:rikf-affiche.jpeg}}\" alt=\"Affiche du Rodrigues International Kite Surf Festival 2026\" /><figcaption>Une fois par an, le festival RIKF sert de vitrine au travail de fond mené par le club le reste de l'année.</figcaption></figure>\n<h2>La voile pour grandir</h2>\n<p>Sur Optimist pour les enfants et sur Laser pour les adolescents, l'initiation à la voile sportive apprend la compétition, l'autonomie et l'esprit d'équipe. Autant de compétences qui dépassent largement le plan d'eau.</p>\n<p>Chaque contribution — don, matériel, mécénat ou bénévolat — finance directement ces trois programmes : les cours de natation gratuits, la formation des moniteurs et l'école de voile.</p>",
+        "keyFigures": [
+          {
+            "value": "3",
+            "label": "programmes menés à l'année"
+          },
+          {
+            "value": "100 %",
+            "label": "des cours de natation gratuits"
+          },
+          {
+            "value": "2",
+            "label": "supports de voile : Optimist et Laser"
+          },
+          {
+            "value": "1",
+            "label": "parcours certifiant pour les moniteurs de kite"
+          }
+        ]
+      },
+      "en": {
+        "title": "Wind for everyone in Mourouk",
+        "description": "<p>In Mourouk, on the south coast of Rodrigues Island, the Mourouk Wind Sports Club works all year round to structure Rodriguan kitesurfing and turn the island into a genuine windsports school — not just a tourist destination. Chaired by Andy Albert, a well-known figure of local kitesurfing, the association is best known to the public for its international festival, but its core work is three programmes run day in, day out with the people of Rodrigues.</p>\n<h2>Learning to swim, the first freedom</h2>\n<p>Many Rodriguan children grow up by the sea without knowing how to swim. The club makes the lagoon accessible to everyone with free swimming lessons, supervised by qualified lifeguards. Swimming is the gateway to every water sport — and a matter of everyday safety on an island.</p>\n<h2>Training tomorrow's instructors</h2>\n<p>So that kitesurfing benefits Rodriguans first, the club has built a certified training pathway for local instructors: safety, teaching, equipment management. The goal: a new generation of qualified instructors making a living from windsports on their own island, in a lagoon with exceptional wind conditions all year long.</p>\n<figure><img src=\"{{image:rikf-affiche.jpeg}}\" alt=\"Poster of the Rodrigues International Kite Surf Festival 2026\" /><figcaption>Once a year, the RIKF festival showcases the groundwork the club carries out the rest of the year.</figcaption></figure>\n<h2>Sailing to grow up</h2>\n<p>On Optimist for children and Laser for teenagers, learning to sail teaches competition, independence and team spirit — skills that reach far beyond the water.</p>\n<p>Every contribution — donations, equipment, sponsorship or volunteering — directly funds these three programmes: free swimming lessons, instructor training and the sailing school.</p>",
+        "keyFigures": [
+          {
+            "value": "3",
+            "label": "year-round programmes"
+          },
+          {
+            "value": "100%",
+            "label": "free swimming lessons"
+          },
+          {
+            "value": "2",
+            "label": "sailing classes: Optimist and Laser"
+          },
+          {
+            "value": "1",
+            "label": "certified pathway for kite instructors"
+          }
+        ]
+      }
+    }
+  },
+  {
     "id": "0ade5eed-0004-7000-8000-000000000002",
     "image": "pecheurs-artisanaux.jpg",
     "isDefault": false,
