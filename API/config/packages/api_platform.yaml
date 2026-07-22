@@ -6,6 +6,7 @@ api_platform:
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
     exception_to_status:
+        App\ActivityPoint\Domain\Exception\ActivityPointNotFoundException: 404
         App\Accommodation\Domain\Exception\AccommodationNotFoundException: 404
         App\Accommodation\Domain\Exception\PhotoNotFoundException: 404
         App\Reservation\Domain\Exception\ReservationNotFoundException: 404

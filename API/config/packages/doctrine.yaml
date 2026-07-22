@@ -86,6 +86,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Donation/Infrastructure/Doctrine'
                 prefix: 'App\Donation\Infrastructure\Doctrine'
                 alias: Donation
+            ActivityPoint:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/ActivityPoint/Infrastructure/Doctrine'
+                prefix: 'App\ActivityPoint\Infrastructure\Doctrine'
+                alias: ActivityPoint
         controller_resolver:
             auto_mapping: false
 

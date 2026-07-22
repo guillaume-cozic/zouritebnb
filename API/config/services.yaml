@@ -37,6 +37,9 @@ services:
     App\SolidarityProject\Domain\Port\SolidarityProjectRepository:
         alias: App\SolidarityProject\Infrastructure\Doctrine\DoctrineSolidarityProjectRepository
 
+    App\ActivityPoint\Domain\Port\ActivityPointRepository:
+        alias: App\ActivityPoint\Infrastructure\Doctrine\DoctrineActivityPointRepository
+
     App\Reservation\Domain\Port\ReservationRepository:
         alias: App\Reservation\Infrastructure\Doctrine\DoctrineReservationRepository
 

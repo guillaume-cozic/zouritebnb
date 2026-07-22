@@ -52,6 +52,7 @@ security:
         - { path: ^/api/regions, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api/localities, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api/host-profiles, methods: [GET], roles: PUBLIC_ACCESS }
+        - { path: ^/api/activity-points$, methods: [GET], roles: PUBLIC_ACCESS }
 
         # Wishlist: anonymous visitors (tracked by a cookie correlation id sent in the
         # X-Wishlist-Id header) can manage their wishlist. The merge endpoint stays

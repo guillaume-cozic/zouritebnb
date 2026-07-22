@@ -3093,6 +3093,49 @@
                 ]
             }
         },
+        "/api/activity-points": {
+            "get": {
+                "operationId": "api_activity-points_get_collection",
+                "tags": [
+                    "ActivityPoint"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ActivityPoint collection",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "ActivityPoint.jsonld-activity_point.list collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchemaNoPagination"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ActivityPoint.jsonld-activity_point.list"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Lister les points d'activit\u00e9 de Rodrigues",
+                "description": "Retourne la liste compl\u00e8te (non pagin\u00e9e) des points d'activit\u00e9 de l'\u00eele Rodrigues : spots de kitesurf, points de vue, sites naturels, plages, sites de plong\u00e9e et patrimoine. Route publique, destin\u00e9e \u00e0 la carte interactive du site.",
+                "parameters": []
+            }
+        },
         "/api/admin/accommodations": {
             "get": {
                 "operationId": "api_adminaccommodations_get_collection",
@@ -3184,6 +3227,590 @@
                         "explode": false
                     }
                 ]
+            }
+        },
+        "/api/admin/activity-points": {
+            "get": {
+                "operationId": "api_adminactivity-points_get_collection",
+                "tags": [
+                    "AdminActivityPoint"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AdminActivityPoint collection",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "description": "AdminActivityPoint.jsonld-admin_activity_point.list collection.",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/HydraCollectionBaseSchema"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "required": [
+                                                "member"
+                                            ],
+                                            "properties": {
+                                                "member": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AdminActivityPoint.jsonld-admin_activity_point.list"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Lister les points d'activit\u00e9 (administration)",
+                "description": "Retourne la liste pagin\u00e9e des points d'activit\u00e9 de la plateforme, tri\u00e9s par nom. Filtres optionnels : \"search\" (recherche partielle sur le nom et la description) et \"category\" (cat\u00e9gorie exacte). R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Recherche partielle sur le nom ou la description",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form",
+                        "explode": false,
+                        "example": "lagon"
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Filtre sur la cat\u00e9gorie exacte (kitesurf, viewpoint, nature, beach, diving, heritage ou activity)",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "kitesurf",
+                                "viewpoint",
+                                "nature",
+                                "beach",
+                                "diving",
+                                "heritage",
+                                "activity"
+                            ]
+                        },
+                        "style": "form",
+                        "explode": false,
+                        "example": "kitesurf"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The collection page number",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "style": "form",
+                        "explode": false
+                    },
+                    {
+                        "name": "itemsPerPage",
+                        "in": "query",
+                        "description": "The number of items per page",
+                        "required": false,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "minimum": 0,
+                            "maximum": 100
+                        },
+                        "style": "form",
+                        "explode": false
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "api_adminactivity-points_post",
+                "tags": [
+                    "AdminActivityPoint"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "AdminActivityPoint resource created",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Cr\u00e9er un point d'activit\u00e9 (administration)",
+                "description": "Cr\u00e9e un nouveau point d'activit\u00e9 sur la carte de Rodrigues. Le nom et la description sont obligatoires, la cat\u00e9gorie doit \u00eatre l'une de kitesurf, viewpoint, nature, beach, diving, heritage ou activity, et les coordonn\u00e9es doivent rester dans les bornes de l'\u00eele (latitude -20.05 \u00e0 -19.35, longitude 62.95 \u00e0 63.95). Toute violation r\u00e9pond 422. R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new AdminActivityPoint resource",
+                    "content": {
+                        "application/ld+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Requ\u00eate valide",
+                                    "value": {
+                                        "name": "Lagune de Mourouk",
+                                        "description": "Spot de kitesurf r\u00e9put\u00e9 pour son lagon turquoise et son vent r\u00e9gulier.",
+                                        "category": "kitesurf",
+                                        "latitude": -19.7577,
+                                        "longitude": 63.4499,
+                                        "articleUrl": "/blog/kitesurf-mourouk"
+                                    }
+                                },
+                                "blank_name": {
+                                    "summary": "Invalide : nom vide",
+                                    "description": "R\u00e9pond 422 : le nom du point est obligatoire.",
+                                    "value": {
+                                        "name": "",
+                                        "description": "Une description.",
+                                        "category": "kitesurf",
+                                        "latitude": -19.7577,
+                                        "longitude": 63.4499
+                                    }
+                                },
+                                "invalid_category": {
+                                    "summary": "Invalide : cat\u00e9gorie inconnue",
+                                    "description": "R\u00e9pond 422 : la cat\u00e9gorie doit \u00eatre kitesurf, viewpoint, nature, beach, diving, heritage ou activity.",
+                                    "value": {
+                                        "name": "Lagune de Mourouk",
+                                        "description": "Une description.",
+                                        "category": "surf",
+                                        "latitude": -19.7577,
+                                        "longitude": 63.4499
+                                    }
+                                },
+                                "latitude_out_of_bounds": {
+                                    "summary": "Invalide : latitude hors de Rodrigues",
+                                    "description": "R\u00e9pond 422 : la latitude doit \u00eatre comprise entre -20.05 et -19.35.",
+                                    "value": {
+                                        "name": "Lagune de Mourouk",
+                                        "description": "Une description.",
+                                        "category": "kitesurf",
+                                        "latitude": -21.5,
+                                        "longitude": 63.4499
+                                    }
+                                },
+                                "missing_longitude": {
+                                    "summary": "Invalide : longitude manquante",
+                                    "description": "R\u00e9pond 422 : la longitude est obligatoire.",
+                                    "value": {
+                                        "name": "Lagune de Mourouk",
+                                        "description": "Une description.",
+                                        "category": "kitesurf",
+                                        "latitude": -19.7577
+                                    }
+                                },
+                                "invalid_article_url": {
+                                    "summary": "Invalide : URL d'article mal form\u00e9e",
+                                    "description": "R\u00e9pond 422 : l'URL d'article doit commencer par \"http://\", \"https://\" ou \"/\".",
+                                    "value": {
+                                        "name": "Lagune de Mourouk",
+                                        "description": "Une description.",
+                                        "category": "kitesurf",
+                                        "latitude": -19.7577,
+                                        "longitude": 63.4499,
+                                        "articleUrl": "blog/kitesurf-mourouk"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
+        "/api/admin/activity-points/{id}": {
+            "get": {
+                "operationId": "api_adminactivity-points_id_get",
+                "tags": [
+                    "AdminActivityPoint"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AdminActivityPoint resource",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminActivityPoint.jsonld-admin_activity_point.list"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "R\u00e9cup\u00e9rer un point d'activit\u00e9 (administration)",
+                "description": "Retourne le d\u00e9tail complet d'un point d'activit\u00e9 par son identifiant UUID, pour pr\u00e9-remplir le formulaire d'\u00e9dition. R\u00e9pond 404 si le point est inconnu. R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AdminActivityPoint identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "api_adminactivity-points_id_delete",
+                "tags": [
+                    "AdminActivityPoint"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AdminActivityPoint resource deleted"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Supprimer un point d'activit\u00e9 (administration)",
+                "description": "Supprime d\u00e9finitivement un point d'activit\u00e9 de la carte. R\u00e9pond 404 si le point est inconnu. R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AdminActivityPoint identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ]
+            },
+            "patch": {
+                "operationId": "api_adminactivity-points_id_patch",
+                "tags": [
+                    "AdminActivityPoint"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AdminActivityPoint resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Modifier un point d'activit\u00e9 (administration)",
+                "description": "Remplace les informations d'un point d'activit\u00e9 (nom, description, cat\u00e9gorie, coordonn\u00e9es, URL d'article). Les m\u00eames r\u00e8gles de validation qu'\u00e0 la cr\u00e9ation s'appliquent (422 en cas de violation). R\u00e9pond 404 si le point est inconnu. R\u00e9serv\u00e9 aux administrateurs (ROLE_ADMIN).",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AdminActivityPoint identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AdminActivityPoint resource",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Requ\u00eate valide",
+                                    "value": {
+                                        "name": "Lagune de Mourouk",
+                                        "description": "Spot de kitesurf r\u00e9put\u00e9, vent r\u00e9gulier toute l'ann\u00e9e.",
+                                        "category": "kitesurf",
+                                        "latitude": -19.7577,
+                                        "longitude": 63.4499,
+                                        "articleUrl": null
+                                    }
+                                },
+                                "blank_description": {
+                                    "summary": "Invalide : description vide",
+                                    "description": "R\u00e9pond 422 : la description du point est obligatoire.",
+                                    "value": {
+                                        "name": "Lagune de Mourouk",
+                                        "description": "",
+                                        "category": "kitesurf",
+                                        "latitude": -19.7577,
+                                        "longitude": 63.4499
+                                    }
+                                },
+                                "longitude_out_of_bounds": {
+                                    "summary": "Invalide : longitude hors de Rodrigues",
+                                    "description": "R\u00e9pond 422 : la longitude doit \u00eatre comprise entre 62.95 et 63.95.",
+                                    "value": {
+                                        "name": "Lagune de Mourouk",
+                                        "description": "Une description.",
+                                        "category": "kitesurf",
+                                        "latitude": -19.7577,
+                                        "longitude": 57.5
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
             }
         },
         "/api/admin/dashboard": {
@@ -9330,6 +9957,74 @@
                     }
                 ]
             },
+            "ActivityPoint.jsonld-activity_point.list": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Identifiant unique du point d'activit\u00e9 (UUID)",
+                                "example": "01961e2f-dead-7000-beef-000000000001",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "name": {
+                                "description": "Nom du point d'activit\u00e9",
+                                "example": "Lagune de Mourouk",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "description": {
+                                "description": "Description du point d'activit\u00e9",
+                                "example": "Spot de kitesurf r\u00e9put\u00e9 pour son lagon turquoise et son vent r\u00e9gulier.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "category": {
+                                "description": "Cat\u00e9gorie du point (kitesurf, viewpoint, nature, beach, diving, heritage ou activity)",
+                                "example": "kitesurf",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "latitude": {
+                                "description": "Latitude du point (bornes Rodrigues : -20.05 \u00e0 -19.35)",
+                                "example": -19.7577,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "longitude": {
+                                "description": "Longitude du point (bornes Rodrigues : 62.95 \u00e0 63.95)",
+                                "example": 63.4499,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "articleUrl": {
+                                "description": "URL d'un article li\u00e9 au point (null si aucun)",
+                                "example": "/blog/kitesurf-mourouk",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
             "AdminAccommodation.jsonld-admin_accommodation.list": {
                 "allOf": [
                     {
@@ -9413,6 +10108,74 @@
                             "hostEmail": {
                                 "description": "Email d'un membre de l'\u00e9quipe h\u00f4te (null si aucune \u00e9quipe ou aucun membre)",
                                 "example": "host@example.com",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "AdminActivityPoint.jsonld-admin_activity_point.list": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/HydraItemBaseSchema"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Identifiant unique du point d'activit\u00e9 (UUID)",
+                                "example": "01961e2f-dead-7000-beef-000000000001",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "name": {
+                                "description": "Nom du point d'activit\u00e9",
+                                "example": "Lagune de Mourouk",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "description": {
+                                "description": "Description du point d'activit\u00e9",
+                                "example": "Spot de kitesurf r\u00e9put\u00e9 pour son lagon turquoise et son vent r\u00e9gulier.",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "category": {
+                                "description": "Cat\u00e9gorie du point (kitesurf, viewpoint, nature, beach, diving, heritage ou activity)",
+                                "example": "kitesurf",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "latitude": {
+                                "description": "Latitude du point (bornes Rodrigues : -20.05 \u00e0 -19.35)",
+                                "example": -19.7577,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "longitude": {
+                                "description": "Longitude du point (bornes Rodrigues : 62.95 \u00e0 63.95)",
+                                "example": 63.4499,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "articleUrl": {
+                                "description": "URL d'un article li\u00e9 au point (null si aucun)",
+                                "example": "/blog/kitesurf-mourouk",
                                 "type": [
                                     "string",
                                     "null"
@@ -11895,6 +12658,14 @@
         {
             "name": "AdminAccommodation",
             "description": "Resource 'AdminAccommodation' operations."
+        },
+        {
+            "name": "ActivityPoint",
+            "description": "Resource 'ActivityPoint' operations."
+        },
+        {
+            "name": "AdminActivityPoint",
+            "description": "Resource 'AdminActivityPoint' operations."
         },
         {
             "name": "Conversation",
