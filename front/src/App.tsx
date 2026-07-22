@@ -32,6 +32,7 @@ const ResetPasswordPage = React.lazy(() => import('./features/auth/components/Re
 const VerifyEmailPage = React.lazy(() => import('./features/auth/components/VerifyEmailPage'));
 const SolidarityProjectsPage = React.lazy(() => import('./features/solidarityProject/components/SolidarityProjectsPage'));
 const SolidarityProjectDetailPage = React.lazy(() => import('./features/solidarityProject/components/SolidarityProjectDetailPage'));
+const DonationPage = React.lazy(() => import('./features/donation/components/DonationPage'));
 const AccommodationCalendarPage = React.lazy(() => import('./features/reservation/components/AccommodationCalendarPage'));
 const AllAccommodationsCalendarPage = React.lazy(() => import('./features/reservation/components/AllAccommodationsCalendarPage'));
 const MessagingPage = React.lazy(() => import('./features/conversation/components/MessagingPage'));
@@ -72,6 +73,7 @@ function App() {
             <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/solidarity-projects" element={<SolidarityProjectsPage />} />
             <Route path="/solidarity-projects/:id" element={<SolidarityProjectDetailPage />} />
+            <Route path="/solidarity-projects/:id/donate" element={<DonationPage />} />
             <Route path="/cgu" element={<TermsOfUsePage />} />
             <Route path="/cgv" element={<TermsOfSalePage />} />
             <Route path="/mentions-legales" element={<LegalNoticePage />} />

@@ -618,6 +618,33 @@
     },
     "location": "Rodrigues, Maurice"
   },
+  "donation": {
+    "eyebrow": "Don solidaire",
+    "title": "Faire un don",
+    "subtitle": "Votre don soutient directement « {{project}} ».",
+    "back": "Retour au projet",
+    "amountLegend": "Choisissez le montant de votre don",
+    "customLabel": "Autre montant",
+    "customPlaceholder": "Montant libre",
+    "amountHint": "Entre 1 € et 10 000 €.",
+    "continue": "Continuer",
+    "continueWithAmount": "Continuer avec {{amount}}",
+    "changeAmount": "Modifier le montant",
+    "paymentFor": "Don de {{amount}}",
+    "payLabel": "Faire un don de {{amount}}",
+    "processing": "Paiement en cours…",
+    "secure": "Paiement sécurisé par Stripe. Aucun montant n'est débité sans votre confirmation.",
+    "closed": "Ce projet est clôturé et n'accepte plus de dons. Découvrez les autres projets en cours !",
+    "loadError": "Impossible de charger le projet. Réessayez plus tard.",
+    "devAccepted": "Simuler un don accepté (dev)",
+    "success": {
+      "title": "Merci pour votre don !",
+      "message": "Votre don de {{amount}} soutient directement « {{project}} ». Merci de faire vivre les initiatives de Rodrigues.",
+      "messageNoAmount": "Votre don soutient directement « {{project}} ». Merci de faire vivre les initiatives de Rodrigues.",
+      "backToProject": "Retour au projet",
+      "allProjects": "Voir les autres projets"
+    }
+  },
   "edit": {
     "title": "Modifier l'hébergement",
     "backToDetail": "Retour à l'annonce",

@@ -11,6 +11,7 @@ import reservationReducer from '../features/reservation/ReservationSlice';
 import conversationReducer from '../features/conversation/ConversationSlice';
 import geographyReducer from '../features/geography/GeographySlice';
 import paymentReducer from '../features/payment/PaymentSlice';
+import donationReducer from '../features/donation/DonationSlice';
 import reviewReducer from '../features/review/ReviewSlice';
 import userProfileReducer from '../features/userProfile/UserProfileSlice';
 import hostProfileReducer from '../features/hostProfile/HostProfileSlice';
@@ -33,6 +34,7 @@ export const store = configureStore({
     conversation: conversationReducer,
     geography: geographyReducer,
     payment: paymentReducer,
+    donation: donationReducer,
     review: reviewReducer,
     userProfile: userProfileReducer,
     hostProfile: hostProfileReducer,

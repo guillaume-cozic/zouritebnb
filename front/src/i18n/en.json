@@ -618,6 +618,33 @@
     },
     "location": "Rodrigues, Mauritius"
   },
+  "donation": {
+    "eyebrow": "Solidarity donation",
+    "title": "Make a donation",
+    "subtitle": "Your donation directly supports \"{{project}}\".",
+    "back": "Back to the project",
+    "amountLegend": "Choose your donation amount",
+    "customLabel": "Other amount",
+    "customPlaceholder": "Free amount",
+    "amountHint": "Between €1 and €10,000.",
+    "continue": "Continue",
+    "continueWithAmount": "Continue with {{amount}}",
+    "changeAmount": "Change amount",
+    "paymentFor": "Donation of {{amount}}",
+    "payLabel": "Donate {{amount}}",
+    "processing": "Processing payment…",
+    "secure": "Payment secured by Stripe. Nothing is charged without your confirmation.",
+    "closed": "This project is closed and no longer accepts donations. Discover the other active projects!",
+    "loadError": "Could not load the project. Please try again later.",
+    "devAccepted": "Simulate an accepted donation (dev)",
+    "success": {
+      "title": "Thank you for your donation!",
+      "message": "Your donation of {{amount}} directly supports \"{{project}}\". Thank you for keeping Rodrigues' initiatives alive.",
+      "messageNoAmount": "Your donation directly supports \"{{project}}\". Thank you for keeping Rodrigues' initiatives alive.",
+      "backToProject": "Back to the project",
+      "allProjects": "See the other projects"
+    }
+  },
   "edit": {
     "title": "Edit accommodation",
     "backToDetail": "Back to listing",

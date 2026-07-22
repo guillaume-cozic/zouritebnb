@@ -440,7 +440,10 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
                   </p>
                 </div>
               </div>
-              <button className="inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 h-12 px-7 transition-all hover:shadow-lg hover:shadow-primary-200 hover:-translate-y-0.5">
+              <Link
+                to={`/solidarity-projects/${project.id}/donate`}
+                className="inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 h-12 px-7 transition-all hover:shadow-lg hover:shadow-primary-200 hover:-translate-y-0.5"
+              >
                 {t('projects.cta.button')}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -456,7 +459,7 @@ const Article: React.FC<ArticleProps> = ({ project, related }) => {
                   <path d="M5 12h14" />
                   <path d="m12 5 7 7-7 7" />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
         </div>
