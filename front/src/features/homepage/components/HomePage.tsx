@@ -238,9 +238,6 @@ const HomePage: React.FC = () => {
                   <span className="text-sm">{t('discover.nature')}</span>
                 </div>
               </div>
-              <button className="inline-flex items-center justify-center text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 h-11 rounded-xl px-8 transition-all hover:shadow-md hover:shadow-primary-200">
-                {t('discover.learnMore')}
-              </button>
             </div>
             <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl">
               <LiteYouTube
