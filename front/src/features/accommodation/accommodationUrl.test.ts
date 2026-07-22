@@ -17,8 +17,8 @@ describe('accommodationPath', () => {
     );
   });
 
-  test("retombe sur l'ancienne URL sans titre ni ville", () => {
-    expect(accommodationPath({ id: ID })).toBe(`/accommodations/${ID}`);
+  test("retombe sur l'UUID nu sans titre ni ville", () => {
+    expect(accommodationPath({ id: ID })).toBe(`/hebergements/${ID}`);
   });
 });
 

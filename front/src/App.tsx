@@ -77,9 +77,9 @@ function App() {
             <Route path="/mentions-legales" element={<LegalNoticePage />} />
             <Route path="/confidentialite" element={<PrivacyPolicyPage />} />
             <Route path="/accommodations" element={<AccommodationsListingPage />} />
-            {/* URL canonique (slug SEO + uuid) ; l'ancienne forme redirige côté client */}
+            {/* Détail d'une annonce : /hebergements/<slug>--<uuid> (l'UUID final
+                résout, le slug est purement SEO ; un UUID nu est accepté) */}
             <Route path="/hebergements/:slug" element={<AccommodationDetailPage />} />
-            <Route path="/accommodations/:id" element={<AccommodationDetailPage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/accommodations/:id/book" element={<ReservationConfirmationPage />} />
               <Route path="/reservation-confirmed" element={<ReservationSuccessPage />} />

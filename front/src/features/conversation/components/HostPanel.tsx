@@ -197,7 +197,7 @@ const HostPanel: React.FC<Props> = ({ reservation, locale, onAccept, onRefuse, b
 
       <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/50">
         <Link
-          to={`/accommodations/${reservation.accommodationId}`}
+          to={`/hebergements/${reservation.accommodationId}`}
           className="flex items-center justify-center gap-1.5 text-xs font-medium text-primary-600 hover:text-primary-700"
         >
           {t('conversation.viewAccommodation')}

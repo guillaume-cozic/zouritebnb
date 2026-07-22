@@ -32,7 +32,6 @@ const ROUTE_META: ReadonlyArray<readonly [string, RouteMeta]> = [
   ['/accommodations/:id/edit', { title: 'editAccommodation' }],
   ['/accommodations/:id/photos', { title: 'photos' }],
   ['/hebergements/:slug', { title: 'accommodation', description: 'accommodation', indexable: true }],
-  ['/accommodations/:id', { title: 'accommodation', description: 'accommodation', indexable: true }],
   ['/accommodations', { title: 'accommodations', description: 'accommodations', indexable: true }],
   ['/reservation-confirmed', { title: 'reservationConfirmed' }],
   ['/solidarity-projects/:id', { title: 'solidarityProject', description: 'solidarityProject', indexable: true }],
@@ -171,11 +170,9 @@ const Seo = () => {
     // Page de détail d'une annonce : metas spécifiques (titre, extrait de la
     // description, photo, canonical à slug) + données structurées, dès que
     // l'annonce de la route est chargée en store.
-    const detailMatch =
-      matchPath('/hebergements/:slug', pathname) ?? matchPath('/accommodations/:id', pathname);
-    const detailParams = (detailMatch?.params ?? {}) as { slug?: string; id?: string };
+    const detailMatch = matchPath('/hebergements/:slug', pathname);
     const routeAccommodationId = detailMatch
-      ? accommodationIdFromSlug(detailParams.slug ?? detailParams.id)
+      ? accommodationIdFromSlug(detailMatch.params.slug)
       : null;
     const accommodation =
       routeAccommodationId && currentAccommodation?.id?.toLowerCase() === routeAccommodationId

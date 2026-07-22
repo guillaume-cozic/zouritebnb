@@ -6,6 +6,7 @@ import Footer from '../../../components/Footer';
 import { fetchWishlist } from '../WishlistSlice';
 import { selectWishlistItems, selectWishlistStatus } from '../WishlistSelectors';
 import WishlistButton from './WishlistButton';
+import { accommodationPath } from '../../accommodation/accommodationUrl';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -61,7 +62,7 @@ const WishlistPage: React.FC = () => {
                   key={item.accommodationId}
                   className="relative flex flex-col rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1"
                 >
-                  <Link to={`/accommodations/${item.accommodationId}`} className="block aspect-video relative overflow-hidden">
+                  <Link to={accommodationPath({ id: item.accommodationId, title: item.title, city: item.city })} className="block aspect-video relative overflow-hidden">
                     {item.photoUrl ? (
                       <img
                         src={`${API_BASE}${item.photoUrl}`}
@@ -79,7 +80,7 @@ const WishlistPage: React.FC = () => {
                   <WishlistButton accommodationId={item.accommodationId} className="absolute top-3 right-3 z-10" />
 
                   <div className="p-5 flex flex-col flex-1">
-                    <Link to={`/accommodations/${item.accommodationId}`} className="font-semibold text-lg text-gray-900 group-hover:text-primary-600 transition-colors">
+                    <Link to={accommodationPath({ id: item.accommodationId, title: item.title, city: item.city })} className="font-semibold text-lg text-gray-900 group-hover:text-primary-600 transition-colors">
                       {item.title}
                     </Link>
                     <div className="flex items-center text-sm text-gray-500 mt-1">

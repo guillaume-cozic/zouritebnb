@@ -47,7 +47,7 @@ final readonly class SitemapController
             $slug = $this->slugify(trim(($row['title'] ?? '').' '.($row['city'] ?? '')));
             $paths[] = '' !== $slug
                 ? \sprintf('/hebergements/%s--%s', $slug, $row['id'])
-                : '/accommodations/'.$row['id'];
+                : '/hebergements/'.$row['id'];
         }
 
         foreach ($this->connection->fetchFirstColumn("SELECT BIN_TO_UUID(id) FROM solidarity_project WHERE status = 'active' ORDER BY id") as $id) {

@@ -17,7 +17,7 @@ import { selectAuthUser } from '../../auth/AuthSelectors';
 import LocationMap from '../../../components/LocationMap';
 import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
-import { accommodationIdFromSlug, accommodationPath } from '../accommodationUrl';
+import { accommodationIdFromSlug, accommodationPath, photoThumbnailUrl } from '../accommodationUrl';
 import { computeStayPrice } from '../pricing';
 import { fetchAccommodationAvailability } from '../../reservation/ReservationSlice';
 import { selectAccommodationAvailability } from '../../reservation/ReservationSelectors';
@@ -50,9 +50,9 @@ const SOLIDARITY_RATE = 0.07;
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const AccommodationDetailPage: React.FC = () => {
-  // Route canonique /hebergements/<slug>--<uuid> ou ancienne /accommodations/<uuid>.
-  const { id: rawId, slug } = useParams<{ id?: string; slug?: string }>();
-  const id = rawId ?? accommodationIdFromSlug(slug) ?? undefined;
+  // /hebergements/<slug>--<uuid> : seul l'UUID final compte (slug libre ou absent).
+  const { slug } = useParams<{ slug?: string }>();
+  const id = accommodationIdFromSlug(slug) ?? undefined;
   const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const accommodation = useAppSelector(selectCurrentAccommodation);
@@ -68,12 +68,12 @@ const AccommodationDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Ancienne URL /accommodations/<uuid> : basculer vers l'URL canonique à slug
-  // dès que l'annonce (titre + ville) est connue.
+  // URL non canonique (UUID nu, slug obsolète après renommage…) : basculer
+  // vers l'URL à slug dès que l'annonce (titre + ville) est connue.
   useEffect(() => {
     if (!accommodation?.id || accommodation.id !== id) return;
     const canonical = accommodationPath(accommodation);
-    if (location.pathname.startsWith('/accommodations/') && canonical.startsWith('/hebergements/')) {
+    if (location.pathname !== canonical) {
       navigate(canonical, { replace: true });
     }
   }, [accommodation, id, location.pathname, navigate]);
@@ -275,6 +275,9 @@ const AccommodationDetailPage: React.FC = () => {
                     <img
                       src={photos[0]}
                       alt={`${accommodation.title} - 1`}
+                      // Image principale = LCP de la page : téléchargée en premier.
+                      fetchPriority="high"
+                      decoding="async"
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </button>
@@ -287,8 +290,13 @@ const AccommodationDetailPage: React.FC = () => {
                           className="aspect-square rounded-xl overflow-hidden bg-gray-100 group focus:outline-none focus:ring-2 focus:ring-primary-500"
                         >
                           <img
-                            src={src}
+                            // Vignettes : miniature WebP + chargement différé,
+                            // après l'image principale. La lightbox garde les
+                            // originaux plein format.
+                            src={photoThumbnailUrl(src)}
                             alt={`${accommodation.title} - ${idx + 2}`}
+                            loading="lazy"
+                            decoding="async"
                             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </button>

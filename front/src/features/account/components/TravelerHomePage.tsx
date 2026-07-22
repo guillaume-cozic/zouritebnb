@@ -171,7 +171,7 @@ const TravelerHomePage: React.FC = () => {
                     {countdownLabel(r)}
                   </span>
                   <div className="flex items-center gap-3">
-                    <Link to={`/accommodations/${r.accommodationId}`} className="text-xs font-medium text-gray-500 hover:text-primary-700">
+                    <Link to={`/hebergements/${r.accommodationId}`} className="text-xs font-medium text-gray-500 hover:text-primary-700">
                       {t('travelerHome.viewAccommodation')}
                     </Link>
                     <Link

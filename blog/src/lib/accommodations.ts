@@ -138,5 +138,5 @@ export function accommodationPath(a: { id: string; title?: string; city?: string
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
-  return slug ? `/hebergements/${slug}--${a.id}` : `/accommodations/${a.id}`;
+  return slug ? `/hebergements/${slug}--${a.id}` : `/hebergements/${a.id}`;
 }

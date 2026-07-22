@@ -424,7 +424,7 @@ const ReservationConfirmationPage: React.FC = () => {
   // them (e.g. direct link) is a dead-end: send the user back to choose dates
   // rather than showing a form that can't be submitted.
   if (missingDates) {
-    return <Navigate to={id ? `/accommodations/${id}` : '/accommodations'} replace />;
+    return <Navigate to={id ? `/hebergements/${id}` : '/accommodations'} replace />;
   }
 
   // Stripe Elements requires a stable amount; if no nights yet, use a placeholder.

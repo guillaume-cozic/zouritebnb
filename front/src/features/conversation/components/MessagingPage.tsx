@@ -392,7 +392,7 @@ const MessagingPage: React.FC<MessagingPageProps> = ({ role }) => {
                     // Quick link to the listing from the header (the reservation panel
                     // below/aside also links to it).
                     <Link
-                      to={`/accommodations/${current.accommodationId}`}
+                      to={`/hebergements/${current.accommodationId}`}
                       className="block text-sm font-semibold text-gray-900 truncate hover:text-primary-700 transition-colors"
                     >
                       {accommodationSummaries[current.accommodationId]?.title ?? t('conversation.detailTitle')}

@@ -1,8 +1,8 @@
 /**
  * URLs publiques des annonces : `/hebergements/<slug>--<uuid>`. Le slug (titre
  * + ville) porte les mots-clés pour le SEO ; l'UUID en fin d'URL reste la seule
- * clé de résolution, donc un slug modifié ou tronqué fonctionne toujours.
- * L'ancienne forme `/accommodations/<uuid>` est conservée en redirection.
+ * clé de résolution, donc un slug modifié, tronqué ou absent (UUID nu)
+ * fonctionne toujours ; la page canonise ensuite vers la forme à slug.
  *
  * La même logique de slug existe côté API (SitemapController) et blog
  * (lib/accommodations.ts) — garder les trois synchronisées.
@@ -27,7 +27,7 @@ export const accommodationPath = (accommodation: {
 }): string => {
   if (!accommodation.id) return '/accommodations';
   const slug = slugify([accommodation.title, accommodation.city].filter(Boolean).join(' '));
-  return slug ? `/hebergements/${slug}--${accommodation.id}` : `/accommodations/${accommodation.id}`;
+  return slug ? `/hebergements/${slug}--${accommodation.id}` : `/hebergements/${accommodation.id}`;
 };
 
 /** Extrait l'UUID d'un slug d'URL `<slug>--<uuid>` (ou d'un UUID nu). */
@@ -36,3 +36,10 @@ export const accommodationIdFromSlug = (slug: string | undefined): string | null
   const match = slug.match(UUID_AT_END);
   return match ? match[1].toLowerCase() : null;
 };
+
+/**
+ * Variante miniature (~640px WebP) d'une photo, par convention de nommage —
+ * l'API retombe sur l'original si la miniature n'existe pas encore.
+ */
+export const photoThumbnailUrl = (url: string): string =>
+  url.replace(/\.[a-z0-9]+$/i, '') + '-thumb.webp';
