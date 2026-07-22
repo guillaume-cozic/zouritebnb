@@ -6,3 +6,4 @@ export const selectManagementError = (state: RootState) => state.accommodationMa
 export const selectManagementStatusFilter = (state: RootState) => state.accommodationManagement.statusFilter;
 export const selectHasAccommodation = (state: RootState) => state.accommodationManagement.hasAccommodation;
 export const selectOwnershipStatus = (state: RootState) => state.accommodationManagement.ownershipStatus;
+export const selectPublishError = (state: RootState) => state.accommodationManagement.publishError;

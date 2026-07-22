@@ -7,12 +7,14 @@ import {
   publishAccommodation,
   unpublishAccommodation,
   setStatusFilter,
+  dismissPublishError,
 } from '../AccommodationManagementSlice';
 import {
   selectManagedAccommodations,
   selectManagementStatus,
   selectManagementError,
   selectManagementStatusFilter,
+  selectPublishError,
 } from '../AccommodationManagementSelectors';
 import { StatusFilter } from '../AccommodationManagementTypes';
 import EmptyState, { HomeIcon } from '../../../components/EmptyState';
@@ -39,6 +41,7 @@ const BackofficeAccommodationsPage: React.FC = () => {
   const status = useAppSelector(selectManagementStatus);
   const error = useAppSelector(selectManagementError);
   const statusFilter = useAppSelector(selectManagementStatusFilter);
+  const publishError = useAppSelector(selectPublishError);
 
   useEffect(() => {
     dispatch(fetchAllAccommodations(statusFilter));
@@ -80,6 +83,25 @@ const BackofficeAccommodationsPage: React.FC = () => {
           </button>
         ))}
       </div>
+
+      {publishError && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+        >
+          <div className="flex items-start gap-2">
+            <span aria-hidden="true" className="mt-0.5">⚠️</span>
+            <span>{publishError}</span>
+          </div>
+          <button
+            onClick={() => dispatch(dismissPublishError())}
+            className="shrink-0 text-amber-500 hover:text-amber-700"
+            aria-label={t('common.dismiss', 'Fermer')}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {status === 'loading' && (
         <div className="text-center py-12 text-gray-500">{t('homepage.loading')}</div>

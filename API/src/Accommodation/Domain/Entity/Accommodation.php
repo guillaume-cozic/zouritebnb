@@ -21,6 +21,7 @@ use App\Accommodation\Domain\Event\AccommodationStayConstraintsUpdated;
 use App\Accommodation\Domain\Event\AccommodationTypeUpdated;
 use App\Accommodation\Domain\Event\AccommodationUnpublished;
 use App\Accommodation\Domain\Event\AccommodationWeeklyPromotionUpdated;
+use App\Accommodation\Domain\Exception\AccommodationNotPublishableException;
 use App\Accommodation\Domain\Exception\InvalidDynamicPricingException;
 use App\Accommodation\Domain\Exception\InvalidHouseRulesException;
 use App\Accommodation\Domain\Exception\InvalidPriceException;
@@ -32,6 +33,9 @@ use Symfony\Component\Uid\Uuid;
 final class Accommodation extends AggregateRoot
 {
     public const int HOUSE_RULES_NOTES_MAX_LENGTH = 1000;
+
+    /** Minimum number of photos a host must upload before an accommodation can be published. */
+    public const int MIN_PHOTOS_TO_PUBLISH = 3;
 
     public function __construct(
         private readonly Uuid $id,
@@ -107,8 +111,28 @@ final class Accommodation extends AggregateRoot
         return $this->status;
     }
 
-    public function publish(): void
+    /**
+     * @param int $photoCount number of photos in the accommodation gallery (owned by the Gallery aggregate)
+     */
+    public function publish(int $photoCount): void
     {
+        $missing = [];
+        if ('' === trim($this->title)) {
+            $missing[] = 'title';
+        }
+        if ('' === trim($this->description)) {
+            $missing[] = 'description';
+        }
+        if ($this->price <= 0) {
+            $missing[] = 'price';
+        }
+        if ($photoCount < self::MIN_PHOTOS_TO_PUBLISH) {
+            $missing[] = 'photos';
+        }
+        if ([] !== $missing) {
+            throw AccommodationNotPublishableException::becauseRequirementsNotMet($missing);
+        }
+
         $this->status = AccommodationStatus::Published;
         $this->recordEvent(new AccommodationPublished($this->id));
     }

@@ -10,12 +10,30 @@ final class PublishAccommodationTest extends AccommodationApiTestCase
     {
         $headers = $this->authenticatedOwnerHeaders();
         $id = $this->insertAccommodation('Cozy Chalet', 'A warm mountain chalet', 150.0);
+        $this->insertPhoto($id, 'a.jpg');
+        $this->insertPhoto($id, 'b.jpg');
+        $this->insertPhoto($id, 'c.jpg');
 
         self::createClient()->request('PATCH', '/api/accommodations/'.$id.'/publish', [
             'headers' => $headers,
         ]);
 
         self::assertResponseStatusCodeSame(204);
+    }
+
+    public function test_should_return_422_when_requirements_are_not_met(): void
+    {
+        $headers = $this->authenticatedOwnerHeaders();
+        // Valid title/description/price but only two photos → not publishable.
+        $id = $this->insertAccommodation('Cozy Chalet', 'A warm mountain chalet', 150.0);
+        $this->insertPhoto($id, 'a.jpg');
+        $this->insertPhoto($id, 'b.jpg');
+
+        self::createClient()->request('PATCH', '/api/accommodations/'.$id.'/publish', [
+            'headers' => $headers,
+        ]);
+
+        self::assertResponseStatusCodeSame(422);
     }
 
     public function test_should_return_401_when_not_authenticated(): void

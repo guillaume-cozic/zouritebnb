@@ -13,6 +13,9 @@ interface AccommodationManagementState {
   // Tracked separately from `items` so an active status filter can never make it a false negative.
   hasAccommodation: boolean | null;
   ownershipStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  // Message returned when a publish attempt is rejected (e.g. the listing is still incomplete).
+  // Kept separate from `error` so it never hides the accommodations table.
+  publishError: string | null;
 }
 
 const initialState: AccommodationManagementState = {
@@ -22,6 +25,7 @@ const initialState: AccommodationManagementState = {
   error: null,
   hasAccommodation: null,
   ownershipStatus: 'idle',
+  publishError: null,
 };
 
 export const fetchAllAccommodations = createAsyncThunk(
@@ -107,6 +111,9 @@ const accommodationManagementSlice = createSlice({
     setStatusFilter(state, action: PayloadAction<StatusFilter>) {
       state.statusFilter = action.payload;
     },
+    dismissPublishError(state) {
+      state.publishError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -139,9 +146,16 @@ const accommodationManagementSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload as string;
       })
+      .addCase(publishAccommodation.pending, (state) => {
+        state.publishError = null;
+      })
       .addCase(publishAccommodation.fulfilled, (state, action) => {
+        state.publishError = null;
         const item = state.items.find((a) => a.id === action.payload);
         if (item) item.status = 'published';
+      })
+      .addCase(publishAccommodation.rejected, (state, action) => {
+        state.publishError = action.payload as string;
       })
       .addCase(unpublishAccommodation.fulfilled, (state, action) => {
         const item = state.items.find((a) => a.id === action.payload);
@@ -155,5 +169,5 @@ const accommodationManagementSlice = createSlice({
   },
 });
 
-export const { setStatusFilter } = accommodationManagementSlice.actions;
+export const { setStatusFilter, dismissPublishError } = accommodationManagementSlice.actions;
 export default accommodationManagementSlice.reducer;

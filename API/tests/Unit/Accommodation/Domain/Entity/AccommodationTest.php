@@ -21,6 +21,7 @@ use App\Accommodation\Domain\Event\AccommodationPriceUpdated;
 use App\Accommodation\Domain\Event\AccommodationPublished;
 use App\Accommodation\Domain\Event\AccommodationUnpublished;
 use App\Accommodation\Domain\Event\AccommodationWeeklyPromotionUpdated;
+use App\Accommodation\Domain\Exception\AccommodationNotPublishableException;
 use App\Accommodation\Domain\Exception\InvalidPriceException;
 use App\Accommodation\Domain\Exception\InvalidWeeklyPromotionException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -124,10 +125,41 @@ final class AccommodationTest extends TestCase
     {
         $accommodation = $this->createAccommodation();
 
-        $accommodation->publish();
+        $accommodation->publish(Accommodation::MIN_PHOTOS_TO_PUBLISH);
 
         self::assertSame(AccommodationStatus::Published, $accommodation->getStatus());
         $this->assertSingleEvent($accommodation, AccommodationPublished::class);
+    }
+
+    public function test_should_not_publish_with_too_few_photos(): void
+    {
+        $accommodation = $this->createAccommodation();
+
+        $this->expectException(AccommodationNotPublishableException::class);
+
+        $accommodation->publish(Accommodation::MIN_PHOTOS_TO_PUBLISH - 1);
+    }
+
+    #[DataProvider('incompleteAccommodationProvider')]
+    public function test_should_not_publish_when_a_requirement_is_missing(string $title, string $description): void
+    {
+        $accommodation = new Accommodation(
+            id: Uuid::fromString(self::ID),
+            title: $title,
+            description: $description,
+            price: 100.0,
+        );
+
+        $this->expectException(AccommodationNotPublishableException::class);
+
+        $accommodation->publish(Accommodation::MIN_PHOTOS_TO_PUBLISH);
+    }
+
+    /** @return \Generator<string, array{string, string}> */
+    public static function incompleteAccommodationProvider(): \Generator
+    {
+        yield 'blank title' => ['   ', 'Desc'];
+        yield 'empty description' => ['Title', ''];
     }
 
     public function test_should_unpublish(): void

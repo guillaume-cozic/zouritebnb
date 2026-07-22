@@ -11,6 +11,7 @@ import accommodationManagementReducer, {
   fetchOwnsAccommodation,
   publishAccommodation,
   unpublishAccommodation,
+  dismissPublishError,
 } from './AccommodationManagementSlice';
 import api from '../../services/api';
 
@@ -131,6 +132,45 @@ describe('publishAccommodation / unpublishAccommodation', () => {
 
     const item = store.getState().accommodationManagement.items.find((a) => a.id === 'a-1');
     expect(item?.status).toBe('published');
+  });
+
+  test('un publish rejeté enregistre le message et laisse l\'hébergement en draft', async () => {
+    const store = buildStore();
+    await seedItems(store);
+
+    mockedApi.patch.mockRejectedValue({
+      response: { data: { detail: 'This accommodation cannot be published yet: it needs at least 3 photos.' } },
+    });
+    await store.dispatch(publishAccommodation('a-1'));
+
+    const state = store.getState().accommodationManagement;
+    expect(state.publishError).toBe('This accommodation cannot be published yet: it needs at least 3 photos.');
+    expect(state.items.find((a) => a.id === 'a-1')?.status).toBe('draft');
+  });
+
+  test('un publish réussi efface une erreur de publication précédente', async () => {
+    const store = buildStore();
+    await seedItems(store);
+
+    mockedApi.patch.mockRejectedValueOnce({ response: { data: { detail: 'boom' } } });
+    await store.dispatch(publishAccommodation('a-1'));
+    expect(store.getState().accommodationManagement.publishError).toBe('boom');
+
+    mockedApi.patch.mockResolvedValue({ data: {} });
+    await store.dispatch(publishAccommodation('a-1'));
+    expect(store.getState().accommodationManagement.publishError).toBeNull();
+  });
+
+  test('dismissPublishError efface le message', async () => {
+    const store = buildStore();
+    await seedItems(store);
+
+    mockedApi.patch.mockRejectedValue({ response: { data: { detail: 'boom' } } });
+    await store.dispatch(publishAccommodation('a-1'));
+    expect(store.getState().accommodationManagement.publishError).toBe('boom');
+
+    store.dispatch(dismissPublishError());
+    expect(store.getState().accommodationManagement.publishError).toBeNull();
   });
 
   test('unpublish fait passer l\'hébergement ciblé à draft dans le store', async () => {
