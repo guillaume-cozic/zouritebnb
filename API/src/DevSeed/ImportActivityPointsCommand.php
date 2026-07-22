@@ -72,7 +72,7 @@ final class ImportActivityPointsCommand extends Command
             return Command::SUCCESS;
         }
 
-        $this->em->wrapInTransaction(function (EntityManagerInterface $em) use ($points): void {
+        $this->em->wrapInTransaction(static function (EntityManagerInterface $em) use ($points): void {
             $em->createQuery(\sprintf('DELETE FROM %s', ActivityPointEntity::class))->execute();
 
             foreach ($points as $point) {
