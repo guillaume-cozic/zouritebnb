@@ -42,6 +42,28 @@ services:
     volumes:
       - php_var:/var/www/html/var
 
+  # Worker Messenger : consomme la file async (événements de domaine — emails,
+  # messages système des conversations, statuts de dons…). Sans lui, les
+  # messages s'empilent dans messenger_messages sans jamais être traités.
+  # --time-limit : le process sort proprement chaque heure et Docker le
+  # relance (mémoire fraîche, nouveau code après déploiement).
+  worker:
+    image: ${PHP_IMAGE:?PHP_IMAGE is required (e.g. ghcr.io/owner/bnb-php:sha)}
+    container_name: api-worker
+    restart: unless-stopped
+    command: ["bin/console", "messenger:consume", "async", "--time-limit=3600", "--memory-limit=128M"]
+    env_file:
+      - .env.prod.local
+    environment:
+      FRONTEND_URL: https://www.zouritebnb.com
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      # Même volume que php : les listeners écrivent dans var/uploads
+      # (photos, avatars) et doivent voir les mêmes fichiers.
+      - php_var:/var/www/html/var
+
   nginx:
     image: ${NGINX_IMAGE:?NGINX_IMAGE is required (e.g. ghcr.io/owner/bnb-nginx:sha)}
     container_name: api-nginx
