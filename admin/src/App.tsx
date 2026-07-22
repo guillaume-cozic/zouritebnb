@@ -9,6 +9,8 @@ import { ReviewsPage } from './features/reviews/components/ReviewsPage';
 import { UsersPage } from './features/users/components/UsersPage';
 import { SolidarityProjectsPage } from './features/solidarityProjects/components/SolidarityProjectsPage';
 import { SolidarityProjectFormPage } from './features/solidarityProjects/components/SolidarityProjectFormPage';
+import { ActivityPointsPage } from './features/activityPoints/components/ActivityPointsPage';
+import { ActivityPointFormPage } from './features/activityPoints/components/ActivityPointFormPage';
 
 export function App() {
   return (
@@ -30,6 +32,9 @@ export function App() {
           <Route path="solidarity-projects" element={<SolidarityProjectsPage />} />
           <Route path="solidarity-projects/new" element={<SolidarityProjectFormPage />} />
           <Route path="solidarity-projects/:id/edit" element={<SolidarityProjectFormPage />} />
+          <Route path="activity-points" element={<ActivityPointsPage />} />
+          <Route path="activity-points/new" element={<ActivityPointFormPage />} />
+          <Route path="activity-points/:id/edit" element={<ActivityPointFormPage />} />
           <Route path="users" element={<UsersPage />} />
         </Route>
       </Routes>

@@ -6,6 +6,7 @@ import accommodationsReducer from '../features/accommodations/AccommodationsSlic
 import reviewsReducer from '../features/reviews/ReviewsSlice';
 import usersReducer from '../features/users/UsersSlice';
 import solidarityProjectsReducer from '../features/solidarityProjects/SolidarityProjectsSlice';
+import activityPointsReducer from '../features/activityPoints/ActivityPointsSlice';
 import dashboardReducer from '../features/dashboard/DashboardSlice';
 
 export const store = configureStore({
@@ -16,6 +17,7 @@ export const store = configureStore({
     reviews: reviewsReducer,
     users: usersReducer,
     solidarityProjects: solidarityProjectsReducer,
+    activityPoints: activityPointsReducer,
     dashboard: dashboardReducer,
   },
 });

@@ -10,6 +10,7 @@ const navItems = [
   { to: '/accommodations', label: 'Hébergements' },
   { to: '/reviews', label: 'Avis' },
   { to: '/solidarity-projects', label: 'Projets solidaires' },
+  { to: '/activity-points', label: 'Carte des activités' },
   { to: '/users', label: 'Clients' },
 ];
 
