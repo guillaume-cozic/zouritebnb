@@ -52,6 +52,6 @@ client/node_modules/
 blog/.env
 blog/.env.development
 
-# Scraping Airbnb éphémère (scrape-rodrigues.sh) — le seed figé et commité
+# Scraping Airbnb éphémère — le seed figé et commité
 # vit dans API/src/DevSeed/data/, pas ici.
 rodrigues-*/

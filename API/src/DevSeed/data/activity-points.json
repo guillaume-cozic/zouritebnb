@@ -1,0 +1,338 @@
+[
+  {
+    "id": "5a1e7c10-0010-4c8e-9d5a-9f3b2a6c1e10",
+    "name": "Anse Ali",
+    "description": "Longue plage tranquille de la côte est, avec parking. Baignade familiale, longues marches sur le sable et snorkeling parmi les poissons tropicaux du lagon.",
+    "category": "beach",
+    "latitude": -19.691001,
+    "longitude": 63.498445
+  },
+  {
+    "id": "5a1e7c10-0011-4c8e-9d5a-9f3b2a6c1e11",
+    "name": "Anse Bouteille",
+    "description": "Petite crique préservée de la côte est, accessible à pied depuis Saint-François ou Graviers. Coraux et poissons tout près du bord ; snorkeling à privilégier à marée basse.",
+    "category": "beach",
+    "latitude": -19.717742,
+    "longitude": 63.500258
+  },
+  {
+    "id": "5a1e7c10-0012-4c8e-9d5a-9f3b2a6c1e12",
+    "name": "Anse Femi",
+    "description": "Crique isolée du sud-est aux eaux turquoise, sur le sentier côtier entre Graviers et Saint-François. Accès par piste puis marche, cadre sauvage sans aménagements.",
+    "category": "beach",
+    "latitude": -19.725928,
+    "longitude": 63.488166
+  },
+  {
+    "id": "5a1e7c10-0002-4c8e-9d5a-9f3b2a6c1e02",
+    "name": "Anse Mourouk",
+    "description": "Spot de kitesurf majeur du sud-est : lagon peu profond (1 à 2 m) et alizés side-onshore d'environ 20 nœuds de juin à janvier. Eau plate pour débuter, vagues sur le récif.",
+    "category": "kitesurf",
+    "latitude": -19.741632,
+    "longitude": 63.466666
+  },
+  {
+    "id": "5a1e7c10-0007-4c8e-9d5a-9f3b2a6c1e07",
+    "name": "Anse aux Anglais (English Bay)",
+    "description": "Plage publique à 1 km de Port Mathurin, où débarquèrent les troupes anglaises en 1809. Restaurants et maisons d'hôtes à proximité ; le lagon se découvre à marée basse.",
+    "category": "beach",
+    "latitude": -19.674474,
+    "longitude": 63.43302
+  },
+  {
+    "id": "019f895c-1462-765a-925a-b4b995ac36cf",
+    "name": "Aquarium Mourouk",
+    "description": "Aquarium naturel de la réserve marine de Port Sud-Est, à environ 15 min en bateau de Mourouk. Snorkeling peu profond parmi carangues, poulpes et parfois tortues.",
+    "category": "diving",
+    "latitude": -19.755395,
+    "longitude": 63.469906
+  },
+  {
+    "id": "019f895b-9987-7827-972f-923e2b4e2d8d",
+    "name": "Aquarium Rivière Banane",
+    "description": "Zone corallienne protégée de la réserve marine de Rivière Banane, accessible en bateau. Snorkeling sur des coraux bien préservés : poissons-clowns, poulpes et raies.",
+    "category": "diving",
+    "latitude": -19.67599,
+    "longitude": 63.476118
+  },
+  {
+    "id": "019f8954-40c9-769e-8926-ffd699efa7bf",
+    "name": "Camp mapou",
+    "description": "Hameau rural des hauteurs de l'ouest de Rodrigues, nommé d'après le mapou, arbre du pays. Point de départ de balades entre plaines herbeuses et points de vue sur le lagon ouest.",
+    "category": "nature",
+    "latitude": -19.748238,
+    "longitude": 63.338499
+  },
+  {
+    "id": "019f8951-d126-780a-8a1f-86d8dd1975ef",
+    "name": "Cascade Victoire",
+    "description": "Chute d'eau au cœur d'une vallée verdoyante qui descend vers le lagon, accessible à pied depuis Sainte-Famille. Falaises et végétation luxuriante en font un but de randonnée apprécié.",
+    "category": "viewpoint",
+    "latitude": -19.72204,
+    "longitude": 63.450133
+  },
+  {
+    "id": "019f8925-2e81-7314-9045-5df54213f95e",
+    "name": "Cathédrale Saint Gabriel",
+    "description": "Cathédrale bâtie de 1936 à 1939 par les paroissiens, qui ont porté à dos sable et blocs de corail depuis la côte. L'une des plus grandes églises de l'océan Indien.",
+    "category": "heritage",
+    "latitude": -19.717929,
+    "longitude": 63.438293
+  },
+  {
+    "id": "5a1e7c10-0015-4c8e-9d5a-9f3b2a6c1e15",
+    "name": "Caverne Patate",
+    "description": "Grotte calcaire d'environ 700 m ornée de stalactites et stalagmites, la plus longue de l'île. Visite guidée uniquement, casque fourni, quatre départs par jour.",
+    "category": "heritage",
+    "latitude": -19.755274,
+    "longitude": 63.38665
+  },
+  {
+    "id": "019f892f-e345-7467-96e4-670ee7b387db",
+    "name": "Descente  Kite surf Mourouk vers l'île au chat",
+    "description": "Parcours downwind d'environ 9 km dans le lagon, de la plage de Mourouk à l'île aux Chats en longeant la barrière de corail. Comptez environ 2 h de navigation.",
+    "category": "kitesurf",
+    "latitude": -19.77364,
+    "longitude": 63.434737
+  },
+  {
+    "id": "019f895d-a103-7937-9454-86fae551ef7e",
+    "name": "Descente Kitesurf Mourouk vers Petite Bute",
+    "description": "Parcours downwind dans le lagon au départ de Mourouk vers Petite Butte, à l'ouest : eau plate entre les îlots, alizés de sud-est réguliers. Navigation accompagnée conseillée.",
+    "category": "kitesurf",
+    "latitude": -19.7518,
+    "longitude": 63.397422
+  },
+  {
+    "id": "5a1e7c10-0013-4c8e-9d5a-9f3b2a6c1e13",
+    "name": "Graviers",
+    "description": "Plage sauvage de la côte est, point de départ du sentier côtier de 5 km vers Trou d'Argent et Saint-François. Baignade, pique-nique et criques préservées en chemin.",
+    "category": "beach",
+    "latitude": -19.727867,
+    "longitude": 63.483167
+  },
+  {
+    "id": "019f8932-7869-701a-9bfb-508620779c58",
+    "name": "Ile Hermitage",
+    "description": "Petit îlot boisé du lagon sud, proche de l'île aux Chats, où la légende situe un trésor de pirates. Accessible en bateau, avec baignade et snorkeling dans les eaux alentour.",
+    "category": "viewpoint",
+    "latitude": -19.751881,
+    "longitude": 63.442676
+  },
+  {
+    "id": "019f8953-66a9-7281-9b42-45dd80193e43",
+    "name": "Jardin 5 sens",
+    "description": "Premier jardin botanique de Rodrigues, dédié aux plantes endémiques, médicinales et aromatiques. Visite guidée d'environ une heure, avec dégustation d'infusions et de pâtisseries locales.",
+    "category": "nature",
+    "latitude": -19.716176,
+    "longitude": 63.457879
+  },
+  {
+    "id": "019f892e-6212-7055-a245-11445b8cd116",
+    "name": "La Chapelle Saint Jean l'Evangeliste",
+    "description": "Chapelle catholique construite en 2012 à Baie Topaze, annexe de la paroisse Saint-Esprit. Messe hebdomadaire le samedi et temps de prière mensuel animés par la communauté locale.",
+    "category": "heritage",
+    "latitude": -19.738486,
+    "longitude": 63.349448
+  },
+  {
+    "id": "019f8931-e801-7bd3-84de-4ac2483d5905",
+    "name": "Le poullailer",
+    "description": "Spot de kitesurf local du lagon sud-est, entre Mourouk et Graviers. Eau turquoise peu profonde et alizés réguliers d'avril à novembre, comme sur les spots voisins de l'anse Mourouk.",
+    "category": "kitesurf",
+    "latitude": -19.76741,
+    "longitude": 63.461666
+  },
+  {
+    "id": "019f896e-03a0-7090-8d10-3a71395a11ff",
+    "name": "Mangrove",
+    "description": "Zone de mangrove de la côte nord-ouest, replantée en palétuviers pour freiner l'érosion du littoral et abriter les juvéniles de poissons du lagon. Observation facile à marée basse.",
+    "category": "nature",
+    "latitude": -19.696829,
+    "longitude": 63.389611
+  },
+  {
+    "id": "019f896e-7b8c-780c-8ad7-781168f00f53",
+    "name": "Mangrove",
+    "description": "Palétuviers issus des campagnes de replantation menées à Rodrigues, en bordure du lagon nord-ouest. Ils stabilisent la côte et servent de nurserie aux poissons et crustacés.",
+    "category": "nature",
+    "latitude": -19.687728,
+    "longitude": 63.399138
+  },
+  {
+    "id": "5a1e7c10-0003-4c8e-9d5a-9f3b2a6c1e03",
+    "name": "Mont Limon",
+    "description": "Point culminant de Rodrigues (389 à 398 m selon les sources), au centre-est de l'île. Un kiosque au sommet offre un large panorama sur les vallées et le lagon, accès par un court sentier.",
+    "category": "viewpoint",
+    "latitude": -19.706587,
+    "longitude": 63.446603
+  },
+  {
+    "id": "019f892d-201d-7c92-a8f6-68d48215a5d4",
+    "name": "Montagne chérie",
+    "description": "Point de vue du sud-est dominant le lagon de Mourouk, avec ses kitesurfeurs et ses bancs de sable à marée basse. Point de départ de randonnées le long de la côte sud-est.",
+    "category": "viewpoint",
+    "latitude": -19.731119,
+    "longitude": 63.467803
+  },
+  {
+    "id": "019f8929-2cbf-7c14-82f2-7c6eeaaa1c89",
+    "name": "Musée de Rodrigues",
+    "description": "Musée ouvert en 2025 près de Port Mathurin, consacré à l'histoire de Rodrigues, sa faune et sa flore, et à la participation des Rodriguais aux deux guerres mondiales.",
+    "category": "heritage",
+    "latitude": -19.67797,
+    "longitude": 63.427763
+  },
+  {
+    "id": "019f8963-9302-7b52-8c16-6520c65c8a29",
+    "name": "Passe Saint François",
+    "description": "Passe naturelle creusée dans le récif, plongée dérivante de 6 à 30 m sur environ 1 km. Courants soutenus, carangues et barracudas ; réservée aux plongeurs expérimentés.",
+    "category": "diving",
+    "latitude": -19.69993,
+    "longitude": 63.502564
+  },
+  {
+    "id": "019f8952-c54a-761d-802e-41f58310c352",
+    "name": "Plage de Grand Baie",
+    "description": "Plage publique du village de Grand Baie, au nord-est de l'île. Eaux calmes propices à la baignade et au snorkeling, restaurants créoles à proximité.",
+    "category": "beach",
+    "latitude": -19.673424,
+    "longitude": 63.448491
+  },
+  {
+    "id": "019f8928-10b9-701e-b4a2-8d080c7714d6",
+    "name": "Plage de Mourouk",
+    "description": "Plage du sud bordant un vaste lagon peu profond balayé par les alizés, spot de kitesurf réputé pour tous niveaux avec plusieurs écoles installées sur place.",
+    "category": "beach",
+    "latitude": -19.741707,
+    "longitude": 63.46798
+  },
+  {
+    "id": "019f8927-8f23-7023-8854-c4465d50553a",
+    "name": "Plage de Saint François",
+    "description": "Plage de sable blanc ombragée de filaos sur la côte est, aux eaux calmes. Point de départ du sentier côtier vers Trou d'Argent et Anse Bouteille.",
+    "category": "beach",
+    "latitude": -19.701102,
+    "longitude": 63.496084
+  },
+  {
+    "id": "019f892f-147c-72bf-9689-b371f78ca9f6",
+    "name": "Plage de l'ile au chat",
+    "description": "Îlot sauvage du lagon sud, accessible en bateau depuis Graviers (environ 45 min). Plage déserte et snorkeling sur les coraux, souvent combiné avec l'île Hermitage.",
+    "category": "beach",
+    "latitude": -19.773029,
+    "longitude": 63.434688
+  },
+  {
+    "id": "019f896c-3b9b-7029-ba0e-d60ce15e8cba",
+    "name": "Plongée Bouteille Anse aux Anglais",
+    "description": "Base de plongée bouteille de la côte nord, près de Port Mathurin. Baptêmes sur le jardin de corail de la baie, puis tombants et récifs de coraux durs hors du lagon.",
+    "category": "diving",
+    "latitude": -19.673838,
+    "longitude": 63.434291
+  },
+  {
+    "id": "019f8969-e0eb-7b66-982f-480ec29dfddc",
+    "name": "Plongée Bouteille Mourouk",
+    "description": "Plongée bouteille au départ de Mourouk avec le centre Bouba Diving, face à la Grande Passe : tombants, grottes et jardins de corail dans une zone marine protégée.",
+    "category": "diving",
+    "latitude": -19.741627,
+    "longitude": 63.465968
+  },
+  {
+    "id": "5a1e7c10-0001-4c8e-9d5a-9f3b2a6c1e01",
+    "name": "Pointe Coton",
+    "description": "Grande plage de sable blanc de la côte est, bordée de filaos et de rochers coralliens. Point de départ du sentier littoral menant à Trou d'Argent.",
+    "category": "beach",
+    "latitude": -19.684213,
+    "longitude": 63.495655
+  },
+  {
+    "id": "019f896d-8158-7c18-8ec2-28d594cb81d1",
+    "name": "Pointe au diable",
+    "description": "Pointe de la côte ouest avec vue sur le lagon et les mangroves, où les pêcheurs font sécher le poulpe. Point d'embarquement pour l'île aux Cocos.",
+    "category": "viewpoint",
+    "latitude": -19.702718,
+    "longitude": 63.377627
+  },
+  {
+    "id": "019f8a04-8333-795b-a0e9-f476682864e6",
+    "name": "Pont suspendu",
+    "description": "Pont suspendu d'environ 130 m enjambant la ravine de Cascade Pistaches à 40 m de hauteur, aménagé par l'équipe de Tyrodrig, qui exploite aussi des tyroliennes voisines.",
+    "category": "activity",
+    "latitude": -19.722828,
+    "longitude": 63.370825
+  },
+  {
+    "id": "5a1e7c10-0017-4c8e-9d5a-9f3b2a6c1e17",
+    "name": "Port Mathurin",
+    "description": "Capitale administrative de Rodrigues, connue pour son marché du samedi matin (fruits, poissons, artisanat). Rues à maisons créoles, musée et front de mer.",
+    "category": "heritage",
+    "latitude": -19.679753,
+    "longitude": 63.423412
+  },
+  {
+    "id": "5a1e7c10-0008-4c8e-9d5a-9f3b2a6c1e08",
+    "name": "Rivière Banane",
+    "description": "Baie paisible de la côte nord-est, en réserve marine. Son « Aquarium naturel », accessible en bateau avec les pêcheurs, abrite coraux préservés, poissons-clowns et poulpes.",
+    "category": "beach",
+    "latitude": -19.676934,
+    "longitude": 63.475158
+  },
+  {
+    "id": "019f892a-f181-7897-ad1c-d65fc618f81d",
+    "name": "Route des 52 contours",
+    "description": "Route en lacets célèbre pour ses 52 virages, reliant les hauteurs de l'île à Port Sud-Est. Ses courbes offrent des vues plongeantes sur le lagon sud-est.",
+    "category": "viewpoint",
+    "latitude": -19.730392,
+    "longitude": 63.440412
+  },
+  {
+    "id": "5a1e7c10-0006-4c8e-9d5a-9f3b2a6c1e06",
+    "name": "Réserve François Leguat",
+    "description": "Réserve abritant plus de 3 000 tortues géantes d'Aldabra et radiées, et un réseau de grottes calcaires dont la Grande Caverne (500 m), visitable avec guide.",
+    "category": "nature",
+    "latitude": -19.755657,
+    "longitude": 63.370171
+  },
+  {
+    "id": "5a1e7c10-0005-4c8e-9d5a-9f3b2a6c1e05",
+    "name": "Réserve Grande Montagne",
+    "description": "Vestige de forêt indigène restauré par la Mauritian Wildlife Foundation : plantes endémiques, foudi et fauvette de Rodrigues, roussette dorée. Sentiers et écotours guidés.",
+    "category": "nature",
+    "latitude": -19.705627,
+    "longitude": 63.463125
+  },
+  {
+    "id": "019f8930-b6f1-77ef-abf3-68727224da30",
+    "name": "Skatepark",
+    "description": "Spot de kitesurf du lagon de Mourouk, face au Bakwa Lodge : plan d'eau peu profond mêlant sections lisses et petites vagues reformées, apprécié en freestyle.",
+    "category": "kitesurf",
+    "latitude": -19.735643,
+    "longitude": 63.48866
+  },
+  {
+    "id": "019f896f-6141-781a-8cbe-c42f88316363",
+    "name": "Trou d'argent",
+    "description": "Crique sauvage de la côte est encadrée de falaises, accessible à pied par le sentier côtier Graviers–Saint-François. Une légende y situe un trésor de pirate.",
+    "category": "beach",
+    "latitude": -19.713551,
+    "longitude": 63.501143
+  },
+  {
+    "id": "019f8a06-01da-7125-a997-e2f2853ef6c4",
+    "name": "Tyrolienne",
+    "description": "Parcours de tyroliennes Tyrodrig au-dessus des vallées de Mourouk : câbles de 100 à 420 m suspendus jusqu'à 120 m du sol, accessibles dès le jeune âge.",
+    "category": "activity",
+    "latitude": -19.722777,
+    "longitude": 63.455679
+  },
+  {
+    "id": "5a1e7c10-0014-4c8e-9d5a-9f3b2a6c1e14",
+    "name": "Île aux Cocos",
+    "description": "Îlot-réserve ornithologique à l'ouest du lagon où nichent sternes et noddis (environ 4 500 oiseaux). Excursion en bateau réglementée, avec guide et permis d'accès.",
+    "category": "nature",
+    "latitude": -19.722514,
+    "longitude": 63.299189
+  }
+]
