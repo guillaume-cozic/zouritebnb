@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 're
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { tileA11yHandlers } from '../../../components/leafletA11y';
+import { accommodationPath } from '../../accommodation/accommodationUrl';
 import { AccommodationListItem, MapBounds } from '../HomepageTypes';
 import {
   RODRIGUES_BOUNDS_VISCOSITY,
@@ -206,7 +207,7 @@ const AccommodationsMap: React.FC<AccommodationsMapProps> = ({
             >
               <Popup>
                 <Link
-                  to={`/accommodations/${item.id}`}
+                  to={accommodationPath(item)}
                   className="block no-underline text-inherit"
                   style={{ minWidth: 200 }}
                 >

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AccommodationListItem } from '../HomepageTypes';
+import { accommodationPath } from '../../accommodation/accommodationUrl';
 import RatingBadge from '../../review/components/RatingBadge';
 import WishlistButton from '../../wishlist/components/WishlistButton';
 
@@ -70,7 +71,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
       {/* Wishlist heart (over the photo, above the card-wide link) */}
       <WishlistButton accommodationId={accommodation.id} className="absolute top-3 right-3 z-10" />
       {/* Image */}
-      <Link to={`/accommodations/${accommodation.id}`} className="block aspect-video relative overflow-hidden cursor-pointer">
+      <Link to={accommodationPath(accommodation)} className="block aspect-video relative overflow-hidden cursor-pointer">
         {absolutePhotos.length > 0 ? (
           <>
             {absolutePhotos.slice(0, maxRevealed + 1).map((src, i) => (
@@ -179,7 +180,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, on
             )}
           </div>
           <Link
-            to={`/accommodations/${accommodation.id}`}
+            to={accommodationPath(accommodation)}
             className="inline-flex items-center gap-1.5 rounded-xl text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 h-10 px-5 transition-all hover:shadow-md hover:shadow-primary-200"
           >
             {t('homepage.viewDetails')}

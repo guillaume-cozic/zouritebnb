@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { fr } from 'date-fns/locale/fr';
@@ -17,6 +17,7 @@ import { selectAuthUser } from '../../auth/AuthSelectors';
 import LocationMap from '../../../components/LocationMap';
 import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
+import { accommodationIdFromSlug, accommodationPath } from '../accommodationUrl';
 import { computeStayPrice } from '../pricing';
 import { fetchAccommodationAvailability } from '../../reservation/ReservationSlice';
 import { selectAccommodationAvailability } from '../../reservation/ReservationSelectors';
@@ -49,7 +50,9 @@ const SOLIDARITY_RATE = 0.07;
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const AccommodationDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  // Route canonique /hebergements/<slug>--<uuid> ou ancienne /accommodations/<uuid>.
+  const { id: rawId, slug } = useParams<{ id?: string; slug?: string }>();
+  const id = rawId ?? accommodationIdFromSlug(slug) ?? undefined;
   const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const accommodation = useAppSelector(selectCurrentAccommodation);
@@ -63,6 +66,17 @@ const AccommodationDetailPage: React.FC = () => {
   const reviews = useAppSelector(selectAccommodationReviews);
   const availability = useAppSelector(selectAccommodationAvailability);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Ancienne URL /accommodations/<uuid> : basculer vers l'URL canonique à slug
+  // dès que l'annonce (titre + ville) est connue.
+  useEffect(() => {
+    if (!accommodation?.id || accommodation.id !== id) return;
+    const canonical = accommodationPath(accommodation);
+    if (location.pathname.startsWith('/accommodations/') && canonical.startsWith('/hebergements/')) {
+      navigate(canonical, { replace: true });
+    }
+  }, [accommodation, id, location.pathname, navigate]);
 
   // Booked nights → date intervals the picker disables and strikes through.
   // A range covers checkIn..(checkOut - 1): the departure day stays bookable for a new arrival.

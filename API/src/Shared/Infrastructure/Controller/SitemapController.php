@@ -41,8 +41,13 @@ final readonly class SitemapController
 
         // SQL brut plutôt que les repositories des modules : Shared ne doit
         // dépendre d'aucun module (règle phparkitect).
-        foreach ($this->connection->fetchFirstColumn("SELECT BIN_TO_UUID(id) FROM accommodation WHERE status = 'published' ORDER BY id") as $id) {
-            $paths[] = '/accommodations/'.$id;
+        // URL canonique des annonces : /hebergements/<slug>--<uuid> — même
+        // convention que le front (accommodationUrl.ts) et le blog.
+        foreach ($this->connection->fetchAllAssociative("SELECT BIN_TO_UUID(id) AS id, title, city FROM accommodation WHERE status = 'published' ORDER BY id") as $row) {
+            $slug = $this->slugify(trim(($row['title'] ?? '').' '.($row['city'] ?? '')));
+            $paths[] = '' !== $slug
+                ? \sprintf('/hebergements/%s--%s', $slug, $row['id'])
+                : '/accommodations/'.$row['id'];
         }
 
         foreach ($this->connection->fetchFirstColumn("SELECT BIN_TO_UUID(id) FROM solidarity_project WHERE status = 'active' ORDER BY id") as $id) {
@@ -64,5 +69,27 @@ final readonly class SitemapController
             'Content-Type' => 'application/xml; charset=UTF-8',
             'Cache-Control' => 'public, max-age=3600',
         ]);
+    }
+
+    /**
+     * Slug identique à celui du front (accommodationUrl.ts) : minuscules,
+     * accents français translittérés, tout le reste en tirets.
+     */
+    private function slugify(string $value): string
+    {
+        $value = mb_strtolower($value, 'UTF-8');
+        $value = strtr($value, [
+            'œ' => 'oe', 'æ' => 'ae',
+            'à' => 'a', 'â' => 'a', 'ä' => 'a', 'á' => 'a', 'ã' => 'a',
+            'ç' => 'c',
+            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
+            'î' => 'i', 'ï' => 'i', 'í' => 'i',
+            'ô' => 'o', 'ö' => 'o', 'ó' => 'o', 'õ' => 'o',
+            'ù' => 'u', 'û' => 'u', 'ü' => 'u', 'ú' => 'u',
+            'ÿ' => 'y', 'ñ' => 'n',
+        ]);
+        $value = (string) preg_replace('/[^a-z0-9]+/', '-', $value);
+
+        return trim($value, '-');
     }
 }

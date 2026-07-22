@@ -1,5 +1,5 @@
 ---
-import type { Accommodation } from '../lib/accommodations';
+import { accommodationPath, type Accommodation } from '../lib/accommodations';
 import type { Lang } from '../lib/i18n';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 const { accommodation: a, lang } = Astro.props;
 
 const frontUrl = (import.meta.env.PUBLIC_FRONT_URL ?? '/').replace(/\/$/, '');
-const href = `${frontUrl}/accommodations/${a.id}`;
+const href = `${frontUrl}${accommodationPath(a)}`;
 
 const typeLabels: Record<string, Record<string, string>> = {
   fr: { house: 'Maison', apartment: 'Appartement', room: 'Chambre', bungalow: 'Bungalow', villa: 'Villa', studio: 'Studio' },

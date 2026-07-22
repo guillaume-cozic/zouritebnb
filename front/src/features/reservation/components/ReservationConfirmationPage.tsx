@@ -15,6 +15,7 @@ import { createPaymentIntent } from '../../payment/PaymentSlice';
 import { Accommodation } from '../../accommodation/AccommodationTypes';
 import { AuthUser } from '../../auth/AuthTypes';
 import Footer from '../../../components/Footer';
+import { accommodationPath } from '../../accommodation/accommodationUrl';
 import stripePromise from '../../../services/stripe';
 
 const PLATFORM_COMMISSION_RATE = 0.08;
@@ -328,7 +329,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
       <div className="flex justify-end gap-2">
         <Link
-          to={accommodation?.id ? `/accommodations/${accommodation.id}` : '/accommodations'}
+          to={accommodation?.id ? accommodationPath(accommodation) : '/accommodations'}
           className="inline-flex items-center justify-center h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           {t('request.cancel')}
@@ -440,7 +441,7 @@ const ReservationConfirmationPage: React.FC = () => {
     <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-gradient-to-b from-primary-50/30 via-white to-white">
       <div className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Link
-          to={accommodation?.id ? `/accommodations/${accommodation.id}` : '/accommodations'}
+          to={accommodation?.id ? accommodationPath(accommodation) : '/accommodations'}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-primary-700 mb-6"
         >
           <svg

@@ -1,6 +1,13 @@
 import { useEffect } from 'react';
 import { useLocation, matchPath } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '../store/hooks';
+import { selectCurrentAccommodation } from '../features/accommodation/AccommodationSelectors';
+import { accommodationIdFromSlug, accommodationPath } from '../features/accommodation/accommodationUrl';
+import { Accommodation } from '../features/accommodation/AccommodationTypes';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const DEFAULT_OG_IMAGE = 'https://www.zouritebnb.com/logo512.png';
 
 /**
  * Per-route <head> management: title, meta description, robots, canonical and
@@ -24,6 +31,7 @@ const ROUTE_META: ReadonlyArray<readonly [string, RouteMeta]> = [
   ['/accommodations/:id/book', { title: 'book' }],
   ['/accommodations/:id/edit', { title: 'editAccommodation' }],
   ['/accommodations/:id/photos', { title: 'photos' }],
+  ['/hebergements/:slug', { title: 'accommodation', description: 'accommodation', indexable: true }],
   ['/accommodations/:id', { title: 'accommodation', description: 'accommodation', indexable: true }],
   ['/accommodations', { title: 'accommodations', description: 'accommodations', indexable: true }],
   ['/reservation-confirmed', { title: 'reservationConfirmed' }],
@@ -88,9 +96,63 @@ const setCanonical = (href: string | null): void => {
   el.href = href;
 };
 
+const setJsonLd = (data: object | null): void => {
+  let el = document.head.querySelector<HTMLScriptElement>('script[data-seo-jsonld]');
+  if (!data) {
+    el?.remove();
+    return;
+  }
+  if (!el) {
+    el = document.createElement('script');
+    el.type = 'application/ld+json';
+    el.setAttribute('data-seo-jsonld', '');
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(data);
+};
+
+const absoluteUrl = (url: string): string => (url.startsWith('http') ? url : `${API_BASE}${url}`);
+
+const excerpt = (text: string | undefined, max = 155): string =>
+  (text ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
+
+/** Données structurées schema.org de l'annonce (résultats enrichis Google). */
+const accommodationJsonLd = (a: Accommodation, canonical: string): object => ({
+  '@context': 'https://schema.org',
+  '@type': 'VacationRental',
+  name: a.title,
+  description: excerpt(a.description, 300),
+  url: canonical,
+  image: (a.photos ?? []).slice(0, 8).map((p) => absoluteUrl(p.url)),
+  address: {
+    '@type': 'PostalAddress',
+    ...(a.city ? { addressLocality: a.city } : {}),
+    addressCountry: 'MU',
+  },
+  ...(a.latitude != null && a.longitude != null
+    ? { geo: { '@type': 'GeoCoordinates', latitude: a.latitude, longitude: a.longitude } }
+    : {}),
+  ...(a.maxGuests != null
+    ? { occupancy: { '@type': 'QuantitativeValue', value: a.maxGuests } }
+    : {}),
+  ...(a.price != null
+    ? { offers: { '@type': 'Offer', price: a.price, priceCurrency: 'EUR' } }
+    : {}),
+  ...(a.averageRating != null && (a.reviewCount ?? 0) > 0
+    ? {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: a.averageRating,
+          reviewCount: a.reviewCount,
+        },
+      }
+    : {}),
+});
+
 const Seo = () => {
   const { pathname } = useLocation();
   const { t, i18n } = useTranslation();
+  const currentAccommodation = useAppSelector(selectCurrentAccommodation);
 
   useEffect(() => {
     document.documentElement.lang = i18n.language.startsWith('fr') ? 'fr' : 'en';
@@ -98,17 +160,44 @@ const Seo = () => {
     const brand = t('meta.brand');
     const match = ROUTE_META.find(([pattern]) => matchPath(pattern, pathname));
     const meta = match ? match[1] : NOT_FOUND_META;
-    const title =
+    let title =
       pathname === '/'
         ? `${brand} — ${t('meta.titles.home')}`
         : `${t(`meta.titles.${meta.title}`)} · ${brand}`;
-    const description = t(`meta.descriptions.${meta.description ?? 'default'}`);
-    const canonical = meta.indexable ? `${window.location.origin}${pathname}` : null;
+    let description = t(`meta.descriptions.${meta.description ?? 'default'}`);
+    let canonical = meta.indexable ? `${window.location.origin}${pathname}` : null;
+    let ogImage = DEFAULT_OG_IMAGE;
+
+    // Page de détail d'une annonce : metas spécifiques (titre, extrait de la
+    // description, photo, canonical à slug) + données structurées, dès que
+    // l'annonce de la route est chargée en store.
+    const detailMatch =
+      matchPath('/hebergements/:slug', pathname) ?? matchPath('/accommodations/:id', pathname);
+    const detailParams = (detailMatch?.params ?? {}) as { slug?: string; id?: string };
+    const routeAccommodationId = detailMatch
+      ? accommodationIdFromSlug(detailParams.slug ?? detailParams.id)
+      : null;
+    const accommodation =
+      routeAccommodationId && currentAccommodation?.id?.toLowerCase() === routeAccommodationId
+        ? currentAccommodation
+        : null;
+
+    if (accommodation?.title) {
+      title = `${accommodation.title} — ${accommodation.city ?? 'Rodrigues'} · ${brand}`;
+      description = excerpt(accommodation.description) || description;
+      canonical = `${window.location.origin}${accommodationPath(accommodation)}`;
+      const photo = accommodation.photos?.[0]?.url;
+      if (photo) ogImage = absoluteUrl(photo);
+      setJsonLd(accommodationJsonLd(accommodation, canonical));
+    } else {
+      setJsonLd(null);
+    }
 
     document.title = title;
     setMeta('name', 'description', description);
     setMeta('property', 'og:title', title);
     setMeta('property', 'og:description', description);
+    setMeta('property', 'og:image', ogImage);
     setCanonical(canonical);
     if (canonical) {
       setMeta('property', 'og:url', canonical);
@@ -117,7 +206,7 @@ const Seo = () => {
       removeMeta('property', 'og:url');
       setMeta('name', 'robots', 'noindex');
     }
-  }, [pathname, t, i18n.language]);
+  }, [pathname, t, i18n.language, currentAccommodation]);
 
   return null;
 };

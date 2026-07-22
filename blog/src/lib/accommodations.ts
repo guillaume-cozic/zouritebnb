@@ -121,3 +121,22 @@ export async function accommodationsInZone(zoneSlug: string): Promise<Accommodat
     .filter((a) => a.zoneSlug === zoneSlug)
     .sort((a, b) => b.reviewCount - a.reviewCount || a.price - b.price);
 }
+
+/**
+ * Chemin public d'une annonce sur le front : /hebergements/<slug>--<uuid>.
+ * Même convention de slug que le front (accommodationUrl.ts) et l'API
+ * (SitemapController) — l'UUID final reste la clé de résolution.
+ */
+export function accommodationPath(a: { id: string; title?: string; city?: string }): string {
+  const slug = [a.title, a.city]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+    .replace(/œ/g, 'oe')
+    .replace(/æ/g, 'ae')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slug ? `/hebergements/${slug}--${a.id}` : `/accommodations/${a.id}`;
+}

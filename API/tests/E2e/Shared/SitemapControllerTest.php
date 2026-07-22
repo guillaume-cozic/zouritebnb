@@ -37,7 +37,7 @@ final class SitemapControllerTest extends ApiTestCase
         self::assertStringContainsString("<loc>{$frontendUrl}/solidarity-projects</loc>", $xml);
         self::assertStringContainsString("<loc>{$frontendUrl}/mentions-legales</loc>", $xml);
 
-        self::assertStringContainsString("/accommodations/{$published}</loc>", $xml);
+        self::assertStringContainsString("/hebergements/villa-published--{$published}</loc>", $xml);
         self::assertStringNotContainsString($draft, $xml);
         self::assertStringContainsString("/solidarity-projects/{$active}</loc>", $xml);
         self::assertStringNotContainsString($closed, $xml);
