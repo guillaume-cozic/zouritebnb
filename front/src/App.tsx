@@ -84,6 +84,9 @@ function App() {
             {/* Détail d'une annonce : /hebergements/<slug>--<uuid> (l'UUID final
                 résout, le slug est purement SEO ; un UUID nu est accepté) */}
             <Route path="/hebergements/:slug" element={<AccommodationDetailPage />} />
+            {/* Publique : un futur hôte peut découvrir le formulaire sans compte ;
+                la connexion n'est exigée qu'à la soumission de la première étape. */}
+            <Route path="/create" element={<CreateAccommodationWizard />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/accommodations/:id/book" element={<ReservationConfirmationPage />} />
               <Route path="/reservation-confirmed" element={<ReservationSuccessPage />} />
@@ -96,7 +99,6 @@ function App() {
             <Route path="/conversations" element={<Navigate to="/account/conversations" replace />} />
             <Route path="/conversations/:id" element={<Navigate to="/account/conversations" replace />} />
             <Route element={<ProtectedRoute />}>
-              <Route path="/create" element={<CreateAccommodationWizard />} />
               <Route element={<BackofficeLayout />}>
                 <Route path="/admin" element={<HostHomePage />} />
                 {/* Pages useless without a listing: gated behind owning ≥1 accommodation */}

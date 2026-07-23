@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import WizardNavigation from '../../../components/WizardNavigation';
@@ -8,6 +9,8 @@ import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { createAccommodation } from '../AccommodationSlice';
 import { selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
+import { selectAuthUser } from '../../auth/AuthSelectors';
+import { hasRenewableSession } from '../../../services/api';
 import { PLATFORM_COMMISSION_RATE, SOLIDARITY_RATE } from '../../../constants/pricing';
 
 const getSchema = (t: TFunction) => z.object({
@@ -28,6 +31,8 @@ type FormData = z.infer<ReturnType<typeof getSchema>>;
 function DescriptionStep() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const user = useAppSelector(selectAuthUser);
   const status = useAppSelector(selectAccommodationStatus);
   const apiError = useAppSelector(selectAccommodationError);
   const isLoading = status === 'loading';
@@ -42,7 +47,13 @@ function DescriptionStep() {
     resolver: zodResolver(schema),
   });
 
+  // La page est publique : un visiteur peut découvrir le formulaire, mais la
+  // création exige un compte — on l'envoie se connecter puis revenir ici.
   const onSubmit = (data: FormData) => {
+    if (!user || !hasRenewableSession()) {
+      navigate(`/login?returnTo=${encodeURIComponent('/create')}`);
+      return;
+    }
     dispatch(createAccommodation(data));
   };
 
