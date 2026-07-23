@@ -11,6 +11,12 @@ export interface PricePeriod {
   pricePerNight: number;
 }
 
+/** Optional paid service offered by the host (e.g. cleaning, breakfast). */
+export interface ExtraService {
+  name: string;
+  price: number;
+}
+
 /** All accommodation types, in display order. */
 export const ACCOMMODATION_TYPES: AccommodationType[] = ['apartment', 'house', 'villa', 'studio', 'room', 'bungalow'];
 
@@ -28,6 +34,8 @@ export interface Accommodation {
   lastMinuteDays?: number | null;
   /** Seasonal / per-date nightly overrides. */
   pricePeriods?: PricePeriod[];
+  /** Optional paid services offered by the host. */
+  extraServices?: ExtraService[];
   cancellationPolicy?: CancellationPolicy;
   /** When true, guest requests are auto-confirmed without host approval. */
   instantBooking?: boolean;
@@ -134,6 +142,11 @@ export interface UpdateDynamicPricingPayload {
 export interface UpdatePricePeriodsPayload {
   id: string;
   pricePeriods: PricePeriod[];
+}
+
+export interface UpdateExtraServicesPayload {
+  id: string;
+  extraServices: ExtraService[];
 }
 
 export interface UpdateCancellationPolicyPayload {

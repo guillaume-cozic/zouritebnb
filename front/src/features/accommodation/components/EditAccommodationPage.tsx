@@ -16,7 +16,7 @@ import {
   selectAccommodationError,
   selectEditSaveStatus,
 } from '../AccommodationSelectors';
-import { Accommodation, CancellationPolicy, AccommodationType, ACCOMMODATION_TYPES, PricePeriod } from '../AccommodationTypes';
+import { Accommodation, CancellationPolicy, AccommodationType, ACCOMMODATION_TYPES, PricePeriod, ExtraService } from '../AccommodationTypes';
 import { AMENITY_CATEGORIES } from '../AmenityData';
 import MapSelector from '../../../components/MapSelector';
 import { Button, Card, Field, Input, SaveIndicator, Select, Textarea } from '../../../components/ui';
@@ -66,6 +66,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
   const [lastMinuteDiscount, setLastMinuteDiscount] = useState<string>(numToStr(accommodation.lastMinuteDiscountPercentage));
   const [lastMinuteDays, setLastMinuteDays] = useState<string>(numToStr(accommodation.lastMinuteDays));
   const [pricePeriods, setPricePeriods] = useState<PricePeriod[]>(accommodation.pricePeriods ?? []);
+  const [extraServices, setExtraServices] = useState<ExtraService[]>(accommodation.extraServices ?? []);
   const [capacityValues, setCapacityValues] = useState({
     bedrooms: accommodation.bedrooms ?? 0,
     bathrooms: accommodation.bathrooms ?? 0,
@@ -185,6 +186,23 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
       i === index ? { ...p, [field]: field === 'pricePerNight' ? Number(value) : value } : p
     );
     commitPricePeriods(next);
+  };
+
+  const commitExtraServices = (next: ExtraService[]) => {
+    setExtraServices(next);
+    dispatch(accommodationFieldEdited({ field: 'extraServices', id, extraServices: next }));
+  };
+  const handleAddExtraService = () => {
+    setExtraServices((prev) => [...prev, { name: '', price: 0 }]);
+  };
+  const handleRemoveExtraService = (index: number) => {
+    commitExtraServices(extraServices.filter((_, i) => i !== index));
+  };
+  const handleExtraServiceChange = (index: number, field: keyof ExtraService, value: string) => {
+    const next = extraServices.map((s, i) =>
+      i === index ? { ...s, [field]: field === 'price' ? Number(value) : value } : s
+    );
+    commitExtraServices(next);
   };
 
   const handleCapacityChange = (field: string, value: number) => {
@@ -476,6 +494,48 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
                         </Field>
                         <Button type="button" variant="ghost" size="sm" onClick={() => handleRemovePricePeriod(index)}>
                           {t('dynamicPricing.remove')}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Extra paid services (cleaning, breakfast, ...) */}
+              <div className="pt-4 border-t border-surface-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-surface-700">{t('extraServices.title')}</h3>
+                  <Button type="button" variant="secondary" size="sm" onClick={handleAddExtraService}>
+                    {t('extraServices.add')}
+                  </Button>
+                </div>
+                <p className="text-xs text-surface-400">{t('extraServices.hint')}</p>
+                {extraServices.length === 0 ? (
+                  <p className="text-xs text-surface-400">{t('extraServices.none')}</p>
+                ) : (
+                  <div className="space-y-2">
+                    {extraServices.map((service, index) => (
+                      <div key={index} className="flex flex-wrap items-end gap-2">
+                        <Field label={t('extraServices.nameLabel')} className="flex-1 min-w-[12rem]">
+                          <Input
+                            type="text"
+                            maxLength={100}
+                            placeholder={t('extraServices.namePlaceholder')}
+                            value={service.name}
+                            onChange={(e) => handleExtraServiceChange(index, 'name', e.target.value)}
+                          />
+                        </Field>
+                        <Field label={t('extraServices.priceLabel')}>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min={0}
+                            value={service.price || ''}
+                            onChange={(e) => handleExtraServiceChange(index, 'price', e.target.value)}
+                          />
+                        </Field>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveExtraService(index)}>
+                          {t('extraServices.remove')}
                         </Button>
                       </div>
                     ))}

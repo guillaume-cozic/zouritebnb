@@ -321,6 +321,60 @@ describe('accommodationFieldEdited', () => {
     }
   });
 
+  test('saves the extra services under the price badge section', async () => {
+    vi.useFakeTimers();
+    try {
+      mockedApi.put.mockResolvedValue({ data: {} });
+      const store = buildStore();
+
+      store.dispatch(accommodationFieldEdited({
+        field: 'extraServices',
+        id: 'a-1',
+        extraServices: [
+          { name: 'Ménage', price: 30 },
+          { name: 'Petit-déjeuner', price: 12.5 },
+        ],
+      }));
+      vi.advanceTimersByTime(1201);
+      await flush();
+
+      expect(mockedApi.put).toHaveBeenCalledWith(
+        '/api/accommodations/a-1/extra-services',
+        { extraServices: [{ name: 'Ménage', price: 30 }, { name: 'Petit-déjeuner', price: 12.5 }] },
+        expect.anything()
+      );
+      expect(store.getState().accommodation.editSaveStatus.price).toBe('saved');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('skips saving extra services when a name is empty or a price is not positive', async () => {
+    vi.useFakeTimers();
+    try {
+      const store = buildStore();
+
+      store.dispatch(accommodationFieldEdited({
+        field: 'extraServices',
+        id: 'a-1',
+        extraServices: [{ name: '  ', price: 30 }],
+      }));
+      vi.advanceTimersByTime(1201);
+      await flush();
+      store.dispatch(accommodationFieldEdited({
+        field: 'extraServices',
+        id: 'a-1',
+        extraServices: [{ name: 'Ménage', price: 0 }],
+      }));
+      vi.advanceTimersByTime(1201);
+      await flush();
+
+      expect(mockedApi.put).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   test('saves the weekly promotion under the price badge section', async () => {
     vi.useFakeTimers();
     try {

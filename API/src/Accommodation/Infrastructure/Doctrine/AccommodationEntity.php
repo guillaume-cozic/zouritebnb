@@ -108,6 +108,10 @@ class AccommodationEntity
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $pricePeriods = null;
 
+    /** @var array<array{name: string, price: float}>|null */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $extraServices = null;
+
     #[ORM\Column(options: ['default' => false])]
     private bool $smokingAllowed = false;
 
@@ -490,6 +494,20 @@ class AccommodationEntity
     public function setPricePeriods(?array $pricePeriods): static
     {
         $this->pricePeriods = $pricePeriods;
+
+        return $this;
+    }
+
+    /** @return array<array{name: string, price: float}>|null */
+    public function getExtraServices(): ?array
+    {
+        return $this->extraServices;
+    }
+
+    /** @param array<array{name: string, price: float}>|null $extraServices */
+    public function setExtraServices(?array $extraServices): static
+    {
+        $this->extraServices = $extraServices;
 
         return $this;
     }

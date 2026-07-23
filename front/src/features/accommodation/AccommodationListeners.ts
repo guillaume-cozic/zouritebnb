@@ -19,12 +19,13 @@ import {
   updateHouseRules,
   updateInstantBooking,
   updatePricePeriods,
+  updateExtraServices,
   updateStayConstraints,
   updateType,
   updatePrice,
   updateWeeklyPromotion,
 } from './AccommodationSlice';
-import type { PricePeriod } from './AccommodationTypes';
+import type { ExtraService, PricePeriod } from './AccommodationTypes';
 
 const AUTOSAVE_DELAY = 1200;
 const SAVED_BADGE_DELAY = 2500;
@@ -73,6 +74,16 @@ const areValidPricePeriods = (periods: PricePeriod[]): boolean =>
       p.pricePerNight > 0
   );
 
+/** Every service must have a non-empty name (max 100 chars) and a strictly positive price. */
+const areValidExtraServices = (services: ExtraService[]): boolean =>
+  services.every(
+    (s) =>
+      s.name.trim() !== '' &&
+      s.name.trim().length <= 100 &&
+      Number.isFinite(s.price) &&
+      s.price > 0
+  );
+
 /** A payload is saved only when it satisfies the same business rules the forms enforce. */
 const isSavable = (p: AccommodationFieldEditedPayload): boolean => {
   switch (p.field) {
@@ -91,6 +102,8 @@ const isSavable = (p: AccommodationFieldEditedPayload): boolean => {
       return isValidPercentage(p.weekendSurchargePercentage, 500) && isValidLastMinute(p.lastMinuteDiscountPercentage, p.lastMinuteDays);
     case 'pricePeriods':
       return areValidPricePeriods(p.pricePeriods);
+    case 'extraServices':
+      return areValidExtraServices(p.extraServices);
     case 'cancellationPolicy':
       return p.cancellationPolicy === 'flexible' || p.cancellationPolicy === 'moderate';
     case 'instantBooking':
@@ -131,6 +144,8 @@ const dispatchSave = (p: AccommodationFieldEditedPayload, dispatch: AppDispatch)
       }));
     case 'pricePeriods':
       return dispatch(updatePricePeriods({ id: p.id, pricePeriods: p.pricePeriods }));
+    case 'extraServices':
+      return dispatch(updateExtraServices({ id: p.id, extraServices: p.extraServices }));
     case 'cancellationPolicy':
       return dispatch(updateCancellationPolicy({ id: p.id, cancellationPolicy: p.cancellationPolicy }));
     case 'instantBooking':
@@ -181,6 +196,7 @@ const EDIT_FIELDS: AccommodationEditField[] = [
   'weeklyPromotion',
   'dynamicPricing',
   'pricePeriods',
+  'extraServices',
   'cancellationPolicy',
   'instantBooking',
   'type',

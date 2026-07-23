@@ -807,6 +807,18 @@
     "nightlyPrice": "Price / night",
     "remove": "Remove"
   },
+  "extraServices": {
+    "title": "Extra services",
+    "hint": "Optional paid services offered to guests (charged outside the stay price).",
+    "add": "Add a service",
+    "none": "No extra services.",
+    "nameLabel": "Service name",
+    "namePlaceholder": "Cleaning, breakfast…",
+    "priceLabel": "Price (€)",
+    "remove": "Remove",
+    "detailTitle": "Extra services available",
+    "detailHint": "Optional services offered by the host, paid on site."
+  },
   "instantBooking": {
     "title": "Instant booking",
     "description": "Guest requests are confirmed automatically, without your approval. Payment is captured immediately."

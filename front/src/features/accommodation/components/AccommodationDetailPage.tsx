@@ -414,6 +414,25 @@ const AccommodationDetailPage: React.FC = () => {
               </div>
             )}
 
+            {/* Extra paid services */}
+            {accommodation.extraServices && accommodation.extraServices.length > 0 && (
+              <div className="border-b pb-8 mb-8">
+                <h2 className="text-2xl font-semibold mb-6">{t('extraServices.detailTitle')}</h2>
+                <ul className="space-y-3">
+                  {accommodation.extraServices.map((service, index) => (
+                    <li key={index} className="flex items-center justify-between gap-3">
+                      <span className="flex items-center gap-3">
+                        <span className="w-2 h-2 rounded-full bg-primary-600" />
+                        {service.name}
+                      </span>
+                      <span className="font-medium">{service.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-sm text-gray-500 mt-4">{t('extraServices.detailHint')}</p>
+              </div>
+            )}
+
             {/* Address */}
             {accommodation.street && (
               <div className="border-b pb-8 mb-8">

@@ -14,6 +14,8 @@ import {
   UpdateDynamicPricingPayload,
   UpdatePricePeriodsPayload,
   PricePeriod,
+  UpdateExtraServicesPayload,
+  ExtraService,
   UpdateCancellationPolicyPayload,
   UpdateInstantBookingPayload,
   UpdateTypePayload,
@@ -45,6 +47,7 @@ export type AccommodationFieldEditedPayload =
   | { field: 'weeklyPromotion'; id: string; weeklyPromotionPercentage: number | null }
   | { field: 'dynamicPricing'; id: string; weekendSurchargePercentage: number | null; lastMinuteDiscountPercentage: number | null; lastMinuteDays: number | null }
   | { field: 'pricePeriods'; id: string; pricePeriods: PricePeriod[] }
+  | { field: 'extraServices'; id: string; extraServices: ExtraService[] }
   | { field: 'cancellationPolicy'; id: string; cancellationPolicy: CancellationPolicy }
   | { field: 'instantBooking'; id: string; instantBooking: boolean }
   | { field: 'type'; id: string; type: AccommodationType | null }
@@ -70,6 +73,7 @@ export const editSectionForField = (field: AccommodationEditField): EditSection 
     case 'weeklyPromotion':
     case 'dynamicPricing':
     case 'pricePeriods':
+    case 'extraServices':
       return 'price';
     case 'checkInOut':
     case 'houseRules':
@@ -320,6 +324,24 @@ export const updatePricePeriods = createAsyncThunk(
   }
 );
 
+export const updateExtraServices = createAsyncThunk(
+  'accommodation/updateExtraServices',
+  async ({ id, extraServices }: UpdateExtraServicesPayload, { rejectWithValue }) => {
+    try {
+      await api.put(
+        `/api/accommodations/${id}/extra-services`,
+        { extraServices },
+        { headers: { 'Content-Type': 'application/ld+json' } }
+      );
+      return { extraServices };
+    } catch (err) {
+      return rejectWithValue(
+        extractErrorMessage(err, 'Erreur lors de la mise à jour des services supplémentaires')
+      );
+    }
+  }
+);
+
 export const updateCancellationPolicy = createAsyncThunk(
   'accommodation/updateCancellationPolicy',
   async ({ id, cancellationPolicy }: UpdateCancellationPolicyPayload, { rejectWithValue }) => {
@@ -485,6 +507,7 @@ const EDIT_SECTION_BY_THUNK_PREFIX: Record<string, EditSection> = {
   [updateWeeklyPromotion.typePrefix]: 'price',
   [updateDynamicPricing.typePrefix]: 'price',
   [updatePricePeriods.typePrefix]: 'price',
+  [updateExtraServices.typePrefix]: 'price',
   [updateCancellationPolicy.typePrefix]: 'cancellation',
   [updateInstantBooking.typePrefix]: 'cancellation',
   [updateStayConstraints.typePrefix]: 'cancellation',
@@ -502,6 +525,7 @@ const EDIT_THUNKS = [
   updateWeeklyPromotion,
   updateDynamicPricing,
   updatePricePeriods,
+  updateExtraServices,
   updateCancellationPolicy,
   updateInstantBooking,
   updateType,
@@ -708,6 +732,21 @@ const accommodationSlice = createSlice({
         }
       })
       .addCase(updatePricePeriods.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      // Update extra services (cleaning, breakfast, ...)
+      .addCase(updateExtraServices.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updateExtraServices.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.current) {
+          state.current.extraServices = action.payload.extraServices;
+        }
+      })
+      .addCase(updateExtraServices.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })

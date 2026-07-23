@@ -807,6 +807,18 @@
     "nightlyPrice": "Prix / nuit",
     "remove": "Supprimer"
   },
+  "extraServices": {
+    "title": "Services supplémentaires",
+    "hint": "Services optionnels payants proposés aux voyageurs (facturés en dehors du prix du séjour).",
+    "add": "Ajouter un service",
+    "none": "Aucun service supplémentaire.",
+    "nameLabel": "Nom du service",
+    "namePlaceholder": "Ménage, petit-déjeuner…",
+    "priceLabel": "Prix (€)",
+    "remove": "Supprimer",
+    "detailTitle": "Services supplémentaires proposés",
+    "detailHint": "Services optionnels proposés par l'hôte, à régler sur place."
+  },
   "instantBooking": {
     "title": "Réservation instantanée",
     "description": "Les demandes des voyageurs sont confirmées automatiquement, sans validation de votre part. Le paiement est capturé immédiatement."

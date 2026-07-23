@@ -210,6 +210,48 @@ use Symfony\Component\Serializer\Attribute\Groups;
             output: false,
             processor: UpdateAccommodationPricePeriodsProcessor::class,
         ),
+        new Put(
+            uriTemplate: '/accommodations/{id}/extra-services',
+            status: 204,
+            openapi: new OpenApiOperation(
+                summary: 'Définir les services supplémentaires d\'un hébergement',
+                description: 'Remplace l\'intégralité des services supplémentaires proposés par l\'hôte (ménage, petit-déjeuner...). Chaque service : name non vide (max 100 caractères) et price strictement positif (> 0), en euros. Envoyer une liste vide pour tout retirer.',
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/ld+json' => new MediaType(
+                            examples: new \ArrayObject([
+                                'valid' => new Example(
+                                    summary: 'Ménage et petit-déjeuner',
+                                    value: ['extraServices' => [
+                                        ['name' => 'Ménage', 'price' => 30.0],
+                                        ['name' => 'Petit-déjeuner', 'price' => 12.5],
+                                    ]],
+                                ),
+                                'empty' => new Example(
+                                    summary: 'Retirer tous les services',
+                                    value: ['extraServices' => []],
+                                ),
+                                'empty_name' => new Example(
+                                    summary: 'Invalide : nom vide',
+                                    description: 'Retourne une erreur 422 car le nom du service est obligatoire.',
+                                    value: ['extraServices' => [['name' => '', 'price' => 30.0]]],
+                                ),
+                                'negative_price' => new Example(
+                                    summary: 'Invalide : prix négatif ou nul',
+                                    description: 'Retourne une erreur 422 car le prix doit être strictement positif.',
+                                    value: ['extraServices' => [['name' => 'Ménage', 'price' => -30.0]]],
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ),
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            denormalizationContext: ['groups' => ['accommodation:write']],
+            input: UpdateAccommodationExtraServicesInput::class,
+            output: false,
+            processor: UpdateAccommodationExtraServicesProcessor::class,
+        ),
         new Patch(
             uriTemplate: '/accommodations/{id}/instant-booking',
             status: 204,
@@ -687,6 +729,11 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Tarifs par période (saisonnier / dates) : prix par nuit appliqué aux nuits comprises dans chaque plage [startDate, endDate] (format Y-m-d). Le premier intervalle correspondant l\'emporte.', example: [['startDate' => '2026-07-01', 'endDate' => '2026-08-31', 'pricePerNight' => 250.0]])]
     public array $pricePeriods = [];
 
+    /** @var array<array{name: string, price: float}> */
+    #[Groups(['accommodation:read'])]
+    #[ApiProperty(description: 'Services supplémentaires proposés par l\'hôte : nom (non vide, max 100 caractères) et prix strictement positif en euros.', example: [['name' => 'Ménage', 'price' => 30.0], ['name' => 'Petit-déjeuner', 'price' => 12.5]])]
+    public array $extraServices = [];
+
     #[Groups(['accommodation:read'])]
     #[ApiProperty(description: 'Règlement intérieur : fumeurs autorisés', example: false)]
     public bool $smokingAllowed = false;
@@ -819,6 +866,7 @@ class AccommodationOutput implements FromEntityInterface
         $output->lastMinuteDiscountPercentage = $entity->getLastMinuteDiscountPercentage();
         $output->lastMinuteDays = $entity->getLastMinuteDays();
         $output->pricePeriods = $entity->getPricePeriods() ?? [];
+        $output->extraServices = $entity->getExtraServices() ?? [];
         $output->smokingAllowed = $entity->isSmokingAllowed();
         $output->petsAllowed = $entity->isPetsAllowed();
         $output->partiesAllowed = $entity->isPartiesAllowed();

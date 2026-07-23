@@ -10,6 +10,7 @@ use App\Accommodation\Domain\Entity\Address;
 use App\Accommodation\Domain\Entity\Amenities;
 use App\Accommodation\Domain\Entity\Capacity;
 use App\Accommodation\Domain\Entity\CheckInOut;
+use App\Accommodation\Domain\Entity\ExtraServices;
 use App\Accommodation\Domain\Entity\Geolocation;
 use App\Accommodation\Domain\Port\AccommodationRepository;
 use App\Tests\Integration\RepositoryTestCase;
@@ -245,6 +246,79 @@ final class DoctrineAccommodationRepositoryTest extends RepositoryTestCase
         self::assertTrue($found->isPetsAllowed());
         self::assertFalse($found->isPartiesAllowed());
         self::assertSame('Merci de retirer vos chaussures.', $found->getHouseRulesNotes());
+    }
+
+    public function test_should_save_and_find_accommodation_with_extra_services(): void
+    {
+        $id = Uuid::v4();
+        $accommodation = new Accommodation(
+            id: $id,
+            title: 'Serviced Stay',
+            description: 'With extra services',
+            price: 110.0,
+        );
+        $accommodation->updateExtraServices(ExtraServices::fromArray([
+            ['name' => 'Ménage', 'price' => 30.0],
+            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+        ]));
+        $accommodation->releaseEvents();
+
+        $this->repository->save($accommodation);
+        $found = $this->repository->findById($id);
+
+        self::assertNotNull($found);
+        self::assertFalse($found->getExtraServices()->isEmpty());
+        self::assertSame([
+            ['name' => 'Ménage', 'price' => 30.0],
+            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+        ], $found->getExtraServices()->toArray());
+    }
+
+    public function test_should_update_extra_services_of_existing_accommodation(): void
+    {
+        $id = Uuid::v4();
+        $accommodation = new Accommodation(
+            id: $id,
+            title: 'Serviced Stay',
+            description: 'With extra services',
+            price: 110.0,
+        );
+        $accommodation->updateExtraServices(ExtraServices::fromArray([
+            ['name' => 'Ménage', 'price' => 30.0],
+        ]));
+        $accommodation->releaseEvents();
+        $this->repository->save($accommodation);
+
+        $reloaded = $this->repository->findById($id);
+        self::assertNotNull($reloaded);
+        $reloaded->updateExtraServices(ExtraServices::fromArray([
+            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+        ]));
+        $reloaded->releaseEvents();
+        $this->repository->save($reloaded);
+
+        $found = $this->repository->findById($id);
+        self::assertNotNull($found);
+        self::assertSame([
+            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+        ], $found->getExtraServices()->toArray());
+    }
+
+    public function test_should_persist_empty_extra_services(): void
+    {
+        $id = Uuid::v4();
+        $accommodation = new Accommodation(
+            id: $id,
+            title: 'Bare Stay',
+            description: 'No extra services',
+            price: 80.0,
+        );
+
+        $this->repository->save($accommodation);
+        $found = $this->repository->findById($id);
+
+        self::assertNotNull($found);
+        self::assertTrue($found->getExtraServices()->isEmpty());
     }
 
     public function test_should_save_and_find_fully_populated_accommodation(): void

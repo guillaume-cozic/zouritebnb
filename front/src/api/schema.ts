@@ -85,6 +85,13 @@ export interface paths {
      */
     patch: operations["api_accommodations_iddynamic-pricing_patch"];
   };
+  "/api/accommodations/{id}/extra-services": {
+    /**
+     * Définir les services supplémentaires d'un hébergement
+     * @description Remplace l'intégralité des services supplémentaires proposés par l'hôte (ménage, petit-déjeuner...). Chaque service : name non vide (max 100 caractères) et price strictement positif (> 0), en euros. Envoyer une liste vide pour tout retirer.
+     */
+    put: operations["api_accommodations_idextra-services_put"];
+  };
   "/api/accommodations/{id}/geolocation": {
     /**
      * Définir la géolocalisation d'un hébergement
@@ -738,6 +745,22 @@ export interface components {
           [key: string]: number | string;
         })[];
       /**
+       * @description Services supplémentaires proposés par l'hôte : nom (non vide, max 100 caractères) et prix strictement positif en euros.
+       * @example [
+       *   {
+       *     "name": "Ménage",
+       *     "price": 30
+       *   },
+       *   {
+       *     "name": "Petit-déjeuner",
+       *     "price": 12.5
+       *   }
+       * ]
+       */
+      extraServices?: ({
+          [key: string]: number | string;
+        })[];
+      /**
        * @description Règlement intérieur : fumeurs autorisés
        * @default false
        * @example false
@@ -1057,6 +1080,22 @@ export interface components {
        * ]
        */
       pricePeriods?: ({
+          [key: string]: number | string;
+        })[];
+      /**
+       * @description Services supplémentaires proposés par l'hôte : nom (non vide, max 100 caractères) et prix strictement positif en euros.
+       * @example [
+       *   {
+       *     "name": "Ménage",
+       *     "price": 30
+       *   },
+       *   {
+       *     "name": "Petit-déjeuner",
+       *     "price": 12.5
+       *   }
+       * ]
+       */
+      extraServices?: ({
           [key: string]: number | string;
         })[];
       /**
@@ -3096,6 +3135,62 @@ export interface operations {
     requestBody?: {
       content: {
         "application/merge-patch+json": unknown;
+      };
+    };
+    responses: {
+      /** @description AccommodationEntity resource updated */
+      204: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
+        };
+      };
+    };
+  };
+  /**
+   * Définir les services supplémentaires d'un hébergement
+   * @description Remplace l'intégralité des services supplémentaires proposés par l'hôte (ménage, petit-déjeuner...). Chaque service : name non vide (max 100 caractères) et price strictement positif (> 0), en euros. Envoyer une liste vide pour tout retirer.
+   */
+  "api_accommodations_idextra-services_put": {
+    parameters: {
+      path: {
+        /** @description AccommodationEntity identifier */
+        id: string;
+      };
+    };
+    /** @description The updated AccommodationEntity resource */
+    requestBody?: {
+      content: {
+        "application/ld+json": unknown;
       };
     };
     responses: {

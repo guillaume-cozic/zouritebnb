@@ -1276,6 +1276,175 @@
                 }
             }
         },
+        "/api/accommodations/{id}/extra-services": {
+            "put": {
+                "operationId": "api_accommodations_idextra-services_put",
+                "tags": [
+                    "AccommodationEntity"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "AccommodationEntity resource updated",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "D\u00e9finir les services suppl\u00e9mentaires d'un h\u00e9bergement",
+                "description": "Remplace l'int\u00e9gralit\u00e9 des services suppl\u00e9mentaires propos\u00e9s par l'h\u00f4te (m\u00e9nage, petit-d\u00e9jeuner...). Chaque service : name non vide (max 100 caract\u00e8res) et price strictement positif (> 0), en euros. Envoyer une liste vide pour tout retirer.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "AccommodationEntity identifier",
+                        "required": true,
+                        "deprecated": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple",
+                        "explode": false
+                    }
+                ],
+                "requestBody": {
+                    "description": "The updated AccommodationEntity resource",
+                    "content": {
+                        "application/ld+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "M\u00e9nage et petit-d\u00e9jeuner",
+                                    "value": {
+                                        "extraServices": [
+                                            {
+                                                "name": "M\u00e9nage",
+                                                "price": 30
+                                            },
+                                            {
+                                                "name": "Petit-d\u00e9jeuner",
+                                                "price": 12.5
+                                            }
+                                        ]
+                                    }
+                                },
+                                "empty": {
+                                    "summary": "Retirer tous les services",
+                                    "value": {
+                                        "extraServices": []
+                                    }
+                                },
+                                "empty_name": {
+                                    "summary": "Invalide : nom vide",
+                                    "description": "Retourne une erreur 422 car le nom du service est obligatoire.",
+                                    "value": {
+                                        "extraServices": [
+                                            {
+                                                "name": "",
+                                                "price": 30
+                                            }
+                                        ]
+                                    }
+                                },
+                                "negative_price": {
+                                    "summary": "Invalide : prix n\u00e9gatif ou nul",
+                                    "description": "Retourne une erreur 422 car le prix doit \u00eatre strictement positif.",
+                                    "value": {
+                                        "extraServices": [
+                                            {
+                                                "name": "M\u00e9nage",
+                                                "price": -30
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
         "/api/accommodations/{id}/geolocation": {
             "put": {
                 "operationId": "api_accommodations_idgeolocation_put",
@@ -9171,6 +9340,33 @@
                                     }
                                 }
                             },
+                            "extraServices": {
+                                "description": "Services suppl\u00e9mentaires propos\u00e9s par l'h\u00f4te : nom (non vide, max 100 caract\u00e8res) et prix strictement positif en euros.",
+                                "example": [
+                                    {
+                                        "name": "M\u00e9nage",
+                                        "price": 30
+                                    },
+                                    {
+                                        "name": "Petit-d\u00e9jeuner",
+                                        "price": 12.5
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
                             "smokingAllowed": {
                                 "description": "R\u00e8glement int\u00e9rieur : fumeurs autoris\u00e9s",
                                 "default": false,
@@ -9675,6 +9871,33 @@
                                         "startDate": "2026-07-01",
                                         "endDate": "2026-08-31",
                                         "pricePerNight": 250
+                                    }
+                                ],
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "anyOf": [
+                                            {
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "extraServices": {
+                                "description": "Services suppl\u00e9mentaires propos\u00e9s par l'h\u00f4te : nom (non vide, max 100 caract\u00e8res) et prix strictement positif en euros.",
+                                "example": [
+                                    {
+                                        "name": "M\u00e9nage",
+                                        "price": 30
+                                    },
+                                    {
+                                        "name": "Petit-d\u00e9jeuner",
+                                        "price": 12.5
                                     }
                                 ],
                                 "type": "array",

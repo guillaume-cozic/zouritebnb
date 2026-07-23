@@ -11,6 +11,7 @@ use App\Accommodation\Domain\Event\AccommodationCapacityUpdated;
 use App\Accommodation\Domain\Event\AccommodationCheckInOutUpdated;
 use App\Accommodation\Domain\Event\AccommodationDescriptionUpdated;
 use App\Accommodation\Domain\Event\AccommodationDynamicPricingUpdated;
+use App\Accommodation\Domain\Event\AccommodationExtraServicesUpdated;
 use App\Accommodation\Domain\Event\AccommodationGeolocationUpdated;
 use App\Accommodation\Domain\Event\AccommodationHouseRulesUpdated;
 use App\Accommodation\Domain\Event\AccommodationInstantBookingUpdated;
@@ -69,10 +70,14 @@ final class Accommodation extends AggregateRoot
         }
 
         $this->pricePeriods = new PricePeriods([]);
+        $this->extraServices = new ExtraServices([]);
     }
 
     /** Seasonal / per-date nightly overrides. Set after construction (see updatePricePeriods). */
     private PricePeriods $pricePeriods;
+
+    /** Paid extra services offered with the accommodation. Set after construction (see updateExtraServices). */
+    private ExtraServices $extraServices;
 
     public function getRegionId(): ?Uuid
     {
@@ -374,6 +379,17 @@ final class Accommodation extends AggregateRoot
     {
         $this->pricePeriods = $pricePeriods;
         $this->recordEvent(new AccommodationPricePeriodsUpdated($this->id));
+    }
+
+    public function getExtraServices(): ExtraServices
+    {
+        return $this->extraServices;
+    }
+
+    public function updateExtraServices(ExtraServices $extraServices): void
+    {
+        $this->extraServices = $extraServices;
+        $this->recordEvent(new AccommodationExtraServicesUpdated($this->id));
     }
 
     private static function hasNonPositiveNights(?int $minNights, ?int $maxNights): bool
