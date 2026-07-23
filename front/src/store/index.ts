@@ -18,6 +18,7 @@ import hostProfileReducer from '../features/hostProfile/HostProfileSlice';
 import wishlistReducer from '../features/wishlist/WishlistSlice';
 import hostRevenueReducer from '../features/hostRevenue/HostRevenueSlice';
 import activityPointReducer from '../features/activityPoint/ActivityPointSlice';
+import contactReducer from '../features/contact/ContactSlice';
 import { listenerMiddleware } from './listenerMiddleware';
 import './registerListeners';
 
@@ -42,6 +43,7 @@ export const store = configureStore({
     wishlist: wishlistReducer,
     hostRevenue: hostRevenueReducer,
     activityPoint: activityPointReducer,
+    contact: contactReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),

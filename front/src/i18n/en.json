@@ -738,7 +738,27 @@
     "termsOfUse": "Terms of Use",
     "termsOfSale": "Terms of Sale",
     "legalNotice": "Legal Notice",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "contactForm": "Contact us"
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Contact us",
+    "subtitle": "A question or feedback? Write to us and we'll get back to you quickly.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "What is your message about?",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Your message…",
+    "submit": "Send message",
+    "success": {
+      "title": "Message sent!",
+      "message": "Thank you for your message, we'll get back to you as soon as possible.",
+      "backHome": "Back to home"
+    }
   },
   "wizard": {
     "newAccommodation": "New accommodation",

@@ -4943,6 +4943,124 @@
                 ]
             }
         },
+        "/api/contact_messages": {
+            "post": {
+                "operationId": "api_contact_messages_post",
+                "tags": [
+                    "ContactMessage"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "ContactMessage resource created",
+                        "links": {}
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "links": {}
+                    },
+                    "422": {
+                        "description": "An error occurred",
+                        "content": {
+                            "application/ld+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation.jsonld"
+                                }
+                            },
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConstraintViolation"
+                                }
+                            }
+                        },
+                        "links": {}
+                    }
+                },
+                "summary": "Envoyer un message de contact \u00e0 la plateforme",
+                "description": "Enregistre un message envoy\u00e9 via le formulaire de contact public. Le nom, le sujet et le message ne doivent pas \u00eatre vides, et l'adresse e-mail doit \u00eatre valide ; sinon la requ\u00eate est rejet\u00e9e avec une erreur 422. Endpoint public : aucun compte n'est requis.",
+                "parameters": [],
+                "requestBody": {
+                    "description": "The new ContactMessage resource",
+                    "content": {
+                        "application/ld+json": {
+                            "examples": {
+                                "valid": {
+                                    "summary": "Requ\u00eate valide",
+                                    "value": {
+                                        "name": "Marie Dupont",
+                                        "email": "marie.dupont@example.com",
+                                        "subject": "Question sur une r\u00e9servation",
+                                        "message": "Bonjour, je souhaite savoir s'il est possible de modifier les dates de ma r\u00e9servation. Merci !"
+                                    }
+                                },
+                                "empty_name": {
+                                    "summary": "Invalide : nom vide",
+                                    "description": "Renvoie une erreur 422 : le nom de l'exp\u00e9diteur est obligatoire.",
+                                    "value": {
+                                        "name": "",
+                                        "email": "marie.dupont@example.com",
+                                        "subject": "Question sur une r\u00e9servation",
+                                        "message": "Bonjour, pouvez-vous m'aider ?"
+                                    }
+                                },
+                                "invalid_email": {
+                                    "summary": "Invalide : adresse e-mail mal form\u00e9e",
+                                    "description": "Renvoie une erreur 422 : l'adresse e-mail doit \u00eatre une adresse valide.",
+                                    "value": {
+                                        "name": "Marie Dupont",
+                                        "email": "pas-un-email",
+                                        "subject": "Question sur une r\u00e9servation",
+                                        "message": "Bonjour, pouvez-vous m'aider ?"
+                                    }
+                                },
+                                "empty_subject": {
+                                    "summary": "Invalide : sujet vide",
+                                    "description": "Renvoie une erreur 422 : le sujet du message est obligatoire.",
+                                    "value": {
+                                        "name": "Marie Dupont",
+                                        "email": "marie.dupont@example.com",
+                                        "subject": "",
+                                        "message": "Bonjour, pouvez-vous m'aider ?"
+                                    }
+                                },
+                                "empty_message": {
+                                    "summary": "Invalide : message vide",
+                                    "description": "Renvoie une erreur 422 : le contenu du message est obligatoire.",
+                                    "value": {
+                                        "name": "Marie Dupont",
+                                        "email": "marie.dupont@example.com",
+                                        "subject": "Question sur une r\u00e9servation",
+                                        "message": ""
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
         "/api/conversations": {
             "get": {
                 "operationId": "api_conversations_get_collection",
@@ -12773,6 +12891,14 @@
                                     "string",
                                     "null"
                                 ]
+                            },
+                            "refreshToken": {
+                                "description": "Jeton de rafra\u00eechissement (longue dur\u00e9e) \u00e0 envoyer \u00e0 POST /api/token/refresh pour obtenir un nouveau JWT sans se reconnecter",
+                                "example": "f3a1c2...9b",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
                             }
                         }
                     }
@@ -12892,14 +13018,6 @@
                                     "string",
                                     "null"
                                 ]
-                            },
-                            "refreshToken": {
-                                "description": "Jeton de rafra\u00eechissement (longue dur\u00e9e) \u00e0 envoyer \u00e0 POST /api/token/refresh pour obtenir un nouveau JWT sans se reconnecter",
-                                "example": "f3a1c2...9b",
-                                "type": [
-                                    "string",
-                                    "null"
-                                ]
                             }
                         }
                     }
@@ -12930,6 +13048,10 @@
         {
             "name": "AdminActivityPoint",
             "description": "Resource 'AdminActivityPoint' operations."
+        },
+        {
+            "name": "ContactMessage",
+            "description": "Resource 'ContactMessage' operations."
         },
         {
             "name": "Conversation",

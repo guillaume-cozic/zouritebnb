@@ -738,7 +738,27 @@
     "termsOfUse": "Conditions d'utilisation (CGU)",
     "termsOfSale": "Conditions de vente (CGV)",
     "legalNotice": "Mentions légales",
-    "privacyPolicy": "Politique de confidentialité"
+    "privacyPolicy": "Politique de confidentialité",
+    "contactForm": "Nous contacter"
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Contactez-nous",
+    "subtitle": "Une question, une remarque ? Écrivez-nous, nous vous répondrons rapidement.",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Votre nom",
+    "emailLabel": "Email",
+    "emailPlaceholder": "vous@exemple.com",
+    "subjectLabel": "Sujet",
+    "subjectPlaceholder": "L'objet de votre message",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Votre message…",
+    "submit": "Envoyer le message",
+    "success": {
+      "title": "Message envoyé !",
+      "message": "Merci pour votre message, nous reviendrons vers vous au plus vite.",
+      "backHome": "Retour à l'accueil"
+    }
   },
   "wizard": {
     "newAccommodation": "Nouvel hébergement",

@@ -92,6 +92,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/ActivityPoint/Infrastructure/Doctrine'
                 prefix: 'App\ActivityPoint\Infrastructure\Doctrine'
                 alias: ActivityPoint
+            Contact:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Contact/Infrastructure/Doctrine'
+                prefix: 'App\Contact\Infrastructure\Doctrine'
+                alias: Contact
         controller_resolver:
             auto_mapping: false
 

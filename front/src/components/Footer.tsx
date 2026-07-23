@@ -55,6 +55,9 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('footer.contact')}</h4>
             <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link to="/contact" className="hover:text-white transition-colors">{t('footer.contactForm')}</Link>
+              </li>
               <li>contact@zouritebnb.com</li>
             </ul>
           </div>

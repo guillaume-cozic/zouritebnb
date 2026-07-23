@@ -229,6 +229,9 @@ services:
     App\Review\Domain\Port\CompletedStayChecker:
         alias: App\Review\Infrastructure\Doctrine\DbalCompletedStayChecker
 
+    App\Contact\Domain\Port\ContactMessageRepository:
+        alias: App\Contact\Infrastructure\Doctrine\DoctrineContactMessageRepository
+
     Stripe\StripeClient:
         arguments: ['%env(STRIPE_SECRET_KEY)%']
 

@@ -306,6 +306,13 @@ export interface paths {
      */
     get: operations["api_adminusers_get_collection"];
   };
+  "/api/contact_messages": {
+    /**
+     * Envoyer un message de contact à la plateforme
+     * @description Enregistre un message envoyé via le formulaire de contact public. Le nom, le sujet et le message ne doivent pas être vides, et l'adresse e-mail doit être valide ; sinon la requête est rejetée avec une erreur 422. Endpoint public : aucun compte n'est requis.
+     */
+    post: operations["api_contact_messages_post"];
+  };
   "/api/conversations": {
     /**
      * Lister mes conversations
@@ -4626,6 +4633,40 @@ export interface operations {
           "application/ld+json": components["schemas"]["Error.jsonld"];
           "application/problem+json": components["schemas"]["Error"];
           "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  /**
+   * Envoyer un message de contact à la plateforme
+   * @description Enregistre un message envoyé via le formulaire de contact public. Le nom, le sujet et le message ne doivent pas être vides, et l'adresse e-mail doit être valide ; sinon la requête est rejetée avec une erreur 422. Endpoint public : aucun compte n'est requis.
+   */
+  api_contact_messages_post: {
+    /** @description The new ContactMessage resource */
+    requestBody?: {
+      content: {
+        "application/ld+json": unknown;
+      };
+    };
+    responses: {
+      /** @description ContactMessage resource created */
+      201: {
+        content: never;
+      };
+      /** @description Invalid input */
+      400: {
+        content: {
+          "application/ld+json": components["schemas"]["Error.jsonld"];
+          "application/problem+json": components["schemas"]["Error"];
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description An error occurred */
+      422: {
+        content: {
+          "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+          "application/problem+json": components["schemas"]["ConstraintViolation"];
+          "application/json": components["schemas"]["ConstraintViolation"];
         };
       };
     };

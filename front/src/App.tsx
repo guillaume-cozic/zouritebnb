@@ -46,6 +46,7 @@ const TermsOfUsePage = React.lazy(() => import('./features/legal/components/Term
 const TermsOfSalePage = React.lazy(() => import('./features/legal/components/TermsOfSalePage'));
 const LegalNoticePage = React.lazy(() => import('./features/legal/components/LegalNoticePage'));
 const PrivacyPolicyPage = React.lazy(() => import('./features/legal/components/PrivacyPolicyPage'));
+const ContactPage = React.lazy(() => import('./features/contact/components/ContactPage'));
 
 const RouteFallback: React.FC = () => (
   <div className="flex justify-center pt-24">
@@ -80,6 +81,7 @@ function App() {
             <Route path="/cgv" element={<TermsOfSalePage />} />
             <Route path="/mentions-legales" element={<LegalNoticePage />} />
             <Route path="/confidentialite" element={<PrivacyPolicyPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/accommodations" element={<AccommodationsListingPage />} />
             {/* Détail d'une annonce : /hebergements/<slug>--<uuid> (l'UUID final
                 résout, le slug est purement SEO ; un UUID nu est accepté) */}

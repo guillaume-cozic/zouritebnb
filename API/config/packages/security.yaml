@@ -76,6 +76,9 @@ security:
         # Donations to solidarity projects are anonymous: no account is required
         - { path: ^/api/donation-intents$, methods: [POST], roles: PUBLIC_ACCESS }
 
+        # Contact form is reachable by any visitor: no account is required
+        - { path: ^/api/contact_messages$, methods: [POST], roles: PUBLIC_ACCESS }
+
         # Admin back-office endpoints are restricted to platform administrators
         - { path: ^/api/admin, roles: ROLE_ADMIN }
 
