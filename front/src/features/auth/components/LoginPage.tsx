@@ -63,13 +63,15 @@ const LoginPage: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-7 sm:p-8 space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.email')}</label>
+          <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">{t('auth.email')}</label>
           <div className="relative">
             <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="20" height="16" x="2" y="4" rx="2" />
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
             </svg>
             <input
+              id="login-email"
+              name="email"
               type="email"
               required
               value={email}
@@ -81,13 +83,15 @@ const LoginPage: React.FC = () => {
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">{t('auth.password')}</label>
+          <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-2">{t('auth.password')}</label>
           <div className="relative">
             <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
             <input
+              id="login-password"
+              name="password"
               type="password"
               required
               value={password}
