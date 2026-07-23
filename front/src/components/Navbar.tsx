@@ -127,18 +127,17 @@ const Navbar: React.FC = () => {
             )}
           </Link>
 
-          {/* Create button (host mode only) */}
-          {isHostMode && (
-            <Link to="/create">
-              <button className="justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md px-3 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                  <path d="M5 12h14" />
-                  <path d="M12 5v14" />
-                </svg>
-                <span className="hidden sm:inline">{t('navbar.createAccommodation')}</span>
-              </button>
-            </Link>
-          )}
+          {/* Create button — /create est publique : visible aussi pour les
+              visiteurs anonymes et les voyageurs (futurs hôtes) */}
+          <Link to="/create">
+            <button className="justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 border border-gray-200 bg-white hover:bg-gray-50 h-9 rounded-md px-3 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M5 12h14" />
+                <path d="M12 5v14" />
+              </svg>
+              <span className="hidden sm:inline">{t('navbar.createAccommodation')}</span>
+            </button>
+          </Link>
 
           {/* Mode switch (host ↔ traveler): only for hosts who own at least one listing.
               Hidden while ownership is unresolved (null) to avoid showing it to travelers. */}
