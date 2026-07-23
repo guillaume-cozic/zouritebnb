@@ -16,6 +16,39 @@ describe('computeStayPrice', () => {
     expect(r.appliedDiscountPercentage).toBeNull();
   });
 
+  test('services billed with the reservation are totalled apart, optional ones excluded', () => {
+    const r = computeStayPrice(
+      {
+        pricePerNight: 100,
+        extraServices: [
+          { price: 30, billedWithReservation: true },
+          { price: 12.5, billedWithReservation: false },
+          { price: 20, billedWithReservation: true },
+        ],
+      },
+      new Date('2026-06-10T15:00:00'),
+      new Date('2026-06-14T11:00:00'),
+      LONG_AGO
+    );
+    expect(r.subtotal).toBe(400);
+    expect(r.extraServicesTotal).toBe(50);
+  });
+
+  test('billed services are not affected by stay discounts', () => {
+    const r = computeStayPrice(
+      {
+        pricePerNight: 100,
+        weeklyPromotionPercentage: 20,
+        extraServices: [{ price: 30, billedWithReservation: true }],
+      },
+      new Date('2026-06-10T15:00:00'),
+      new Date('2026-06-17T11:00:00'),
+      LONG_AGO
+    );
+    expect(r.subtotal).toBe(560);
+    expect(r.extraServicesTotal).toBe(30);
+  });
+
   test('weekly promotion from 7 nights', () => {
     const r = computeStayPrice(
       { pricePerNight: 100, weeklyPromotionPercentage: 20 },

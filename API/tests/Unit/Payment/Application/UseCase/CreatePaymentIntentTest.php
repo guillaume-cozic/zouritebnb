@@ -104,6 +104,27 @@ final class CreatePaymentIntentTest extends TestCase
         self::assertSame(56000, $this->gateway->calls[0]['amountCents']);
     }
 
+    public function test_should_include_extra_services_billed_with_the_reservation_in_the_amount(): void
+    {
+        $accommodationId = Uuid::fromString('01961e2f-dead-7000-beef-0000000000a4');
+        UuidGenerator::queue([Uuid::fromString('01961e2f-dead-7000-beef-000000000003')]);
+
+        // 100€/night × 4 nights = 400€, plus 30€ of extra services billed
+        // once per stay => 430€ = 43000 cents charged on Stripe.
+        $this->pricingProvider->set($accommodationId, 100.0, billedExtraServices: [
+            ['name' => 'Ménage', 'price' => 30.0],
+        ]);
+
+        $this->useCase->handle(new CreatePaymentIntentCommand(
+            accommodationId: $accommodationId,
+            checkIn: new \DateTimeImmutable('2026-06-10T15:00:00+00:00'),
+            checkOut: new \DateTimeImmutable('2026-06-14T11:00:00+00:00'),
+            userId: Uuid::v7(),
+        ));
+
+        self::assertSame(43000, $this->gateway->calls[0]['amountCents']);
+    }
+
     public function test_should_reject_when_accommodation_not_found(): void
     {
         $this->expectException(InvalidPaymentException::class);

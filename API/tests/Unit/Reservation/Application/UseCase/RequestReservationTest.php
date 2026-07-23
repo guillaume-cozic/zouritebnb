@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Reservation\Application\UseCase;
 use App\Reservation\Application\UseCase\RequestReservation;
 use App\Reservation\Domain\Command\RequestReservationCommand;
 use App\Reservation\Domain\Entity\ReservationId;
+use App\Reservation\Domain\Entity\ReservationPrice;
 use App\Reservation\Domain\Entity\ReservationStatus;
 use App\Reservation\Domain\Exception\InvalidDateRangeException;
 use App\Reservation\Domain\Exception\InvalidGuestNameException;
@@ -131,6 +132,34 @@ final class RequestReservationTest extends TestCase
         self::assertNotNull($reservation);
         self::assertSame(560.0, $reservation->getPrice()->totalPrice);
         self::assertSame(20.0, $reservation->getPrice()->appliedDiscountPercentage);
+    }
+
+    public function test_should_snapshot_extra_services_billed_with_the_reservation(): void
+    {
+        $accommodationId = Uuid::v7();
+        $teamId = Uuid::v7();
+        // 4 nights × 100 = 400, plus 30 € of extra services billed with the reservation.
+        $this->pricingProvider->set($accommodationId, 100.0, null, $teamId, billedExtraServices: [
+            ['name' => 'Ménage', 'price' => 30.0],
+        ]);
+
+        $id = $this->useCase->handle(new RequestReservationCommand(
+            accommodationId: $accommodationId,
+            guestUserId: Uuid::v7(),
+            guestTeamId: Uuid::v7(),
+            checkIn: new \DateTimeImmutable('2026-05-01'),
+            checkOut: new \DateTimeImmutable('2026-05-05'),
+            guestName: 'John Doe',
+        ));
+
+        $reservation = $this->repository->ofId(new ReservationId(Uuid::fromString($id)));
+        self::assertNotNull($reservation);
+        $price = $reservation->getPrice();
+        self::assertSame(430.0, $price->totalPrice);
+        self::assertSame(30.0, $price->extraServicesTotal);
+        // Commission and donation are computed on the full total, services included.
+        self::assertSame(round(430.0 * ReservationPrice::COMMISSION_RATE, 2), $price->commissionAmount);
+        self::assertSame(round(430.0 * ReservationPrice::DONATION_RATE, 2), $price->donationAmount);
     }
 
     public function test_should_throw_when_accommodation_not_found(): void

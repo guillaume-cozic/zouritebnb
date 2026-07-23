@@ -21,6 +21,11 @@ final class InvalidExtraServiceException extends \DomainException
         return new self(\sprintf('Extra service price must be strictly positive, got %s.', $value));
     }
 
+    public static function becauseNonBooleanBilledWithReservation(): self
+    {
+        return new self('Extra service billedWithReservation must be a boolean.');
+    }
+
     public static function becauseInvalidItem(): self
     {
         return new self('An extra service collection only accepts ExtraService instances.');

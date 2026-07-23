@@ -20,7 +20,7 @@ import { Accommodation, CancellationPolicy, AccommodationType, ACCOMMODATION_TYP
 import { AMENITY_CATEGORIES } from '../AmenityData';
 import MapSelector from '../../../components/MapSelector';
 import { Button, Card, Field, Input, SaveIndicator, Select, Textarea } from '../../../components/ui';
-import EditLayout, { SECTIONS, EditSection } from './EditLayout';
+import EditLayout, { sectionIcon, EditSection } from './EditLayout';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -193,16 +193,23 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
     dispatch(accommodationFieldEdited({ field: 'extraServices', id, extraServices: next }));
   };
   const handleAddExtraService = () => {
-    setExtraServices((prev) => [...prev, { name: '', price: 0 }]);
+    setExtraServices((prev) => [...prev, { name: '', price: 0, billedWithReservation: false }]);
   };
   const handleRemoveExtraService = (index: number) => {
     commitExtraServices(extraServices.filter((_, i) => i !== index));
   };
-  const handleExtraServiceChange = (index: number, field: keyof ExtraService, value: string) => {
+  const handleExtraServiceChange = (index: number, field: 'name' | 'price', value: string) => {
     const next = extraServices.map((s, i) =>
       i === index ? { ...s, [field]: field === 'price' ? Number(value) : value } : s
     );
     commitExtraServices(next);
+  };
+  const handleExtraServiceBilledToggle = (index: number) => {
+    commitExtraServices(
+      extraServices.map((s, i) =>
+        i === index ? { ...s, billedWithReservation: !s.billedWithReservation } : s
+      )
+    );
   };
 
   const handleCapacityChange = (field: string, value: number) => {
@@ -313,7 +320,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
         <div ref={(el) => { sectionRefs.current.description = el; }}>
           <Card
             title={t('edit.section.description')}
-            icon={SECTIONS[0].icon}
+            icon={sectionIcon('description')}
             action={<SaveIndicator status={sectionStatus.description ?? 'idle'} />}
             className={SECTION_CARD_CLASS}
           >
@@ -351,7 +358,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
         <div ref={(el) => { sectionRefs.current.price = el; }}>
           <Card
             title={t('edit.section.price')}
-            icon={SECTIONS[1].icon}
+            icon={sectionIcon('price')}
             iconClassName="bg-success-50 text-success-600"
             action={<SaveIndicator status={sectionStatus.price ?? 'idle'} />}
             className={SECTION_CARD_CLASS}
@@ -501,47 +508,82 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
                 )}
               </div>
 
-              {/* Extra paid services (cleaning, breakfast, ...) */}
-              <div className="pt-4 border-t border-surface-100 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-surface-700">{t('extraServices.title')}</h3>
-                  <Button type="button" variant="secondary" size="sm" onClick={handleAddExtraService}>
-                    {t('extraServices.add')}
-                  </Button>
-                </div>
-                <p className="text-xs text-surface-400">{t('extraServices.hint')}</p>
-                {extraServices.length === 0 ? (
-                  <p className="text-xs text-surface-400">{t('extraServices.none')}</p>
-                ) : (
-                  <div className="space-y-2">
-                    {extraServices.map((service, index) => (
-                      <div key={index} className="flex flex-wrap items-end gap-2">
-                        <Field label={t('extraServices.nameLabel')} className="flex-1 min-w-[12rem]">
-                          <Input
-                            type="text"
-                            maxLength={100}
-                            placeholder={t('extraServices.namePlaceholder')}
-                            value={service.name}
-                            onChange={(e) => handleExtraServiceChange(index, 'name', e.target.value)}
-                          />
-                        </Field>
-                        <Field label={t('extraServices.priceLabel')}>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            min={0}
-                            value={service.price || ''}
-                            onChange={(e) => handleExtraServiceChange(index, 'price', e.target.value)}
-                          />
-                        </Field>
-                        <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveExtraService(index)}>
-                          {t('extraServices.remove')}
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Extra paid services (cleaning, breakfast, ...) */}
+        <div ref={(el) => { sectionRefs.current.services = el; }}>
+          <Card
+            title={t('extraServices.title')}
+            icon={sectionIcon('services')}
+            iconClassName="bg-rose-50 text-rose-600"
+            action={
+              <div className="flex items-center gap-2">
+                <SaveIndicator status={sectionStatus.services ?? 'idle'} />
+                <Button type="button" variant="secondary" size="sm" onClick={handleAddExtraService}>
+                  {t('extraServices.add')}
+                </Button>
               </div>
+            }
+            className={SECTION_CARD_CLASS}
+          >
+            <div className="space-y-3">
+              <p className="text-xs text-surface-400">{t('extraServices.hint')}</p>
+              {extraServices.length === 0 ? (
+                <p className="text-xs text-surface-400">{t('extraServices.none')}</p>
+              ) : (
+                <div className="space-y-2">
+                  {extraServices.map((service, index) => (
+                      <div key={index} className="space-y-2 rounded-xl border border-surface-100 p-3">
+                        <div className="flex flex-wrap items-end gap-2">
+                          <Field label={t('extraServices.nameLabel')} className="flex-1 min-w-[12rem]">
+                            <Input
+                              type="text"
+                              maxLength={100}
+                              placeholder={t('extraServices.namePlaceholder')}
+                              value={service.name}
+                              onChange={(e) => handleExtraServiceChange(index, 'name', e.target.value)}
+                            />
+                          </Field>
+                          <Field label={t('extraServices.priceLabel')}>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min={0}
+                              value={service.price || ''}
+                              onChange={(e) => handleExtraServiceChange(index, 'price', e.target.value)}
+                            />
+                          </Field>
+                          <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveExtraService(index)}>
+                            {t('extraServices.remove')}
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={service.billedWithReservation}
+                            aria-label={t('extraServices.billedLabel')}
+                            onClick={() => handleExtraServiceBilledToggle(index)}
+                            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${
+                              service.billedWithReservation ? 'bg-primary-600' : 'bg-surface-300'
+                            }`}
+                          >
+                            <span
+                              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                                service.billedWithReservation ? 'translate-x-5' : 'translate-x-0.5'
+                              }`}
+                            />
+                          </button>
+                          <span className="text-sm text-surface-600">
+                            {t(service.billedWithReservation ? 'extraServices.billedLabel' : 'extraServices.onSiteLabel')}
+                          </span>
+                        </div>
+                      </div>
+                  ))}
+                </div>
+              )}
             </div>
           </Card>
         </div>
@@ -550,7 +592,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
         <div ref={(el) => { sectionRefs.current.capacity = el; }}>
           <Card
             title={t('edit.section.capacity')}
-            icon={SECTIONS[2].icon}
+            icon={sectionIcon('capacity')}
             iconClassName="bg-violet-50 text-violet-600"
             action={<SaveIndicator status={sectionStatus.capacity ?? 'idle'} />}
             className={SECTION_CARD_CLASS}
@@ -580,7 +622,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
         <div ref={(el) => { sectionRefs.current.amenities = el; }}>
           <Card
             title={t('edit.section.amenities')}
-            icon={SECTIONS[3].icon}
+            icon={sectionIcon('amenities')}
             iconClassName="bg-warning-50 text-warning-600"
             action={
               <div className="flex items-center gap-2">
@@ -626,7 +668,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
         <div ref={(el) => { sectionRefs.current.location = el; }}>
           <Card
             title={t('edit.section.location')}
-            icon={SECTIONS[4].icon}
+            icon={sectionIcon('location')}
             iconClassName="bg-rose-50 text-rose-600"
             action={<SaveIndicator status={sectionStatus.location ?? 'idle'} />}
             className={SECTION_CARD_CLASS}
@@ -679,7 +721,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
         <div ref={(el) => { sectionRefs.current.checkinout = el; }}>
           <Card
             title={t('edit.section.checkinout')}
-            icon={SECTIONS[5].icon}
+            icon={sectionIcon('checkinout')}
             iconClassName="bg-sky-50 text-sky-600"
             action={<SaveIndicator status={sectionStatus.checkinout ?? 'idle'} />}
             className={SECTION_CARD_CLASS}
@@ -750,7 +792,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
         <div ref={(el) => { sectionRefs.current.cancellation = el; }}>
           <Card
             title={t('edit.section.cancellation')}
-            icon={SECTIONS[6].icon}
+            icon={sectionIcon('cancellation')}
             iconClassName="bg-amber-50 text-amber-600"
             action={<SaveIndicator status={sectionStatus.cancellation ?? 'idle'} />}
             className={SECTION_CARD_CLASS}
@@ -843,7 +885,7 @@ const EditAccommodationForm: React.FC<{ accommodation: Accommodation }> = ({ acc
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600">
-                {SECTIONS[7].icon}
+                {sectionIcon('photos')}
               </div>
               <h2 className="text-lg font-semibold">{t('edit.section.photos')}</h2>
             </div>

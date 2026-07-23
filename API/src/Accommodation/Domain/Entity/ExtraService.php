@@ -19,6 +19,7 @@ final readonly class ExtraService
     public function __construct(
         string $name,
         public float $price,
+        public bool $billedWithReservation = false,
     ) {
         $name = trim($name);
         if ('' === $name) {
@@ -36,18 +37,25 @@ final readonly class ExtraService
 
     public static function fromArray(array $data): self
     {
+        $billedWithReservation = $data['billedWithReservation'] ?? false;
+        if (!\is_bool($billedWithReservation)) {
+            throw InvalidExtraServiceException::becauseNonBooleanBilledWithReservation();
+        }
+
         return new self(
             name: (string) ($data['name'] ?? ''),
             price: (float) ($data['price'] ?? 0),
+            billedWithReservation: $billedWithReservation,
         );
     }
 
-    /** @return array{name: string, price: float} */
+    /** @return array{name: string, price: float, billedWithReservation: bool} */
     public function toArray(): array
     {
         return [
             'name' => $this->name,
             'price' => $this->price,
+            'billedWithReservation' => $this->billedWithReservation,
         ];
     }
 }

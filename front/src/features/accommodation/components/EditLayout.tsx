@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-export type EditSection = 'description' | 'price' | 'capacity' | 'amenities' | 'location' | 'checkinout' | 'cancellation' | 'photos';
+export type EditSection = 'description' | 'price' | 'services' | 'capacity' | 'amenities' | 'location' | 'checkinout' | 'cancellation' | 'photos';
 
 export const SECTIONS: { key: EditSection; icon: React.ReactNode }[] = [
   {
@@ -12,6 +12,10 @@ export const SECTIONS: { key: EditSection; icon: React.ReactNode }[] = [
   {
     key: 'price',
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg>,
+  },
+  {
+    key: 'services',
+    icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 20h18" /><path d="M5 17a7 7 0 0 1 14 0" /><path d="M12 7v3" /><path d="M10 7h4" /></svg>,
   },
   {
     key: 'capacity',
@@ -39,8 +43,12 @@ export const SECTIONS: { key: EditSection; icon: React.ReactNode }[] = [
   },
 ];
 
+/** Icon of a section, looked up by key (indexes shift when sections are added). */
+export const sectionIcon = (key: EditSection): React.ReactNode =>
+  SECTIONS.find((s) => s.key === key)!.icon;
+
 // Sections that live on the edit page (scrollable)
-const EDIT_PAGE_SECTIONS: EditSection[] = ['description', 'price', 'capacity', 'amenities', 'location', 'checkinout', 'cancellation'];
+const EDIT_PAGE_SECTIONS: EditSection[] = ['description', 'price', 'services', 'capacity', 'amenities', 'location', 'checkinout', 'cancellation'];
 
 interface EditLayoutProps {
   accommodationId: string;

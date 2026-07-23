@@ -84,5 +84,23 @@ final class ReservationPriceTest extends TestCase
         self::assertSame(396.0, $price->totalPrice);
         self::assertSame(31.68, $price->commissionAmount);
         self::assertSame(27.72, $price->donationAmount);
+        self::assertSame(0.0, $price->extraServicesTotal);
+    }
+
+    public function test_from_stay_should_snapshot_extra_services_and_rate_the_full_total(): void
+    {
+        // 400 € de nuits + 30 € de services facturés à la réservation = 430 €.
+        // Commission et contribution s'appliquent au total complet, services inclus.
+        $price = ReservationPrice::fromStay(
+            totalPrice: 430.0,
+            pricePerNight: 100.0,
+            appliedDiscountPercentage: null,
+            extraServicesTotal: 30.0,
+        );
+
+        self::assertSame(430.0, $price->totalPrice);
+        self::assertSame(30.0, $price->extraServicesTotal);
+        self::assertSame(34.4, $price->commissionAmount);
+        self::assertSame(30.1, $price->donationAmount);
     }
 }

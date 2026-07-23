@@ -88,7 +88,7 @@ export interface paths {
   "/api/accommodations/{id}/extra-services": {
     /**
      * Définir les services supplémentaires d'un hébergement
-     * @description Remplace l'intégralité des services supplémentaires proposés par l'hôte (ménage, petit-déjeuner...). Chaque service : name non vide (max 100 caractères) et price strictement positif (> 0), en euros. Envoyer une liste vide pour tout retirer.
+     * @description Remplace l'intégralité des services supplémentaires proposés par l'hôte (ménage, petit-déjeuner...). Chaque service : name non vide (max 100 caractères), price strictement positif (> 0) en euros, et billedWithReservation (booléen, false par défaut). Les services avec billedWithReservation à true sont ajoutés au montant payé à la réservation ; les autres sont réglés sur place. Envoyer une liste vide pour tout retirer.
      */
     put: operations["api_accommodations_idextra-services_put"];
   };
@@ -745,20 +745,22 @@ export interface components {
           [key: string]: number | string;
         })[];
       /**
-       * @description Services supplémentaires proposés par l'hôte : nom (non vide, max 100 caractères) et prix strictement positif en euros.
+       * @description Services supplémentaires proposés par l'hôte : nom (non vide, max 100 caractères), prix strictement positif en euros, et billedWithReservation (les services à true sont ajoutés au montant payé à la réservation, les autres sont réglés sur place).
        * @example [
        *   {
        *     "name": "Ménage",
-       *     "price": 30
+       *     "price": 30,
+       *     "billedWithReservation": true
        *   },
        *   {
        *     "name": "Petit-déjeuner",
-       *     "price": 12.5
+       *     "price": 12.5,
+       *     "billedWithReservation": false
        *   }
        * ]
        */
       extraServices?: ({
-          [key: string]: number | string;
+          [key: string]: boolean | number | string;
         })[];
       /**
        * @description Règlement intérieur : fumeurs autorisés
@@ -1083,20 +1085,22 @@ export interface components {
           [key: string]: number | string;
         })[];
       /**
-       * @description Services supplémentaires proposés par l'hôte : nom (non vide, max 100 caractères) et prix strictement positif en euros.
+       * @description Services supplémentaires proposés par l'hôte : nom (non vide, max 100 caractères), prix strictement positif en euros, et billedWithReservation (les services à true sont ajoutés au montant payé à la réservation, les autres sont réglés sur place).
        * @example [
        *   {
        *     "name": "Ménage",
-       *     "price": 30
+       *     "price": 30,
+       *     "billedWithReservation": true
        *   },
        *   {
        *     "name": "Petit-déjeuner",
-       *     "price": 12.5
+       *     "price": 12.5,
+       *     "billedWithReservation": false
        *   }
        * ]
        */
       extraServices?: ({
-          [key: string]: number | string;
+          [key: string]: boolean | number | string;
         })[];
       /**
        * @description Règlement intérieur : fumeurs autorisés
@@ -2258,6 +2262,11 @@ export interface components {
        */
       appliedDiscountPercentage?: number | null;
       /**
+       * @description Total des services supplémentaires facturés à la réservation (déjà inclus dans totalPrice)
+       * @example 30
+       */
+      extraServicesTotal?: number | null;
+      /**
        * @description Montant total réglé par le voyageur : séjour + frais de service + don solidaire (identique au total de la facture)
        * @example 460
        */
@@ -2580,6 +2589,11 @@ export interface components {
        * @example eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...
        */
       token?: string | null;
+      /**
+       * @description Jeton de rafraîchissement (longue durée) à envoyer à POST /api/token/refresh pour obtenir un nouveau JWT sans se reconnecter
+       * @example f3a1c2...9b
+       */
+      refreshToken?: string | null;
     });
     "UserVerification.jsonld-user_verification.read": components["schemas"]["HydraItemBaseSchema"] & ({
       /**
@@ -3178,7 +3192,7 @@ export interface operations {
   };
   /**
    * Définir les services supplémentaires d'un hébergement
-   * @description Remplace l'intégralité des services supplémentaires proposés par l'hôte (ménage, petit-déjeuner...). Chaque service : name non vide (max 100 caractères) et price strictement positif (> 0), en euros. Envoyer une liste vide pour tout retirer.
+   * @description Remplace l'intégralité des services supplémentaires proposés par l'hôte (ménage, petit-déjeuner...). Chaque service : name non vide (max 100 caractères), price strictement positif (> 0) en euros, et billedWithReservation (booléen, false par défaut). Les services avec billedWithReservation à true sont ajoutés au montant payé à la réservation ; les autres sont réglés sur place. Envoyer une liste vide pour tout retirer.
    */
   "api_accommodations_idextra-services_put": {
     parameters: {

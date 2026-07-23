@@ -215,16 +215,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
             status: 204,
             openapi: new OpenApiOperation(
                 summary: 'Définir les services supplémentaires d\'un hébergement',
-                description: 'Remplace l\'intégralité des services supplémentaires proposés par l\'hôte (ménage, petit-déjeuner...). Chaque service : name non vide (max 100 caractères) et price strictement positif (> 0), en euros. Envoyer une liste vide pour tout retirer.',
+                description: 'Remplace l\'intégralité des services supplémentaires proposés par l\'hôte (ménage, petit-déjeuner...). Chaque service : name non vide (max 100 caractères), price strictement positif (> 0) en euros, et billedWithReservation (booléen, false par défaut). Les services avec billedWithReservation à true sont ajoutés au montant payé à la réservation ; les autres sont réglés sur place. Envoyer une liste vide pour tout retirer.',
                 requestBody: new RequestBody(
                     content: new \ArrayObject([
                         'application/ld+json' => new MediaType(
                             examples: new \ArrayObject([
                                 'valid' => new Example(
-                                    summary: 'Ménage et petit-déjeuner',
+                                    summary: 'Ménage facturé à la réservation, petit-déjeuner réglé sur place',
                                     value: ['extraServices' => [
-                                        ['name' => 'Ménage', 'price' => 30.0],
-                                        ['name' => 'Petit-déjeuner', 'price' => 12.5],
+                                        ['name' => 'Ménage', 'price' => 30.0, 'billedWithReservation' => true],
+                                        ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false],
                                     ]],
                                 ),
                                 'empty' => new Example(
@@ -240,6 +240,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
                                     summary: 'Invalide : prix négatif ou nul',
                                     description: 'Retourne une erreur 422 car le prix doit être strictement positif.',
                                     value: ['extraServices' => [['name' => 'Ménage', 'price' => -30.0]]],
+                                ),
+                                'non_boolean_billed_with_reservation' => new Example(
+                                    summary: 'Invalide : billedWithReservation non booléen',
+                                    description: 'Retourne une erreur 422 car billedWithReservation doit être un booléen.',
+                                    value: ['extraServices' => [['name' => 'Ménage', 'price' => 30.0, 'billedWithReservation' => 'yes']]],
                                 ),
                             ]),
                         ),
@@ -729,9 +734,9 @@ class AccommodationOutput implements FromEntityInterface
     #[ApiProperty(description: 'Tarifs par période (saisonnier / dates) : prix par nuit appliqué aux nuits comprises dans chaque plage [startDate, endDate] (format Y-m-d). Le premier intervalle correspondant l\'emporte.', example: [['startDate' => '2026-07-01', 'endDate' => '2026-08-31', 'pricePerNight' => 250.0]])]
     public array $pricePeriods = [];
 
-    /** @var array<array{name: string, price: float}> */
+    /** @var array<array{name: string, price: float, billedWithReservation: bool}> */
     #[Groups(['accommodation:read'])]
-    #[ApiProperty(description: 'Services supplémentaires proposés par l\'hôte : nom (non vide, max 100 caractères) et prix strictement positif en euros.', example: [['name' => 'Ménage', 'price' => 30.0], ['name' => 'Petit-déjeuner', 'price' => 12.5]])]
+    #[ApiProperty(description: 'Services supplémentaires proposés par l\'hôte : nom (non vide, max 100 caractères), prix strictement positif en euros, et billedWithReservation (les services à true sont ajoutés au montant payé à la réservation, les autres sont réglés sur place).', example: [['name' => 'Ménage', 'price' => 30.0, 'billedWithReservation' => true], ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false]])]
     public array $extraServices = [];
 
     #[Groups(['accommodation:read'])]

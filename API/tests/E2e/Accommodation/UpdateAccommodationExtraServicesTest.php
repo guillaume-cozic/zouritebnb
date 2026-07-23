@@ -16,8 +16,8 @@ final class UpdateAccommodationExtraServicesTest extends AccommodationApiTestCas
         self::createClient()->request('PUT', '/api/accommodations/'.$id.'/extra-services', [
             'headers' => $headers + ['Content-Type' => 'application/ld+json'],
             'json' => ['extraServices' => [
-                ['name' => 'Ménage', 'price' => 30.0],
-                ['name' => 'Petit-déjeuner', 'price' => 12.5],
+                ['name' => 'Ménage', 'price' => 30.0, 'billedWithReservation' => true],
+                ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false],
             ]],
         ]);
 
@@ -28,10 +28,32 @@ final class UpdateAccommodationExtraServicesTest extends AccommodationApiTestCas
         self::assertResponseIsSuccessful();
         self::assertJsonContains([
             'extraServices' => [
-                ['name' => 'Ménage', 'price' => 30],
-                ['name' => 'Petit-déjeuner', 'price' => 12.5],
+                ['name' => 'Ménage', 'price' => 30, 'billedWithReservation' => true],
+                ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false],
             ],
         ]);
+    }
+
+    public function test_should_default_billed_with_reservation_to_false_when_key_absent(): void
+    {
+        $headers = $this->authenticatedOwnerHeaders();
+        $id = $this->insertAccommodation('Cozy Chalet', 'A warm mountain chalet', 150.0);
+
+        self::createClient()->request('PUT', '/api/accommodations/'.$id.'/extra-services', [
+            'headers' => $headers + ['Content-Type' => 'application/ld+json'],
+            'json' => ['extraServices' => [
+                ['name' => 'Petit-déjeuner', 'price' => 12.5],
+            ]],
+        ]);
+
+        self::assertResponseStatusCodeSame(204);
+
+        $response = self::createClient()->request('GET', '/api/accommodations/'.$id);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame([
+            ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false],
+        ], $response->toArray()['extraServices']);
     }
 
     public function test_should_replace_extra_services(): void
@@ -61,7 +83,7 @@ final class UpdateAccommodationExtraServicesTest extends AccommodationApiTestCas
 
         self::assertResponseIsSuccessful();
         self::assertSame([
-            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+            ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false],
         ], $response->toArray()['extraServices']);
     }
 
@@ -119,6 +141,7 @@ final class UpdateAccommodationExtraServicesTest extends AccommodationApiTestCas
         yield 'zero price' => [[['name' => 'Ménage', 'price' => 0.0]]];
         yield 'negative price' => [[['name' => 'Ménage', 'price' => -30.0]]];
         yield 'malformed item' => [[['label' => 'Ménage']]];
+        yield 'non-boolean billedWithReservation' => [[['name' => 'Ménage', 'price' => 30.0, 'billedWithReservation' => 'yes']]];
     }
 
     public function test_should_return_401_when_not_authenticated(): void

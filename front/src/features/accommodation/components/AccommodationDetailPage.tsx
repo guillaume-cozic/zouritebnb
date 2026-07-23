@@ -115,18 +115,21 @@ const AccommodationDetailPage: React.FC = () => {
           lastMinuteDiscountPercentage: accommodation?.lastMinuteDiscountPercentage,
           lastMinuteDays: accommodation?.lastMinuteDays,
           pricePeriods: accommodation?.pricePeriods,
+          extraServices: accommodation?.extraServices,
         },
         startDate,
         endDate,
         new Date()
       )
-    : { nights: 0, subtotal: 0, appliedDiscountPercentage: null };
+    : { nights: 0, subtotal: 0, appliedDiscountPercentage: null, extraServicesTotal: 0 };
   const nights = stay.nights;
   const subtotal = stay.subtotal;
   const appliedDiscount = stay.appliedDiscountPercentage;
+  const billedServicesTotal = stay.extraServicesTotal;
+  const billedServices = (accommodation?.extraServices ?? []).filter((s) => s.billedWithReservation);
   const platformFee = subtotal * PLATFORM_COMMISSION_RATE;
   const solidarityFee = subtotal * SOLIDARITY_RATE;
-  const total = subtotal + platformFee + solidarityFee;
+  const total = subtotal + billedServicesTotal + platformFee + solidarityFee;
   const formatPrice = (n: number) => `${n.toLocaleString(i18n.language, { maximumFractionDigits: 2 })}\u00A0€`;
   useEffect(() => {
     if (id) {
@@ -424,6 +427,15 @@ const AccommodationDetailPage: React.FC = () => {
                       <span className="flex items-center gap-3">
                         <span className="w-2 h-2 rounded-full bg-primary-600" />
                         {service.name}
+                        <span
+                          className={
+                            service.billedWithReservation
+                              ? 'text-xs font-medium rounded-full px-2 py-0.5 bg-primary-50 text-primary-700'
+                              : 'text-xs font-medium rounded-full px-2 py-0.5 bg-surface-100 text-surface-600'
+                          }
+                        >
+                          {t(service.billedWithReservation ? 'extraServices.billedBadge' : 'extraServices.onSiteBadge')}
+                        </span>
                       </span>
                       <span className="font-medium">{service.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
                     </li>
@@ -657,6 +669,13 @@ const AccommodationDetailPage: React.FC = () => {
                       <span>{t('detail.nights', { count: nights })}</span>
                       <span>{formatPrice(subtotal)}</span>
                     </div>
+                    {billedServicesTotal > 0 &&
+                      billedServices.map((service, index) => (
+                        <div key={index} className="flex justify-between text-gray-600">
+                          <span>{service.name}</span>
+                          <span>{formatPrice(service.price)}</span>
+                        </div>
+                      ))}
                     <div className="flex justify-between text-gray-600">
                       <span>{t('detail.platformFee', { rate: Math.round(PLATFORM_COMMISSION_RATE * 100) })}</span>
                       <span>{formatPrice(platformFee)}</span>

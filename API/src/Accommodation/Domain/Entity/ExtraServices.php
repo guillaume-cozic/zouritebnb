@@ -29,7 +29,7 @@ final readonly class ExtraServices
     }
 
     /**
-     * @param array<array{name?: string, price?: float}> $list
+     * @param array<array{name?: string, price?: float, billedWithReservation?: bool}> $list
      */
     public static function fromArray(array $list): self
     {
@@ -39,7 +39,7 @@ final readonly class ExtraServices
         ));
     }
 
-    /** @return array<array{name: string, price: float}> */
+    /** @return array<array{name: string, price: float, billedWithReservation: bool}> */
     public function toArray(): array
     {
         return array_map(static fn (ExtraService $service): array => $service->toArray(), $this->services);
@@ -48,5 +48,17 @@ final readonly class ExtraServices
     public function isEmpty(): bool
     {
         return [] === $this->services;
+    }
+
+    /**
+     * Sum of the prices of the services billed with the reservation
+     * (the remaining services are paid on-site).
+     */
+    public function billedWithReservationTotal(): float
+    {
+        return array_sum(array_map(
+            static fn (ExtraService $service): float => $service->billedWithReservation ? $service->price : 0.0,
+            $this->services,
+        ));
     }
 }

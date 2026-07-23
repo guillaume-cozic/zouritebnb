@@ -56,13 +56,16 @@ class ReservationEntity
     #[ORM\Column(options: ['default' => 0])]
     private float $donationAmount = 0.0;
 
+    #[ORM\Column(options: ['default' => 0])]
+    private float $extraServicesTotal = 0.0;
+
     #[ORM\Column(length: 20, options: ['default' => 'flexible'])]
     private string $cancellationPolicy = 'flexible';
 
     #[ORM\Column(options: ['default' => false])]
     private bool $cancelledByHost = false;
 
-    /** @var array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float}|null */
+    /** @var array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float, extraServicesTotal?: float}|null */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $pendingModification = null;
 
@@ -234,6 +237,18 @@ class ReservationEntity
         return $this;
     }
 
+    public function getExtraServicesTotal(): float
+    {
+        return $this->extraServicesTotal;
+    }
+
+    public function setExtraServicesTotal(float $extraServicesTotal): static
+    {
+        $this->extraServicesTotal = $extraServicesTotal;
+
+        return $this;
+    }
+
     public function getCancellationPolicy(): string
     {
         return $this->cancellationPolicy;
@@ -258,13 +273,13 @@ class ReservationEntity
         return $this;
     }
 
-    /** @return array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float}|null */
+    /** @return array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float, extraServicesTotal?: float}|null */
     public function getPendingModification(): ?array
     {
         return $this->pendingModification;
     }
 
-    /** @param array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float}|null $pendingModification */
+    /** @param array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float, extraServicesTotal?: float}|null $pendingModification */
     public function setPendingModification(?array $pendingModification): static
     {
         $this->pendingModification = $pendingModification;

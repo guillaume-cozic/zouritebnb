@@ -30,6 +30,7 @@ final readonly class PendingModification
                 appliedDiscountPercentage: isset($data['appliedDiscountPercentage']) ? (float) $data['appliedDiscountPercentage'] : null,
                 commissionAmount: (float) ($data['commissionAmount'] ?? 0),
                 donationAmount: (float) ($data['donationAmount'] ?? 0),
+                extraServicesTotal: (float) ($data['extraServicesTotal'] ?? 0),
             ),
         );
     }
@@ -39,7 +40,7 @@ final readonly class PendingModification
         return round($this->price->totalPrice + $this->price->commissionAmount + $this->price->donationAmount, 2);
     }
 
-    /** @return array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float} */
+    /** @return array{checkIn: string, checkOut: string, totalPrice: float, pricePerNight: float, appliedDiscountPercentage: float|null, commissionAmount: float, donationAmount: float, extraServicesTotal: float} */
     public function toArray(): array
     {
         return [
@@ -50,6 +51,7 @@ final readonly class PendingModification
             'appliedDiscountPercentage' => $this->price->appliedDiscountPercentage,
             'commissionAmount' => $this->price->commissionAmount,
             'donationAmount' => $this->price->donationAmount,
+            'extraServicesTotal' => $this->price->extraServicesTotal,
         ];
     }
 }

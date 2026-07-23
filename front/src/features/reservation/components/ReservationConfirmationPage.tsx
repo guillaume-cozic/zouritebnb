@@ -409,9 +409,13 @@ const ReservationConfirmationPage: React.FC = () => {
     ? pricePerNight * (1 - (weeklyPromo ?? 0) / 100)
     : pricePerNight;
   const subtotal = effectiveNightly * nights;
+  const billedServices = (accommodation?.extraServices ?? []).filter(
+    (s) => s.billedWithReservation
+  );
+  const billedServicesTotal = billedServices.reduce((sum, s) => sum + s.price, 0);
   const platformFee = subtotal * PLATFORM_COMMISSION_RATE;
   const solidarityFee = subtotal * SOLIDARITY_RATE;
-  const total = subtotal + platformFee + solidarityFee;
+  const total = subtotal + billedServicesTotal + platformFee + solidarityFee;
   const totalCents = Math.round(total * 100);
   const formatPrice = (n: number) =>
     `${n.toLocaleString(i18n.language, { maximumFractionDigits: 2 })} €`;
@@ -537,6 +541,12 @@ const ReservationConfirmationPage: React.FC = () => {
                       </span>
                       <span>{formatPrice(subtotal)}</span>
                     </div>
+                    {billedServices.map((service, index) => (
+                      <div key={index} className="flex justify-between text-gray-600">
+                        <span>{service.name}</span>
+                        <span>{formatPrice(service.price)}</span>
+                      </div>
+                    ))}
                     <div className="flex justify-between text-gray-600">
                       <span>
                         {t('detail.platformFee', {

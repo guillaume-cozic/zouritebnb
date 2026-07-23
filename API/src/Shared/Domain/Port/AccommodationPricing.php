@@ -10,6 +10,7 @@ final readonly class AccommodationPricing
 {
     /**
      * @param array<array{startDate: string, endDate: string, pricePerNight: float}> $pricePeriods
+     * @param array<array{name: string, price: float}>                               $billedExtraServices Extra services billed with the reservation (once per stay)
      */
     public function __construct(
         public float $pricePerNight,
@@ -24,6 +25,7 @@ final readonly class AccommodationPricing
         public ?float $lastMinuteDiscountPercentage = null,
         public ?int $lastMinuteDays = null,
         public array $pricePeriods = [],
+        public array $billedExtraServices = [],
     ) {
     }
 }

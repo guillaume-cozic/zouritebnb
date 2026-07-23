@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchAccommodation, uploadPhotos, reorderPhotos, deletePhoto } from '../AccommodationSlice';
 import { selectCurrentAccommodation, selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
-import EditLayout, { SECTIONS } from './EditLayout';
+import EditLayout, { sectionIcon } from './EditLayout';
 import { extractErrorMessage } from '../../../services/errors';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -148,7 +148,7 @@ const AccommodationPhotosPage: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600">
-                {SECTIONS[6].icon}
+                {sectionIcon('photos')}
               </div>
               <h2 className="text-lg font-semibold">{t('edit.section.photos')}</h2>
             </div>

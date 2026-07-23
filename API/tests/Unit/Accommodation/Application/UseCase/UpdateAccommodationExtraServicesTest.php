@@ -42,8 +42,8 @@ final class UpdateAccommodationExtraServicesTest extends TestCase
         $this->givenAccommodation($id);
 
         $services = [
-            ['name' => 'Ménage de fin de séjour', 'price' => 60.0],
-            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+            ['name' => 'Ménage de fin de séjour', 'price' => 60.0, 'billedWithReservation' => true],
+            ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false],
         ];
         $this->useCase->handle(new UpdateAccommodationExtraServicesCommand($id, $services));
 
@@ -73,7 +73,46 @@ final class UpdateAccommodationExtraServicesTest extends TestCase
 
         $this->useCase->handle(new UpdateAccommodationExtraServicesCommand($id, [['name' => '  Ménage  ', 'price' => 60.0]]));
 
-        self::assertSame([['name' => 'Ménage', 'price' => 60.0]], $this->repository->findById($id)->getExtraServices()->toArray());
+        self::assertSame([['name' => 'Ménage', 'price' => 60.0, 'billedWithReservation' => false]], $this->repository->findById($id)->getExtraServices()->toArray());
+    }
+
+    public function test_should_default_billed_with_reservation_to_false_when_key_absent(): void
+    {
+        $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
+        $this->givenAccommodation($id);
+
+        $this->useCase->handle(new UpdateAccommodationExtraServicesCommand($id, [['name' => 'Petit-déjeuner', 'price' => 12.5]]));
+
+        self::assertSame(
+            [['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false]],
+            $this->repository->findById($id)->getExtraServices()->toArray(),
+        );
+    }
+
+    public function test_should_sum_prices_of_services_billed_with_reservation(): void
+    {
+        $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
+        $this->givenAccommodation($id);
+
+        $this->useCase->handle(new UpdateAccommodationExtraServicesCommand($id, [
+            ['name' => 'Ménage', 'price' => 30.0, 'billedWithReservation' => true],
+            ['name' => 'Linge de maison', 'price' => 15.5, 'billedWithReservation' => true],
+            ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false],
+        ]));
+
+        self::assertSame(45.5, $this->repository->findById($id)->getExtraServices()->billedWithReservationTotal());
+    }
+
+    public function test_should_return_zero_billed_with_reservation_total_when_no_service_is_billed(): void
+    {
+        $id = Uuid::fromString('01961e2f-dead-7000-beef-000000000001');
+        $this->givenAccommodation($id);
+
+        $this->useCase->handle(new UpdateAccommodationExtraServicesCommand($id, [
+            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+        ]));
+
+        self::assertSame(0.0, $this->repository->findById($id)->getExtraServices()->billedWithReservationTotal());
     }
 
     #[DataProvider('invalidExtraServices')]
@@ -109,6 +148,10 @@ final class UpdateAccommodationExtraServicesTest extends TestCase
         yield 'negative price' => [
             ['name' => 'Ménage', 'price' => -5.0],
             'Extra service price must be strictly positive, got -5.',
+        ];
+        yield 'non-boolean billedWithReservation' => [
+            ['name' => 'Ménage', 'price' => 30.0, 'billedWithReservation' => 'yes'],
+            'Extra service billedWithReservation must be a boolean.',
         ];
     }
 

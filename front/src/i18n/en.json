@@ -667,6 +667,7 @@
     "section": {
       "description": "Description",
       "price": "Price",
+      "services": "Services",
       "capacity": "Capacity",
       "amenities": "Amenities",
       "location": "Location",
@@ -809,15 +810,19 @@
   },
   "extraServices": {
     "title": "Extra services",
-    "hint": "Optional paid services offered to guests (charged outside the stay price).",
+    "hint": "Paid services offered to guests. A service \"billed with the reservation\" is automatically added to the amount paid at booking; the others are paid on site.",
     "add": "Add a service",
     "none": "No extra services.",
     "nameLabel": "Service name",
     "namePlaceholder": "Cleaning, breakfast…",
     "priceLabel": "Price (€)",
     "remove": "Remove",
+    "billedLabel": "Billed with the reservation",
+    "onSiteLabel": "Optional, paid on site",
     "detailTitle": "Extra services available",
-    "detailHint": "Optional services offered by the host, paid on site."
+    "detailHint": "Services \"billed with the reservation\" are included in the total paid online; optional services are paid on site.",
+    "billedBadge": "Billed at booking",
+    "onSiteBadge": "Optional, on site"
   },
   "instantBooking": {
     "title": "Instant booking",

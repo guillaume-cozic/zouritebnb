@@ -1373,7 +1373,7 @@
                     }
                 },
                 "summary": "D\u00e9finir les services suppl\u00e9mentaires d'un h\u00e9bergement",
-                "description": "Remplace l'int\u00e9gralit\u00e9 des services suppl\u00e9mentaires propos\u00e9s par l'h\u00f4te (m\u00e9nage, petit-d\u00e9jeuner...). Chaque service : name non vide (max 100 caract\u00e8res) et price strictement positif (> 0), en euros. Envoyer une liste vide pour tout retirer.",
+                "description": "Remplace l'int\u00e9gralit\u00e9 des services suppl\u00e9mentaires propos\u00e9s par l'h\u00f4te (m\u00e9nage, petit-d\u00e9jeuner...). Chaque service : name non vide (max 100 caract\u00e8res), price strictement positif (> 0) en euros, et billedWithReservation (bool\u00e9en, false par d\u00e9faut). Les services avec billedWithReservation \u00e0 true sont ajout\u00e9s au montant pay\u00e9 \u00e0 la r\u00e9servation ; les autres sont r\u00e9gl\u00e9s sur place. Envoyer une liste vide pour tout retirer.",
                 "parameters": [
                     {
                         "name": "id",
@@ -1394,16 +1394,18 @@
                         "application/ld+json": {
                             "examples": {
                                 "valid": {
-                                    "summary": "M\u00e9nage et petit-d\u00e9jeuner",
+                                    "summary": "M\u00e9nage factur\u00e9 \u00e0 la r\u00e9servation, petit-d\u00e9jeuner r\u00e9gl\u00e9 sur place",
                                     "value": {
                                         "extraServices": [
                                             {
                                                 "name": "M\u00e9nage",
-                                                "price": 30
+                                                "price": 30,
+                                                "billedWithReservation": true
                                             },
                                             {
                                                 "name": "Petit-d\u00e9jeuner",
-                                                "price": 12.5
+                                                "price": 12.5,
+                                                "billedWithReservation": false
                                             }
                                         ]
                                     }
@@ -1434,6 +1436,19 @@
                                             {
                                                 "name": "M\u00e9nage",
                                                 "price": -30
+                                            }
+                                        ]
+                                    }
+                                },
+                                "non_boolean_billed_with_reservation": {
+                                    "summary": "Invalide : billedWithReservation non bool\u00e9en",
+                                    "description": "Retourne une erreur 422 car billedWithReservation doit \u00eatre un bool\u00e9en.",
+                                    "value": {
+                                        "extraServices": [
+                                            {
+                                                "name": "M\u00e9nage",
+                                                "price": 30,
+                                                "billedWithReservation": "yes"
                                             }
                                         ]
                                     }
@@ -9341,15 +9356,17 @@
                                 }
                             },
                             "extraServices": {
-                                "description": "Services suppl\u00e9mentaires propos\u00e9s par l'h\u00f4te : nom (non vide, max 100 caract\u00e8res) et prix strictement positif en euros.",
+                                "description": "Services suppl\u00e9mentaires propos\u00e9s par l'h\u00f4te : nom (non vide, max 100 caract\u00e8res), prix strictement positif en euros, et billedWithReservation (les services \u00e0 true sont ajout\u00e9s au montant pay\u00e9 \u00e0 la r\u00e9servation, les autres sont r\u00e9gl\u00e9s sur place).",
                                 "example": [
                                     {
                                         "name": "M\u00e9nage",
-                                        "price": 30
+                                        "price": 30,
+                                        "billedWithReservation": true
                                     },
                                     {
                                         "name": "Petit-d\u00e9jeuner",
-                                        "price": 12.5
+                                        "price": 12.5,
+                                        "billedWithReservation": false
                                     }
                                 ],
                                 "type": "array",
@@ -9357,6 +9374,9 @@
                                     "type": "object",
                                     "additionalProperties": {
                                         "anyOf": [
+                                            {
+                                                "type": "boolean"
+                                            },
                                             {
                                                 "type": "number"
                                             },
@@ -9889,15 +9909,17 @@
                                 }
                             },
                             "extraServices": {
-                                "description": "Services suppl\u00e9mentaires propos\u00e9s par l'h\u00f4te : nom (non vide, max 100 caract\u00e8res) et prix strictement positif en euros.",
+                                "description": "Services suppl\u00e9mentaires propos\u00e9s par l'h\u00f4te : nom (non vide, max 100 caract\u00e8res), prix strictement positif en euros, et billedWithReservation (les services \u00e0 true sont ajout\u00e9s au montant pay\u00e9 \u00e0 la r\u00e9servation, les autres sont r\u00e9gl\u00e9s sur place).",
                                 "example": [
                                     {
                                         "name": "M\u00e9nage",
-                                        "price": 30
+                                        "price": 30,
+                                        "billedWithReservation": true
                                     },
                                     {
                                         "name": "Petit-d\u00e9jeuner",
-                                        "price": 12.5
+                                        "price": 12.5,
+                                        "billedWithReservation": false
                                     }
                                 ],
                                 "type": "array",
@@ -9905,6 +9927,9 @@
                                     "type": "object",
                                     "additionalProperties": {
                                         "anyOf": [
+                                            {
+                                                "type": "boolean"
+                                            },
                                             {
                                                 "type": "number"
                                             },
@@ -12143,6 +12168,14 @@
                                     "null"
                                 ]
                             },
+                            "extraServicesTotal": {
+                                "description": "Total des services suppl\u00e9mentaires factur\u00e9s \u00e0 la r\u00e9servation (d\u00e9j\u00e0 inclus dans totalPrice)",
+                                "example": 30,
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
                             "totalPaid": {
                                 "description": "Montant total r\u00e9gl\u00e9 par le voyageur : s\u00e9jour + frais de service + don solidaire (identique au total de la facture)",
                                 "example": 460,
@@ -12855,6 +12888,14 @@
                             "photoUrl": {
                                 "description": "URL relative d'une photo de l'h\u00e9bergement (null si aucune)",
                                 "example": "/uploads/photos/abc.jpg",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "refreshToken": {
+                                "description": "Jeton de rafra\u00eechissement (longue dur\u00e9e) \u00e0 envoyer \u00e0 POST /api/token/refresh pour obtenir un nouveau JWT sans se reconnecter",
+                                "example": "f3a1c2...9b",
                                 "type": [
                                     "string",
                                     "null"

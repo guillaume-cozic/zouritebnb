@@ -17,7 +17,9 @@ use App\Shared\Domain\Port\AccommodationPricing;
  *  1. the nightly base is the matching price-period override, else the flat price;
  *  2. a weekend surcharge is applied on Friday and Saturday nights;
  *  3. the best single stay-level discount (weekly promotion vs last-minute, never
- *     stacked) is applied to the resulting subtotal.
+ *     stacked) is applied to the resulting subtotal;
+ *  4. the extra services billed with the reservation are added once per stay,
+ *     after the discount (discounts only ever apply to the nights).
  */
 final readonly class StayPriceCalculator
 {
@@ -45,11 +47,28 @@ final readonly class StayPriceCalculator
         $discount = $this->stayDiscount($pricing, $nights, $checkInDay, $bookedAt);
         $total = $subtotal * (1 - ($discount ?? 0.0) / 100);
 
+        // Extra services billed with the reservation are charged once per stay,
+        // after the discount — discounts only ever apply to the nights.
+        $extraServicesTotal = $this->extraServicesTotal($pricing);
+        $total += $extraServicesTotal;
+
         return new StayPrice(
             totalPrice: round($total, 2),
             pricePerNight: $pricing->pricePerNight,
             appliedDiscountPercentage: $discount,
+            extraServicesTotal: $extraServicesTotal,
         );
+    }
+
+    /** Sum of the extra services billed with the reservation, once per stay. */
+    private function extraServicesTotal(AccommodationPricing $pricing): float
+    {
+        $total = 0.0;
+        foreach ($pricing->billedExtraServices as $service) {
+            $total += (float) ($service['price'] ?? 0.0);
+        }
+
+        return round($total, 2);
     }
 
     /** Matching price-period override for that night, else the flat nightly price. */

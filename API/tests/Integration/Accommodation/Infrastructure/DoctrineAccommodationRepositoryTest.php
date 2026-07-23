@@ -258,8 +258,8 @@ final class DoctrineAccommodationRepositoryTest extends RepositoryTestCase
             price: 110.0,
         );
         $accommodation->updateExtraServices(ExtraServices::fromArray([
-            ['name' => 'Ménage', 'price' => 30.0],
-            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+            ['name' => 'Ménage', 'price' => 30.0, 'billedWithReservation' => true],
+            ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false],
         ]));
         $accommodation->releaseEvents();
 
@@ -269,8 +269,8 @@ final class DoctrineAccommodationRepositoryTest extends RepositoryTestCase
         self::assertNotNull($found);
         self::assertFalse($found->getExtraServices()->isEmpty());
         self::assertSame([
-            ['name' => 'Ménage', 'price' => 30.0],
-            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+            ['name' => 'Ménage', 'price' => 30.0, 'billedWithReservation' => true],
+            ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => false],
         ], $found->getExtraServices()->toArray());
     }
 
@@ -292,7 +292,7 @@ final class DoctrineAccommodationRepositoryTest extends RepositoryTestCase
         $reloaded = $this->repository->findById($id);
         self::assertNotNull($reloaded);
         $reloaded->updateExtraServices(ExtraServices::fromArray([
-            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+            ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => true],
         ]));
         $reloaded->releaseEvents();
         $this->repository->save($reloaded);
@@ -300,7 +300,7 @@ final class DoctrineAccommodationRepositoryTest extends RepositoryTestCase
         $found = $this->repository->findById($id);
         self::assertNotNull($found);
         self::assertSame([
-            ['name' => 'Petit-déjeuner', 'price' => 12.5],
+            ['name' => 'Petit-déjeuner', 'price' => 12.5, 'billedWithReservation' => true],
         ], $found->getExtraServices()->toArray());
     }
 

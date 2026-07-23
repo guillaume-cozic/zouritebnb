@@ -34,7 +34,7 @@ import {
 export type AutoSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 /** Sections of the edit page, used to display a per-section auto-save badge. */
-export type EditSection = 'description' | 'price' | 'capacity' | 'amenities' | 'location' | 'checkinout' | 'cancellation';
+export type EditSection = 'description' | 'price' | 'services' | 'capacity' | 'amenities' | 'location' | 'checkinout' | 'cancellation';
 
 /**
  * Single business intent dispatched by the edit page when the user modifies a
@@ -73,8 +73,9 @@ export const editSectionForField = (field: AccommodationEditField): EditSection 
     case 'weeklyPromotion':
     case 'dynamicPricing':
     case 'pricePeriods':
-    case 'extraServices':
       return 'price';
+    case 'extraServices':
+      return 'services';
     case 'checkInOut':
     case 'houseRules':
       return 'checkinout';
@@ -507,7 +508,7 @@ const EDIT_SECTION_BY_THUNK_PREFIX: Record<string, EditSection> = {
   [updateWeeklyPromotion.typePrefix]: 'price',
   [updateDynamicPricing.typePrefix]: 'price',
   [updatePricePeriods.typePrefix]: 'price',
-  [updateExtraServices.typePrefix]: 'price',
+  [updateExtraServices.typePrefix]: 'services',
   [updateCancellationPolicy.typePrefix]: 'cancellation',
   [updateInstantBooking.typePrefix]: 'cancellation',
   [updateStayConstraints.typePrefix]: 'cancellation',

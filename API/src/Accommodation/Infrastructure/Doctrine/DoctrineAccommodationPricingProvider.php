@@ -36,6 +36,27 @@ final readonly class DoctrineAccommodationPricingProvider implements Accommodati
             lastMinuteDiscountPercentage: $entity->getLastMinuteDiscountPercentage(),
             lastMinuteDays: $entity->getLastMinuteDays(),
             pricePeriods: $entity->getPricePeriods() ?? [],
+            billedExtraServices: $this->billedExtraServices($entity->getExtraServices() ?? []),
         );
+    }
+
+    /**
+     * Keeps only the extra services billed with the reservation (a missing
+     * "billedWithReservation" key means the service is paid on site).
+     *
+     * @param array<array{name: string, price: float, billedWithReservation?: bool}> $extraServices
+     *
+     * @return array<array{name: string, price: float}>
+     */
+    private function billedExtraServices(array $extraServices): array
+    {
+        $billed = [];
+        foreach ($extraServices as $service) {
+            if (true === ($service['billedWithReservation'] ?? false)) {
+                $billed[] = ['name' => (string) $service['name'], 'price' => (float) $service['price']];
+            }
+        }
+
+        return $billed;
     }
 }

@@ -55,6 +55,7 @@ final readonly class CreateReservation
             totalPrice: $stayPrice->totalPrice,
             pricePerNight: $stayPrice->pricePerNight,
             appliedDiscountPercentage: $stayPrice->appliedDiscountPercentage,
+            extraServicesTotal: $stayPrice->extraServicesTotal,
         );
 
         $reservation = Reservation::create(

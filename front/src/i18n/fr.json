@@ -667,6 +667,7 @@
     "section": {
       "description": "Description",
       "price": "Prix",
+      "services": "Services",
       "capacity": "Capacité",
       "amenities": "Équipements",
       "location": "Localisation",
@@ -809,15 +810,19 @@
   },
   "extraServices": {
     "title": "Services supplémentaires",
-    "hint": "Services optionnels payants proposés aux voyageurs (facturés en dehors du prix du séjour).",
+    "hint": "Services payants proposés aux voyageurs. Un service « facturé à la réservation » est ajouté automatiquement au montant payé lors de la réservation ; les autres se règlent sur place.",
     "add": "Ajouter un service",
     "none": "Aucun service supplémentaire.",
     "nameLabel": "Nom du service",
     "namePlaceholder": "Ménage, petit-déjeuner…",
     "priceLabel": "Prix (€)",
     "remove": "Supprimer",
+    "billedLabel": "Facturé à la réservation",
+    "onSiteLabel": "Facultatif, à régler sur place",
     "detailTitle": "Services supplémentaires proposés",
-    "detailHint": "Services optionnels proposés par l'hôte, à régler sur place."
+    "detailHint": "Les services « facturés à la réservation » sont inclus dans le total payé en ligne ; les services facultatifs se règlent sur place.",
+    "billedBadge": "Facturé à la réservation",
+    "onSiteBadge": "En option, sur place"
   },
   "instantBooking": {
     "title": "Réservation instantanée",

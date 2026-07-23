@@ -70,6 +70,7 @@ final readonly class RequestReservation
             totalPrice: $stayPrice->totalPrice,
             pricePerNight: $stayPrice->pricePerNight,
             appliedDiscountPercentage: $stayPrice->appliedDiscountPercentage,
+            extraServicesTotal: $stayPrice->extraServicesTotal,
         );
 
         $reservation = Reservation::request(

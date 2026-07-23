@@ -26,6 +26,7 @@ final readonly class ReservationPrice
         public ?float $appliedDiscountPercentage,
         public float $commissionAmount = 0.0,
         public float $donationAmount = 0.0,
+        public float $extraServicesTotal = 0.0,
     ) {
         if ($this->totalPrice < 0) {
             throw InvalidReservationException::becauseNegativeTotalPrice($this->totalPrice);
@@ -38,9 +39,10 @@ final readonly class ReservationPrice
     /**
      * Builds the full financial snapshot of a stay: it computes and freezes the
      * platform commission (margin) and the solidarity donation at booking time so
-     * that later rate changes never rewrite historical reservations.
+     * that later rate changes never rewrite historical reservations. Both rates
+     * apply to the full total, extra services billed with the reservation included.
      */
-    public static function fromStay(float $totalPrice, float $pricePerNight, ?float $appliedDiscountPercentage): self
+    public static function fromStay(float $totalPrice, float $pricePerNight, ?float $appliedDiscountPercentage, float $extraServicesTotal = 0.0): self
     {
         return new self(
             totalPrice: $totalPrice,
@@ -48,6 +50,7 @@ final readonly class ReservationPrice
             appliedDiscountPercentage: $appliedDiscountPercentage,
             commissionAmount: round($totalPrice * self::COMMISSION_RATE, 2),
             donationAmount: round($totalPrice * self::DONATION_RATE, 2),
+            extraServicesTotal: $extraServicesTotal,
         );
     }
 }

@@ -60,6 +60,7 @@ final readonly class RequestReservationModification
             totalPrice: $stayPrice->totalPrice,
             pricePerNight: $stayPrice->pricePerNight,
             appliedDiscountPercentage: $stayPrice->appliedDiscountPercentage,
+            extraServicesTotal: $stayPrice->extraServicesTotal,
         );
 
         $reservation->requestModification($dateRange, $price, $this->clock->now());

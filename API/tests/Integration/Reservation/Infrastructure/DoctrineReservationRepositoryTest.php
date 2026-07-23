@@ -41,7 +41,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
             ),
             guestName: new GuestName('John Doe'),
             guestCount: new GuestCount(4),
-            price: new ReservationPrice(totalPrice: 320.0, pricePerNight: 80.0, appliedDiscountPercentage: null),
+            price: new ReservationPrice(totalPrice: 320.0, pricePerNight: 80.0, appliedDiscountPercentage: null, extraServicesTotal: 25.0),
         );
 
         $this->repository->save($reservation);
@@ -57,6 +57,7 @@ final class DoctrineReservationRepositoryTest extends RepositoryTestCase
         self::assertSame(320.0, $found->getPrice()->totalPrice);
         self::assertSame(80.0, $found->getPrice()->pricePerNight);
         self::assertNull($found->getPrice()->appliedDiscountPercentage);
+        self::assertSame(25.0, $found->getPrice()->extraServicesTotal);
         self::assertEquals(new \DateTimeImmutable('2026-05-01'), $found->getDateRange()->checkIn());
         self::assertEquals(new \DateTimeImmutable('2026-05-05'), $found->getDateRange()->checkOut());
     }

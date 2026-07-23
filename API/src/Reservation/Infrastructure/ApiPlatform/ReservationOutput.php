@@ -305,6 +305,10 @@ class ReservationOutput implements FromEntityInterface
     public ?float $appliedDiscountPercentage = null;
 
     #[Groups(['reservation:read'])]
+    #[ApiProperty(description: 'Total des services supplémentaires facturés à la réservation (déjà inclus dans totalPrice)', example: 30.0)]
+    public ?float $extraServicesTotal = null;
+
+    #[Groups(['reservation:read'])]
     #[ApiProperty(description: 'Montant total réglé par le voyageur : séjour + frais de service + don solidaire (identique au total de la facture)', example: 460.0)]
     public ?float $totalPaid = null;
 
@@ -349,6 +353,7 @@ class ReservationOutput implements FromEntityInterface
         $output->totalPrice = $price->totalPrice;
         $output->pricePerNight = $price->pricePerNight;
         $output->appliedDiscountPercentage = $price->appliedDiscountPercentage;
+        $output->extraServicesTotal = $price->extraServicesTotal;
         // Grand total actually paid, mirroring the invoice (stay + frozen fee + donation).
         $output->totalPaid = round($price->totalPrice + $price->commissionAmount + $price->donationAmount, 2);
         $output->cancellationPolicy = $entity->getCancellationPolicy()->value;

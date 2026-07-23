@@ -158,4 +158,41 @@ final class StayPriceCalculatorTest extends TestCase
         // 7 nights × 100 = 700, −30% = 490.
         self::assertSame(490.0, $price->totalPrice);
     }
+
+    public function test_should_add_billed_extra_services_once_per_stay_after_the_discount(): void
+    {
+        // 7 nights × 100 = 700, −20% = 560; services (25 + 15 = 40) are added
+        // AFTER the discount — discounts only ever apply to the nights.
+        $price = $this->calculator->calculate(
+            new AccommodationPricing(
+                pricePerNight: 100.0,
+                weeklyPromotionPercentage: 20.0,
+                billedExtraServices: [
+                    ['name' => 'Ménage', 'price' => 25.0],
+                    ['name' => 'Draps', 'price' => 15.0],
+                ],
+            ),
+            new \DateTimeImmutable('2026-06-10T15:00:00+00:00'),
+            new \DateTimeImmutable('2026-06-17T11:00:00+00:00'),
+            new \DateTimeImmutable(self::BOOKED_LONG_AGO),
+        );
+
+        self::assertSame(600.0, $price->totalPrice);
+        self::assertSame(40.0, $price->extraServicesTotal);
+        self::assertSame(20.0, $price->appliedDiscountPercentage);
+        self::assertSame(60000, $price->amountInCents());
+    }
+
+    public function test_should_report_zero_extra_services_total_when_none_are_billed(): void
+    {
+        $price = $this->calculator->calculate(
+            new AccommodationPricing(pricePerNight: 100.0, weeklyPromotionPercentage: null),
+            new \DateTimeImmutable('2026-06-10T15:00:00+00:00'),
+            new \DateTimeImmutable('2026-06-14T11:00:00+00:00'),
+            new \DateTimeImmutable(self::BOOKED_LONG_AGO),
+        );
+
+        self::assertSame(0.0, $price->extraServicesTotal);
+        self::assertSame(400.0, $price->totalPrice);
+    }
 }

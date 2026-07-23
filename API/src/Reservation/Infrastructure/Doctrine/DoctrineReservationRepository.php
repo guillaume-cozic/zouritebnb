@@ -48,6 +48,7 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
             ->setAppliedDiscountPercentage($reservation->getPrice()->appliedDiscountPercentage)
             ->setCommissionAmount($reservation->getPrice()->commissionAmount)
             ->setDonationAmount($reservation->getPrice()->donationAmount)
+            ->setExtraServicesTotal($reservation->getPrice()->extraServicesTotal)
             ->setCancellationPolicy($reservation->getCancellationPolicy()->value)
             ->setCancelledByHost($reservation->isCancelledByHost())
             ->setPendingModification($reservation->getPendingModification()?->toArray());
@@ -158,6 +159,7 @@ class DoctrineReservationRepository extends ServiceEntityRepository implements R
                 appliedDiscountPercentage: $entity->getAppliedDiscountPercentage(),
                 commissionAmount: $entity->getCommissionAmount(),
                 donationAmount: $entity->getDonationAmount(),
+                extraServicesTotal: $entity->getExtraServicesTotal(),
             ),
             guestUserId: $entity->getGuestUserId(),
             cancellationPolicy: CancellationPolicy::fromString($entity->getCancellationPolicy()),

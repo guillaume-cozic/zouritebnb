@@ -15,6 +15,8 @@ export interface PricePeriod {
 export interface ExtraService {
   name: string;
   price: number;
+  /** When true, the service is charged with the reservation; otherwise paid on site. */
+  billedWithReservation: boolean;
 }
 
 /** All accommodation types, in display order. */

@@ -321,7 +321,7 @@ describe('accommodationFieldEdited', () => {
     }
   });
 
-  test('saves the extra services under the price badge section', async () => {
+  test('saves the extra services under the services badge section', async () => {
     vi.useFakeTimers();
     try {
       mockedApi.put.mockResolvedValue({ data: {} });
@@ -331,8 +331,8 @@ describe('accommodationFieldEdited', () => {
         field: 'extraServices',
         id: 'a-1',
         extraServices: [
-          { name: 'Ménage', price: 30 },
-          { name: 'Petit-déjeuner', price: 12.5 },
+          { name: 'Ménage', price: 30, billedWithReservation: true },
+          { name: 'Petit-déjeuner', price: 12.5, billedWithReservation: false },
         ],
       }));
       vi.advanceTimersByTime(1201);
@@ -340,10 +340,15 @@ describe('accommodationFieldEdited', () => {
 
       expect(mockedApi.put).toHaveBeenCalledWith(
         '/api/accommodations/a-1/extra-services',
-        { extraServices: [{ name: 'Ménage', price: 30 }, { name: 'Petit-déjeuner', price: 12.5 }] },
+        {
+          extraServices: [
+            { name: 'Ménage', price: 30, billedWithReservation: true },
+            { name: 'Petit-déjeuner', price: 12.5, billedWithReservation: false },
+          ],
+        },
         expect.anything()
       );
-      expect(store.getState().accommodation.editSaveStatus.price).toBe('saved');
+      expect(store.getState().accommodation.editSaveStatus.services).toBe('saved');
     } finally {
       vi.useRealTimers();
     }
@@ -357,14 +362,14 @@ describe('accommodationFieldEdited', () => {
       store.dispatch(accommodationFieldEdited({
         field: 'extraServices',
         id: 'a-1',
-        extraServices: [{ name: '  ', price: 30 }],
+        extraServices: [{ name: '  ', price: 30, billedWithReservation: true }],
       }));
       vi.advanceTimersByTime(1201);
       await flush();
       store.dispatch(accommodationFieldEdited({
         field: 'extraServices',
         id: 'a-1',
-        extraServices: [{ name: 'Ménage', price: 0 }],
+        extraServices: [{ name: 'Ménage', price: 0, billedWithReservation: false }],
       }));
       vi.advanceTimersByTime(1201);
       await flush();

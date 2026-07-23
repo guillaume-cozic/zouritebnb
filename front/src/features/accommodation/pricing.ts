@@ -1,7 +1,8 @@
 /**
  * Client-side replica of the backend StayPriceCalculator: prices a stay night by
  * night (price-period override → weekend surcharge) then applies the best single
- * stay-level discount (weekly promotion vs last-minute, never stacked). Kept in sync
+ * stay-level discount (weekly promotion vs last-minute, never stacked); services
+ * billed with the reservation are added once per stay, never discounted. Kept in sync
  * with API/src/Shared/Domain/Service/StayPriceCalculator.php. The displayed estimate
  * is informational; the amount actually charged is always computed server-side.
  */
@@ -11,6 +12,11 @@ export interface PricePeriodInput {
   pricePerNight: number;
 }
 
+export interface ExtraServiceInput {
+  price: number;
+  billedWithReservation: boolean;
+}
+
 export interface StayPriceInput {
   pricePerNight: number;
   weeklyPromotionPercentage?: number | null;
@@ -18,12 +24,15 @@ export interface StayPriceInput {
   lastMinuteDiscountPercentage?: number | null;
   lastMinuteDays?: number | null;
   pricePeriods?: PricePeriodInput[];
+  extraServices?: ExtraServiceInput[];
 }
 
 export interface StayPriceResult {
   nights: number;
   subtotal: number;
   appliedDiscountPercentage: number | null;
+  /** Flat per-stay total of the services billed with the reservation (not discounted). */
+  extraServicesTotal: number;
 }
 
 const WEEKLY_PROMOTION_MIN_NIGHTS = 7;
@@ -45,8 +54,12 @@ export function computeStayPrice(
   const start = startOfDay(checkIn);
   const end = startOfDay(checkOut);
   const nights = Math.max(0, Math.round((end.getTime() - start.getTime()) / MS_PER_DAY));
+  const extraServicesTotal = (pricing.extraServices ?? [])
+    .filter((s) => s.billedWithReservation)
+    .reduce((sum, s) => sum + s.price, 0);
+
   if (nights === 0) {
-    return { nights: 0, subtotal: 0, appliedDiscountPercentage: null };
+    return { nights: 0, subtotal: 0, appliedDiscountPercentage: null, extraServicesTotal: 0 };
   }
 
   const periods = pricing.pricePeriods ?? [];
@@ -94,5 +107,6 @@ export function computeStayPrice(
     nights,
     subtotal: Math.round(discounted * 100) / 100,
     appliedDiscountPercentage,
+    extraServicesTotal: Math.round(extraServicesTotal * 100) / 100,
   };
 }
