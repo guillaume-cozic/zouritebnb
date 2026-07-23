@@ -17,9 +17,7 @@ import { AuthUser } from '../../auth/AuthTypes';
 import Footer from '../../../components/Footer';
 import { accommodationPath } from '../../accommodation/accommodationUrl';
 import stripePromise from '../../../services/stripe';
-
-const PLATFORM_COMMISSION_RATE = 0.08;
-const SOLIDARITY_RATE = 0.07;
+import { PLATFORM_COMMISSION_RATE, SOLIDARITY_RATE } from '../../../constants/pricing';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const toApiDateTime = (date: Date, time: string): string => {

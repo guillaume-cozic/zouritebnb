@@ -19,6 +19,7 @@ import PhotoLightbox from '../../../components/PhotoLightbox';
 import { fetchAccommodation } from '../AccommodationSlice';
 import { accommodationIdFromSlug, accommodationPath, photoThumbnailUrl } from '../accommodationUrl';
 import { computeStayPrice } from '../pricing';
+import { PLATFORM_COMMISSION_RATE, SOLIDARITY_RATE } from '../../../constants/pricing';
 import { fetchAccommodationAvailability } from '../../reservation/ReservationSlice';
 import { selectAccommodationAvailability } from '../../reservation/ReservationSelectors';
 import RatingBadge from '../../review/components/RatingBadge';
@@ -43,9 +44,6 @@ const toStr = (d: Date | null): string => {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 };
-
-const PLATFORM_COMMISSION_RATE = 0.08;
-const SOLIDARITY_RATE = 0.07;
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 

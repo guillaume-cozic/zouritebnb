@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { createAccommodation } from '../AccommodationSlice';
 import { selectAccommodationStatus, selectAccommodationError } from '../AccommodationSelectors';
+import { PLATFORM_COMMISSION_RATE, SOLIDARITY_RATE } from '../../../constants/pricing';
 
 const getSchema = (t: TFunction) => z.object({
   title: z
@@ -125,6 +126,34 @@ function DescriptionStep() {
             <p className="text-xs text-primary-700">
               {t('descriptionStep.priceHint')}
             </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-primary-100 bg-primary-50 p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <svg className="w-5 h-5 text-primary-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
+          </svg>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-primary-800">
+              {t('descriptionStep.billingInfoTitle')}
+            </p>
+            <p className="text-xs text-primary-700">
+              {t('descriptionStep.billingInfoHost')}
+            </p>
+            <ul className="space-y-1 text-xs text-primary-700 list-disc pl-4">
+              <li>
+                {t('descriptionStep.billingInfoCommission', {
+                  rate: Math.round(PLATFORM_COMMISSION_RATE * 100),
+                })}
+              </li>
+              <li>
+                {t('descriptionStep.billingInfoDonation', {
+                  rate: Math.round(SOLIDARITY_RATE * 100),
+                })}
+              </li>
+            </ul>
           </div>
         </div>
       </div>
