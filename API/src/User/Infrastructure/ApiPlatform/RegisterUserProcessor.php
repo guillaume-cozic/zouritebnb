@@ -13,6 +13,7 @@ use App\Team\Domain\Port\TeamRepository;
 use App\User\Application\UseCase\RegisterUser;
 use App\User\Domain\Command\RegisterUserCommand;
 use App\User\Infrastructure\Doctrine\UserEntity;
+use App\User\Infrastructure\Security\RefreshTokenIssuer;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
@@ -31,6 +32,7 @@ final readonly class RegisterUserProcessor implements ProcessorInterface
         private RateLimiterFactoryInterface $registerLimiter,
         private JWTTokenManagerInterface $tokenManager,
         private EntityManagerInterface $entityManager,
+        private RefreshTokenIssuer $refreshTokenIssuer,
     ) {
     }
 
@@ -71,6 +73,7 @@ final readonly class RegisterUserProcessor implements ProcessorInterface
         $output->email = $data->email;
         $output->teamId = $ids['teamId'];
         $output->token = $this->tokenManager->create($securityUser);
+        $output->refreshToken = $this->refreshTokenIssuer->issueFor($securityUser);
 
         return $output;
     }

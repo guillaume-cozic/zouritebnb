@@ -80,6 +80,10 @@ services:
     App\User\Domain\Port\TokenGenerator:
         alias: App\User\Infrastructure\Security\RandomTokenGenerator
 
+    App\User\Infrastructure\Security\RefreshTokenIssuer:
+        arguments:
+            $refreshTokenTtl: '%app.jwt_refresh_token_ttl%'
+
     App\User\Application\Listener\RequestEmailVerificationOnUserRegistered:
         tags: [messenger.message_handler]
 

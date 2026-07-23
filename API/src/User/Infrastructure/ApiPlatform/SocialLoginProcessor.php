@@ -15,6 +15,7 @@ use App\User\Domain\Command\AuthenticateSocialUserCommand;
 use App\User\Domain\Entity\SocialAuthenticationResult;
 use App\User\Domain\Entity\SocialProvider;
 use App\User\Infrastructure\Doctrine\UserEntity;
+use App\User\Infrastructure\Security\RefreshTokenIssuer;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
@@ -33,6 +34,7 @@ final readonly class SocialLoginProcessor implements ProcessorInterface
         private RateLimiterFactoryInterface $socialLoginLimiter,
         private JWTTokenManagerInterface $tokenManager,
         private EntityManagerInterface $entityManager,
+        private RefreshTokenIssuer $refreshTokenIssuer,
     ) {
     }
 
@@ -85,6 +87,7 @@ final readonly class SocialLoginProcessor implements ProcessorInterface
         $output->verificationStatus = $user->getVerificationStatus()->value;
         $output->emailVerified = $user->isEmailVerified();
         $output->token = $this->tokenManager->create($securityUser);
+        $output->refreshToken = $this->refreshTokenIssuer->issueFor($securityUser);
 
         return $output;
     }

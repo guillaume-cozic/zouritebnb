@@ -5,6 +5,7 @@ vi.mock('../../services/api', () => ({
   AUTH_USER_KEY: 'auth.user',
   clearStoredAuth: vi.fn(),
   setStoredToken: vi.fn(),
+  setStoredRefreshToken: vi.fn(),
 }));
 
 import { configureStore } from '@reduxjs/toolkit';

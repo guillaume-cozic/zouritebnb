@@ -1,15 +1,20 @@
 import type { Mocked } from 'vitest';
 vi.mock('../../services/api', () => {
   const AUTH_TOKEN_KEY = 'auth.token';
+  const AUTH_REFRESH_TOKEN_KEY = 'auth.refreshToken';
   const AUTH_USER_KEY = 'auth.user';
   return {
     __esModule: true,
     default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
     AUTH_TOKEN_KEY,
+    AUTH_REFRESH_TOKEN_KEY,
     AUTH_USER_KEY,
     setStoredToken: (token: string) => globalThis.localStorage.setItem(AUTH_TOKEN_KEY, token),
+    setStoredRefreshToken: (token: string) =>
+      globalThis.localStorage.setItem(AUTH_REFRESH_TOKEN_KEY, token),
     clearStoredAuth: () => {
       globalThis.localStorage.removeItem(AUTH_TOKEN_KEY);
+      globalThis.localStorage.removeItem(AUTH_REFRESH_TOKEN_KEY);
       globalThis.localStorage.removeItem(AUTH_USER_KEY);
     },
   };
@@ -34,6 +39,7 @@ const buildStore = () => configureStore({ reducer: { auth: authReducer } });
 
 const user = { id: 'u-1', email: 'a@b.fr', firstName: null, lastName: null };
 const userWithToken = { ...user, token: 'jwt-abc-123' };
+const userWithTokens = { ...userWithToken, refreshToken: 'refresh-xyz-789' };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -63,6 +69,16 @@ describe('loginUser', () => {
     expect(state.user?.token).toBe('jwt-abc-123');
     // The raw token is persisted under its own key for the request interceptor.
     expect(localStorage.getItem('auth.token')).toBe('jwt-abc-123');
+  });
+
+  test('le store persiste le refresh token renvoyé au login', async () => {
+    mockedApi.post.mockResolvedValue({ data: userWithTokens });
+    const store = buildStore();
+
+    await store.dispatch(loginUser({ email: 'a@b.fr', password: 'secret' }));
+
+    // The refresh token is persisted so the JWT can be renewed silently.
+    expect(localStorage.getItem('auth.refreshToken')).toBe('refresh-xyz-789');
   });
 
   test('le store passe à failed avec le message d\'erreur après rejected', async () => {
@@ -181,8 +197,8 @@ describe('verifyEmail', () => {
 });
 
 describe('logout', () => {
-  test('le store vide l\'utilisateur et nettoie le localStorage (user + token)', async () => {
-    mockedApi.post.mockResolvedValue({ data: userWithToken });
+  test('le store vide l\'utilisateur et nettoie le localStorage (user + token + refresh)', async () => {
+    mockedApi.post.mockResolvedValue({ data: userWithTokens });
     const store = buildStore();
     await store.dispatch(loginUser({ email: 'a@b.fr', password: 'secret' }));
 
@@ -191,5 +207,6 @@ describe('logout', () => {
     expect(store.getState().auth.user).toBeNull();
     expect(localStorage.getItem('auth.user')).toBeNull();
     expect(localStorage.getItem('auth.token')).toBeNull();
+    expect(localStorage.getItem('auth.refreshToken')).toBeNull();
   });
 });

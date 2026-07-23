@@ -2,3 +2,6 @@ lexik_jwt_authentication:
     secret_key: '%env(resolve:JWT_SECRET_KEY)%'
     public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
     pass_phrase: '%env(JWT_PASSPHRASE)%'
+    # Short-lived access token: it is renewed silently from the refresh token
+    # (see gesdinet_jwt_refresh_token.yaml), so a leaked JWT expires quickly.
+    token_ttl: 3600

@@ -3,6 +3,7 @@ import api, {
   AUTH_USER_KEY,
   clearStoredAuth,
   setStoredToken,
+  setStoredRefreshToken,
 } from '../../services/api';
 import { AuthUser } from './AuthTypes';
 import {
@@ -211,6 +212,9 @@ const authSlice = createSlice({
       localStorage.setItem(STORAGE_KEY, JSON.stringify(action.payload));
       if (action.payload.token) {
         setStoredToken(action.payload.token);
+      }
+      if (action.payload.refreshToken) {
+        setStoredRefreshToken(action.payload.refreshToken);
       }
     };
     const handleRejected = (state: AuthState, action: { payload?: unknown }) => {

@@ -171,4 +171,8 @@ class UserOutput
     #[Groups(['user:token'])]
     #[ApiProperty(description: 'JWT Bearer à placer dans l\'en-tête Authorization pour les requêtes authentifiées', example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...')]
     public ?string $token = null;
+
+    #[Groups(['user:token'])]
+    #[ApiProperty(description: 'Jeton de rafraîchissement (longue durée) à envoyer à POST /api/token/refresh pour obtenir un nouveau JWT sans se reconnecter', example: 'f3a1c2...9b')]
+    public ?string $refreshToken = null;
 }

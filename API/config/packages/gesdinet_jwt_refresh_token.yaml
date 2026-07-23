@@ -1,0 +1,11 @@
+parameters:
+    # Refresh token lifetime (30 days). The short-lived JWT is renewed silently
+    # from this token, so the user stays signed in without re-entering credentials.
+    app.jwt_refresh_token_ttl: 2592000
+
+gesdinet_jwt_refresh_token:
+    refresh_token_class: App\User\Infrastructure\Doctrine\RefreshTokenEntity
+    ttl: '%app.jwt_refresh_token_ttl%'
+    # Rotate the refresh token on every use: consuming one deletes it and returns a
+    # fresh token+expiry, so a leaked refresh token has a narrow window of validity.
+    single_use: true

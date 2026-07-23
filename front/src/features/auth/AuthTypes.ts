@@ -14,4 +14,6 @@ export interface AuthUser {
   emailVerified?: boolean;
   /** JWT Bearer returned by /api/login, attached to authenticated requests. */
   token?: string | null;
+  /** Long-lived refresh token used to renew the JWT silently (POST /api/token/refresh). */
+  refreshToken?: string | null;
 }

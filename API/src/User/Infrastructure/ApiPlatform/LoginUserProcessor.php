@@ -10,6 +10,7 @@ use App\Shared\Infrastructure\Security\IpRateLimiter;
 use App\User\Application\UseCase\AuthenticateUser;
 use App\User\Domain\Command\AuthenticateUserCommand;
 use App\User\Infrastructure\Doctrine\UserEntity;
+use App\User\Infrastructure\Security\RefreshTokenIssuer;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
@@ -25,6 +26,7 @@ final readonly class LoginUserProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         private IpRateLimiter $rateLimiter,
         private RateLimiterFactoryInterface $loginLimiter,
+        private RefreshTokenIssuer $refreshTokenIssuer,
     ) {
     }
 
@@ -61,6 +63,7 @@ final readonly class LoginUserProcessor implements ProcessorInterface
         $output->verificationStatus = $user->getVerificationStatus()->value;
         $output->emailVerified = $user->isEmailVerified();
         $output->token = $this->tokenManager->create($securityUser);
+        $output->refreshToken = $this->refreshTokenIssuer->issueFor($securityUser);
 
         return $output;
     }

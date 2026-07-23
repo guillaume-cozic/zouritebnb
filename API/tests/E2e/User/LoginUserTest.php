@@ -34,6 +34,9 @@ final class LoginUserTest extends UserApiTestCase
         $data = $response->toArray();
         self::assertArrayHasKey('token', $data);
         self::assertNotEmpty($data['token']);
+        // A refresh token is issued so the session can be renewed silently.
+        self::assertArrayHasKey('refreshToken', $data);
+        self::assertNotEmpty($data['refreshToken']);
     }
 
     public function test_should_return422_when_password_is_wrong(): void
